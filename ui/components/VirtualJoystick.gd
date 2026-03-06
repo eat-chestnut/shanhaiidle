@@ -24,7 +24,7 @@ func _input(event: InputEvent) -> void:
 		if mouse_button.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if mouse_button.pressed:
-			var press_local := to_local(mouse_button.position)
+			var press_local: Vector2 = _screen_to_local(mouse_button.position)
 			if local_rect.has_point(press_local):
 				_mouse_active = true
 				_update_from_local_pos(press_local)
@@ -35,12 +35,12 @@ func _input(event: InputEvent) -> void:
 
 	if event is InputEventMouseMotion and _mouse_active and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		var mouse_motion: InputEventMouseMotion = event
-		_update_from_local_pos(to_local(mouse_motion.position))
+		_update_from_local_pos(_screen_to_local(mouse_motion.position))
 		return
 
 	if event is InputEventScreenTouch:
 		var touch: InputEventScreenTouch = event
-		var touch_local := to_local(touch.position)
+		var touch_local: Vector2 = _screen_to_local(touch.position)
 		if touch.pressed:
 			if _active_touch_id == -1 and local_rect.has_point(touch_local):
 				_active_touch_id = touch.index
@@ -53,7 +53,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenDrag:
 		var drag: InputEventScreenDrag = event
 		if drag.index == _active_touch_id:
-			_update_from_local_pos(to_local(drag.position))
+			_update_from_local_pos(_screen_to_local(drag.position))
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -75,6 +75,9 @@ func _draw() -> void:
 
 func _base_radius() -> float:
 	return maxf(0.0, minf(size.x, size.y) * 0.5 - 6.0)
+
+func _screen_to_local(screen_pos: Vector2) -> Vector2:
+	return get_global_transform_with_canvas().affine_inverse() * screen_pos
 
 func _update_from_local_pos(local_pos: Vector2) -> void:
 	var center := size * 0.5
