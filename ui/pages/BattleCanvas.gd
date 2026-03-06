@@ -408,20 +408,30 @@ func _auto_attack() -> void:
 	if enemies.is_empty():
 		return
 
-	var target_index := _find_nearest_enemy_index()
+	var player_pos: Vector2 = player["pos"]
+	var player_attack_range: float = float(player.get("attack_range", 10.0))
+	var player_radius: float = float(player["radius"])
+	var target_index := -1
+	var best_distance_sq := INF
+
+	for i in enemies.size():
+		var enemy_i: Dictionary = enemies[i]
+		var enemy_pos_i: Vector2 = enemy_i["pos"]
+		var enemy_radius_i: float = float(enemy_i.get("radius", 14.0))
+		var attack_distance: float = player_attack_range + player_radius + enemy_radius_i
+		var distance_to_enemy: float = player_pos.distance_to(enemy_pos_i)
+		if distance_to_enemy > attack_distance:
+			continue
+
+		var distance_sq: float = player_pos.distance_squared_to(enemy_pos_i)
+		if distance_sq < best_distance_sq:
+			best_distance_sq = distance_sq
+			target_index = i
+
 	if target_index < 0:
 		return
 
 	var enemy: Dictionary = enemies[target_index]
-	var player_pos: Vector2 = player["pos"]
-	var enemy_pos: Vector2 = enemy["pos"]
-	var player_attack_range: float = float(player.get("attack_range", 10.0))
-	var player_radius: float = float(player["radius"])
-	var enemy_radius: float = float(enemy.get("radius", 14.0))
-	var attack_distance: float = player_attack_range + player_radius + enemy_radius
-	if player_pos.distance_to(enemy_pos) > attack_distance:
-		return
-
 	var damage: int = int(player["atk"]) - int(enemy["def"])
 	if damage < 1:
 		damage = 1
