@@ -41,6 +41,7 @@ var kills := 0
 
 var _attack_timer := 0.0
 var _hit_log_cd := 0.0
+var player_moving_to_target := false
 
 func _ready() -> void:
 	randomize()
@@ -253,10 +254,12 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 
 func _move_player_to_nearest_enemy(delta: float) -> void:
 	if enemies.is_empty():
+		player_moving_to_target = false
 		return
 
 	var nearest_index := _find_nearest_enemy_index()
 	if nearest_index < 0:
+		player_moving_to_target = false
 		return
 
 	var nearest_enemy: Dictionary = enemies[nearest_index]
@@ -267,9 +270,17 @@ func _move_player_to_nearest_enemy(delta: float) -> void:
 	var player_attack_range: float = float(player.get("attack_range", 10.0))
 	var player_speed: float = float(player.get("speed", 140.0))
 
-	var desired_distance: float = player_attack_range + player_radius + enemy_radius
+	var attack_reach: float = player_attack_range + player_radius + enemy_radius
+	var stop_dist: float = maxf(0.0, attack_reach - 8.0)
+	var start_dist: float = attack_reach + 8.0
 	var distance_to_enemy: float = player_pos.distance_to(enemy_pos)
-	if distance_to_enemy > desired_distance:
+
+	if distance_to_enemy > start_dist:
+		player_moving_to_target = true
+	elif distance_to_enemy < stop_dist:
+		player_moving_to_target = false
+
+	if player_moving_to_target:
 		var dir: Vector2 = (enemy_pos - player_pos).normalized()
 		player_pos += dir * player_speed * delta
 		player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
@@ -349,6 +360,7 @@ func _on_player_dead() -> void:
 	enemies.clear()
 	_attack_timer = 0.0
 	_hit_log_cd = 0.0
+	player_moving_to_target = false
 
 	for spawn_id in spawn_order:
 		if not spawn_rt.has(spawn_id):
