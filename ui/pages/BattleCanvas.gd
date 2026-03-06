@@ -186,6 +186,7 @@ func _init_spawn_rt() -> void:
 			"respawn_s": maxf(0.05, float(spawn_point.get("respawn_s", 1.5))),
 			"max_alive": maxi(0, int(spawn_point.get("max_alive", 1))),
 			"monster_id": str(spawn_point.get("monster_id", DEFAULT_MONSTER_ID)),
+			"spawn_radius": maxf(0.0, float(spawn_point.get("spawn_radius", 0.0))),
 			"alive_count": 0,
 			"next_spawn_at": 0.0,
 			"x_ratio": clampf(float(spawn_point.get("x_ratio", 0.5)), 0.0, 1.0),
@@ -239,13 +240,15 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 
 	var hp: int = int(template.get("hp", 30))
 	var enemy_radius: float = float(template.get("radius", 14.0))
-	var spawn_pos: Vector2 = runtime.get("pos", Vector2.ZERO)
+	var home_pos: Vector2 = runtime.get("pos", Vector2.ZERO)
+	var spawn_radius: float = maxf(0.0, float(runtime.get("spawn_radius", 0.0)))
+	var spawn_pos: Vector2 = home_pos + _random_point_in_circle(spawn_radius)
 	spawn_pos = _clamp_pos_in_arena(spawn_pos, enemy_radius)
 	var enemy := {
 		"spawn_id": spawn_id,
 		"monster_id": monster_id,
 		"pos": spawn_pos,
-		"home_pos": spawn_pos,
+		"home_pos": home_pos,
 		"state": "idle",
 		"speed": float(template.get("speed", 85.0)),
 		"aggro_range": float(template.get("aggro_range", 220.0)),
@@ -332,6 +335,13 @@ func _get_joy_vector() -> Vector2:
 		if vec_any is Vector2:
 			return vec_any
 	return Vector2.ZERO
+
+func _random_point_in_circle(radius: float) -> Vector2:
+	if radius <= 0.0:
+		return Vector2.ZERO
+	var angle: float = randf() * TAU
+	var dist: float = sqrt(randf()) * radius
+	return Vector2(cos(angle), sin(angle)) * dist
 
 func _move_enemies(delta: float) -> void:
 	if enemies.is_empty():
@@ -652,6 +662,10 @@ func _draw_spawn_points() -> void:
 			continue
 		var runtime: Dictionary = spawn_rt[spawn_id]
 		var pos: Vector2 = runtime.get("pos", Vector2.ZERO)
+		var spawn_radius: float = maxf(0.0, float(runtime.get("spawn_radius", 0.0)))
+		if spawn_radius > 0.0:
+			draw_circle(pos, spawn_radius, Color(1.0, 1.0, 1.0, 0.05))
+			draw_arc(pos, spawn_radius, 0.0, TAU, 96, Color(1.0, 1.0, 1.0, 0.12), 2.0, true)
 		draw_line(pos + Vector2(-4, 0), pos + Vector2(4, 0), Color.WHITE, 1.0)
 		draw_line(pos + Vector2(0, -4), pos + Vector2(0, 4), Color.WHITE, 1.0)
 		draw_circle(pos, 2.0, Color.WHITE)
