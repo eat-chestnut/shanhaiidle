@@ -41,14 +41,16 @@ var kills := 0
 
 var _attack_timer := 0.0
 var _hit_log_cd := 0.0
-var manual_target: Vector2 = Vector2.ZERO
-var manual_moving := false
+var _joystick: Node = null
+var _auto_seek_moving := false
+var _manual_seek_off_fired := false
 
 func _ready() -> void:
 	randomize()
 	_load_battle_cfg()
 	_recalc_arena(true)
 	player["pos"] = arena_rect.position + arena_rect.size * 0.5
+	_joystick = get_node_or_null("../VirtualJoystick")
 
 func _process(delta: float) -> void:
 	battle_time += delta
@@ -58,7 +60,7 @@ func _process(delta: float) -> void:
 		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
 
 	_process_spawn_points()
-	_process_manual_move(delta)
+	_process_player_move(delta)
 	_move_enemies(delta)
 	_enemy_attack_player(delta)
 
@@ -69,40 +71,6 @@ func _process(delta: float) -> void:
 		_auto_attack()
 
 	queue_redraw()
-
-func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		var mouse_button: InputEventMouseButton = event
-		if mouse_button.button_index != MOUSE_BUTTON_LEFT:
-			return
-		if mouse_button.pressed:
-			if arena_rect.has_point(mouse_button.position):
-				manual_target = _clamp_pos_in_arena(mouse_button.position, 0.0)
-				manual_moving = true
-		else:
-			manual_moving = false
-		return
-
-	if event is InputEventMouseMotion:
-		var mouse_motion: InputEventMouseMotion = event
-		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and manual_moving:
-			manual_target = _clamp_pos_in_arena(mouse_motion.position, 0.0)
-		return
-
-	if event is InputEventScreenTouch:
-		var touch: InputEventScreenTouch = event
-		if touch.pressed:
-			if arena_rect.has_point(touch.position):
-				manual_target = _clamp_pos_in_arena(touch.position, 0.0)
-				manual_moving = true
-		else:
-			manual_moving = false
-		return
-
-	if event is InputEventScreenDrag:
-		var drag: InputEventScreenDrag = event
-		if manual_moving:
-			manual_target = _clamp_pos_in_arena(drag.position, 0.0)
 
 func _load_battle_cfg() -> void:
 	var battle_cfg: Dictionary = {}
@@ -292,21 +260,78 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 	}
 	enemies.append(enemy)
 
-func _process_manual_move(delta: float) -> void:
-	if not manual_moving:
+func _process_player_move(delta: float) -> void:
+	var joy_vec: Vector2 = _get_joy_vector()
+	var joy_len: float = joy_vec.length()
+	if joy_len > 0.0:
+		_process_joystick_move(joy_vec, delta)
 		return
 
+	_manual_seek_off_fired = false
+	if not GameSettings.auto_seek_enabled:
+		_auto_seek_moving = false
+		return
+
+	_process_auto_seek_move(delta)
+
+func _process_joystick_move(joy_vec: Vector2, delta: float) -> void:
 	var player_pos: Vector2 = player["pos"]
 	var player_radius: float = float(player["radius"])
 	var player_speed: float = float(player.get("speed", 140.0))
-	var delta_vec: Vector2 = manual_target - player_pos
-	var distance: float = delta_vec.length()
-	if distance <= 2.0:
+	var joy_dir: Vector2 = joy_vec.normalized()
+	player_pos += joy_dir * player_speed * delta
+	player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
+	_auto_seek_moving = false
+
+	if GameSettings.auto_seek_enabled and not _manual_seek_off_fired:
+		GameSettings.set_auto_seek(false, "手动移动自动关闭")
+		_manual_seek_off_fired = true
+
+func _process_auto_seek_move(delta: float) -> void:
+	if enemies.is_empty():
+		_auto_seek_moving = false
 		return
 
-	var move_dir: Vector2 = delta_vec / distance
-	player_pos += move_dir * player_speed * delta
+	var nearest_index := _find_nearest_enemy_index()
+	if nearest_index < 0:
+		_auto_seek_moving = false
+		return
+
+	var nearest_enemy: Dictionary = enemies[nearest_index]
+	var player_pos: Vector2 = player["pos"]
+	var enemy_pos: Vector2 = nearest_enemy["pos"]
+	var enemy_radius: float = float(nearest_enemy.get("radius", 14.0))
+	var player_radius: float = float(player["radius"])
+	var player_attack_range: float = float(player.get("attack_range", 10.0))
+	var player_speed: float = float(player.get("speed", 140.0))
+
+	var attack_reach: float = player_attack_range + player_radius + enemy_radius
+	var stop_dist: float = maxf(0.0, attack_reach - 8.0)
+	var start_dist: float = attack_reach + 8.0
+	var distance_to_enemy: float = player_pos.distance_to(enemy_pos)
+
+	if distance_to_enemy > start_dist:
+		_auto_seek_moving = true
+	elif distance_to_enemy < stop_dist:
+		_auto_seek_moving = false
+
+	if not _auto_seek_moving:
+		return
+
+	var move_vec: Vector2 = enemy_pos - player_pos
+	var move_len: float = move_vec.length()
+	if move_len <= 0.001:
+		return
+
+	player_pos += (move_vec / move_len) * player_speed * delta
 	player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
+
+func _get_joy_vector() -> Vector2:
+	if _joystick != null and _joystick.has_method("get_vector"):
+		var vec_any = _joystick.call("get_vector")
+		if vec_any is Vector2:
+			return vec_any
+	return Vector2.ZERO
 
 func _move_enemies(delta: float) -> void:
 	if enemies.is_empty():
@@ -421,7 +446,8 @@ func _on_player_dead() -> void:
 	enemies.clear()
 	_attack_timer = 0.0
 	_hit_log_cd = 0.0
-	manual_moving = false
+	_auto_seek_moving = false
+	_manual_seek_off_fired = false
 
 	for spawn_id in spawn_order:
 		if not spawn_rt.has(spawn_id):
@@ -573,11 +599,6 @@ func _draw() -> void:
 	var attack_visual_radius: float = player_attack_range + player_radius
 	draw_circle(player_pos, attack_visual_radius, Color(1.0, 1.0, 1.0, 0.08))
 	draw_arc(player_pos, attack_visual_radius, 0.0, TAU, 72, Color(1.0, 1.0, 1.0, 0.18), 2.0, true)
-	if manual_moving:
-		draw_circle(manual_target, 8.0, Color(1.0, 1.0, 1.0, 0.18))
-		draw_arc(manual_target, 8.0, 0.0, TAU, 36, Color.WHITE, 1.5, true)
-		draw_line(manual_target + Vector2(-5, -5), manual_target + Vector2(5, 5), Color.WHITE, 1.5)
-		draw_line(manual_target + Vector2(-5, 5), manual_target + Vector2(5, -5), Color.WHITE, 1.5)
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
 
