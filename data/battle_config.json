@@ -1,12 +1,15 @@
 {
   "battle": {
-    "stage_name": "肉鸽-山海经｜刷怪点测试",
+    "stage_name": "山海经｜刷怪点（单点）",
+    "arena_padding": 26,
     "player": {
       "hp": 200,
       "radius": 18,
       "atk": 12,
       "def": 4,
-      "attack_interval": 0.25
+      "speed": 140,
+      "attack_interval": 0.25,
+      "attack_range": 10
     },
     "monsters": [
       {
@@ -14,36 +17,44 @@
         "name": "小妖",
         "hp": 30,
         "def": 2,
+        "atk": 6,
         "radius": 14,
-        "speed": 85
+        "speed": 85,
+        "aggro_range": 220,
+        "attack_interval": 0.9,
+        "attack_range": 8
       }
     ],
     "spawn_points": [
       {
         "id": "sp_1",
-        "x_ratio": 0.15,
-        "y_ratio": 0.20,
-        "respawn_s": 2.0,
-        "max_alive": 3,
-        "monster_id": "mob_a"
-      },
-      {
-        "id": "sp_2",
-        "x_ratio": 0.85,
-        "y_ratio": 0.25,
-        "respawn_s": 2.2,
-        "max_alive": 3,
-        "monster_id": "mob_a"
-      },
-      {
-        "id": "sp_3",
-        "x_ratio": 0.25,
-        "y_ratio": 0.85,
-        "respawn_s": 2.5,
-        "max_alive": 4,
+        "x_ratio": 0.50,
+        "y_ratio": 0.22,
+        "respawn_s": 1.6,
+        "max_alive": 10,
         "monster_id": "mob_a"
       }
-    ]
+    ],
+    "drops": {
+      "drop_chance": 0.25,
+      "rarity_weights": {
+        "white": 80,
+        "blue": 18,
+        "gold": 2
+      },
+      "items": {
+        "white": [
+          "桂枝",
+          "玉屑"
+        ],
+        "blue": [
+          "白玉碎"
+        ],
+        "gold": [
+          "妖核"
+        ]
+      }
+    }
   },
   "ui": {
     "bottom_menu_height": 80
