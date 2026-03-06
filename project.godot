@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 EventBus="*res://autoload/EventBus.gd"
 ConfigService="*res://autoload/ConfigService.gd"
+I18nService="*res://autoload/I18nService.gd"
 GameSettings="*res://autoload/GameSettings.gd"
 InventoryModel="*res://autoload/InventoryModel.gd"
 EquipmentModel="*res://autoload/EquipmentModel.gd"
@@ -28,7 +29,6 @@ BattleService="*res://autoload/BattleService.gd"
 
 window/size/viewport_width=758
 window/size/viewport_height=1920
-window/dpi/allow_hidpi=true
 window/stretch/scale_mode="integer"
 
 [rendering]

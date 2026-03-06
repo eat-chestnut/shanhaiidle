@@ -19,28 +19,35 @@ const SLOT_KEYS := [
 ]
 
 @onready var _dim_bg: ColorRect = $DimBG
+@onready var _title: Label = $Panel/VBox/Header/Title
 @onready var _btn_close: BaseButton = $Panel/VBox/Header/BtnClose
 @onready var _btn_tab_items: BaseButton = $Panel/VBox/Tabs/TabItems/BtnTabItems
 @onready var _btn_tab_equip: BaseButton = $Panel/VBox/Tabs/TabEquip/BtnTabEquip
 @onready var _lbl_tab_items: Label = $Panel/VBox/Tabs/TabItems/LblTabItems
 @onready var _lbl_tab_equip: Label = $Panel/VBox/Tabs/TabEquip/LblTabEquip
-@onready var _grid: GridContainer = $Panel/VBox/BottomInventoryGrid/Grid
+@onready var _equip_title: Label = $Panel/VBox/TopSection/EquipPanel/VBox/EquipTitle
+@onready var _stats_title: Label = $Panel/VBox/TopSection/StatsPanel/VBox/StatsTitle
+@onready var _detail_title: Label = $Panel/VBox/TopSection/StatsPanel/VBox/DetailTitle
 @onready var _stats_text: RichTextLabel = $Panel/VBox/TopSection/StatsPanel/VBox/StatsText
 @onready var _detail_text: RichTextLabel = $Panel/VBox/TopSection/StatsPanel/VBox/DetailText
+@onready var _grid: GridContainer = $Panel/VBox/BottomGrid/Grid
 @onready var _btn_equip: Button = $Panel/VBox/ActionBar/BtnEquip
 @onready var _btn_unequip: Button = $Panel/VBox/ActionBar/BtnUnequip
+@onready var _equip_popup: Node = $EquipPopup
 
 var _slots: Array[Control] = []
 var _slot_rows: Array[Dictionary] = []
 var _tab := "items"
 var _selected_bag_uid := 0
 var _selected_slot_key := ""
+var _selected_slot_uid := 0
 var _equip_slot_labels: Dictionary = {}
 
 func _ready() -> void:
 	visible = false
 	_ensure_slots()
 	_cache_equip_slot_labels()
+	_apply_i18n()
 
 	if not _btn_close.pressed.is_connected(close):
 		_btn_close.pressed.connect(close)
@@ -58,8 +65,9 @@ func _ready() -> void:
 		EventBus.inventory_updated.connect(_on_inventory_updated)
 
 	_refresh_tab_visual()
-	_update_action_buttons()
 	_refresh_stats_panel()
+	_refresh_detail_default()
+	_update_action_buttons()
 
 func open() -> void:
 	if visible:
@@ -73,6 +81,8 @@ func close() -> void:
 	if not visible:
 		return
 	visible = false
+	if _equip_popup != null and _equip_popup.has_method("close"):
+		_equip_popup.call("close")
 	closed.emit()
 
 func refresh() -> void:
@@ -106,9 +116,21 @@ func refresh() -> void:
 
 	_refresh_equip_slots(rarity_colors)
 	_refresh_stats_panel()
-	_refresh_detail()
+	if _selected_slot_key.is_empty() and _selected_bag_uid == 0:
+		_refresh_detail_default()
 	_refresh_tab_visual()
 	_update_action_buttons()
+
+func _apply_i18n() -> void:
+	_title.text = I18nService.t("ui.bag.title")
+	_btn_close.tooltip_text = I18nService.t("ui.btn.close")
+	_lbl_tab_items.text = I18nService.t("ui.tab.items")
+	_lbl_tab_equip.text = I18nService.t("ui.tab.equip")
+	_equip_title.text = I18nService.t("ui.panel.equip_slots")
+	_stats_title.text = I18nService.t("ui.panel.stats")
+	_detail_title.text = I18nService.t("ui.panel.detail")
+	_btn_equip.text = I18nService.t("ui.btn.equip")
+	_btn_unequip.text = I18nService.t("ui.btn.unequip")
 
 func _ensure_slots() -> void:
 	if not _slots.is_empty():
@@ -126,7 +148,7 @@ func _ensure_slots() -> void:
 func _cache_equip_slot_labels() -> void:
 	_equip_slot_labels.clear()
 	for slot_key in SLOT_KEYS:
-		var btn_path := "Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_%s" % slot_key
+		var btn_path := "Panel/VBox/TopSection/EquipPanel/VBox/EquipGrid/Slot_%s" % slot_key
 		var btn_any = get_node_or_null(btn_path)
 		if btn_any is BaseButton:
 			var btn: BaseButton = btn_any
@@ -151,6 +173,12 @@ func _refresh_stats_panel() -> void:
 		int(stats.get("CRIT", 0)),
 	]
 
+func _refresh_detail_default() -> void:
+	if _tab == "equip":
+		_detail_text.text = I18nService.t("ui.tip.select_equip")
+	else:
+		_detail_text.text = I18nService.t("ui.tip.select_slot")
+
 func _refresh_equip_slots(rarity_colors: Dictionary) -> void:
 	for slot_key in SLOT_KEYS:
 		var label_any = _equip_slot_labels.get(slot_key)
@@ -158,68 +186,32 @@ func _refresh_equip_slots(rarity_colors: Dictionary) -> void:
 			continue
 		var label: Label = label_any
 		var inst: Dictionary = EquipmentModel.get_equipped_instance(slot_key)
+		var slot_name := I18nService.t("slot.%s" % slot_key, slot_key)
 		if inst.is_empty():
-			label.text = "%s: —" % slot_key
+			label.text = "%s\n—" % slot_name
 			label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 0.95))
 			continue
 		var rarity := str(inst.get("rarity", "white"))
-		label.text = "%s: %s" % [slot_key, str(inst.get("name", "未知装备"))]
+		var equip_name := str(inst.get("name", ""))
+		label.text = "%s\n%s" % [slot_name, equip_name if not equip_name.is_empty() else "—"]
 		label.add_theme_color_override("font_color", _resolve_rarity_color(rarity, rarity_colors))
 
-func _refresh_detail() -> void:
-	if _selected_bag_uid > 0:
-		var bag_row := _find_bag_row_by_uid(_selected_bag_uid)
-		if not bag_row.is_empty():
-			_show_bag_detail(bag_row)
-			return
-		_selected_bag_uid = 0
-
-	if not _selected_slot_key.is_empty():
-		var equipped_row: Dictionary = EquipmentModel.get_equipped_instance(_selected_slot_key)
-		if equipped_row.is_empty():
-			_detail_text.text = "栏位：%s\n当前为空" % _selected_slot_key
-		else:
-			_detail_text.text = "栏位：%s\n名称：%s\n稀有度：%s\n主属性：%s +%d" % [
-				_selected_slot_key,
-				str(equipped_row.get("name", "未知装备")),
-				str(equipped_row.get("rarity", "white")),
-				str(equipped_row.get("main_stat", "")),
-				int(equipped_row.get("main_val", 0)),
-			]
-		return
-
-	if _tab == "items":
-		_detail_text.text = "物品页签：用于查看材料/杂物。"
-	else:
-		_detail_text.text = "装备页签：选择装备并穿戴，或点槽位卸下。"
-
-func _show_bag_detail(row: Dictionary) -> void:
-	_detail_text.text = "名称：%s\n稀有度：%s\n槽位：%s\n主属性：%s +%d\nUID：%d" % [
-		str(row.get("name", "未知装备")),
-		str(row.get("rarity", "white")),
-		str(row.get("slot", "")),
-		str(row.get("main_stat", "")),
-		int(row.get("main_val", 0)),
-		int(row.get("uid", 0)),
-	]
-
 func _update_action_buttons() -> void:
-	_btn_equip.disabled = not (_tab == "equip" and _selected_bag_uid > 0)
-	var can_unequip := false
-	if not _selected_slot_key.is_empty():
-		can_unequip = EquipmentModel.get_equipped_uid(_selected_slot_key) != 0
-	_btn_unequip.disabled = not can_unequip
+	_btn_equip.disabled = _selected_bag_uid <= 0
+	_btn_unequip.disabled = _selected_slot_key.is_empty() or _selected_slot_uid <= 0
 
 func _on_tab_items_pressed() -> void:
 	_tab = "items"
 	_selected_bag_uid = 0
 	_selected_slot_key = ""
+	_selected_slot_uid = 0
 	refresh()
 
 func _on_tab_equip_pressed() -> void:
 	_tab = "equip"
 	_selected_bag_uid = 0
 	_selected_slot_key = ""
+	_selected_slot_uid = 0
 	refresh()
 
 func _on_slot_gui_input(event: InputEvent, index: int) -> void:
@@ -243,36 +235,83 @@ func _on_slot_clicked(index: int) -> void:
 		return
 
 	_selected_slot_key = ""
+	_selected_slot_uid = 0
+
 	if _tab == "equip":
 		_selected_bag_uid = int(row.get("uid", 0))
-		_show_bag_detail(row)
+		_detail_text.text = _build_equip_detail_text(row, false, "")
+		if _selected_bag_uid > 0 and _equip_popup != null and _equip_popup.has_method("open_for_bag"):
+			_equip_popup.call("open_for_bag", _selected_bag_uid)
 	else:
 		_selected_bag_uid = 0
-		_detail_text.text = "物品：%s\n数量：%d\n稀有度：%s" % [
+		_detail_text.text = "%s：%s\n%s：%d\n%s：%s" % [
+			I18nService.t("ui.popup.item", "物品"),
 			str(row.get("name", str(row.get("id", "")))),
+			I18nService.t("ui.popup.count", "数量"),
 			int(row.get("count", 1)),
+			I18nService.t("ui.popup.rarity", "稀有度"),
 			str(row.get("rarity", "white")),
 		]
 	_update_action_buttons()
 
 func _on_equip_slot_pressed(slot_key: String) -> void:
-	_selected_slot_key = slot_key
 	_selected_bag_uid = 0
-	_refresh_detail()
+	_selected_slot_key = slot_key
+	_selected_slot_uid = EquipmentModel.get_equipped_uid(slot_key)
+	if _selected_slot_uid <= 0:
+		_detail_text.text = I18nService.t("ui.popup.empty_slot", "—")
+		_update_action_buttons()
+		return
+
+	var inst: Dictionary = EquipmentModel.get_equipped_instance(slot_key)
+	_detail_text.text = _build_equip_detail_text(inst, true, slot_key)
+	if _equip_popup != null and _equip_popup.has_method("open_for_slot"):
+		_equip_popup.call("open_for_slot", slot_key, _selected_slot_uid)
 	_update_action_buttons()
 
 func _on_btn_equip_pressed() -> void:
 	if _selected_bag_uid <= 0:
 		return
-	if EquipmentModel.equip_uid(_selected_bag_uid):
-		_selected_bag_uid = 0
-		refresh()
+	if _equip_popup != null and _equip_popup.has_method("open_for_bag"):
+		_equip_popup.call("open_for_bag", _selected_bag_uid)
 
 func _on_btn_unequip_pressed() -> void:
-	if _selected_slot_key.is_empty():
+	if _selected_slot_key.is_empty() or _selected_slot_uid <= 0:
 		return
-	EquipmentModel.unequip(_selected_slot_key)
-	refresh()
+	if _equip_popup != null and _equip_popup.has_method("open_for_slot"):
+		_equip_popup.call("open_for_slot", _selected_slot_key, _selected_slot_uid)
+
+func _build_equip_detail_text(inst: Dictionary, equipped: bool, slot_key: String) -> String:
+	if inst.is_empty():
+		return "—"
+	var rarity := str(inst.get("rarity", "white"))
+	var rarity_text := I18nService.t("rarity.%s" % rarity, rarity)
+	var slot_label := ""
+	if equipped and not slot_key.is_empty():
+		slot_label = I18nService.t("slot.%s" % slot_key, slot_key)
+	else:
+		var base_slot := str(inst.get("slot", ""))
+		var display_slot := _slot_key_from_base(base_slot)
+		slot_label = I18nService.t("slot.%s" % display_slot, display_slot)
+	return "%s\n%s %s\n%s %s +%d\n%s %s" % [
+		str(inst.get("name", "—")),
+		I18nService.t("ui.popup.rarity", "稀有度:"),
+		rarity_text,
+		I18nService.t("ui.popup.main_stat", "主属性:"),
+		str(inst.get("main_stat", "")),
+		int(inst.get("main_val", 0)),
+		I18nService.t("ui.popup.slot", "槽位:"),
+		slot_label,
+	]
+
+func _slot_key_from_base(base_slot: String) -> String:
+	match base_slot:
+		"ring":
+			return "ring1"
+		"bracelet":
+			return "bracelet1"
+		_:
+			return base_slot
 
 func _on_dim_bg_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -290,15 +329,6 @@ func _on_dim_bg_gui_input(event: InputEvent) -> void:
 func _on_inventory_updated() -> void:
 	if visible:
 		refresh()
-
-func _find_bag_row_by_uid(uid: int) -> Dictionary:
-	if uid <= 0:
-		return {}
-	var rows: Array[Dictionary] = EquipmentModel.list_bag_sorted()
-	for row in rows:
-		if int(row.get("uid", 0)) == uid:
-			return row
-	return {}
 
 func _bag_contains_uid(uid: int, rows: Array[Dictionary]) -> bool:
 	if uid <= 0:
