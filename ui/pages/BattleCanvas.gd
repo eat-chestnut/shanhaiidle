@@ -1,5 +1,9 @@
 extends Control
 
+const PLAYER_LABEL_SIZE := 18
+const ENEMY_LABEL_SIZE := 18
+const HUD_LABEL_SIZE := 20
+
 var player := {
 	"pos": Vector2.ZERO,
 	"radius": 18.0,
@@ -110,7 +114,7 @@ func _draw() -> void:
 	var player_pos: Vector2 = player["pos"]
 	var player_radius: float = player["radius"]
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
-	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE)
+	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
 
 	var label_enemy_indices := _get_nearest_enemy_index_set(15)
 	for i in enemies.size():
@@ -120,12 +124,20 @@ func _draw() -> void:
 		var hp: int = enemy["hp"]
 		draw_circle(enemy_pos, enemy_radius, Color(0.86, 0.18, 0.18))
 		if label_enemy_indices.has(i):
-			_draw_label(enemy_pos + Vector2(enemy_radius + 6.0, 5.0), "敌 HP:%d" % hp, Color(1.0, 0.90, 0.90))
+			_draw_label(
+				enemy_pos + Vector2(enemy_radius + 6.0, 5.0),
+				"敌 HP:%d" % hp,
+				Color.WHITE,
+				ENEMY_LABEL_SIZE,
+				true
+			)
 
 	_draw_label(
 		Vector2(12, 22),
 		"Kills: %d  Enemies: %d" % [kills, enemies.size()],
-		Color(0.90, 0.95, 1.0)
+		Color.WHITE,
+		HUD_LABEL_SIZE,
+		true
 	)
 
 func _get_nearest_enemy_index_set(limit: int) -> Dictionary:
@@ -151,10 +163,28 @@ func _get_nearest_enemy_index_set(limit: int) -> Dictionary:
 		label_indices[int(distance_pairs[i]["idx"])] = true
 	return label_indices
 
-func _draw_label(pos: Vector2, text: String, color: Color) -> void:
+func _draw_label(
+	pos: Vector2,
+	text: String,
+	color: Color,
+	font_size: int,
+	with_shadow: bool = false
+) -> void:
 	var font := get_theme_default_font()
-	var font_size := get_theme_default_font_size()
 	if font == null:
 		font = ThemeDB.fallback_font
-		font_size = ThemeDB.fallback_font_size
+	if font_size <= 0:
+		font_size = get_theme_default_font_size()
+		if font_size <= 0:
+			font_size = ThemeDB.fallback_font_size
+	if with_shadow:
+		draw_string(
+			font,
+			pos + Vector2(1, 1),
+			text,
+			HORIZONTAL_ALIGNMENT_LEFT,
+			-1,
+			font_size,
+			Color.BLACK
+		)
 	draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)

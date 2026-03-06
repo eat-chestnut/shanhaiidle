@@ -1,6 +1,6 @@
 extends ScrollContainer
 
-const MAX_LOGS := 200
+const MAX_LOGS := 220
 
 @onready var _log_container: VBoxContainer = $VBoxContainer
 
@@ -9,6 +9,13 @@ func append_log(text: String) -> void:
 	label.text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var label_settings := LabelSettings.new()
+	label_settings.font_size = 18
+	label_settings.outline_size = 1
+	label_settings.outline_color = Color.BLACK
+	label.label_settings = label_settings
+
 	_log_container.add_child(label)
 
 	var excess := _log_container.get_child_count() - MAX_LOGS
