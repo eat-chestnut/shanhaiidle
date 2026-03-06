@@ -39,7 +39,15 @@ func _ready() -> void:
 			_inventory_overlay.connect("closed", closed_cb)
 	_set_battle_paused(false)
 
-	EventBus.add_log("进入战斗：刷怪点已激活（3处）")
+	var spawn_count := 1
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var battle_any = cfg.get("battle", {})
+	if battle_any is Dictionary:
+		var battle_cfg: Dictionary = battle_any
+		var spawn_points_any = battle_cfg.get("spawn_points", [])
+		if spawn_points_any is Array:
+			spawn_count = max(1, spawn_points_any.size())
+	EventBus.add_log("进入战斗：刷怪点已激活（%d处）" % spawn_count)
 	EventBus.add_log("提示：击杀每满5会播报一次")
 
 func _on_auto_seek_pressed() -> void:

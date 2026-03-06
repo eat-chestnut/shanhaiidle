@@ -1,0 +1,25 @@
+{
+  "slots": ["weapon","helm","armor","pants","shoes","cloak","ring","bracelet"],
+  "equip_templates": [
+    {
+      "id":"eq_weapon_001","name":"木牙兵刃","slot":"weapon","rarity":"white",
+      "main_stat":"ATK","main_min":2,"main_max":4
+    },
+    {
+      "id":"eq_armor_001","name":"麻布护甲","slot":"armor","rarity":"white",
+      "main_stat":"HP","main_min":10,"main_max":18
+    },
+    {
+      "id":"eq_ring_001","name":"青石戒","slot":"ring","rarity":"blue",
+      "main_stat":"CRIT","main_min":1,"main_max":3
+    },
+    {
+      "id":"eq_weapon_002","name":"玉锋兵刃","slot":"weapon","rarity":"blue",
+      "main_stat":"ATK","main_min":4,"main_max":6
+    },
+    {
+      "id":"eq_armor_002","name":"鳞纹护甲","slot":"armor","rarity":"blue",
+      "main_stat":"DEF","main_min":2,"main_max":4
+    }
+  ]
+}

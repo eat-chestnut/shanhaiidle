@@ -19,6 +19,14 @@ func load_cfg() -> void:
 		}
 	cfg["items_db"] = items_db
 
+	var equip_db: Variant = _load_json_file("res://data/equip_templates.json")
+	if not (equip_db is Dictionary):
+		equip_db = {
+			"slots": [],
+			"equip_templates": [],
+		}
+	cfg["equip_db"] = equip_db
+
 func get_cfg() -> Dictionary:
 	return cfg
 

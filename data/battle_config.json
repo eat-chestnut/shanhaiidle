@@ -43,6 +43,24 @@
         "blue": 18,
         "gold": 2
       },
+      "equip_chance": 0.08,
+      "equip_weights": {
+        "white": 85,
+        "blue": 14,
+        "gold": 1
+      },
+      "equip_by_rarity": {
+        "white": [
+          "eq_weapon_001",
+          "eq_armor_001"
+        ],
+        "blue": [
+          "eq_ring_001",
+          "eq_weapon_002",
+          "eq_armor_002"
+        ],
+        "gold": []
+      },
       "items": {
         "white": [
           "桂枝",

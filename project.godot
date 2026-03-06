@@ -21,6 +21,7 @@ EventBus="*res://autoload/EventBus.gd"
 ConfigService="*res://autoload/ConfigService.gd"
 GameSettings="*res://autoload/GameSettings.gd"
 InventoryModel="*res://autoload/InventoryModel.gd"
+EquipmentModel="*res://autoload/EquipmentModel.gd"
 
 [display]
 

@@ -30,12 +30,16 @@ var player := {
 var stage_name: String = "未命名关卡"
 var monsters_cfg: Dictionary = {}
 var monster_default_cfg: Dictionary = {}
+var equip_templates_by_id: Dictionary = {}
 var spawn_points_cfg: Array[Dictionary] = []
 var spawn_rt: Dictionary = {}
 var spawn_order: Array[String] = []
 var drop_chance := 0.0
 var drop_weights: Dictionary = {}
 var drop_items: Dictionary = {}
+var equip_drop_chance := 0.0
+var equip_drop_weights: Dictionary = {}
+var equip_drop_by_rarity: Dictionary = {}
 
 var arena_rect: Rect2 = Rect2(Vector2.ZERO, Vector2.ZERO)
 var _last_canvas_size: Vector2 = Vector2.ZERO
@@ -52,6 +56,7 @@ var drop_gold_count := 0
 var _attack_timer := 0.0
 var _hit_log_cd := 0.0
 var _joystick: Node = null
+var _equipment_model: Node = null
 var _auto_seek_moving := false
 var _manual_seek_off_fired := false
 
@@ -59,12 +64,15 @@ func _ready() -> void:
 	randomize()
 	_load_battle_cfg()
 	_recalc_arena(true)
+	_equipment_model = get_node_or_null("/root/EquipmentModel")
+	_sync_player_combat_stats(true)
 	player["pos"] = arena_rect.position + arena_rect.size * 0.5
 	_joystick = get_node_or_null("../VirtualJoystick")
 
 func _process(delta: float) -> void:
 	battle_time += delta
 	_recalc_arena()
+	_sync_player_combat_stats()
 	player["pos"] = _clamp_pos_in_arena(player["pos"], float(player["radius"]))
 	if _hit_log_cd > 0.0:
 		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
@@ -97,6 +105,7 @@ func _load_battle_cfg() -> void:
 	stage_name = str(battle_cfg.get("stage_name", "未命名关卡"))
 	_load_player_cfg(battle_cfg)
 	_load_monster_templates(battle_cfg)
+	_load_equip_templates()
 	_load_spawn_points(battle_cfg)
 	_load_drops_cfg(battle_cfg)
 	_init_spawn_rt()
@@ -127,6 +136,53 @@ func _load_monster_templates(battle_cfg: Dictionary) -> void:
 				if i == 0:
 					monster_default_cfg = monster.duplicate(true)
 
+func _load_equip_templates() -> void:
+	equip_templates_by_id.clear()
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var equip_db_any = cfg.get("equip_db", {})
+	if not (equip_db_any is Dictionary):
+		return
+	var equip_db: Dictionary = equip_db_any
+	var templates_any = equip_db.get("equip_templates", [])
+	if not (templates_any is Array):
+		return
+
+	for tpl_any in templates_any:
+		if not (tpl_any is Dictionary):
+			continue
+		var tpl: Dictionary = tpl_any
+		var tpl_id := str(tpl.get("id", ""))
+		if tpl_id.is_empty():
+			continue
+		equip_templates_by_id[tpl_id] = tpl.duplicate(true)
+
+func _sync_player_combat_stats(force_full: bool = false) -> void:
+	if _equipment_model == null:
+		_equipment_model = get_node_or_null("/root/EquipmentModel")
+	if _equipment_model == null or not _equipment_model.has_method("get_total_stats"):
+		return
+
+	var stats_any = _equipment_model.call("get_total_stats")
+	if not (stats_any is Dictionary):
+		return
+	var stats: Dictionary = stats_any
+
+	var new_hp_max := maxi(1, int(stats.get("HP", int(player.get("max_hp", 200)))))
+	var old_hp_max := maxi(1, int(player.get("max_hp", new_hp_max)))
+	var current_hp := int(player.get("hp", old_hp_max))
+
+	if force_full:
+		current_hp = new_hp_max
+	elif old_hp_max != new_hp_max:
+		var ratio := float(current_hp) / float(old_hp_max)
+		current_hp = int(round(clampf(ratio, 0.0, 1.0) * float(new_hp_max)))
+
+	player["max_hp"] = new_hp_max
+	player["hp"] = clampi(current_hp, 0, new_hp_max)
+	player["atk"] = int(stats.get("ATK", int(player.get("atk", 12))))
+	player["def"] = int(stats.get("DEF", int(player.get("def", 4))))
+	player["crit"] = int(stats.get("CRIT", 0))
+
 func _load_player_cfg(battle_cfg: Dictionary) -> void:
 	var max_hp: int = int(player.get("max_hp", player.get("hp", 200)))
 	var player_cfg_any = battle_cfg.get("player", {})
@@ -156,6 +212,9 @@ func _load_drops_cfg(battle_cfg: Dictionary) -> void:
 	drop_chance = 0.0
 	drop_weights.clear()
 	drop_items.clear()
+	equip_drop_chance = 0.0
+	equip_drop_weights.clear()
+	equip_drop_by_rarity.clear()
 
 	var drops_any = battle_cfg.get("drops", {})
 	if not (drops_any is Dictionary):
@@ -180,6 +239,24 @@ func _load_drops_cfg(battle_cfg: Dictionary) -> void:
 				for item_any in list_any:
 					names.append(str(item_any))
 				drop_items[rarity] = names
+
+	equip_drop_chance = clampf(float(drops.get("equip_chance", 0.0)), 0.0, 1.0)
+	var equip_weights_any = drops.get("equip_weights", {})
+	if equip_weights_any is Dictionary:
+		var equip_weights_dict: Dictionary = equip_weights_any
+		for rarity in ["white", "blue", "gold"]:
+			equip_drop_weights[rarity] = maxi(0, int(equip_weights_dict.get(rarity, 0)))
+
+	var equip_pool_any = drops.get("equip_by_rarity", {})
+	if equip_pool_any is Dictionary:
+		var equip_pool: Dictionary = equip_pool_any
+		for rarity in ["white", "blue", "gold"]:
+			var list_any = equip_pool.get(rarity, [])
+			if list_any is Array:
+				var ids: Array[String] = []
+				for tpl_id_any in list_any:
+					ids.append(str(tpl_id_any))
+				equip_drop_by_rarity[rarity] = ids
 
 func _init_spawn_rt() -> void:
 	spawn_rt.clear()
@@ -463,6 +540,7 @@ func _enemy_attack_player(delta: float) -> void:
 
 func _on_player_dead() -> void:
 	EventBus.add_log("你倒下了……重开刷怪点")
+	_sync_player_combat_stats(true)
 	player["hp"] = int(player["max_hp"])
 	kills = 0
 	drop_white_count = 0
@@ -539,19 +617,66 @@ func _auto_attack() -> void:
 		enemies.remove_at(target_index)
 		_decrease_spawn_alive(spawn_id)
 		kills += 1
-		_try_log_drop(death_pos)
+		_try_spawn_drop(death_pos)
 		if kills % 5 == 0:
 			EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
 	else:
 		enemies[target_index] = enemy
 
-func _try_log_drop(death_pos: Vector2) -> void:
+func _try_spawn_drop(death_pos: Vector2) -> void:
+	if _try_spawn_equip_drop(death_pos):
+		return
+	_try_spawn_item_drop(death_pos)
+
+func _try_spawn_equip_drop(death_pos: Vector2) -> bool:
+	if equip_drop_chance <= 0.0:
+		return false
+	if randf() >= equip_drop_chance:
+		return false
+
+	var rarity := _roll_weighted_rarity(equip_drop_weights)
+	if rarity.is_empty():
+		return false
+
+	var pool_any = equip_drop_by_rarity.get(rarity, [])
+	if not (pool_any is Array):
+		return false
+	var pool: Array = pool_any
+	if pool.is_empty():
+		return false
+
+	var template_id := str(pool[randi() % pool.size()])
+	if template_id.is_empty():
+		return false
+
+	var equip_name := _resolve_equip_name(template_id)
+	var tag := _rarity_tag(rarity)
+	_record_drop_counter(rarity)
+	EventBus.add_log("%s 装备掉落：%s" % [tag, equip_name])
+
+	ground_loots.append({
+		"type": "equip",
+		"pos": death_pos,
+		"template_id": template_id,
+		"name": equip_name,
+		"rarity": rarity,
+		"ttl": LOOT_TTL,
+	})
+	floating_texts.append({
+		"text": "%s %s" % [tag, equip_name],
+		"pos": death_pos,
+		"ttl": FLOAT_TEXT_TTL,
+		"color": _drop_color_for_rarity(rarity),
+	})
+	return true
+
+func _try_spawn_item_drop(death_pos: Vector2) -> void:
 	if drop_chance <= 0.0:
 		return
 	if randf() >= drop_chance:
 		return
 
-	var rarity := _roll_drop_rarity()
+	var rarity := _roll_weighted_rarity(drop_weights)
 	if rarity.is_empty():
 		return
 
@@ -563,21 +688,16 @@ func _try_log_drop(death_pos: Vector2) -> void:
 		return
 
 	var item_name := str(items[randi() % items.size()])
-	var tag := "[白]"
-	match rarity:
-		"blue":
-			tag = "[蓝]"
-			drop_blue_count += 1
-		"gold":
-			tag = "[金]"
-			drop_gold_count += 1
-		_:
-			tag = "[白]"
-			drop_white_count += 1
+	if item_name.is_empty():
+		return
+	var tag := _rarity_tag(rarity)
+	_record_drop_counter(rarity)
 	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
 	ground_loots.append({
+		"type": "item",
 		"pos": death_pos,
 		"item_id": item_name,
+		"name": item_name,
 		"rarity": rarity,
 		"ttl": LOOT_TTL,
 	})
@@ -588,6 +708,31 @@ func _try_log_drop(death_pos: Vector2) -> void:
 		"color": _drop_color_for_rarity(rarity),
 	})
 
+func _rarity_tag(rarity: String) -> String:
+	match rarity:
+		"blue":
+			return "[蓝]"
+		"gold":
+			return "[金]"
+		_:
+			return "[白]"
+
+func _record_drop_counter(rarity: String) -> void:
+	match rarity:
+		"blue":
+			drop_blue_count += 1
+		"gold":
+			drop_gold_count += 1
+		_:
+			drop_white_count += 1
+
+func _resolve_equip_name(template_id: String) -> String:
+	var tpl_any = equip_templates_by_id.get(template_id, {})
+	if tpl_any is Dictionary:
+		var tpl: Dictionary = tpl_any
+		return str(tpl.get("name", template_id))
+	return template_id
+
 func _update_ground_loots(delta: float) -> void:
 	if ground_loots.is_empty():
 		return
@@ -597,10 +742,21 @@ func _update_ground_loots(delta: float) -> void:
 		var loot: Dictionary = ground_loots[i]
 		var loot_pos: Vector2 = loot.get("pos", Vector2.ZERO)
 		if player_pos.distance_to(loot_pos) <= LOOT_PICKUP_RADIUS:
-			var item_id := str(loot.get("item_id", ""))
-			if not item_id.is_empty():
-				InventoryModel.add_item(item_id, 1)
-				EventBus.add_log("拾取：%s" % item_id)
+			var loot_type := str(loot.get("type", "item"))
+			if loot_type == "equip":
+				var template_id := str(loot.get("template_id", ""))
+				var equip_name := str(loot.get("name", _resolve_equip_name(template_id)))
+				if not template_id.is_empty():
+					if _equipment_model == null:
+						_equipment_model = get_node_or_null("/root/EquipmentModel")
+					if _equipment_model != null and _equipment_model.has_method("add_equip"):
+						_equipment_model.call("add_equip", template_id)
+						EventBus.add_log("拾取装备：%s" % equip_name)
+			else:
+				var item_id := str(loot.get("item_id", ""))
+				if not item_id.is_empty():
+					InventoryModel.add_item(item_id, 1)
+					EventBus.add_log("拾取：%s" % item_id)
 			ground_loots.remove_at(i)
 			continue
 
@@ -624,10 +780,10 @@ func _update_floating_texts(delta: float) -> void:
 		ft["ttl"] = ttl
 		floating_texts[i] = ft
 
-func _roll_drop_rarity() -> String:
-	var white_w: int = int(drop_weights.get("white", 0))
-	var blue_w: int = int(drop_weights.get("blue", 0))
-	var gold_w: int = int(drop_weights.get("gold", 0))
+func _roll_weighted_rarity(weights: Dictionary) -> String:
+	var white_w: int = int(weights.get("white", 0))
+	var blue_w: int = int(weights.get("blue", 0))
+	var gold_w: int = int(weights.get("gold", 0))
 	var total: int = max(0, white_w) + max(0, blue_w) + max(0, gold_w)
 	if total <= 0:
 		return ""
@@ -756,17 +912,22 @@ func _draw_ground_loots() -> void:
 
 	var player_pos: Vector2 = player["pos"]
 	var labeled_indices: Dictionary = {}
-	for i in ground_loots.size():
+	for i in range(ground_loots.size()):
 		var loot: Dictionary = ground_loots[i]
 		var pos: Vector2 = loot.get("pos", Vector2.ZERO)
 		var rarity := str(loot.get("rarity", "white"))
-		draw_circle(pos, 6.0, _drop_color_for_rarity(rarity))
+		var color := _drop_color_for_rarity(rarity)
+		var loot_type := str(loot.get("type", "item"))
+		if loot_type == "equip":
+			draw_rect(Rect2(pos - Vector2(6, 6), Vector2(12, 12)), color, true)
+		else:
+			draw_circle(pos, 6.0, color)
 
 	var labels_to_draw := mini(MAX_LOOT_LABELS, ground_loots.size())
 	for _n in range(labels_to_draw):
 		var nearest_index := -1
 		var best_dist := INF
-		for i in ground_loots.size():
+		for i in range(ground_loots.size()):
 			if labeled_indices.has(i):
 				continue
 			var loot_i: Dictionary = ground_loots[i]
@@ -782,11 +943,11 @@ func _draw_ground_loots() -> void:
 
 		var loot_n: Dictionary = ground_loots[nearest_index]
 		var loot_pos_n: Vector2 = loot_n.get("pos", Vector2.ZERO)
-		var item_id := str(loot_n.get("item_id", ""))
+		var loot_name := str(loot_n.get("name", loot_n.get("item_id", loot_n.get("template_id", ""))))
 		var rarity_n := str(loot_n.get("rarity", "white"))
 		_draw_label(
 			loot_pos_n + Vector2(10.0, -4.0),
-			item_id,
+			loot_name,
 			_drop_color_for_rarity(rarity_n),
 			LOOT_LABEL_SIZE,
 			true
