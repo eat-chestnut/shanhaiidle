@@ -28,6 +28,9 @@ var monster_default_cfg: Dictionary = {}
 var spawn_points_cfg: Array[Dictionary] = []
 var spawn_rt: Dictionary = {}
 var spawn_order: Array[String] = []
+var drop_chance := 0.0
+var drop_weights: Dictionary = {}
+var drop_items: Dictionary = {}
 
 var arena_rect: Rect2 = Rect2(Vector2.ZERO, Vector2.ZERO)
 var _last_canvas_size: Vector2 = Vector2.ZERO
@@ -79,6 +82,7 @@ func _load_battle_cfg() -> void:
 	_load_player_cfg(battle_cfg)
 	_load_monster_templates(battle_cfg)
 	_load_spawn_points(battle_cfg)
+	_load_drops_cfg(battle_cfg)
 	_init_spawn_rt()
 
 func _load_battle_cfg_from_file() -> Dictionary:
@@ -131,6 +135,35 @@ func _load_spawn_points(battle_cfg: Dictionary) -> void:
 			if first_any is Dictionary:
 				var spawn_point: Dictionary = first_any
 				spawn_points_cfg.append(spawn_point.duplicate(true))
+
+func _load_drops_cfg(battle_cfg: Dictionary) -> void:
+	drop_chance = 0.0
+	drop_weights.clear()
+	drop_items.clear()
+
+	var drops_any = battle_cfg.get("drops", {})
+	if not (drops_any is Dictionary):
+		return
+
+	var drops: Dictionary = drops_any
+	drop_chance = clampf(float(drops.get("drop_chance", 0.0)), 0.0, 1.0)
+
+	var weights_any = drops.get("rarity_weights", {})
+	if weights_any is Dictionary:
+		var weights: Dictionary = weights_any
+		for rarity in ["white", "blue", "gold"]:
+			drop_weights[rarity] = maxi(0, int(weights.get(rarity, 0)))
+
+	var items_any = drops.get("items", {})
+	if items_any is Dictionary:
+		var items_dict: Dictionary = items_any
+		for rarity in ["white", "blue", "gold"]:
+			var list_any = items_dict.get(rarity, [])
+			if list_any is Array:
+				var names: Array[String] = []
+				for item_any in list_any:
+					names.append(str(item_any))
+				drop_items[rarity] = names
 
 func _init_spawn_rt() -> void:
 	spawn_rt.clear()
@@ -369,10 +402,54 @@ func _auto_attack() -> void:
 		enemies.remove_at(target_index)
 		_decrease_spawn_alive(spawn_id)
 		kills += 1
+		_try_log_drop()
 		if kills % 5 == 0:
 			EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
 	else:
 		enemies[target_index] = enemy
+
+func _try_log_drop() -> void:
+	if drop_chance <= 0.0:
+		return
+	if randf() >= drop_chance:
+		return
+
+	var rarity := _roll_drop_rarity()
+	if rarity.is_empty():
+		return
+
+	var items_any = drop_items.get(rarity, [])
+	if not (items_any is Array):
+		return
+	var items: Array = items_any
+	if items.is_empty():
+		return
+
+	var item_name := str(items[randi() % items.size()])
+	var tag := "[白]"
+	match rarity:
+		"blue":
+			tag = "[蓝]"
+		"gold":
+			tag = "[金]"
+		_:
+			tag = "[白]"
+	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
+
+func _roll_drop_rarity() -> String:
+	var white_w: int = int(drop_weights.get("white", 0))
+	var blue_w: int = int(drop_weights.get("blue", 0))
+	var gold_w: int = int(drop_weights.get("gold", 0))
+	var total: int = max(0, white_w) + max(0, blue_w) + max(0, gold_w)
+	if total <= 0:
+		return ""
+
+	var roll: int = randi() % total
+	if roll < white_w:
+		return "white"
+	if roll < white_w + blue_w:
+		return "blue"
+	return "gold"
 
 func _decrease_spawn_alive(spawn_id: String) -> void:
 	if spawn_id.is_empty() or not spawn_rt.has(spawn_id):
