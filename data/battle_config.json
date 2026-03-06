@@ -1,6 +1,13 @@
 {
   "battle": {
-    "stage_name": "肉鸽-山海经（刷怪点测试）",
+    "stage_name": "肉鸽-山海经｜刷怪点测试",
+    "player": {
+      "hp": 200,
+      "radius": 18,
+      "atk": 12,
+      "def": 4,
+      "attack_interval": 0.25
+    },
     "monsters": [
       {
         "id": "mob_a",
