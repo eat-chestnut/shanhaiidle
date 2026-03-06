@@ -13,6 +13,7 @@ config_version=5
 config/name="放置-肉鸽-山海经"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
+run/main_scene="res://ui/pages/PageBattle.tscn"
 
 [autoload]
 
