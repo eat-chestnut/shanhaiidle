@@ -8,16 +8,17 @@ const DEFAULT_MONSTER_ID := "mob_a"
 
 var player := {
 	"pos": Vector2.ZERO,
+	"hp": 200,
 	"radius": 18.0,
 	"atk": 12,
-	"def": 3,
+	"def": 4,
 	"attack_interval": 0.25,
 }
 
 var stage_name: String = "未命名关卡"
 var monsters_cfg: Dictionary = {}
 var spawn_points_cfg: Array[Dictionary] = []
-var spawn_runtime: Dictionary = {}
+var spawn_rt: Dictionary = {}
 var spawn_order: Array[String] = []
 
 var arena_rect: Rect2 = Rect2(Vector2.ZERO, Vector2.ZERO)
@@ -62,9 +63,10 @@ func _load_battle_cfg() -> void:
 		battle_cfg = _load_battle_cfg_from_file()
 
 	stage_name = str(battle_cfg.get("stage_name", "未命名关卡"))
+	_load_player_cfg(battle_cfg)
 	_load_monster_templates(battle_cfg)
 	_load_spawn_points(battle_cfg)
-	_init_spawn_runtime()
+	_init_spawn_rt()
 
 func _load_battle_cfg_from_file() -> Dictionary:
 	var path := "res://data/battle_config.json"
@@ -88,6 +90,16 @@ func _load_monster_templates(battle_cfg: Dictionary) -> void:
 				if not monster_id.is_empty():
 					monsters_cfg[monster_id] = monster.duplicate(true)
 
+func _load_player_cfg(battle_cfg: Dictionary) -> void:
+	var player_cfg_any = battle_cfg.get("player", {})
+	if player_cfg_any is Dictionary:
+		var player_cfg: Dictionary = player_cfg_any
+		player["hp"] = int(player_cfg.get("hp", player.get("hp", 200)))
+		player["radius"] = float(player_cfg.get("radius", player.get("radius", 18.0)))
+		player["atk"] = int(player_cfg.get("atk", player.get("atk", 12)))
+		player["def"] = int(player_cfg.get("def", player.get("def", 4)))
+		player["attack_interval"] = maxf(0.05, float(player_cfg.get("attack_interval", player.get("attack_interval", 0.25))))
+
 func _load_spawn_points(battle_cfg: Dictionary) -> void:
 	spawn_points_cfg.clear()
 	var spawn_points = battle_cfg.get("spawn_points", [])
@@ -97,8 +109,8 @@ func _load_spawn_points(battle_cfg: Dictionary) -> void:
 				var spawn_point: Dictionary = spawn_any
 				spawn_points_cfg.append(spawn_point.duplicate(true))
 
-func _init_spawn_runtime() -> void:
-	spawn_runtime.clear()
+func _init_spawn_rt() -> void:
+	spawn_rt.clear()
 	spawn_order.clear()
 
 	for i in spawn_points_cfg.size():
@@ -106,22 +118,20 @@ func _init_spawn_runtime() -> void:
 		var spawn_id: String = str(spawn_point.get("id", "sp_%d" % [i + 1]))
 		if spawn_id.is_empty():
 			spawn_id = "sp_%d" % [i + 1]
-		while spawn_runtime.has(spawn_id):
+		while spawn_rt.has(spawn_id):
 			spawn_id += "_dup"
 
 		var runtime := {
-			"id": spawn_id,
-			"x_ratio": clampf(float(spawn_point.get("x_ratio", 0.5)), 0.0, 1.0),
-			"y_ratio": clampf(float(spawn_point.get("y_ratio", 0.5)), 0.0, 1.0),
+			"pos": Vector2.ZERO,
 			"respawn_s": maxf(0.05, float(spawn_point.get("respawn_s", 1.5))),
 			"max_alive": maxi(0, int(spawn_point.get("max_alive", 1))),
 			"monster_id": str(spawn_point.get("monster_id", DEFAULT_MONSTER_ID)),
 			"alive_count": 0,
-			"full_logged": false,
-			"next_spawn_time": 0.0,
-			"pos": Vector2.ZERO,
+			"next_spawn_at": 0.0,
+			"x_ratio": clampf(float(spawn_point.get("x_ratio", 0.5)), 0.0, 1.0),
+			"y_ratio": clampf(float(spawn_point.get("y_ratio", 0.5)), 0.0, 1.0),
 		}
-		spawn_runtime[spawn_id] = runtime
+		spawn_rt[spawn_id] = runtime
 		spawn_order.append(spawn_id)
 
 	_update_spawn_positions()
@@ -135,34 +145,30 @@ func _recalc_arena(force: bool = false) -> void:
 
 func _update_spawn_positions() -> void:
 	for spawn_id in spawn_order:
-		if not spawn_runtime.has(spawn_id):
+		if not spawn_rt.has(spawn_id):
 			continue
-		var runtime: Dictionary = spawn_runtime[spawn_id]
+		var runtime: Dictionary = spawn_rt[spawn_id]
 		var x_ratio: float = clampf(float(runtime.get("x_ratio", 0.5)), 0.0, 1.0)
 		var y_ratio: float = clampf(float(runtime.get("y_ratio", 0.5)), 0.0, 1.0)
 		runtime["pos"] = arena_rect.position + Vector2(arena_rect.size.x * x_ratio, arena_rect.size.y * y_ratio)
-		spawn_runtime[spawn_id] = runtime
+		spawn_rt[spawn_id] = runtime
 
 func _process_spawn_points() -> void:
 	for spawn_id in spawn_order:
-		if not spawn_runtime.has(spawn_id):
+		if not spawn_rt.has(spawn_id):
 			continue
-		var runtime: Dictionary = spawn_runtime[spawn_id]
+		var runtime: Dictionary = spawn_rt[spawn_id]
 		var alive_count: int = int(runtime.get("alive_count", 0))
 		var max_alive: int = maxi(0, int(runtime.get("max_alive", 0)))
-		var full_logged: bool = bool(runtime.get("full_logged", false))
-		var next_spawn_time: float = float(runtime.get("next_spawn_time", 0.0))
+		var next_spawn_at: float = float(runtime.get("next_spawn_at", 0.0))
 		var respawn_s: float = maxf(0.05, float(runtime.get("respawn_s", 1.5)))
 
-		if alive_count < max_alive and battle_time >= next_spawn_time:
+		if alive_count < max_alive and battle_time >= next_spawn_at:
 			_spawn_enemy_from_point(spawn_id, runtime)
 			alive_count += 1
 			runtime["alive_count"] = alive_count
-			runtime["next_spawn_time"] = battle_time + respawn_s
-			if alive_count == max_alive and not full_logged:
-				runtime["full_logged"] = true
-				EventBus.add_log("刷怪点%s：满产能（%d）" % [spawn_id, max_alive])
-			spawn_runtime[spawn_id] = runtime
+			runtime["next_spawn_at"] = battle_time + respawn_s
+			spawn_rt[spawn_id] = runtime
 
 func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 	var monster_id: String = str(runtime.get("monster_id", DEFAULT_MONSTER_ID))
@@ -241,17 +247,17 @@ func _auto_attack() -> void:
 		enemies[target_index] = enemy
 
 func _decrease_spawn_alive(spawn_id: String) -> void:
-	if spawn_id.is_empty() or not spawn_runtime.has(spawn_id):
+	if spawn_id.is_empty() or not spawn_rt.has(spawn_id):
 		return
-	var runtime: Dictionary = spawn_runtime[spawn_id]
+	var runtime: Dictionary = spawn_rt[spawn_id]
 	var alive_count: int = maxi(0, int(runtime.get("alive_count", 0)) - 1)
 	var respawn_s: float = maxf(0.05, float(runtime.get("respawn_s", 1.5)))
 	var gate_time: float = battle_time + respawn_s
-	var next_spawn_time: float = float(runtime.get("next_spawn_time", 0.0))
+	var next_spawn_at: float = float(runtime.get("next_spawn_at", 0.0))
 	runtime["alive_count"] = alive_count
-	if next_spawn_time < gate_time:
-		runtime["next_spawn_time"] = gate_time
-	spawn_runtime[spawn_id] = runtime
+	if next_spawn_at < gate_time:
+		runtime["next_spawn_at"] = gate_time
+	spawn_rt[spawn_id] = runtime
 
 func _find_nearest_enemy_index() -> int:
 	var player_pos: Vector2 = player["pos"]
@@ -292,7 +298,7 @@ func _draw() -> void:
 			true
 		)
 
-	var hud_text := "%s｜击杀:%d｜场上:%d｜刷怪点:%d" % [stage_name, kills, enemies.size(), spawn_order.size()]
+	var hud_text := "%s｜Kills:%d｜Enemies:%d｜HP:%d" % [stage_name, kills, enemies.size(), int(player["hp"])]
 	var hud_pos := Vector2(12, 30)
 	var hud_bg_width: float = minf(size.x - 16.0, _measure_text_width(hud_text, HUD_LABEL_SIZE) + 20.0)
 	var hud_bg_rect := Rect2(hud_pos + Vector2(-8, -28), Vector2(hud_bg_width, 40))
@@ -309,16 +315,16 @@ func _draw() -> void:
 func _draw_spawn_points() -> void:
 	for i in spawn_order.size():
 		var spawn_id: String = spawn_order[i]
-		if not spawn_runtime.has(spawn_id):
+		if not spawn_rt.has(spawn_id):
 			continue
-		var runtime: Dictionary = spawn_runtime[spawn_id]
+		var runtime: Dictionary = spawn_rt[spawn_id]
 		var pos: Vector2 = runtime.get("pos", Vector2.ZERO)
 		draw_line(pos + Vector2(-4, 0), pos + Vector2(4, 0), Color.WHITE, 1.0)
 		draw_line(pos + Vector2(0, -4), pos + Vector2(0, 4), Color.WHITE, 1.0)
 		draw_circle(pos, 2.0, Color.WHITE)
 		_draw_label(
 			pos + Vector2(8, -6),
-			"刷%d" % [i + 1],
+			"刷 %s" % spawn_id,
 			Color(1.0, 1.0, 1.0, 0.95),
 			SPAWN_LABEL_SIZE,
 			true
