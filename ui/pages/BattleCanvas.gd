@@ -551,15 +551,30 @@ func _draw_spawn_points() -> void:
 		)
 
 func _build_spawn_status_line() -> String:
-	var parts: Array[String] = []
-	for spawn_id in spawn_order:
-		if not spawn_rt.has(spawn_id):
-			continue
-		var runtime: Dictionary = spawn_rt[spawn_id]
-		var alive_count: int = int(runtime.get("alive_count", 0))
-		var max_alive: int = int(runtime.get("max_alive", 0))
-		parts.append("%s %d/%d" % [spawn_id, alive_count, max_alive])
-	return "刷怪点：%s" % "  ".join(parts)
+	var alive_count := 0
+	var max_alive := 0
+	if spawn_rt.has("sp_1"):
+		var runtime_sp1: Dictionary = spawn_rt["sp_1"]
+		alive_count = int(runtime_sp1.get("alive_count", 0))
+		max_alive = int(runtime_sp1.get("max_alive", 0))
+	elif not spawn_order.is_empty():
+		var first_id: String = spawn_order[0]
+		if spawn_rt.has(first_id):
+			var runtime_first: Dictionary = spawn_rt[first_id]
+			alive_count = int(runtime_first.get("alive_count", 0))
+			max_alive = int(runtime_first.get("max_alive", 0))
+
+	var aggro_on := "未进入"
+	var player_pos: Vector2 = player["pos"]
+	for enemy in enemies:
+		var enemy_dict: Dictionary = enemy
+		var enemy_pos: Vector2 = enemy_dict["pos"]
+		var enemy_aggro_range: float = float(enemy_dict.get("aggro_range", 220.0))
+		if enemy_pos.distance_to(player_pos) <= enemy_aggro_range:
+			aggro_on = "已进入"
+			break
+
+	return "刷怪点 sp_1：%d/%d｜警戒：%s" % [alive_count, max_alive, aggro_on]
 
 func _draw_label(
 	pos: Vector2,
