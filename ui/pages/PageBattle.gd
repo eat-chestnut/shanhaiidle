@@ -36,6 +36,17 @@ func _on_auto_seek_changed(enabled: bool) -> void:
 
 func _refresh_auto_seek_button(enabled: bool) -> void:
 	_btn_auto_seek.text = "自动索敌：开" if enabled else "自动索敌：关"
+	if enabled:
+		_btn_auto_seek.add_theme_color_override("font_color", Color.WHITE)
+		_btn_auto_seek.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0, 1.0))
+		_btn_auto_seek.add_theme_color_override("font_pressed_color", Color.WHITE)
+		_btn_auto_seek.add_theme_color_override("font_focus_color", Color.WHITE)
+	else:
+		var dim := Color(0.7, 0.7, 0.7, 1.0)
+		_btn_auto_seek.add_theme_color_override("font_color", dim)
+		_btn_auto_seek.add_theme_color_override("font_hover_color", dim)
+		_btn_auto_seek.add_theme_color_override("font_pressed_color", dim)
+		_btn_auto_seek.add_theme_color_override("font_focus_color", dim)
 
 func _on_log_toggle_pressed() -> void:
 	_log_view_state = (_log_view_state + 1) % 3
