@@ -674,6 +674,7 @@ func _draw() -> void:
 		_measure_text_width(hud_line_2, HUD_SUB_LABEL_SIZE)
 	) + 20.0
 	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
+	hud_bg_width = minf(hud_bg_width, 420.0)
 	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 48))
 	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
 
