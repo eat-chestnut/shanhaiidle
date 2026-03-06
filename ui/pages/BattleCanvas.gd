@@ -117,6 +117,7 @@ func _init_spawn_runtime() -> void:
 			"max_alive": maxi(0, int(spawn_point.get("max_alive", 1))),
 			"monster_id": str(spawn_point.get("monster_id", DEFAULT_MONSTER_ID)),
 			"alive_count": 0,
+			"full_logged": false,
 			"next_spawn_time": 0.0,
 			"pos": Vector2.ZERO,
 		}
@@ -149,6 +150,7 @@ func _process_spawn_points() -> void:
 		var runtime: Dictionary = spawn_runtime[spawn_id]
 		var alive_count: int = int(runtime.get("alive_count", 0))
 		var max_alive: int = maxi(0, int(runtime.get("max_alive", 0)))
+		var full_logged: bool = bool(runtime.get("full_logged", false))
 		var next_spawn_time: float = float(runtime.get("next_spawn_time", 0.0))
 		var respawn_s: float = maxf(0.05, float(runtime.get("respawn_s", 1.5)))
 
@@ -157,6 +159,9 @@ func _process_spawn_points() -> void:
 			alive_count += 1
 			runtime["alive_count"] = alive_count
 			runtime["next_spawn_time"] = battle_time + respawn_s
+			if alive_count == max_alive and not full_logged:
+				runtime["full_logged"] = true
+				EventBus.add_log("刷怪点%s：满产能（%d）" % [spawn_id, max_alive])
 			spawn_runtime[spawn_id] = runtime
 
 func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
