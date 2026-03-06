@@ -523,14 +523,14 @@ func _draw() -> void:
 	var hp_max: int = int(player.get("max_hp", hp_now))
 	var hud_line_1 := "%s｜HP %d/%d｜击杀 %d｜场上 %d" % [stage_name, hp_now, hp_max, kills, enemies.size()]
 	var hud_line_2 := _build_spawn_status_line()
-	var hud_pos_1 := Vector2(12, 30)
-	var hud_pos_2 := Vector2(12, 60)
+	var hud_pos_1 := Vector2(12, 36)
+	var hud_pos_2 := hud_pos_1 + Vector2(0, 28)
 	var hud_bg_width: float = maxf(
 		_measure_text_width(hud_line_1, HUD_LABEL_SIZE),
 		_measure_text_width(hud_line_2, HUD_SUB_LABEL_SIZE)
 	) + 20.0
 	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
-	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -28), Vector2(hud_bg_width, 72))
+	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 48))
 	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
 
 	_draw_label(

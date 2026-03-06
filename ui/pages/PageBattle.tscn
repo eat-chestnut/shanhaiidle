@@ -1,8 +1,15 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ui/pages/PageBattle.gd" id="1_jqyvh"]
 [ext_resource type="Script" path="res://ui/pages/BattleCanvas.gd" id="2_u5g0q"]
 [ext_resource type="PackedScene" path="res://ui/components/LogPanel.tscn" id="3_2of85"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logpanel_pad"]
+bg_color = Color(0, 0, 0, 0)
+content_margin_left = 6.0
+content_margin_right = 6.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
 
 [node name="PageBattle" type="Control"]
 layout_mode = 3
@@ -43,7 +50,7 @@ size_flags_stretch_ratio = 1.0
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="LogTitle" type="Label" parent="RootVBox/LogWrap/LogVBox"]
 layout_mode = 2
@@ -54,6 +61,7 @@ theme_override_font_sizes/font_size = 22
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_logpanel_pad")
 
 [node name="BottomMenu" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2
