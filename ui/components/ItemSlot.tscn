@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://icon.svg" id="2_hor5d"]
 
 [node name="ItemSlot" type="Control"]
-custom_minimum_size = Vector2(92, 92)
+custom_minimum_size = Vector2(100, 100)
 script = ExtResource("1_x5x1r")
 
 [node name="BorderOverlay" type="Panel" parent="."]
