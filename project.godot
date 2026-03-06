@@ -14,6 +14,10 @@ config/name="放置-肉鸽-山海经"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+EventBus="*res://autoload/EventBus.gd"
+
 [rendering]
 
 renderer/rendering_method="mobile"
