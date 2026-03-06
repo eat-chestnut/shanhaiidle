@@ -270,17 +270,22 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 		template = template_any
 
 	var hp: int = int(template.get("hp", 30))
+	var enemy_radius: float = float(template.get("radius", 14.0))
+	var spawn_pos: Vector2 = runtime.get("pos", Vector2.ZERO)
+	spawn_pos = _clamp_pos_in_arena(spawn_pos, enemy_radius)
 	var enemy := {
 		"spawn_id": spawn_id,
 		"monster_id": monster_id,
-		"pos": runtime.get("pos", Vector2.ZERO),
+		"pos": spawn_pos,
+		"home_pos": spawn_pos,
+		"state": "idle",
 		"speed": float(template.get("speed", 85.0)),
 		"aggro_range": float(template.get("aggro_range", 220.0)),
 		"attack_range": float(template.get("attack_range", 8.0)),
 		"attack_cd": maxf(0.05, float(template.get("attack_interval", ENEMY_ATTACK_INTERVAL))),
 		"atk": int(template.get("atk", DEFAULT_ENEMY_ATK)),
 		"attack_timer": 0.0,
-		"radius": float(template.get("radius", 14.0)),
+		"radius": enemy_radius,
 		"hp": hp,
 		"hpmax": hp,
 		"def": int(template.get("def", 2)),
@@ -311,17 +316,51 @@ func _move_enemies(delta: float) -> void:
 	for i in enemies.size():
 		var enemy: Dictionary = enemies[i]
 		var enemy_pos: Vector2 = enemy["pos"]
+		var home_pos: Vector2 = enemy.get("home_pos", enemy_pos)
 		var enemy_speed: float = float(enemy.get("speed", 85.0))
 		var enemy_aggro_range: float = float(enemy.get("aggro_range", 220.0))
 		var enemy_radius: float = float(enemy.get("radius", 14.0))
+		var state: String = str(enemy.get("state", "idle"))
+		var prev_state: String = state
 		var distance_to_player: float = enemy_pos.distance_to(player_pos)
 
-		if distance_to_player <= enemy_aggro_range:
-			var dir: Vector2 = (player_pos - enemy_pos).normalized()
-			enemy_pos += dir * enemy_speed * delta
-			enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
+		match state:
+			"idle":
+				if distance_to_player <= enemy_aggro_range:
+					state = "chase"
+			"chase":
+				if distance_to_player > enemy_aggro_range * 1.2:
+					state = "return"
+			"return":
+				pass
+			_:
+				state = "idle"
+
+		if state == "chase":
+			var chase_vec: Vector2 = player_pos - enemy_pos
+			var chase_len: float = chase_vec.length()
+			if chase_len > 0.001:
+				enemy_pos += (chase_vec / chase_len) * enemy_speed * delta
+				enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
+		elif state == "return":
+			var home_vec: Vector2 = home_pos - enemy_pos
+			var home_dist: float = home_vec.length()
+			if home_dist <= 6.0:
+				enemy_pos = home_pos
+				state = "idle"
+			else:
+				enemy_pos += (home_vec / home_dist) * enemy_speed * delta
+				enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
+				if enemy_pos.distance_to(home_pos) <= 6.0:
+					enemy_pos = home_pos
+					state = "idle"
+
+		if prev_state == "chase" and state != "chase":
+			enemy["attack_timer"] = 0.0
 
 		enemy["pos"] = enemy_pos
+		enemy["home_pos"] = home_pos
+		enemy["state"] = state
 		enemies[i] = enemy
 
 func _enemy_attack_player(delta: float) -> void:
@@ -336,17 +375,21 @@ func _enemy_attack_player(delta: float) -> void:
 	for i in enemies.size():
 		var enemy: Dictionary = enemies[i]
 		var enemy_pos: Vector2 = enemy["pos"]
+		var enemy_state: String = str(enemy.get("state", "idle"))
 		var enemy_radius: float = float(enemy.get("radius", 14.0))
-		var enemy_aggro_range: float = float(enemy.get("aggro_range", 220.0))
 		var enemy_attack_range: float = float(enemy.get("attack_range", 8.0))
 		var enemy_attack_cd: float = maxf(0.05, float(enemy.get("attack_cd", ENEMY_ATTACK_INTERVAL)))
 		var enemy_atk: int = int(enemy.get("atk", DEFAULT_ENEMY_ATK))
 		var attack_timer: float = float(enemy.get("attack_timer", 0.0))
+		if enemy_state != "chase":
+			enemies[i] = enemy
+			continue
+
 		attack_timer += delta
 
 		var distance_to_player: float = enemy_pos.distance_to(player_pos)
 		var attack_distance: float = enemy_attack_range + player_radius + enemy_radius
-		if distance_to_player <= enemy_aggro_range and distance_to_player <= attack_distance and attack_timer >= enemy_attack_cd:
+		if distance_to_player <= attack_distance and attack_timer >= enemy_attack_cd:
 			var damage: int = enemy_atk - player_def
 			if damage < 1:
 				damage = 1
