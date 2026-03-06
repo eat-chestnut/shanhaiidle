@@ -33,7 +33,7 @@ grow_vertical = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-size_flags_stretch_ratio = 2.0
+size_flags_stretch_ratio = 2.3
 
 [node name="BattleLayer" type="Control" parent="RootVBox/BattleWrap"]
 layout_mode = 2
@@ -72,20 +72,32 @@ text = "自动索敌：开"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-size_flags_stretch_ratio = 1.0
+size_flags_stretch_ratio = 0.7
 
-[node name="LogVBox" type="VBoxContainer" parent="RootVBox/LogWrap"]
+[node name="LogBox" type="VBoxContainer" parent="RootVBox/LogWrap"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="LogTitle" type="Label" parent="RootVBox/LogWrap/LogVBox"]
+[node name="LogHeader" type="HBoxContainer" parent="RootVBox/LogWrap/LogBox"]
 layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+
+[node name="LogTitle" type="Label" parent="RootVBox/LogWrap/LogBox/LogHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "战斗日志"
 theme_override_font_sizes/font_size = 22
 
-[node name="LogPanel" parent="RootVBox/LogWrap/LogVBox" instance=ExtResource("3_2of85")]
+[node name="BtnLogToggle" type="Button" parent="RootVBox/LogWrap/LogBox/LogHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "▼"
+
+[node name="LogPanel" parent="RootVBox/LogWrap/LogBox" instance=ExtResource("3_2of85")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
