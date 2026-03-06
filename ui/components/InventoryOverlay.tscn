@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://ui/components/InventoryOverlay.gd" id="1_h5wki"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_0xpr8"]
+[ext_resource type="Script" path="res://ui/components/InventoryOverlay.gd" id="1_8gb42"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_ap3mu"]
 
 [node name="InventoryOverlay" type="Control"]
 visible = false
@@ -12,7 +12,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("1_h5wki")
+script = ExtResource("1_8gb42")
 
 [node name="DimBG" type="ColorRect" parent="."]
 layout_mode = 1
@@ -21,15 +21,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.55)
 mouse_filter = 1
+color = Color(0, 0, 0, 0.55)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
-anchor_left = 0.05
-anchor_top = 0.05
-anchor_right = 0.95
-anchor_bottom = 0.9
+anchor_left = 0.04
+anchor_top = 0.03
+anchor_right = 0.96
+anchor_bottom = 0.96
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
@@ -38,114 +38,82 @@ mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
-[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+[node name="Header" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 52)
 
-[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+[node name="Title" type="Label" parent="Panel/VBox/Header"]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "背包"
 theme_override_font_sizes/font_size = 28
 vertical_alignment = 1
 
-[node name="BtnClose" type="TextureButton" parent="Panel/VBox/TopBar"]
+[node name="HeaderSpacer" type="Control" parent="Panel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnClose" type="TextureButton" parent="Panel/VBox/Header"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="TabBar" type="HBoxContainer" parent="Panel/VBox"]
+[node name="TopSection" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 340)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
 theme_override_constants/separation = 10
 
-[node name="TabItems" type="HBoxContainer" parent="Panel/VBox/TabBar"]
-layout_mode = 2
-custom_minimum_size = Vector2(120, 0)
-theme_override_constants/separation = 6
-
-[node name="BtnTabItems" type="TextureButton" parent="Panel/VBox/TabBar/TabItems"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="LblTabItems" type="Label" parent="Panel/VBox/TabBar/TabItems"]
-layout_mode = 2
-text = "物品"
-vertical_alignment = 1
-
-[node name="TabEquip" type="HBoxContainer" parent="Panel/VBox/TabBar"]
-layout_mode = 2
-custom_minimum_size = Vector2(120, 0)
-theme_override_constants/separation = 6
-
-[node name="BtnTabEquip" type="TextureButton" parent="Panel/VBox/TabBar/TabEquip"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
-ignore_texture_size = true
-stretch_mode = 5
-
-[node name="LblTabEquip" type="Label" parent="Panel/VBox/TabBar/TabEquip"]
-layout_mode = 2
-text = "装备"
-vertical_alignment = 1
-
-[node name="TabSpacer" type="Control" parent="Panel/VBox/TabBar"]
+[node name="CharacterPanel" type="PanelContainer" parent="Panel/VBox/TopSection"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.9
 
-[node name="Body" type="HBoxContainer" parent="Panel/VBox"]
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/TopSection/CharacterPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+alignment = 1
 theme_override_constants/separation = 10
 
-[node name="LeftPane" type="PanelContainer" parent="Panel/VBox/Body"]
+[node name="Portrait" type="TextureRect" parent="Panel/VBox/TopSection/CharacterPanel/VBox"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_ap3mu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharacterName" type="Label" parent="Panel/VBox/TopSection/CharacterPanel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "角色"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="EquipPanel" type="PanelContainer" parent="Panel/VBox/TopSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+
+[node name="EquipGrid" type="GridContainer" parent="Panel/VBox/TopSection/EquipPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-size_flags_stretch_ratio = 2.0
-
-[node name="Grid" type="GridContainer" parent="Panel/VBox/Body/LeftPane"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-columns = 5
-
-[node name="RightPane" type="VBoxContainer" parent="Panel/VBox/Body"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-size_flags_stretch_ratio = 1.2
-theme_override_constants/separation = 8
-
-[node name="EquipTitle" type="Label" parent="Panel/VBox/Body/RightPane"]
-layout_mode = 2
-text = "装备栏"
-theme_override_font_sizes/font_size = 22
-
-[node name="EquipGrid" type="GridContainer" parent="Panel/VBox/Body/RightPane"]
-layout_mode = 2
-size_flags_horizontal = 3
 columns = 2
 
-[node name="Slot_weapon" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_weapon" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_weapon"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_weapon"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -155,14 +123,14 @@ text = "weapon"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_helm" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_helm" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_helm"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_helm"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -172,14 +140,14 @@ text = "helm"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_armor" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_armor" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_armor"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_armor"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -189,14 +157,14 @@ text = "armor"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_pants" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_pants" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_pants"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_pants"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -206,14 +174,14 @@ text = "pants"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_shoes" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_shoes" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_shoes"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_shoes"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -223,14 +191,14 @@ text = "shoes"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_cloak" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_cloak" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_cloak"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_cloak"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -240,14 +208,14 @@ text = "cloak"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_ring1" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_ring1" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_ring1"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_ring1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -257,14 +225,14 @@ text = "ring1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_ring2" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_ring2" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_ring2"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_ring2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -274,14 +242,14 @@ text = "ring2"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_bracelet1" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_bracelet1" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_bracelet1"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_bracelet1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -291,14 +259,14 @@ text = "bracelet1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Slot_bracelet2" type="TextureButton" parent="Panel/VBox/Body/RightPane/EquipGrid"]
-custom_minimum_size = Vector2(140, 40)
+[node name="Slot_bracelet2" type="TextureButton" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid"]
+custom_minimum_size = Vector2(144, 44)
 layout_mode = 2
-texture_normal = ExtResource("2_0xpr8")
+texture_normal = ExtResource("2_ap3mu")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Panel/VBox/Body/RightPane/EquipGrid/Slot_bracelet2"]
+[node name="Text" type="Label" parent="Panel/VBox/TopSection/EquipPanel/EquipGrid/Slot_bracelet2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -308,32 +276,111 @@ text = "bracelet2"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DetailTitle" type="Label" parent="Panel/VBox/Body/RightPane"]
+[node name="StatsPanel" type="PanelContainer" parent="Panel/VBox/TopSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.1
+
+[node name="VBox" type="VBoxContainer" parent="Panel/VBox/TopSection/StatsPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="StatsTitle" type="Label" parent="Panel/VBox/TopSection/StatsPanel/VBox"]
+layout_mode = 2
+text = "属性"
+theme_override_font_sizes/font_size = 22
+
+[node name="StatsText" type="RichTextLabel" parent="Panel/VBox/TopSection/StatsPanel/VBox"]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+size_flags_horizontal = 3
+fit_content = false
+scroll_active = false
+text = "HP 200\nATK 12\nDEF 4\nCRIT 0"
+
+[node name="DetailTitle" type="Label" parent="Panel/VBox/TopSection/StatsPanel/VBox"]
 layout_mode = 2
 text = "详情"
 theme_override_font_sizes/font_size = 20
 
-[node name="DetailText" type="RichTextLabel" parent="Panel/VBox/Body/RightPane"]
-custom_minimum_size = Vector2(0, 160)
+[node name="DetailText" type="RichTextLabel" parent="Panel/VBox/TopSection/StatsPanel/VBox"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-bbcode_enabled = false
 fit_content = false
 scroll_active = true
-text = "未选择装备"
+text = "未选择"
 
-[node name="ActionRow" type="HBoxContainer" parent="Panel/VBox/Body/RightPane"]
+[node name="Tabs" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="BtnEquip" type="Button" parent="Panel/VBox/Body/RightPane/ActionRow"]
+[node name="TabItems" type="HBoxContainer" parent="Panel/VBox/Tabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+theme_override_constants/separation = 6
+
+[node name="BtnTabItems" type="TextureButton" parent="Panel/VBox/Tabs/TabItems"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+texture_normal = ExtResource("2_ap3mu")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="LblTabItems" type="Label" parent="Panel/VBox/Tabs/TabItems"]
+layout_mode = 2
+text = "物品"
+vertical_alignment = 1
+
+[node name="TabEquip" type="HBoxContainer" parent="Panel/VBox/Tabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+theme_override_constants/separation = 6
+
+[node name="BtnTabEquip" type="TextureButton" parent="Panel/VBox/Tabs/TabEquip"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+texture_normal = ExtResource("2_ap3mu")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="LblTabEquip" type="Label" parent="Panel/VBox/Tabs/TabEquip"]
+layout_mode = 2
+text = "装备"
+vertical_alignment = 1
+
+[node name="TabSpacer" type="Control" parent="Panel/VBox/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BottomInventoryGrid" type="PanelContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Grid" type="GridContainer" parent="Panel/VBox/BottomInventoryGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 5
+
+[node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="BtnEquip" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "穿戴"
 
-[node name="BtnUnequip" type="Button" parent="Panel/VBox/Body/RightPane/ActionRow"]
+[node name="BtnUnequip" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "卸下"

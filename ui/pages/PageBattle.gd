@@ -9,10 +9,12 @@ const LOG_VIEW_EXPANDED := 2
 @onready var _btn_log_toggle: Button = $RootVBox/LogWrap/LogBox/LogHeader/BtnLogToggle
 @onready var _btn_auto_seek: Button = $RootVBox/BattleWrap/BattleLayer/BtnAutoSeek
 @onready var _btn_bag: BaseButton = $RootVBox/BottomMenu/BagGroup/BtnBag
-@onready var _battle_canvas: Node = $RootVBox/BattleWrap/BattleLayer/BattleCanvas
+@onready var _battle_canvas: Control = $RootVBox/BattleWrap/BattleLayer/BattleCanvas
+@onready var _joystick: CanvasItem = $RootVBox/BattleWrap/BattleLayer/VirtualJoystick
 @onready var _inventory_overlay: Node = $InventoryOverlay
 
 var _log_view_state := LOG_VIEW_HALF
+var _overlay_open := false
 
 func _ready() -> void:
 	if not EventBus.log_added.is_connected(_log_panel.append_log):
@@ -37,7 +39,9 @@ func _ready() -> void:
 			_inventory_overlay.connect("opened", opened_cb)
 		if _inventory_overlay.has_signal("closed") and not _inventory_overlay.is_connected("closed", closed_cb):
 			_inventory_overlay.connect("closed", closed_cb)
-	_set_battle_paused(false)
+	_overlay_open = false
+	if _joystick != null:
+		_joystick.visible = true
 
 	var spawn_count := 1
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -49,6 +53,18 @@ func _ready() -> void:
 			spawn_count = max(1, spawn_points_any.size())
 	EventBus.add_log("进入战斗：刷怪点已激活（%d处）" % spawn_count)
 	EventBus.add_log("提示：击杀每满5会播报一次")
+
+func _process(_delta: float) -> void:
+	if _battle_canvas == null:
+		return
+	BattleService.set_viewport_arena_size(_battle_canvas.size)
+
+	var input_vec := Vector2.ZERO
+	if not _overlay_open and _joystick != null and _joystick.has_method("get_vector"):
+		var vec_any = _joystick.call("get_vector")
+		if vec_any is Vector2:
+			input_vec = vec_any
+	BattleService.set_manual_input(input_vec)
 
 func _on_auto_seek_pressed() -> void:
 	GameSettings.set_auto_seek(not GameSettings.auto_seek_enabled, "按钮切换")
@@ -98,15 +114,18 @@ func _apply_log_view_state() -> void:
 func _on_bag_pressed() -> void:
 	if _inventory_overlay != null and _inventory_overlay.has_method("open"):
 		_inventory_overlay.call("open")
-	_set_battle_paused(true)
+	_overlay_open = true
+	if _joystick != null:
+		_joystick.visible = false
+	BattleService.set_manual_input(Vector2.ZERO)
 
 func _on_inventory_opened() -> void:
-	_set_battle_paused(true)
+	_overlay_open = true
+	if _joystick != null:
+		_joystick.visible = false
+	BattleService.set_manual_input(Vector2.ZERO)
 
 func _on_inventory_closed() -> void:
-	_set_battle_paused(false)
-
-func _set_battle_paused(paused: bool) -> void:
-	if _battle_canvas == null:
-		return
-	_battle_canvas.process_mode = Node.PROCESS_MODE_DISABLED if paused else Node.PROCESS_MODE_INHERIT
+	_overlay_open = false
+	if _joystick != null:
+		_joystick.visible = true

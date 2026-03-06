@@ -5,853 +5,68 @@ const ENEMY_LABEL_SIZE := 24
 const HUD_LABEL_SIZE := 28
 const HUD_SUB_LABEL_SIZE := 22
 const SPAWN_LABEL_SIZE := 18
-const DEFAULT_MONSTER_ID := "mob_a"
-const DEFAULT_ENEMY_ATK := 6
-const ENEMY_ATTACK_INTERVAL := 0.8
-const HIT_LOG_INTERVAL := 1.0
-const FLOAT_TEXT_TTL := 1.2
-const LOOT_TTL := 20.0
-const LOOT_PICKUP_RADIUS := 28.0
 const LOOT_LABEL_SIZE := 18
 const MAX_LOOT_LABELS := 6
 
-var player := {
-	"pos": Vector2.ZERO,
-	"hp": 200,
-	"max_hp": 200,
-	"radius": 18.0,
-	"atk": 12,
-	"def": 4,
-	"speed": 140.0,
-	"attack_interval": 0.25,
-	"attack_range": 10.0,
-}
+var local_state: Dictionary = {}
 
-var stage_name: String = "未命名关卡"
-var monsters_cfg: Dictionary = {}
-var monster_default_cfg: Dictionary = {}
-var equip_templates_by_id: Dictionary = {}
-var spawn_points_cfg: Array[Dictionary] = []
-var spawn_rt: Dictionary = {}
-var spawn_order: Array[String] = []
-var drop_chance := 0.0
-var drop_weights: Dictionary = {}
-var drop_items: Dictionary = {}
-var equip_drop_chance := 0.0
-var equip_drop_weights: Dictionary = {}
-var equip_drop_by_rarity: Dictionary = {}
-
-var arena_rect: Rect2 = Rect2(Vector2.ZERO, Vector2.ZERO)
-var _last_canvas_size: Vector2 = Vector2.ZERO
-
-var battle_time := 0.0
-var enemies: Array[Dictionary] = []
-var ground_loots: Array[Dictionary] = []
-var floating_texts: Array[Dictionary] = []
-var kills := 0
-var drop_white_count := 0
-var drop_blue_count := 0
-var drop_gold_count := 0
-
-var _attack_timer := 0.0
-var _hit_log_cd := 0.0
-var _joystick: Node = null
-var _equipment_model: Node = null
-var _auto_seek_moving := false
-var _manual_seek_off_fired := false
-
-func _ready() -> void:
-	randomize()
-	_load_battle_cfg()
-	_recalc_arena(true)
-	_equipment_model = get_node_or_null("/root/EquipmentModel")
-	_sync_player_combat_stats(true)
-	player["pos"] = arena_rect.position + arena_rect.size * 0.5
-	_joystick = get_node_or_null("../VirtualJoystick")
-
-func _process(delta: float) -> void:
-	battle_time += delta
-	_recalc_arena()
-	_sync_player_combat_stats()
-	player["pos"] = _clamp_pos_in_arena(player["pos"], float(player["radius"]))
-	if _hit_log_cd > 0.0:
-		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
-
-	_process_spawn_points()
-	_process_player_move(delta)
-	_move_enemies(delta)
-	_enemy_attack_player(delta)
-	_update_ground_loots(delta)
-	_update_floating_texts(delta)
-
-	_attack_timer += delta
-	var attack_interval: float = float(player["attack_interval"])
-	while _attack_timer >= attack_interval:
-		_attack_timer -= attack_interval
-		_auto_attack()
-
+func _process(_delta: float) -> void:
+	local_state = BattleService.get_state()
 	queue_redraw()
 
-func _load_battle_cfg() -> void:
-	var battle_cfg: Dictionary = {}
-	var config_service = get_node_or_null("/root/ConfigService")
-	if config_service != null and config_service.has_method("get_cfg"):
-		var full_cfg = config_service.call("get_cfg")
-		if full_cfg is Dictionary:
-			battle_cfg = full_cfg.get("battle", {})
-	if battle_cfg.is_empty():
-		battle_cfg = _load_battle_cfg_from_file()
-
-	stage_name = str(battle_cfg.get("stage_name", "未命名关卡"))
-	_load_player_cfg(battle_cfg)
-	_load_monster_templates(battle_cfg)
-	_load_equip_templates()
-	_load_spawn_points(battle_cfg)
-	_load_drops_cfg(battle_cfg)
-	_init_spawn_rt()
-
-func _load_battle_cfg_from_file() -> Dictionary:
-	var path := "res://data/battle_config.json"
-	if not FileAccess.file_exists(path):
-		return {}
-
-	var text := FileAccess.get_file_as_string(path)
-	var parsed = JSON.parse_string(text)
-	if parsed is Dictionary:
-		return parsed.get("battle", {})
-	return {}
-
-func _load_monster_templates(battle_cfg: Dictionary) -> void:
-	monsters_cfg.clear()
-	monster_default_cfg.clear()
-	var monster_list = battle_cfg.get("monsters", [])
-	if monster_list is Array:
-		for i in monster_list.size():
-			var monster_any = monster_list[i]
-			if monster_any is Dictionary:
-				var monster: Dictionary = monster_any
-				var monster_id: String = str(monster.get("id", ""))
-				if not monster_id.is_empty():
-					monsters_cfg[monster_id] = monster.duplicate(true)
-				if i == 0:
-					monster_default_cfg = monster.duplicate(true)
-
-func _load_equip_templates() -> void:
-	equip_templates_by_id.clear()
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var equip_db_any = cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return
-	var equip_db: Dictionary = equip_db_any
-	var templates_any = equip_db.get("equip_templates", [])
-	if not (templates_any is Array):
-		return
-
-	for tpl_any in templates_any:
-		if not (tpl_any is Dictionary):
-			continue
-		var tpl: Dictionary = tpl_any
-		var tpl_id := str(tpl.get("id", ""))
-		if tpl_id.is_empty():
-			continue
-		equip_templates_by_id[tpl_id] = tpl.duplicate(true)
-
-func _sync_player_combat_stats(force_full: bool = false) -> void:
-	if _equipment_model == null:
-		_equipment_model = get_node_or_null("/root/EquipmentModel")
-	if _equipment_model == null or not _equipment_model.has_method("get_total_stats"):
-		return
-
-	var stats_any = _equipment_model.call("get_total_stats")
-	if not (stats_any is Dictionary):
-		return
-	var stats: Dictionary = stats_any
-
-	var new_hp_max := maxi(1, int(stats.get("HP", int(player.get("max_hp", 200)))))
-	var old_hp_max := maxi(1, int(player.get("max_hp", new_hp_max)))
-	var current_hp := int(player.get("hp", old_hp_max))
-
-	if force_full:
-		current_hp = new_hp_max
-	elif old_hp_max != new_hp_max:
-		var ratio := float(current_hp) / float(old_hp_max)
-		current_hp = int(round(clampf(ratio, 0.0, 1.0) * float(new_hp_max)))
-
-	player["max_hp"] = new_hp_max
-	player["hp"] = clampi(current_hp, 0, new_hp_max)
-	player["atk"] = int(stats.get("ATK", int(player.get("atk", 12))))
-	player["def"] = int(stats.get("DEF", int(player.get("def", 4))))
-	player["crit"] = int(stats.get("CRIT", 0))
-
-func _load_player_cfg(battle_cfg: Dictionary) -> void:
-	var max_hp: int = int(player.get("max_hp", player.get("hp", 200)))
-	var player_cfg_any = battle_cfg.get("player", {})
-	if player_cfg_any is Dictionary:
-		var player_cfg: Dictionary = player_cfg_any
-		max_hp = int(player_cfg.get("hp", max_hp))
-		player["radius"] = float(player_cfg.get("radius", player.get("radius", 18.0)))
-		player["atk"] = int(player_cfg.get("atk", player.get("atk", 12)))
-		player["def"] = int(player_cfg.get("def", player.get("def", 4)))
-		player["speed"] = float(player_cfg.get("speed", player.get("speed", 140.0)))
-		player["attack_interval"] = maxf(0.05, float(player_cfg.get("attack_interval", player.get("attack_interval", 0.25))))
-		player["attack_range"] = float(player_cfg.get("attack_range", player.get("attack_range", 10.0)))
-	player["max_hp"] = max_hp
-	player["hp"] = max_hp
-
-func _load_spawn_points(battle_cfg: Dictionary) -> void:
-	spawn_points_cfg.clear()
-	var spawn_points = battle_cfg.get("spawn_points", [])
-	if spawn_points is Array:
-		if not spawn_points.is_empty():
-			var first_any = spawn_points[0]
-			if first_any is Dictionary:
-				var spawn_point: Dictionary = first_any
-				spawn_points_cfg.append(spawn_point.duplicate(true))
-
-func _load_drops_cfg(battle_cfg: Dictionary) -> void:
-	drop_chance = 0.0
-	drop_weights.clear()
-	drop_items.clear()
-	equip_drop_chance = 0.0
-	equip_drop_weights.clear()
-	equip_drop_by_rarity.clear()
-
-	var drops_any = battle_cfg.get("drops", {})
-	if not (drops_any is Dictionary):
-		return
-
-	var drops: Dictionary = drops_any
-	drop_chance = clampf(float(drops.get("drop_chance", 0.0)), 0.0, 1.0)
-
-	var weights_any = drops.get("rarity_weights", {})
-	if weights_any is Dictionary:
-		var weights: Dictionary = weights_any
-		for rarity in ["white", "blue", "gold"]:
-			drop_weights[rarity] = maxi(0, int(weights.get(rarity, 0)))
-
-	var items_any = drops.get("items", {})
-	if items_any is Dictionary:
-		var items_dict: Dictionary = items_any
-		for rarity in ["white", "blue", "gold"]:
-			var list_any = items_dict.get(rarity, [])
-			if list_any is Array:
-				var names: Array[String] = []
-				for item_any in list_any:
-					names.append(str(item_any))
-				drop_items[rarity] = names
-
-	equip_drop_chance = clampf(float(drops.get("equip_chance", 0.0)), 0.0, 1.0)
-	var equip_weights_any = drops.get("equip_weights", {})
-	if equip_weights_any is Dictionary:
-		var equip_weights_dict: Dictionary = equip_weights_any
-		for rarity in ["white", "blue", "gold"]:
-			equip_drop_weights[rarity] = maxi(0, int(equip_weights_dict.get(rarity, 0)))
-
-	var equip_pool_any = drops.get("equip_by_rarity", {})
-	if equip_pool_any is Dictionary:
-		var equip_pool: Dictionary = equip_pool_any
-		for rarity in ["white", "blue", "gold"]:
-			var list_any = equip_pool.get(rarity, [])
-			if list_any is Array:
-				var ids: Array[String] = []
-				for tpl_id_any in list_any:
-					ids.append(str(tpl_id_any))
-				equip_drop_by_rarity[rarity] = ids
-
-func _init_spawn_rt() -> void:
-	spawn_rt.clear()
-	spawn_order.clear()
-
-	for i in spawn_points_cfg.size():
-		var spawn_point: Dictionary = spawn_points_cfg[i]
-		var spawn_id: String = str(spawn_point.get("id", "sp_%d" % [i + 1]))
-		if spawn_id.is_empty():
-			spawn_id = "sp_%d" % [i + 1]
-		while spawn_rt.has(spawn_id):
-			spawn_id += "_dup"
-
-		var runtime := {
-			"pos": Vector2.ZERO,
-			"respawn_s": maxf(0.05, float(spawn_point.get("respawn_s", 1.5))),
-			"max_alive": maxi(0, int(spawn_point.get("max_alive", 1))),
-			"monster_id": str(spawn_point.get("monster_id", DEFAULT_MONSTER_ID)),
-			"spawn_radius": maxf(0.0, float(spawn_point.get("spawn_radius", 0.0))),
-			"alive_count": 0,
-			"next_spawn_at": 0.0,
-			"x_ratio": clampf(float(spawn_point.get("x_ratio", 0.5)), 0.0, 1.0),
-			"y_ratio": clampf(float(spawn_point.get("y_ratio", 0.5)), 0.0, 1.0),
-		}
-		spawn_rt[spawn_id] = runtime
-		spawn_order.append(spawn_id)
-
-	_update_spawn_positions()
-
-func _recalc_arena(force: bool = false) -> void:
-	if not force and _last_canvas_size.is_equal_approx(size):
-		return
-	_last_canvas_size = size
-	arena_rect = Rect2(Vector2.ZERO, size)
-	_update_spawn_positions()
-
-func _update_spawn_positions() -> void:
-	for spawn_id in spawn_order:
-		if not spawn_rt.has(spawn_id):
-			continue
-		var runtime: Dictionary = spawn_rt[spawn_id]
-		var x_ratio: float = clampf(float(runtime.get("x_ratio", 0.5)), 0.0, 1.0)
-		var y_ratio: float = clampf(float(runtime.get("y_ratio", 0.5)), 0.0, 1.0)
-		runtime["pos"] = arena_rect.position + Vector2(arena_rect.size.x * x_ratio, arena_rect.size.y * y_ratio)
-		spawn_rt[spawn_id] = runtime
-
-func _process_spawn_points() -> void:
-	for spawn_id in spawn_order:
-		if not spawn_rt.has(spawn_id):
-			continue
-		var runtime: Dictionary = spawn_rt[spawn_id]
-		var alive_count: int = int(runtime.get("alive_count", 0))
-		var max_alive: int = maxi(0, int(runtime.get("max_alive", 0)))
-		var next_spawn_at: float = float(runtime.get("next_spawn_at", 0.0))
-		var respawn_s: float = maxf(0.05, float(runtime.get("respawn_s", 1.5)))
-
-		if alive_count < max_alive and battle_time >= next_spawn_at:
-			_spawn_enemy_from_point(spawn_id, runtime)
-			alive_count += 1
-			runtime["alive_count"] = alive_count
-			runtime["next_spawn_at"] = battle_time + respawn_s
-			spawn_rt[spawn_id] = runtime
-
-func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
-	var monster_id: String = str(runtime.get("monster_id", DEFAULT_MONSTER_ID))
-	var template: Dictionary = monster_default_cfg
-	var template_any = monsters_cfg.get(monster_id, monster_default_cfg)
-	if template_any is Dictionary:
-		template = template_any
-
-	var hp: int = int(template.get("hp", 30))
-	var enemy_radius: float = float(template.get("radius", 14.0))
-	var home_pos: Vector2 = runtime.get("pos", Vector2.ZERO)
-	var spawn_radius: float = maxf(0.0, float(runtime.get("spawn_radius", 0.0)))
-	var spawn_pos: Vector2 = home_pos + _random_point_in_circle(spawn_radius)
-	spawn_pos = _clamp_pos_in_arena(spawn_pos, enemy_radius)
-	var enemy := {
-		"spawn_id": spawn_id,
-		"monster_id": monster_id,
-		"pos": spawn_pos,
-		"home_pos": home_pos,
-		"state": "idle",
-		"speed": float(template.get("speed", 85.0)),
-		"aggro_range": float(template.get("aggro_range", 220.0)),
-		"attack_range": float(template.get("attack_range", 8.0)),
-		"attack_cd": maxf(0.05, float(template.get("attack_interval", ENEMY_ATTACK_INTERVAL))),
-		"atk": int(template.get("atk", DEFAULT_ENEMY_ATK)),
-		"attack_timer": 0.0,
-		"radius": enemy_radius,
-		"hp": hp,
-		"hpmax": hp,
-		"def": int(template.get("def", 2)),
-	}
-	enemies.append(enemy)
-
-func _process_player_move(delta: float) -> void:
-	var joy_vec: Vector2 = _get_joy_vector()
-	var joy_len: float = joy_vec.length()
-	if joy_len > 0.0:
-		_process_joystick_move(joy_vec, delta)
-		return
-
-	_manual_seek_off_fired = false
-	if not GameSettings.auto_seek_enabled:
-		_auto_seek_moving = false
-		return
-
-	_process_auto_seek_move(delta)
-
-func _process_joystick_move(joy_vec: Vector2, delta: float) -> void:
-	var player_pos: Vector2 = player["pos"]
-	var player_radius: float = float(player["radius"])
-	var player_speed: float = float(player.get("speed", 140.0))
-	var joy_dir: Vector2 = joy_vec.normalized()
-	player_pos += joy_dir * player_speed * delta
-	player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
-	_auto_seek_moving = false
-
-	if GameSettings.auto_seek_enabled and not _manual_seek_off_fired:
-		GameSettings.set_auto_seek(false, "手动移动自动关闭")
-		_manual_seek_off_fired = true
-
-func _process_auto_seek_move(delta: float) -> void:
-	if enemies.is_empty():
-		_auto_seek_moving = false
-		return
-
-	var nearest_index := _find_nearest_enemy_index()
-	if nearest_index < 0:
-		_auto_seek_moving = false
-		return
-
-	var nearest_enemy: Dictionary = enemies[nearest_index]
-	var player_pos: Vector2 = player["pos"]
-	var enemy_pos: Vector2 = nearest_enemy["pos"]
-	var enemy_radius: float = float(nearest_enemy.get("radius", 14.0))
-	var player_radius: float = float(player["radius"])
-	var player_attack_range: float = float(player.get("attack_range", 10.0))
-	var player_speed: float = float(player.get("speed", 140.0))
-
-	var attack_reach: float = player_attack_range + player_radius + enemy_radius
-	var stop_dist: float = maxf(0.0, attack_reach - 8.0)
-	var start_dist: float = attack_reach + 8.0
-	var distance_to_enemy: float = player_pos.distance_to(enemy_pos)
-
-	if distance_to_enemy > start_dist:
-		_auto_seek_moving = true
-	elif distance_to_enemy < stop_dist:
-		_auto_seek_moving = false
-
-	if not _auto_seek_moving:
-		return
-
-	var move_vec: Vector2 = enemy_pos - player_pos
-	var move_len: float = move_vec.length()
-	if move_len <= 0.001:
-		return
-
-	player_pos += (move_vec / move_len) * player_speed * delta
-	player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
-
-func _get_joy_vector() -> Vector2:
-	if _joystick != null and _joystick.has_method("get_vector"):
-		var vec_any = _joystick.call("get_vector")
-		if vec_any is Vector2:
-			return vec_any
-	return Vector2.ZERO
-
-func _random_point_in_circle(radius: float) -> Vector2:
-	if radius <= 0.0:
-		return Vector2.ZERO
-	var angle: float = randf() * TAU
-	var dist: float = sqrt(randf()) * radius
-	return Vector2(cos(angle), sin(angle)) * dist
-
-func _move_enemies(delta: float) -> void:
-	if enemies.is_empty():
-		return
-
-	var player_pos: Vector2 = player["pos"]
-	for i in enemies.size():
-		var enemy: Dictionary = enemies[i]
-		var enemy_pos: Vector2 = enemy["pos"]
-		var home_pos: Vector2 = enemy.get("home_pos", enemy_pos)
-		var enemy_speed: float = float(enemy.get("speed", 85.0))
-		var enemy_aggro_range: float = float(enemy.get("aggro_range", 220.0))
-		var enemy_radius: float = float(enemy.get("radius", 14.0))
-		var state: String = str(enemy.get("state", "idle"))
-		var prev_state: String = state
-		var distance_to_player: float = enemy_pos.distance_to(player_pos)
-
-		match state:
-			"idle":
-				if distance_to_player <= enemy_aggro_range:
-					state = "chase"
-			"chase":
-				if distance_to_player > enemy_aggro_range * 1.2:
-					state = "return"
-			"return":
-				pass
-			_:
-				state = "idle"
-
-		if state == "chase":
-			var chase_vec: Vector2 = player_pos - enemy_pos
-			var chase_len: float = chase_vec.length()
-			if chase_len > 0.001:
-				enemy_pos += (chase_vec / chase_len) * enemy_speed * delta
-				enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
-		elif state == "return":
-			var home_vec: Vector2 = home_pos - enemy_pos
-			var home_dist: float = home_vec.length()
-			if home_dist <= 6.0:
-				enemy_pos = home_pos
-				state = "idle"
-			else:
-				enemy_pos += (home_vec / home_dist) * enemy_speed * delta
-				enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
-				if enemy_pos.distance_to(home_pos) <= 6.0:
-					enemy_pos = home_pos
-					state = "idle"
-
-		if prev_state == "chase" and state != "chase":
-			enemy["attack_timer"] = 0.0
-
-		enemy["pos"] = enemy_pos
-		enemy["home_pos"] = home_pos
-		enemy["state"] = state
-		enemies[i] = enemy
-
-func _enemy_attack_player(delta: float) -> void:
-	if enemies.is_empty():
-		return
-
-	var player_pos: Vector2 = player["pos"]
-	var player_radius: float = float(player["radius"])
-	var player_def: int = int(player["def"])
-	var total_damage := 0
-
-	for i in enemies.size():
-		var enemy: Dictionary = enemies[i]
-		var enemy_pos: Vector2 = enemy["pos"]
-		var enemy_state: String = str(enemy.get("state", "idle"))
-		var enemy_radius: float = float(enemy.get("radius", 14.0))
-		var enemy_attack_range: float = float(enemy.get("attack_range", 8.0))
-		var enemy_attack_cd: float = maxf(0.05, float(enemy.get("attack_cd", ENEMY_ATTACK_INTERVAL)))
-		var enemy_atk: int = int(enemy.get("atk", DEFAULT_ENEMY_ATK))
-		var attack_timer: float = float(enemy.get("attack_timer", 0.0))
-		if enemy_state != "chase":
-			enemies[i] = enemy
-			continue
-
-		attack_timer += delta
-
-		var distance_to_player: float = enemy_pos.distance_to(player_pos)
-		var attack_distance: float = enemy_attack_range + player_radius + enemy_radius
-		if distance_to_player <= attack_distance and attack_timer >= enemy_attack_cd:
-			var damage: int = enemy_atk - player_def
-			if damage < 1:
-				damage = 1
-			total_damage += damage
-			attack_timer = 0.0
-
-		enemy["attack_timer"] = attack_timer
-		enemies[i] = enemy
-
-	if total_damage <= 0:
-		return
-
-	var current_hp: int = int(player["hp"]) - total_damage
-	if current_hp < 0:
-		current_hp = 0
-	player["hp"] = current_hp
-
-	if _hit_log_cd <= 0.0:
-		EventBus.add_log("受击 -%d（HP %d/%d）" % [total_damage, int(player["hp"]), int(player["max_hp"])])
-		_hit_log_cd = HIT_LOG_INTERVAL
-
-	if current_hp <= 0:
-		_on_player_dead()
-
-func _on_player_dead() -> void:
-	EventBus.add_log("你倒下了……重开刷怪点")
-	_sync_player_combat_stats(true)
-	player["hp"] = int(player["max_hp"])
-	kills = 0
-	drop_white_count = 0
-	drop_blue_count = 0
-	drop_gold_count = 0
-	enemies.clear()
-	ground_loots.clear()
-	floating_texts.clear()
-	_attack_timer = 0.0
-	_hit_log_cd = 0.0
-	_auto_seek_moving = false
-	_manual_seek_off_fired = false
-
-	for spawn_id in spawn_order:
-		if not spawn_rt.has(spawn_id):
-			continue
-		var runtime: Dictionary = spawn_rt[spawn_id]
-		runtime["alive_count"] = 0
-		runtime["next_spawn_at"] = battle_time
-		spawn_rt[spawn_id] = runtime
-
-func _clamp_pos_in_arena(pos: Vector2, radius: float) -> Vector2:
-	var min_x: float = arena_rect.position.x + radius
-	var max_x: float = arena_rect.position.x + arena_rect.size.x - radius
-	var min_y: float = arena_rect.position.y + radius
-	var max_y: float = arena_rect.position.y + arena_rect.size.y - radius
-
-	if max_x < min_x:
-		max_x = min_x
-	if max_y < min_y:
-		max_y = min_y
-
-	return Vector2(
-		clampf(pos.x, min_x, max_x),
-		clampf(pos.y, min_y, max_y)
-	)
-
-func _auto_attack() -> void:
-	if enemies.is_empty():
-		return
-
-	var player_pos: Vector2 = player["pos"]
-	var player_attack_range: float = float(player.get("attack_range", 10.0))
-	var player_radius: float = float(player["radius"])
-	var target_index := -1
-	var best_distance_sq := INF
-
-	for i in enemies.size():
-		var enemy_i: Dictionary = enemies[i]
-		var enemy_pos_i: Vector2 = enemy_i["pos"]
-		var enemy_radius_i: float = float(enemy_i.get("radius", 14.0))
-		var attack_distance: float = player_attack_range + player_radius + enemy_radius_i
-		var distance_to_enemy: float = player_pos.distance_to(enemy_pos_i)
-		if distance_to_enemy > attack_distance:
-			continue
-
-		var distance_sq: float = player_pos.distance_squared_to(enemy_pos_i)
-		if distance_sq < best_distance_sq:
-			best_distance_sq = distance_sq
-			target_index = i
-
-	if target_index < 0:
-		return
-
-	var enemy: Dictionary = enemies[target_index]
-	var damage: int = int(player["atk"]) - int(enemy["def"])
-	if damage < 1:
-		damage = 1
-	enemy["hp"] = int(enemy["hp"]) - damage
-
-	if int(enemy["hp"]) <= 0:
-		var death_pos: Vector2 = enemy.get("pos", player_pos)
-		var spawn_id: String = str(enemy.get("spawn_id", ""))
-		enemies.remove_at(target_index)
-		_decrease_spawn_alive(spawn_id)
-		kills += 1
-		_try_spawn_drop(death_pos)
-		if kills % 5 == 0:
-			EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
-	else:
-		enemies[target_index] = enemy
-
-func _try_spawn_drop(death_pos: Vector2) -> void:
-	if _try_spawn_equip_drop(death_pos):
-		return
-	_try_spawn_item_drop(death_pos)
-
-func _try_spawn_equip_drop(death_pos: Vector2) -> bool:
-	if equip_drop_chance <= 0.0:
-		return false
-	if randf() >= equip_drop_chance:
-		return false
-
-	var rarity := _roll_weighted_rarity(equip_drop_weights)
-	if rarity.is_empty():
-		return false
-
-	var pool_any = equip_drop_by_rarity.get(rarity, [])
-	if not (pool_any is Array):
-		return false
-	var pool: Array = pool_any
-	if pool.is_empty():
-		return false
-
-	var template_id := str(pool[randi() % pool.size()])
-	if template_id.is_empty():
-		return false
-
-	var equip_name := _resolve_equip_name(template_id)
-	var tag := _rarity_tag(rarity)
-	_record_drop_counter(rarity)
-	EventBus.add_log("%s 装备掉落：%s" % [tag, equip_name])
-
-	ground_loots.append({
-		"type": "equip",
-		"pos": death_pos,
-		"template_id": template_id,
-		"name": equip_name,
-		"rarity": rarity,
-		"ttl": LOOT_TTL,
-	})
-	floating_texts.append({
-		"text": "%s %s" % [tag, equip_name],
-		"pos": death_pos,
-		"ttl": FLOAT_TEXT_TTL,
-		"color": _drop_color_for_rarity(rarity),
-	})
-	return true
-
-func _try_spawn_item_drop(death_pos: Vector2) -> void:
-	if drop_chance <= 0.0:
-		return
-	if randf() >= drop_chance:
-		return
-
-	var rarity := _roll_weighted_rarity(drop_weights)
-	if rarity.is_empty():
-		return
-
-	var items_any = drop_items.get(rarity, [])
-	if not (items_any is Array):
-		return
-	var items: Array = items_any
-	if items.is_empty():
-		return
-
-	var item_name := str(items[randi() % items.size()])
-	if item_name.is_empty():
-		return
-	var tag := _rarity_tag(rarity)
-	_record_drop_counter(rarity)
-	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
-	ground_loots.append({
-		"type": "item",
-		"pos": death_pos,
-		"item_id": item_name,
-		"name": item_name,
-		"rarity": rarity,
-		"ttl": LOOT_TTL,
-	})
-	floating_texts.append({
-		"text": "%s %s" % [tag, item_name],
-		"pos": death_pos,
-		"ttl": FLOAT_TEXT_TTL,
-		"color": _drop_color_for_rarity(rarity),
-	})
-
-func _rarity_tag(rarity: String) -> String:
-	match rarity:
-		"blue":
-			return "[蓝]"
-		"gold":
-			return "[金]"
-		_:
-			return "[白]"
-
-func _record_drop_counter(rarity: String) -> void:
-	match rarity:
-		"blue":
-			drop_blue_count += 1
-		"gold":
-			drop_gold_count += 1
-		_:
-			drop_white_count += 1
-
-func _resolve_equip_name(template_id: String) -> String:
-	var tpl_any = equip_templates_by_id.get(template_id, {})
-	if tpl_any is Dictionary:
-		var tpl: Dictionary = tpl_any
-		return str(tpl.get("name", template_id))
-	return template_id
-
-func _update_ground_loots(delta: float) -> void:
-	if ground_loots.is_empty():
-		return
-
-	var player_pos: Vector2 = player["pos"]
-	for i in range(ground_loots.size() - 1, -1, -1):
-		var loot: Dictionary = ground_loots[i]
-		var loot_pos: Vector2 = loot.get("pos", Vector2.ZERO)
-		if player_pos.distance_to(loot_pos) <= LOOT_PICKUP_RADIUS:
-			var loot_type := str(loot.get("type", "item"))
-			if loot_type == "equip":
-				var template_id := str(loot.get("template_id", ""))
-				var equip_name := str(loot.get("name", _resolve_equip_name(template_id)))
-				if not template_id.is_empty():
-					if _equipment_model == null:
-						_equipment_model = get_node_or_null("/root/EquipmentModel")
-					if _equipment_model != null and _equipment_model.has_method("add_equip"):
-						_equipment_model.call("add_equip", template_id)
-						EventBus.add_log("拾取装备：%s" % equip_name)
-			else:
-				var item_id := str(loot.get("item_id", ""))
-				if not item_id.is_empty():
-					InventoryModel.add_item(item_id, 1)
-					EventBus.add_log("拾取：%s" % item_id)
-			ground_loots.remove_at(i)
-			continue
-
-		var ttl: float = float(loot.get("ttl", LOOT_TTL)) - delta
-		if ttl <= 0.0:
-			ground_loots.remove_at(i)
-			continue
-		loot["ttl"] = ttl
-		ground_loots[i] = loot
-
-func _update_floating_texts(delta: float) -> void:
-	if floating_texts.is_empty():
-		return
-
-	for i in range(floating_texts.size() - 1, -1, -1):
-		var ft: Dictionary = floating_texts[i]
-		var ttl: float = float(ft.get("ttl", 0.0)) - delta
-		if ttl <= 0.0:
-			floating_texts.remove_at(i)
-			continue
-		ft["ttl"] = ttl
-		floating_texts[i] = ft
-
-func _roll_weighted_rarity(weights: Dictionary) -> String:
-	var white_w: int = int(weights.get("white", 0))
-	var blue_w: int = int(weights.get("blue", 0))
-	var gold_w: int = int(weights.get("gold", 0))
-	var total: int = max(0, white_w) + max(0, blue_w) + max(0, gold_w)
-	if total <= 0:
-		return ""
-
-	var roll: int = randi() % total
-	if roll < white_w:
-		return "white"
-	if roll < white_w + blue_w:
-		return "blue"
-	return "gold"
-
-func _drop_color_for_rarity(rarity: String) -> Color:
-	match rarity:
-		"blue":
-			return Color(0.53, 0.74, 1.0, 0.95)
-		"gold":
-			return Color(1.0, 0.86, 0.35, 0.95)
-		_:
-			return Color(1.0, 1.0, 1.0, 0.95)
-
-func _decrease_spawn_alive(spawn_id: String) -> void:
-	if spawn_id.is_empty() or not spawn_rt.has(spawn_id):
-		return
-	var runtime: Dictionary = spawn_rt[spawn_id]
-	var alive_count: int = maxi(0, int(runtime.get("alive_count", 0)) - 1)
-	var respawn_s: float = maxf(0.05, float(runtime.get("respawn_s", 1.5)))
-	var gate_time: float = battle_time + respawn_s
-	var next_spawn_at: float = float(runtime.get("next_spawn_at", 0.0))
-	runtime["alive_count"] = alive_count
-	if next_spawn_at < gate_time:
-		runtime["next_spawn_at"] = gate_time
-	spawn_rt[spawn_id] = runtime
-
-func _find_nearest_enemy_index() -> int:
-	var player_pos: Vector2 = player["pos"]
-	var best_index := -1
-	var best_distance_sq := INF
-
-	for i in enemies.size():
-		var enemy_pos: Vector2 = enemies[i]["pos"]
-		var distance_sq := player_pos.distance_squared_to(enemy_pos)
-		if distance_sq < best_distance_sq:
-			best_distance_sq = distance_sq
-			best_index = i
-
-	return best_index
-
 func _draw() -> void:
+	var arena_rect := Rect2(Vector2.ZERO, size)
 	draw_rect(arena_rect, Color(0.09, 0.10, 0.13))
 	draw_rect(arena_rect, Color(0.32, 0.36, 0.42), false, 2.0)
 
-	_draw_spawn_points()
+	var spawn: Dictionary = local_state.get("spawn", {})
+	var player_state: Dictionary = local_state.get("player", {})
+	var enemies: Array = local_state.get("enemies", [])
+	var loots: Array = local_state.get("loot", [])
 
-	var player_pos: Vector2 = player["pos"]
-	var player_radius: float = player["radius"]
-	var player_attack_range: float = float(player.get("attack_range", 10.0))
-	var attack_visual_radius: float = player_attack_range + player_radius
+	_draw_spawn(spawn)
+	_draw_player(player_state)
+	_draw_loots(player_state, loots)
+	_draw_enemies(enemies)
+	_draw_hud(spawn, player_state, enemies.size())
+
+func _draw_spawn(spawn: Dictionary) -> void:
+	var spawn_pos: Vector2 = spawn.get("pos", Vector2.ZERO)
+	var spawn_radius: float = float(spawn.get("spawn_radius", 0.0))
+	if spawn_radius > 0.0:
+		draw_circle(spawn_pos, spawn_radius, Color(1.0, 1.0, 1.0, 0.05))
+		draw_arc(spawn_pos, spawn_radius, 0.0, TAU, 96, Color(1.0, 1.0, 1.0, 0.12), 2.0, true)
+
+	draw_line(spawn_pos + Vector2(-4, 0), spawn_pos + Vector2(4, 0), Color.WHITE, 1.0)
+	draw_line(spawn_pos + Vector2(0, -4), spawn_pos + Vector2(0, 4), Color.WHITE, 1.0)
+	draw_circle(spawn_pos, 2.0, Color.WHITE)
+	_draw_label(
+		spawn_pos + Vector2(8, -6),
+		"刷 sp_1",
+		Color(1.0, 1.0, 1.0, 0.95),
+		SPAWN_LABEL_SIZE,
+		true
+	)
+
+func _draw_player(player_state: Dictionary) -> void:
+	var player_pos: Vector2 = player_state.get("pos", Vector2.ZERO)
+	var player_radius: float = float(player_state.get("radius", 18.0))
+	var player_atk_range: float = float(player_state.get("atk_range", 10.0))
+	var attack_visual_radius := player_atk_range + player_radius
+
 	draw_circle(player_pos, attack_visual_radius, Color(1.0, 1.0, 1.0, 0.08))
 	draw_arc(player_pos, attack_visual_radius, 0.0, TAU, 72, Color(1.0, 1.0, 1.0, 0.18), 2.0, true)
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
-	_draw_ground_loots()
 
-	for enemy in enemies:
-		var enemy_dict: Dictionary = enemy
-		var enemy_pos: Vector2 = enemy_dict["pos"]
-		var enemy_radius: float = enemy_dict["radius"]
-		var hp: int = enemy_dict["hp"]
+func _draw_enemies(enemies: Array) -> void:
+	for enemy_any in enemies:
+		if not (enemy_any is Dictionary):
+			continue
+		var enemy: Dictionary = enemy_any
+		var enemy_pos: Vector2 = enemy.get("pos", Vector2.ZERO)
+		var enemy_radius: float = float(enemy.get("radius", 14.0))
+		var hp: int = int(enemy.get("hp", 0))
 		draw_circle(enemy_pos, enemy_radius, Color(0.86, 0.18, 0.18))
 		_draw_label(
 			enemy_pos + Vector2(enemy_radius + 6.0, 5.0),
@@ -861,59 +76,17 @@ func _draw() -> void:
 			true
 		)
 
-	for ft_any in floating_texts:
-		var ft: Dictionary = ft_any
-		var ttl: float = float(ft.get("ttl", 0.0))
-		var text: String = str(ft.get("text", ""))
-		var pos: Vector2 = ft.get("pos", Vector2.ZERO)
-		var text_color: Color = ft.get("color", Color(1.0, 1.0, 1.0, 0.95))
-		var rise: float = (FLOAT_TEXT_TTL - ttl) * 20.0
-		_draw_label(
-			pos + Vector2(0.0, -rise),
-			text,
-			text_color,
-			ENEMY_LABEL_SIZE,
-			true
-		)
-
-	var hp_now: int = int(player.get("hp", 0))
-	var hp_max: int = int(player.get("max_hp", hp_now))
-	var hud_line_1 := "%s｜HP %d/%d｜击杀 %d｜场上 %d" % [stage_name, hp_now, hp_max, kills, enemies.size()]
-	var hud_line_2 := _build_spawn_status_line()
-	var hud_pos_1 := Vector2(12, 36)
-	var hud_pos_2 := hud_pos_1 + Vector2(0, 28)
-	var hud_bg_width: float = maxf(
-		_measure_text_width(hud_line_1, HUD_LABEL_SIZE),
-		_measure_text_width(hud_line_2, HUD_SUB_LABEL_SIZE)
-	) + 20.0
-	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
-	hud_bg_width = minf(hud_bg_width, 420.0)
-	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 48))
-	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
-
-	_draw_label(
-		hud_pos_1,
-		hud_line_1,
-		Color.WHITE,
-		HUD_LABEL_SIZE,
-		true
-	)
-	_draw_label(
-		hud_pos_2,
-		hud_line_2,
-		Color.WHITE,
-		HUD_SUB_LABEL_SIZE,
-		true
-	)
-
-func _draw_ground_loots() -> void:
-	if ground_loots.is_empty():
+func _draw_loots(player_state: Dictionary, loots: Array) -> void:
+	if loots.is_empty():
 		return
-
-	var player_pos: Vector2 = player["pos"]
+	var player_pos: Vector2 = player_state.get("pos", Vector2.ZERO)
 	var labeled_indices: Dictionary = {}
-	for i in range(ground_loots.size()):
-		var loot: Dictionary = ground_loots[i]
+
+	for i in range(loots.size()):
+		var loot_any = loots[i]
+		if not (loot_any is Dictionary):
+			continue
+		var loot: Dictionary = loot_any
 		var pos: Vector2 = loot.get("pos", Vector2.ZERO)
 		var rarity := str(loot.get("rarity", "white"))
 		var color := _drop_color_for_rarity(rarity)
@@ -923,14 +96,17 @@ func _draw_ground_loots() -> void:
 		else:
 			draw_circle(pos, 6.0, color)
 
-	var labels_to_draw := mini(MAX_LOOT_LABELS, ground_loots.size())
+	var labels_to_draw := mini(MAX_LOOT_LABELS, loots.size())
 	for _n in range(labels_to_draw):
 		var nearest_index := -1
 		var best_dist := INF
-		for i in range(ground_loots.size()):
+		for i in range(loots.size()):
 			if labeled_indices.has(i):
 				continue
-			var loot_i: Dictionary = ground_loots[i]
+			var loot_i_any = loots[i]
+			if not (loot_i_any is Dictionary):
+				continue
+			var loot_i: Dictionary = loot_i_any
 			var loot_pos_i: Vector2 = loot_i.get("pos", Vector2.ZERO)
 			var dist_sq := player_pos.distance_squared_to(loot_pos_i)
 			if dist_sq < best_dist:
@@ -941,72 +117,59 @@ func _draw_ground_loots() -> void:
 			break
 		labeled_indices[nearest_index] = true
 
-		var loot_n: Dictionary = ground_loots[nearest_index]
+		var loot_n: Dictionary = loots[nearest_index]
 		var loot_pos_n: Vector2 = loot_n.get("pos", Vector2.ZERO)
-		var loot_name := str(loot_n.get("name", loot_n.get("item_id", loot_n.get("template_id", ""))))
+		var label := str(loot_n.get("label", ""))
 		var rarity_n := str(loot_n.get("rarity", "white"))
 		_draw_label(
 			loot_pos_n + Vector2(10.0, -4.0),
-			loot_name,
+			label,
 			_drop_color_for_rarity(rarity_n),
 			LOOT_LABEL_SIZE,
 			true
 		)
 
-func _draw_spawn_points() -> void:
-	for i in spawn_order.size():
-		var spawn_id: String = spawn_order[i]
-		if not spawn_rt.has(spawn_id):
-			continue
-		var runtime: Dictionary = spawn_rt[spawn_id]
-		var pos: Vector2 = runtime.get("pos", Vector2.ZERO)
-		var spawn_radius: float = maxf(0.0, float(runtime.get("spawn_radius", 0.0)))
-		if spawn_radius > 0.0:
-			draw_circle(pos, spawn_radius, Color(1.0, 1.0, 1.0, 0.05))
-			draw_arc(pos, spawn_radius, 0.0, TAU, 96, Color(1.0, 1.0, 1.0, 0.12), 2.0, true)
-		draw_line(pos + Vector2(-4, 0), pos + Vector2(4, 0), Color.WHITE, 1.0)
-		draw_line(pos + Vector2(0, -4), pos + Vector2(0, 4), Color.WHITE, 1.0)
-		draw_circle(pos, 2.0, Color.WHITE)
-		_draw_label(
-			pos + Vector2(8, -6),
-			"刷 %s" % spawn_id,
-			Color(1.0, 1.0, 1.0, 0.95),
-			SPAWN_LABEL_SIZE,
-			true
-		)
+func _draw_hud(spawn: Dictionary, player_state: Dictionary, enemy_count: int) -> void:
+	var hp_now: int = int(player_state.get("hp", 0))
+	var hp_max: int = int(player_state.get("hpmax", hp_now))
+	var stage_name := str(local_state.get("stage_name", "未命名关卡"))
+	var kills: int = int(local_state.get("kills", 0))
+	var auto_seek: bool = bool(local_state.get("auto_seek", true))
 
-func _build_spawn_status_line() -> String:
-	var alive_count := 0
-	var max_alive := 0
-	if spawn_rt.has("sp_1"):
-		var runtime_sp1: Dictionary = spawn_rt["sp_1"]
-		alive_count = int(runtime_sp1.get("alive_count", 0))
-		max_alive = int(runtime_sp1.get("max_alive", 0))
-	elif not spawn_order.is_empty():
-		var first_id: String = spawn_order[0]
-		if spawn_rt.has(first_id):
-			var runtime_first: Dictionary = spawn_rt[first_id]
-			alive_count = int(runtime_first.get("alive_count", 0))
-			max_alive = int(runtime_first.get("max_alive", 0))
+	var alive: int = int(spawn.get("alive", 0))
+	var alive_max: int = int(spawn.get("max", 0))
+	var aggro_on := bool(spawn.get("aggro_on", false))
 
-	var aggro_on := "未进入"
-	var player_pos: Vector2 = player["pos"]
-	for enemy in enemies:
-		var enemy_dict: Dictionary = enemy
-		var enemy_pos: Vector2 = enemy_dict["pos"]
-		var enemy_aggro_range: float = float(enemy_dict.get("aggro_range", 220.0))
-		if enemy_pos.distance_to(player_pos) <= enemy_aggro_range:
-			aggro_on = "已进入"
-			break
-
-	return "刷怪点 sp_1：%d/%d｜警戒：%s｜掉落 白%d 蓝%d 金%d" % [
-		alive_count,
-		max_alive,
-		aggro_on,
-		drop_white_count,
-		drop_blue_count,
-		drop_gold_count
+	var line_1 := "%s｜HP %d/%d｜击杀 %d｜场上 %d" % [stage_name, hp_now, hp_max, kills, enemy_count]
+	var line_2 := "刷怪点 sp_1：%d/%d｜警戒：%s｜索敌：%s" % [
+		alive,
+		alive_max,
+		"已进入" if aggro_on else "未进入",
+		"开" if auto_seek else "关"
 	]
+
+	var hud_pos_1 := Vector2(12, 36)
+	var hud_pos_2 := hud_pos_1 + Vector2(0, 28)
+	var hud_bg_width := maxf(
+		_measure_text_width(line_1, HUD_LABEL_SIZE),
+		_measure_text_width(line_2, HUD_SUB_LABEL_SIZE)
+	) + 20.0
+	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
+	hud_bg_width = minf(hud_bg_width, 420.0)
+	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 48))
+	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
+
+	_draw_label(hud_pos_1, line_1, Color.WHITE, HUD_LABEL_SIZE, true)
+	_draw_label(hud_pos_2, line_2, Color.WHITE, HUD_SUB_LABEL_SIZE, true)
+
+func _drop_color_for_rarity(rarity: String) -> Color:
+	match rarity:
+		"blue":
+			return Color(0.53, 0.74, 1.0, 0.95)
+		"gold":
+			return Color(1.0, 0.86, 0.35, 0.95)
+		_:
+			return Color(1.0, 1.0, 1.0, 0.95)
 
 func _draw_label(
 	pos: Vector2,
