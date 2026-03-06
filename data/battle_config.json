@@ -32,6 +32,7 @@
         "y_ratio": 0.22,
         "respawn_s": 1.6,
         "max_alive": 10,
+        "spawn_radius": 220,
         "monster_id": "mob_a"
       }
     ],
