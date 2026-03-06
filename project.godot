@@ -11,13 +11,20 @@ config_version=5
 [application]
 
 config/name="放置-肉鸽-山海经"
+run/main_scene="res://ui/pages/PageBattle.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
-run/main_scene="res://ui/pages/PageBattle.tscn"
 
 [autoload]
 
 EventBus="*res://autoload/EventBus.gd"
+
+[display]
+
+window/size/viewport_width=758
+window/size/viewport_height=1920
+window/dpi/allow_hidpi=true
+window/stretch/scale_mode="integer"
 
 [rendering]
 
