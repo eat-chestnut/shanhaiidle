@@ -41,7 +41,8 @@ var kills := 0
 
 var _attack_timer := 0.0
 var _hit_log_cd := 0.0
-var player_moving_to_target := false
+var manual_target: Vector2 = Vector2.ZERO
+var manual_moving := false
 
 func _ready() -> void:
 	randomize()
@@ -57,7 +58,7 @@ func _process(delta: float) -> void:
 		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
 
 	_process_spawn_points()
-	_move_player_to_nearest_enemy(delta)
+	_process_manual_move(delta)
 	_move_enemies(delta)
 	_enemy_attack_player(delta)
 
@@ -68,6 +69,40 @@ func _process(delta: float) -> void:
 		_auto_attack()
 
 	queue_redraw()
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_button: InputEventMouseButton = event
+		if mouse_button.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mouse_button.pressed:
+			if arena_rect.has_point(mouse_button.position):
+				manual_target = _clamp_pos_in_arena(mouse_button.position, 0.0)
+				manual_moving = true
+		else:
+			manual_moving = false
+		return
+
+	if event is InputEventMouseMotion:
+		var mouse_motion: InputEventMouseMotion = event
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and manual_moving:
+			manual_target = _clamp_pos_in_arena(mouse_motion.position, 0.0)
+		return
+
+	if event is InputEventScreenTouch:
+		var touch: InputEventScreenTouch = event
+		if touch.pressed:
+			if arena_rect.has_point(touch.position):
+				manual_target = _clamp_pos_in_arena(touch.position, 0.0)
+				manual_moving = true
+		else:
+			manual_moving = false
+		return
+
+	if event is InputEventScreenDrag:
+		var drag: InputEventScreenDrag = event
+		if manual_moving:
+			manual_target = _clamp_pos_in_arena(drag.position, 0.0)
 
 func _load_battle_cfg() -> void:
 	var battle_cfg: Dictionary = {}
@@ -252,38 +287,21 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 	}
 	enemies.append(enemy)
 
-func _move_player_to_nearest_enemy(delta: float) -> void:
-	if enemies.is_empty():
-		player_moving_to_target = false
+func _process_manual_move(delta: float) -> void:
+	if not manual_moving:
 		return
 
-	var nearest_index := _find_nearest_enemy_index()
-	if nearest_index < 0:
-		player_moving_to_target = false
-		return
-
-	var nearest_enemy: Dictionary = enemies[nearest_index]
 	var player_pos: Vector2 = player["pos"]
-	var enemy_pos: Vector2 = nearest_enemy["pos"]
-	var enemy_radius: float = float(nearest_enemy.get("radius", 14.0))
 	var player_radius: float = float(player["radius"])
-	var player_attack_range: float = float(player.get("attack_range", 10.0))
 	var player_speed: float = float(player.get("speed", 140.0))
+	var delta_vec: Vector2 = manual_target - player_pos
+	var distance: float = delta_vec.length()
+	if distance <= 2.0:
+		return
 
-	var attack_reach: float = player_attack_range + player_radius + enemy_radius
-	var stop_dist: float = maxf(0.0, attack_reach - 8.0)
-	var start_dist: float = attack_reach + 8.0
-	var distance_to_enemy: float = player_pos.distance_to(enemy_pos)
-
-	if distance_to_enemy > start_dist:
-		player_moving_to_target = true
-	elif distance_to_enemy < stop_dist:
-		player_moving_to_target = false
-
-	if player_moving_to_target:
-		var dir: Vector2 = (enemy_pos - player_pos).normalized()
-		player_pos += dir * player_speed * delta
-		player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
+	var move_dir: Vector2 = delta_vec / distance
+	player_pos += move_dir * player_speed * delta
+	player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
 
 func _move_enemies(delta: float) -> void:
 	if enemies.is_empty():
@@ -360,7 +378,7 @@ func _on_player_dead() -> void:
 	enemies.clear()
 	_attack_timer = 0.0
 	_hit_log_cd = 0.0
-	player_moving_to_target = false
+	manual_moving = false
 
 	for spawn_id in spawn_order:
 		if not spawn_rt.has(spawn_id):
@@ -502,6 +520,11 @@ func _draw() -> void:
 	var attack_visual_radius: float = player_attack_range + player_radius
 	draw_circle(player_pos, attack_visual_radius, Color(1.0, 1.0, 1.0, 0.08))
 	draw_arc(player_pos, attack_visual_radius, 0.0, TAU, 72, Color(1.0, 1.0, 1.0, 0.18), 2.0, true)
+	if manual_moving:
+		draw_circle(manual_target, 8.0, Color(1.0, 1.0, 1.0, 0.18))
+		draw_arc(manual_target, 8.0, 0.0, TAU, 36, Color.WHITE, 1.5, true)
+		draw_line(manual_target + Vector2(-5, -5), manual_target + Vector2(5, 5), Color.WHITE, 1.5)
+		draw_line(manual_target + Vector2(-5, 5), manual_target + Vector2(5, -5), Color.WHITE, 1.5)
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
 
