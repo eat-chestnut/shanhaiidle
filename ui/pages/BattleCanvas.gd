@@ -10,6 +10,10 @@ const DEFAULT_ENEMY_ATK := 6
 const ENEMY_ATTACK_INTERVAL := 0.8
 const HIT_LOG_INTERVAL := 1.0
 const FLOAT_TEXT_TTL := 1.2
+const LOOT_TTL := 20.0
+const LOOT_PICKUP_RADIUS := 28.0
+const LOOT_LABEL_SIZE := 18
+const MAX_LOOT_LABELS := 6
 
 var player := {
 	"pos": Vector2.ZERO,
@@ -38,6 +42,7 @@ var _last_canvas_size: Vector2 = Vector2.ZERO
 
 var battle_time := 0.0
 var enemies: Array[Dictionary] = []
+var ground_loots: Array[Dictionary] = []
 var floating_texts: Array[Dictionary] = []
 var kills := 0
 var drop_white_count := 0
@@ -68,6 +73,7 @@ func _process(delta: float) -> void:
 	_process_player_move(delta)
 	_move_enemies(delta)
 	_enemy_attack_player(delta)
+	_update_ground_loots(delta)
 	_update_floating_texts(delta)
 
 	_attack_timer += delta
@@ -463,6 +469,7 @@ func _on_player_dead() -> void:
 	drop_blue_count = 0
 	drop_gold_count = 0
 	enemies.clear()
+	ground_loots.clear()
 	floating_texts.clear()
 	_attack_timer = 0.0
 	_hit_log_cd = 0.0
@@ -568,12 +575,41 @@ func _try_log_drop(death_pos: Vector2) -> void:
 			tag = "[白]"
 			drop_white_count += 1
 	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
+	ground_loots.append({
+		"pos": death_pos,
+		"item_id": item_name,
+		"rarity": rarity,
+		"ttl": LOOT_TTL,
+	})
 	floating_texts.append({
 		"text": "%s %s" % [tag, item_name],
 		"pos": death_pos,
 		"ttl": FLOAT_TEXT_TTL,
 		"color": _drop_color_for_rarity(rarity),
 	})
+
+func _update_ground_loots(delta: float) -> void:
+	if ground_loots.is_empty():
+		return
+
+	var player_pos: Vector2 = player["pos"]
+	for i in range(ground_loots.size() - 1, -1, -1):
+		var loot: Dictionary = ground_loots[i]
+		var loot_pos: Vector2 = loot.get("pos", Vector2.ZERO)
+		if player_pos.distance_to(loot_pos) <= LOOT_PICKUP_RADIUS:
+			var item_id := str(loot.get("item_id", ""))
+			if not item_id.is_empty():
+				InventoryModel.add_item(item_id, 1)
+				EventBus.add_log("拾取：%s" % item_id)
+			ground_loots.remove_at(i)
+			continue
+
+		var ttl: float = float(loot.get("ttl", LOOT_TTL)) - delta
+		if ttl <= 0.0:
+			ground_loots.remove_at(i)
+			continue
+		loot["ttl"] = ttl
+		ground_loots[i] = loot
 
 func _update_floating_texts(delta: float) -> void:
 	if floating_texts.is_empty():
@@ -653,6 +689,7 @@ func _draw() -> void:
 	draw_arc(player_pos, attack_visual_radius, 0.0, TAU, 72, Color(1.0, 1.0, 1.0, 0.18), 2.0, true)
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
+	_draw_ground_loots()
 
 	for enemy in enemies:
 		var enemy_dict: Dictionary = enemy
@@ -712,6 +749,48 @@ func _draw() -> void:
 		HUD_SUB_LABEL_SIZE,
 		true
 	)
+
+func _draw_ground_loots() -> void:
+	if ground_loots.is_empty():
+		return
+
+	var player_pos: Vector2 = player["pos"]
+	var labeled_indices: Dictionary = {}
+	for i in ground_loots.size():
+		var loot: Dictionary = ground_loots[i]
+		var pos: Vector2 = loot.get("pos", Vector2.ZERO)
+		var rarity := str(loot.get("rarity", "white"))
+		draw_circle(pos, 6.0, _drop_color_for_rarity(rarity))
+
+	var labels_to_draw := mini(MAX_LOOT_LABELS, ground_loots.size())
+	for _n in range(labels_to_draw):
+		var nearest_index := -1
+		var best_dist := INF
+		for i in ground_loots.size():
+			if labeled_indices.has(i):
+				continue
+			var loot_i: Dictionary = ground_loots[i]
+			var loot_pos_i: Vector2 = loot_i.get("pos", Vector2.ZERO)
+			var dist_sq := player_pos.distance_squared_to(loot_pos_i)
+			if dist_sq < best_dist:
+				best_dist = dist_sq
+				nearest_index = i
+
+		if nearest_index < 0:
+			break
+		labeled_indices[nearest_index] = true
+
+		var loot_n: Dictionary = ground_loots[nearest_index]
+		var loot_pos_n: Vector2 = loot_n.get("pos", Vector2.ZERO)
+		var item_id := str(loot_n.get("item_id", ""))
+		var rarity_n := str(loot_n.get("rarity", "white"))
+		_draw_label(
+			loot_pos_n + Vector2(10.0, -4.0),
+			item_id,
+			_drop_color_for_rarity(rarity_n),
+			LOOT_LABEL_SIZE,
+			true
+		)
 
 func _draw_spawn_points() -> void:
 	for i in spawn_order.size():

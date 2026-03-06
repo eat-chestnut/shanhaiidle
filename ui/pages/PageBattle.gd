@@ -8,6 +8,9 @@ const LOG_VIEW_EXPANDED := 2
 @onready var _log_panel: Control = $RootVBox/LogWrap/LogBox/LogPanel
 @onready var _btn_log_toggle: Button = $RootVBox/LogWrap/LogBox/LogHeader/BtnLogToggle
 @onready var _btn_auto_seek: Button = $RootVBox/BattleWrap/BattleLayer/BtnAutoSeek
+@onready var _btn_bag: BaseButton = $RootVBox/BottomMenu/BagGroup/BtnBag
+@onready var _battle_canvas: Node = $RootVBox/BattleWrap/BattleLayer/BattleCanvas
+@onready var _inventory_overlay: Node = $InventoryOverlay
 
 var _log_view_state := LOG_VIEW_HALF
 
@@ -24,6 +27,17 @@ func _ready() -> void:
 	if not GameSettings.auto_seek_changed.is_connected(_on_auto_seek_changed):
 		GameSettings.auto_seek_changed.connect(_on_auto_seek_changed)
 	_refresh_auto_seek_button(GameSettings.auto_seek_enabled)
+
+	if not _btn_bag.pressed.is_connected(_on_bag_pressed):
+		_btn_bag.pressed.connect(_on_bag_pressed)
+	if _inventory_overlay != null:
+		var opened_cb := Callable(self, "_on_inventory_opened")
+		var closed_cb := Callable(self, "_on_inventory_closed")
+		if _inventory_overlay.has_signal("opened") and not _inventory_overlay.is_connected("opened", opened_cb):
+			_inventory_overlay.connect("opened", opened_cb)
+		if _inventory_overlay.has_signal("closed") and not _inventory_overlay.is_connected("closed", closed_cb):
+			_inventory_overlay.connect("closed", closed_cb)
+	_set_battle_paused(false)
 
 	EventBus.add_log("进入战斗：刷怪点已激活（3处）")
 	EventBus.add_log("提示：击杀每满5会播报一次")
@@ -72,3 +86,19 @@ func _apply_log_view_state() -> void:
 		_:
 			_log_view_state = LOG_VIEW_HALF
 			_apply_log_view_state()
+
+func _on_bag_pressed() -> void:
+	if _inventory_overlay != null and _inventory_overlay.has_method("open"):
+		_inventory_overlay.call("open")
+	_set_battle_paused(true)
+
+func _on_inventory_opened() -> void:
+	_set_battle_paused(true)
+
+func _on_inventory_closed() -> void:
+	_set_battle_paused(false)
+
+func _set_battle_paused(paused: bool) -> void:
+	if _battle_canvas == null:
+		return
+	_battle_canvas.process_mode = Node.PROCESS_MODE_DISABLED if paused else Node.PROCESS_MODE_INHERIT

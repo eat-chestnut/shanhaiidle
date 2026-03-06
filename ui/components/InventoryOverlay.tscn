@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/components/InventoryOverlay.gd" id="1_7m6ep"]
+[ext_resource type="Texture2D" path="res://icon.svg" id="2_5gq8d"]
+
+[node name="InventoryOverlay" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_7m6ep")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+mouse_filter = 1
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.08
+anchor_top = 0.08
+anchor_right = 0.92
+anchor_bottom = 0.86
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 52)
+
+[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "背包"
+theme_override_font_sizes/font_size = 28
+vertical_alignment = 1
+
+[node name="BtnClose" type="TextureButton" parent="Panel/VBox/TopBar"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture_normal = ExtResource("2_5gq8d")
+stretch_mode = 5
+ignore_texture_size = true
+
+[node name="Grid" type="GridContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 5

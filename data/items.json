@@ -1,0 +1,13 @@
+{
+  "items": [
+    { "id": "桂枝", "name": "桂枝", "rarity": "white" },
+    { "id": "玉屑", "name": "玉屑", "rarity": "white" },
+    { "id": "白玉碎", "name": "白玉碎", "rarity": "blue" },
+    { "id": "妖核", "name": "妖核", "rarity": "gold" }
+  ],
+  "rarity_colors": {
+    "white": { "r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0 },
+    "blue":  { "r": 0.35, "g": 0.65, "b": 1.0, "a": 1.0 },
+    "gold":  { "r": 1.0, "g": 0.82, "b": 0.35, "a": 1.0 }
+  }
+}
