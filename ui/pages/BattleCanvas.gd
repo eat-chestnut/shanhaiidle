@@ -498,6 +498,10 @@ func _draw() -> void:
 
 	var player_pos: Vector2 = player["pos"]
 	var player_radius: float = player["radius"]
+	var player_attack_range: float = float(player.get("attack_range", 10.0))
+	var attack_visual_radius: float = player_attack_range + player_radius
+	draw_circle(player_pos, attack_visual_radius, Color(1.0, 1.0, 1.0, 0.08))
+	draw_arc(player_pos, attack_visual_radius, 0.0, TAU, 72, Color(1.0, 1.0, 1.0, 0.18), 2.0, true)
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE, PLAYER_LABEL_SIZE)
 
