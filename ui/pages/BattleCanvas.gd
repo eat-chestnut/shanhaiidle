@@ -41,6 +41,7 @@ func _process(delta: float) -> void:
 	player["pos"] = arena_rect.position + arena_rect.size * 0.5
 
 	_process_spawn_points()
+	_move_enemies(delta)
 
 	_attack_timer += delta
 	var attack_interval: float = float(player["attack_interval"])
@@ -169,11 +170,46 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 		"spawn_id": spawn_id,
 		"monster_id": monster_id,
 		"pos": runtime.get("pos", Vector2.ZERO),
+		"speed": float(template.get("speed", 85)),
 		"radius": float(template.get("radius", 14)),
 		"hp": int(template.get("hp", 30)),
 		"def": int(template.get("def", 2)),
 	}
 	enemies.append(enemy)
+
+func _move_enemies(delta: float) -> void:
+	if enemies.is_empty():
+		return
+
+	var player_pos: Vector2 = player["pos"]
+	for i in enemies.size():
+		var enemy: Dictionary = enemies[i]
+		var enemy_pos: Vector2 = enemy["pos"]
+		var enemy_speed: float = float(enemy.get("speed", 85.0))
+		var enemy_radius: float = float(enemy.get("radius", 14.0))
+
+		var dir: Vector2 = (player_pos - enemy_pos).normalized()
+		enemy_pos += dir * enemy_speed * delta
+		enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
+
+		enemy["pos"] = enemy_pos
+		enemies[i] = enemy
+
+func _clamp_pos_in_arena(pos: Vector2, radius: float) -> Vector2:
+	var min_x: float = arena_rect.position.x + radius
+	var max_x: float = arena_rect.position.x + arena_rect.size.x - radius
+	var min_y: float = arena_rect.position.y + radius
+	var max_y: float = arena_rect.position.y + arena_rect.size.y - radius
+
+	if max_x < min_x:
+		max_x = min_x
+	if max_y < min_y:
+		max_y = min_y
+
+	return Vector2(
+		clampf(pos.x, min_x, max_x),
+		clampf(pos.y, min_y, max_y)
+	)
 
 func _auto_attack() -> void:
 	if enemies.is_empty():
