@@ -3,14 +3,13 @@ extends Control
 var player := {
 	"pos": Vector2.ZERO,
 	"radius": 18.0,
-	"atk": 10,
+	"atk": 12,
 	"def": 3,
-	"attack_interval": 0.30,
+	"attack_interval": 0.25,
 }
 
 var enemies: Array[Dictionary] = []
-var max_enemies := 8
-var spawn_interval := 0.9
+var spawn_interval := 1.5
 var kills := 0
 
 var _spawn_timer := 0.0
@@ -26,8 +25,7 @@ func _process(delta: float) -> void:
 	_spawn_timer += delta
 	while _spawn_timer >= spawn_interval:
 		_spawn_timer -= spawn_interval
-		if enemies.size() < max_enemies:
-			_spawn_enemy()
+		_try_spawn_enemy()
 
 	_attack_timer += delta
 	var attack_interval: float = float(player["attack_interval"])
@@ -37,7 +35,7 @@ func _process(delta: float) -> void:
 
 	queue_redraw()
 
-func _spawn_enemy() -> void:
+func _try_spawn_enemy() -> void:
 	var radius := 14.0
 	var enemy := {
 		"pos": _random_border_position(radius),
@@ -86,7 +84,7 @@ func _auto_attack() -> void:
 	if int(enemy["hp"]) <= 0:
 		enemies.remove_at(target_index)
 		kills += 1
-		EventBus.add_log("击杀+1（总击杀%d，场上剩余%d）" % [kills, enemies.size()])
+		EventBus.add_log("击杀+1（总击杀%d，场上%d）" % [kills, enemies.size()])
 	else:
 		enemies[target_index] = enemy
 
@@ -114,18 +112,44 @@ func _draw() -> void:
 	draw_circle(player_pos, player_radius, Color(0.20, 0.82, 0.35))
 	_draw_label(player_pos + Vector2(-8, 5), "我", Color.WHITE)
 
-	for enemy in enemies:
+	var label_enemy_indices := _get_nearest_enemy_index_set(15)
+	for i in enemies.size():
+		var enemy: Dictionary = enemies[i]
 		var enemy_pos: Vector2 = enemy["pos"]
 		var enemy_radius: float = enemy["radius"]
 		var hp: int = enemy["hp"]
 		draw_circle(enemy_pos, enemy_radius, Color(0.86, 0.18, 0.18))
-		_draw_label(enemy_pos + Vector2(enemy_radius + 6.0, 5.0), "敌 HP:%d" % hp, Color(1.0, 0.90, 0.90))
+		if label_enemy_indices.has(i):
+			_draw_label(enemy_pos + Vector2(enemy_radius + 6.0, 5.0), "敌 HP:%d" % hp, Color(1.0, 0.90, 0.90))
 
 	_draw_label(
 		Vector2(12, 22),
-		"Kills: %d  Enemies: %d/%d" % [kills, enemies.size(), max_enemies],
+		"Kills: %d  Enemies: %d" % [kills, enemies.size()],
 		Color(0.90, 0.95, 1.0)
 	)
+
+func _get_nearest_enemy_index_set(limit: int) -> Dictionary:
+	var label_indices := {}
+	if limit <= 0 or enemies.is_empty():
+		return label_indices
+
+	var player_pos: Vector2 = player["pos"]
+	var distance_pairs: Array[Dictionary] = []
+	for i in enemies.size():
+		var enemy_pos: Vector2 = enemies[i]["pos"]
+		distance_pairs.append({
+			"idx": i,
+			"dist": player_pos.distance_squared_to(enemy_pos),
+		})
+
+	distance_pairs.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a["dist"]) < float(b["dist"])
+	)
+
+	var label_count := mini(limit, distance_pairs.size())
+	for i in label_count:
+		label_indices[int(distance_pairs[i]["idx"])] = true
+	return label_indices
 
 func _draw_label(pos: Vector2, text: String, color: Color) -> void:
 	var font := get_theme_default_font()
