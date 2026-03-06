@@ -154,9 +154,15 @@ func _draw() -> void:
 				true
 			)
 
+	var hud_text := "Kills: %d  Enemies: %d" % [kills, enemies.size()]
+	var hud_pos := Vector2(12, 30)
+	var hud_bg_width: float = _measure_text_width(hud_text, HUD_LABEL_SIZE) + 20.0
+	var hud_bg_rect := Rect2(hud_pos + Vector2(-8, -28), Vector2(hud_bg_width, 40))
+	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
+
 	_draw_label(
-		Vector2(12, 22),
-		"Kills: %d  Enemies: %d" % [kills, enemies.size()],
+		hud_pos,
+		hud_text,
 		Color.WHITE,
 		HUD_LABEL_SIZE,
 		true
@@ -210,3 +216,13 @@ func _draw_label(
 			Color.BLACK
 		)
 	draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+func _measure_text_width(text: String, font_size: int) -> float:
+	var font := get_theme_default_font()
+	if font == null:
+		font = ThemeDB.fallback_font
+	if font_size <= 0:
+		font_size = get_theme_default_font_size()
+		if font_size <= 0:
+			font_size = ThemeDB.fallback_font_size
+	return font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x

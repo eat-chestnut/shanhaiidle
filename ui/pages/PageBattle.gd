@@ -1,6 +1,6 @@
 extends Control
 
-@onready var _log_panel = $RootVBox/LogWrap/LogPanel
+@onready var _log_panel = $RootVBox/LogWrap/LogVBox/LogPanel
 
 func _ready() -> void:
 	if not EventBus.log_added.is_connected(_log_panel.append_log):
