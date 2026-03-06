@@ -17,11 +17,14 @@ var player := {
 	"radius": 18.0,
 	"atk": 12,
 	"def": 4,
+	"speed": 140.0,
 	"attack_interval": 0.25,
+	"attack_range": 10.0,
 }
 
 var stage_name: String = "未命名关卡"
 var monsters_cfg: Dictionary = {}
+var monster_default_cfg: Dictionary = {}
 var spawn_points_cfg: Array[Dictionary] = []
 var spawn_rt: Dictionary = {}
 var spawn_order: Array[String] = []
@@ -45,11 +48,12 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	battle_time += delta
 	_recalc_arena()
-	player["pos"] = arena_rect.position + arena_rect.size * 0.5
+	player["pos"] = _clamp_pos_in_arena(player["pos"], float(player["radius"]))
 	if _hit_log_cd > 0.0:
 		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
 
 	_process_spawn_points()
+	_move_player_to_nearest_enemy(delta)
 	_move_enemies(delta)
 	_enemy_attack_player(delta)
 
@@ -90,14 +94,18 @@ func _load_battle_cfg_from_file() -> Dictionary:
 
 func _load_monster_templates(battle_cfg: Dictionary) -> void:
 	monsters_cfg.clear()
+	monster_default_cfg.clear()
 	var monster_list = battle_cfg.get("monsters", [])
 	if monster_list is Array:
-		for monster_any in monster_list:
+		for i in monster_list.size():
+			var monster_any = monster_list[i]
 			if monster_any is Dictionary:
 				var monster: Dictionary = monster_any
 				var monster_id: String = str(monster.get("id", ""))
 				if not monster_id.is_empty():
 					monsters_cfg[monster_id] = monster.duplicate(true)
+				if i == 0:
+					monster_default_cfg = monster.duplicate(true)
 
 func _load_player_cfg(battle_cfg: Dictionary) -> void:
 	var max_hp: int = int(player.get("max_hp", player.get("hp", 200)))
@@ -108,7 +116,9 @@ func _load_player_cfg(battle_cfg: Dictionary) -> void:
 		player["radius"] = float(player_cfg.get("radius", player.get("radius", 18.0)))
 		player["atk"] = int(player_cfg.get("atk", player.get("atk", 12)))
 		player["def"] = int(player_cfg.get("def", player.get("def", 4)))
+		player["speed"] = float(player_cfg.get("speed", player.get("speed", 140.0)))
 		player["attack_interval"] = maxf(0.05, float(player_cfg.get("attack_interval", player.get("attack_interval", 0.25))))
+		player["attack_range"] = float(player_cfg.get("attack_range", player.get("attack_range", 10.0)))
 	player["max_hp"] = max_hp
 	player["hp"] = max_hp
 
@@ -116,9 +126,10 @@ func _load_spawn_points(battle_cfg: Dictionary) -> void:
 	spawn_points_cfg.clear()
 	var spawn_points = battle_cfg.get("spawn_points", [])
 	if spawn_points is Array:
-		for spawn_any in spawn_points:
-			if spawn_any is Dictionary:
-				var spawn_point: Dictionary = spawn_any
+		if not spawn_points.is_empty():
+			var first_any = spawn_points[0]
+			if first_any is Dictionary:
+				var spawn_point: Dictionary = first_any
 				spawn_points_cfg.append(spawn_point.duplicate(true))
 
 func _init_spawn_rt() -> void:
@@ -184,23 +195,51 @@ func _process_spawn_points() -> void:
 
 func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 	var monster_id: String = str(runtime.get("monster_id", DEFAULT_MONSTER_ID))
-	var template: Dictionary = {}
-	var template_any = monsters_cfg.get(monster_id, {})
+	var template: Dictionary = monster_default_cfg
+	var template_any = monsters_cfg.get(monster_id, monster_default_cfg)
 	if template_any is Dictionary:
 		template = template_any
 
+	var hp: int = int(template.get("hp", 30))
 	var enemy := {
 		"spawn_id": spawn_id,
 		"monster_id": monster_id,
 		"pos": runtime.get("pos", Vector2.ZERO),
-		"speed": float(template.get("speed", 85)),
+		"speed": float(template.get("speed", 85.0)),
+		"aggro_range": float(template.get("aggro_range", 220.0)),
+		"attack_range": float(template.get("attack_range", 8.0)),
+		"attack_cd": maxf(0.05, float(template.get("attack_interval", ENEMY_ATTACK_INTERVAL))),
 		"atk": int(template.get("atk", DEFAULT_ENEMY_ATK)),
-		"atk_timer": 0.0,
-		"radius": float(template.get("radius", 14)),
-		"hp": int(template.get("hp", 30)),
+		"attack_timer": 0.0,
+		"radius": float(template.get("radius", 14.0)),
+		"hp": hp,
+		"hpmax": hp,
 		"def": int(template.get("def", 2)),
 	}
 	enemies.append(enemy)
+
+func _move_player_to_nearest_enemy(delta: float) -> void:
+	if enemies.is_empty():
+		return
+
+	var nearest_index := _find_nearest_enemy_index()
+	if nearest_index < 0:
+		return
+
+	var nearest_enemy: Dictionary = enemies[nearest_index]
+	var player_pos: Vector2 = player["pos"]
+	var enemy_pos: Vector2 = nearest_enemy["pos"]
+	var enemy_radius: float = float(nearest_enemy.get("radius", 14.0))
+	var player_radius: float = float(player["radius"])
+	var player_attack_range: float = float(player.get("attack_range", 10.0))
+	var player_speed: float = float(player.get("speed", 140.0))
+
+	var desired_distance: float = player_attack_range + player_radius + enemy_radius
+	var distance_to_enemy: float = player_pos.distance_to(enemy_pos)
+	if distance_to_enemy > desired_distance:
+		var dir: Vector2 = (enemy_pos - player_pos).normalized()
+		player_pos += dir * player_speed * delta
+		player["pos"] = _clamp_pos_in_arena(player_pos, player_radius)
 
 func _move_enemies(delta: float) -> void:
 	if enemies.is_empty():
@@ -211,11 +250,14 @@ func _move_enemies(delta: float) -> void:
 		var enemy: Dictionary = enemies[i]
 		var enemy_pos: Vector2 = enemy["pos"]
 		var enemy_speed: float = float(enemy.get("speed", 85.0))
+		var enemy_aggro_range: float = float(enemy.get("aggro_range", 220.0))
 		var enemy_radius: float = float(enemy.get("radius", 14.0))
+		var distance_to_player: float = enemy_pos.distance_to(player_pos)
 
-		var dir: Vector2 = (player_pos - enemy_pos).normalized()
-		enemy_pos += dir * enemy_speed * delta
-		enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
+		if distance_to_player <= enemy_aggro_range:
+			var dir: Vector2 = (player_pos - enemy_pos).normalized()
+			enemy_pos += dir * enemy_speed * delta
+			enemy_pos = _clamp_pos_in_arena(enemy_pos, enemy_radius)
 
 		enemy["pos"] = enemy_pos
 		enemies[i] = enemy
@@ -233,19 +275,23 @@ func _enemy_attack_player(delta: float) -> void:
 		var enemy: Dictionary = enemies[i]
 		var enemy_pos: Vector2 = enemy["pos"]
 		var enemy_radius: float = float(enemy.get("radius", 14.0))
+		var enemy_aggro_range: float = float(enemy.get("aggro_range", 220.0))
+		var enemy_attack_range: float = float(enemy.get("attack_range", 8.0))
+		var enemy_attack_cd: float = maxf(0.05, float(enemy.get("attack_cd", ENEMY_ATTACK_INTERVAL)))
 		var enemy_atk: int = int(enemy.get("atk", DEFAULT_ENEMY_ATK))
-		var atk_timer: float = float(enemy.get("atk_timer", 0.0))
-		atk_timer += delta
+		var attack_timer: float = float(enemy.get("attack_timer", 0.0))
+		attack_timer += delta
 
-		var attack_range: float = player_radius + enemy_radius + 6.0
-		if enemy_pos.distance_to(player_pos) <= attack_range and atk_timer >= ENEMY_ATTACK_INTERVAL:
+		var distance_to_player: float = enemy_pos.distance_to(player_pos)
+		var attack_distance: float = enemy_attack_range + player_radius + enemy_radius
+		if distance_to_player <= enemy_aggro_range and distance_to_player <= attack_distance and attack_timer >= enemy_attack_cd:
 			var damage: int = enemy_atk - player_def
 			if damage < 1:
 				damage = 1
 			total_damage += damage
-			atk_timer = 0.0
+			attack_timer = 0.0
 
-		enemy["atk_timer"] = atk_timer
+		enemy["attack_timer"] = attack_timer
 		enemies[i] = enemy
 
 	if total_damage <= 0:
@@ -304,6 +350,15 @@ func _auto_attack() -> void:
 		return
 
 	var enemy: Dictionary = enemies[target_index]
+	var player_pos: Vector2 = player["pos"]
+	var enemy_pos: Vector2 = enemy["pos"]
+	var player_attack_range: float = float(player.get("attack_range", 10.0))
+	var player_radius: float = float(player["radius"])
+	var enemy_radius: float = float(enemy.get("radius", 14.0))
+	var attack_distance: float = player_attack_range + player_radius + enemy_radius
+	if player_pos.distance_to(enemy_pos) > attack_distance:
+		return
+
 	var damage: int = int(player["atk"]) - int(enemy["def"])
 	if damage < 1:
 		damage = 1
