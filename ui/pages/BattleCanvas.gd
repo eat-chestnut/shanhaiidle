@@ -18,6 +18,8 @@ var kills := 0
 
 var _spawn_timer := 0.0
 var _attack_timer := 0.0
+var _enemy_group_log_cooldown: float = 0.0
+var _logged_enemy_steps: Dictionary = {}
 
 func _ready() -> void:
 	randomize()
@@ -25,6 +27,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	player["pos"] = size * 0.5
+
+	if _enemy_group_log_cooldown > 0.0:
+		_enemy_group_log_cooldown = maxf(0.0, _enemy_group_log_cooldown - delta)
 
 	_spawn_timer += delta
 	while _spawn_timer >= spawn_interval:
@@ -37,6 +42,7 @@ func _process(delta: float) -> void:
 		_attack_timer -= attack_interval
 		_auto_attack()
 
+	_try_log_enemy_group_growth()
 	queue_redraw()
 
 func _try_spawn_enemy() -> void:
@@ -88,9 +94,25 @@ func _auto_attack() -> void:
 	if int(enemy["hp"]) <= 0:
 		enemies.remove_at(target_index)
 		kills += 1
-		EventBus.add_log("击杀+1（总击杀%d，场上%d）" % [kills, enemies.size()])
+		if kills % 5 == 0:
+			EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
 	else:
 		enemies[target_index] = enemy
+
+func _try_log_enemy_group_growth() -> void:
+	if _enemy_group_log_cooldown > 0.0:
+		return
+
+	var enemy_count := enemies.size()
+	var step: int = enemy_count - (enemy_count % 10)
+	if step < 10:
+		return
+	if _logged_enemy_steps.has(step):
+		return
+
+	_logged_enemy_steps[step] = true
+	_enemy_group_log_cooldown = 1.0
+	EventBus.add_log("敌群增多：场上%d" % enemy_count)
 
 func _find_nearest_enemy_index() -> int:
 	var player_pos: Vector2 = player["pos"]
