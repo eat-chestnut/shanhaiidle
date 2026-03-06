@@ -3,6 +3,7 @@ extends Control
 const PLAYER_LABEL_SIZE := 24
 const ENEMY_LABEL_SIZE := 24
 const HUD_LABEL_SIZE := 28
+const HUD_SUB_LABEL_SIZE := 22
 const SPAWN_LABEL_SIZE := 18
 const DEFAULT_MONSTER_ID := "mob_a"
 const DEFAULT_ENEMY_ATK := 6
@@ -370,17 +371,32 @@ func _draw() -> void:
 			true
 		)
 
-	var hud_text := "%s｜Kills:%d｜Enemies:%d｜HP:%d" % [stage_name, kills, enemies.size(), int(player["hp"])]
-	var hud_pos := Vector2(12, 30)
-	var hud_bg_width: float = minf(size.x - 16.0, _measure_text_width(hud_text, HUD_LABEL_SIZE) + 20.0)
-	var hud_bg_rect := Rect2(hud_pos + Vector2(-8, -28), Vector2(hud_bg_width, 40))
+	var hp_now: int = int(player.get("hp", 0))
+	var hp_max: int = int(player.get("max_hp", hp_now))
+	var hud_line_1 := "%s｜HP %d/%d｜击杀 %d｜场上 %d" % [stage_name, hp_now, hp_max, kills, enemies.size()]
+	var hud_line_2 := _build_spawn_status_line()
+	var hud_pos_1 := Vector2(12, 30)
+	var hud_pos_2 := Vector2(12, 60)
+	var hud_bg_width: float = maxf(
+		_measure_text_width(hud_line_1, HUD_LABEL_SIZE),
+		_measure_text_width(hud_line_2, HUD_SUB_LABEL_SIZE)
+	) + 20.0
+	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
+	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -28), Vector2(hud_bg_width, 72))
 	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
 
 	_draw_label(
-		hud_pos,
-		hud_text,
+		hud_pos_1,
+		hud_line_1,
 		Color.WHITE,
 		HUD_LABEL_SIZE,
+		true
+	)
+	_draw_label(
+		hud_pos_2,
+		hud_line_2,
+		Color.WHITE,
+		HUD_SUB_LABEL_SIZE,
 		true
 	)
 
@@ -401,6 +417,17 @@ func _draw_spawn_points() -> void:
 			SPAWN_LABEL_SIZE,
 			true
 		)
+
+func _build_spawn_status_line() -> String:
+	var parts: Array[String] = []
+	for spawn_id in spawn_order:
+		if not spawn_rt.has(spawn_id):
+			continue
+		var runtime: Dictionary = spawn_rt[spawn_id]
+		var alive_count: int = int(runtime.get("alive_count", 0))
+		var max_alive: int = int(runtime.get("max_alive", 0))
+		parts.append("%s %d/%d" % [spawn_id, alive_count, max_alive])
+	return "刷怪点：%s" % "  ".join(parts)
 
 func _draw_label(
 	pos: Vector2,
