@@ -40,6 +40,9 @@ var battle_time := 0.0
 var enemies: Array[Dictionary] = []
 var floating_texts: Array[Dictionary] = []
 var kills := 0
+var drop_white_count := 0
+var drop_blue_count := 0
+var drop_gold_count := 0
 
 var _attack_timer := 0.0
 var _hit_log_cd := 0.0
@@ -456,6 +459,9 @@ func _on_player_dead() -> void:
 	EventBus.add_log("你倒下了……重开刷怪点")
 	player["hp"] = int(player["max_hp"])
 	kills = 0
+	drop_white_count = 0
+	drop_blue_count = 0
+	drop_gold_count = 0
 	enemies.clear()
 	floating_texts.clear()
 	_attack_timer = 0.0
@@ -554,15 +560,19 @@ func _try_log_drop(death_pos: Vector2) -> void:
 	match rarity:
 		"blue":
 			tag = "[蓝]"
+			drop_blue_count += 1
 		"gold":
 			tag = "[金]"
+			drop_gold_count += 1
 		_:
 			tag = "[白]"
+			drop_white_count += 1
 	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
 	floating_texts.append({
 		"text": "%s %s" % [tag, item_name],
 		"pos": death_pos,
 		"ttl": FLOAT_TEXT_TTL,
+		"color": _drop_color_for_rarity(rarity),
 	})
 
 func _update_floating_texts(delta: float) -> void:
@@ -592,6 +602,15 @@ func _roll_drop_rarity() -> String:
 	if roll < white_w + blue_w:
 		return "blue"
 	return "gold"
+
+func _drop_color_for_rarity(rarity: String) -> Color:
+	match rarity:
+		"blue":
+			return Color(0.53, 0.74, 1.0, 0.95)
+		"gold":
+			return Color(1.0, 0.86, 0.35, 0.95)
+		_:
+			return Color(1.0, 1.0, 1.0, 0.95)
 
 func _decrease_spawn_alive(spawn_id: String) -> void:
 	if spawn_id.is_empty() or not spawn_rt.has(spawn_id):
@@ -654,11 +673,12 @@ func _draw() -> void:
 		var ttl: float = float(ft.get("ttl", 0.0))
 		var text: String = str(ft.get("text", ""))
 		var pos: Vector2 = ft.get("pos", Vector2.ZERO)
+		var text_color: Color = ft.get("color", Color(1.0, 1.0, 1.0, 0.95))
 		var rise: float = (FLOAT_TEXT_TTL - ttl) * 20.0
 		_draw_label(
 			pos + Vector2(0.0, -rise),
 			text,
-			Color(1.0, 1.0, 1.0, 0.95),
+			text_color,
 			ENEMY_LABEL_SIZE,
 			true
 		)
@@ -739,7 +759,14 @@ func _build_spawn_status_line() -> String:
 			aggro_on = "已进入"
 			break
 
-	return "刷怪点 sp_1：%d/%d｜警戒：%s" % [alive_count, max_alive, aggro_on]
+	return "刷怪点 sp_1：%d/%d｜警戒：%s｜掉落 白%d 蓝%d 金%d" % [
+		alive_count,
+		max_alive,
+		aggro_on,
+		drop_white_count,
+		drop_blue_count,
+		drop_gold_count
+	]
 
 func _draw_label(
 	pos: Vector2,
