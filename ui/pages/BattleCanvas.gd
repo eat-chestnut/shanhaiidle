@@ -1,8 +1,8 @@
 extends Control
 
-const PLAYER_LABEL_SIZE := 18
-const ENEMY_LABEL_SIZE := 18
-const HUD_LABEL_SIZE := 20
+const PLAYER_LABEL_SIZE := 24
+const ENEMY_LABEL_SIZE := 24
+const HUD_LABEL_SIZE := 28
 
 var player := {
 	"pos": Vector2.ZERO,
@@ -180,7 +180,7 @@ func _draw_label(
 	if with_shadow:
 		draw_string(
 			font,
-			pos + Vector2(1, 1),
+			pos + Vector2(2, 2),
 			text,
 			HORIZONTAL_ALIGNMENT_LEFT,
 			-1,
