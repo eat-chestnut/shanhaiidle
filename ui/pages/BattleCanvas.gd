@@ -5,10 +5,14 @@ const ENEMY_LABEL_SIZE := 24
 const HUD_LABEL_SIZE := 28
 const SPAWN_LABEL_SIZE := 18
 const DEFAULT_MONSTER_ID := "mob_a"
+const DEFAULT_ENEMY_ATK := 6
+const ENEMY_ATTACK_INTERVAL := 0.8
+const HIT_LOG_INTERVAL := 1.0
 
 var player := {
 	"pos": Vector2.ZERO,
 	"hp": 200,
+	"max_hp": 200,
 	"radius": 18.0,
 	"atk": 12,
 	"def": 4,
@@ -29,6 +33,7 @@ var enemies: Array[Dictionary] = []
 var kills := 0
 
 var _attack_timer := 0.0
+var _hit_log_cd := 0.0
 
 func _ready() -> void:
 	randomize()
@@ -40,9 +45,12 @@ func _process(delta: float) -> void:
 	battle_time += delta
 	_recalc_arena()
 	player["pos"] = arena_rect.position + arena_rect.size * 0.5
+	if _hit_log_cd > 0.0:
+		_hit_log_cd = maxf(0.0, _hit_log_cd - delta)
 
 	_process_spawn_points()
 	_move_enemies(delta)
+	_enemy_attack_player(delta)
 
 	_attack_timer += delta
 	var attack_interval: float = float(player["attack_interval"])
@@ -91,14 +99,17 @@ func _load_monster_templates(battle_cfg: Dictionary) -> void:
 					monsters_cfg[monster_id] = monster.duplicate(true)
 
 func _load_player_cfg(battle_cfg: Dictionary) -> void:
+	var max_hp: int = int(player.get("max_hp", player.get("hp", 200)))
 	var player_cfg_any = battle_cfg.get("player", {})
 	if player_cfg_any is Dictionary:
 		var player_cfg: Dictionary = player_cfg_any
-		player["hp"] = int(player_cfg.get("hp", player.get("hp", 200)))
+		max_hp = int(player_cfg.get("hp", max_hp))
 		player["radius"] = float(player_cfg.get("radius", player.get("radius", 18.0)))
 		player["atk"] = int(player_cfg.get("atk", player.get("atk", 12)))
 		player["def"] = int(player_cfg.get("def", player.get("def", 4)))
 		player["attack_interval"] = maxf(0.05, float(player_cfg.get("attack_interval", player.get("attack_interval", 0.25))))
+	player["max_hp"] = max_hp
+	player["hp"] = max_hp
 
 func _load_spawn_points(battle_cfg: Dictionary) -> void:
 	spawn_points_cfg.clear()
@@ -182,6 +193,8 @@ func _spawn_enemy_from_point(spawn_id: String, runtime: Dictionary) -> void:
 		"monster_id": monster_id,
 		"pos": runtime.get("pos", Vector2.ZERO),
 		"speed": float(template.get("speed", 85)),
+		"atk": int(template.get("atk", DEFAULT_ENEMY_ATK)),
+		"atk_timer": 0.0,
 		"radius": float(template.get("radius", 14)),
 		"hp": int(template.get("hp", 30)),
 		"def": int(template.get("def", 2)),
@@ -205,6 +218,65 @@ func _move_enemies(delta: float) -> void:
 
 		enemy["pos"] = enemy_pos
 		enemies[i] = enemy
+
+func _enemy_attack_player(delta: float) -> void:
+	if enemies.is_empty():
+		return
+
+	var player_pos: Vector2 = player["pos"]
+	var player_radius: float = float(player["radius"])
+	var player_def: int = int(player["def"])
+	var total_damage := 0
+
+	for i in enemies.size():
+		var enemy: Dictionary = enemies[i]
+		var enemy_pos: Vector2 = enemy["pos"]
+		var enemy_radius: float = float(enemy.get("radius", 14.0))
+		var enemy_atk: int = int(enemy.get("atk", DEFAULT_ENEMY_ATK))
+		var atk_timer: float = float(enemy.get("atk_timer", 0.0))
+		atk_timer += delta
+
+		var attack_range: float = player_radius + enemy_radius + 6.0
+		if enemy_pos.distance_to(player_pos) <= attack_range and atk_timer >= ENEMY_ATTACK_INTERVAL:
+			var damage: int = enemy_atk - player_def
+			if damage < 1:
+				damage = 1
+			total_damage += damage
+			atk_timer = 0.0
+
+		enemy["atk_timer"] = atk_timer
+		enemies[i] = enemy
+
+	if total_damage <= 0:
+		return
+
+	var current_hp: int = int(player["hp"]) - total_damage
+	if current_hp < 0:
+		current_hp = 0
+	player["hp"] = current_hp
+
+	if _hit_log_cd <= 0.0:
+		EventBus.add_log("受击 -%d（HP %d/%d）" % [total_damage, int(player["hp"]), int(player["max_hp"])])
+		_hit_log_cd = HIT_LOG_INTERVAL
+
+	if current_hp <= 0:
+		_on_player_dead()
+
+func _on_player_dead() -> void:
+	EventBus.add_log("你倒下了……重开刷怪点")
+	player["hp"] = int(player["max_hp"])
+	kills = 0
+	enemies.clear()
+	_attack_timer = 0.0
+	_hit_log_cd = 0.0
+
+	for spawn_id in spawn_order:
+		if not spawn_rt.has(spawn_id):
+			continue
+		var runtime: Dictionary = spawn_rt[spawn_id]
+		runtime["alive_count"] = 0
+		runtime["next_spawn_at"] = battle_time
+		spawn_rt[spawn_id] = runtime
 
 func _clamp_pos_in_arena(pos: Vector2, radius: float) -> Vector2:
 	var min_x: float = arena_rect.position.x + radius
