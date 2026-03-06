@@ -9,6 +9,7 @@ const DEFAULT_MONSTER_ID := "mob_a"
 const DEFAULT_ENEMY_ATK := 6
 const ENEMY_ATTACK_INTERVAL := 0.8
 const HIT_LOG_INTERVAL := 1.0
+const FLOAT_TEXT_TTL := 1.2
 
 var player := {
 	"pos": Vector2.ZERO,
@@ -37,6 +38,7 @@ var _last_canvas_size: Vector2 = Vector2.ZERO
 
 var battle_time := 0.0
 var enemies: Array[Dictionary] = []
+var floating_texts: Array[Dictionary] = []
 var kills := 0
 
 var _attack_timer := 0.0
@@ -63,6 +65,7 @@ func _process(delta: float) -> void:
 	_process_player_move(delta)
 	_move_enemies(delta)
 	_enemy_attack_player(delta)
+	_update_floating_texts(delta)
 
 	_attack_timer += delta
 	var attack_interval: float = float(player["attack_interval"])
@@ -454,6 +457,7 @@ func _on_player_dead() -> void:
 	player["hp"] = int(player["max_hp"])
 	kills = 0
 	enemies.clear()
+	floating_texts.clear()
 	_attack_timer = 0.0
 	_hit_log_cd = 0.0
 	_auto_seek_moving = false
@@ -517,17 +521,18 @@ func _auto_attack() -> void:
 	enemy["hp"] = int(enemy["hp"]) - damage
 
 	if int(enemy["hp"]) <= 0:
+		var death_pos: Vector2 = enemy.get("pos", player_pos)
 		var spawn_id: String = str(enemy.get("spawn_id", ""))
 		enemies.remove_at(target_index)
 		_decrease_spawn_alive(spawn_id)
 		kills += 1
-		_try_log_drop()
+		_try_log_drop(death_pos)
 		if kills % 5 == 0:
 			EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
 	else:
 		enemies[target_index] = enemy
 
-func _try_log_drop() -> void:
+func _try_log_drop(death_pos: Vector2) -> void:
 	if drop_chance <= 0.0:
 		return
 	if randf() >= drop_chance:
@@ -554,6 +559,24 @@ func _try_log_drop() -> void:
 		_:
 			tag = "[白]"
 	EventBus.add_log("%s 掉落：%s" % [tag, item_name])
+	floating_texts.append({
+		"text": "%s %s" % [tag, item_name],
+		"pos": death_pos,
+		"ttl": FLOAT_TEXT_TTL,
+	})
+
+func _update_floating_texts(delta: float) -> void:
+	if floating_texts.is_empty():
+		return
+
+	for i in range(floating_texts.size() - 1, -1, -1):
+		var ft: Dictionary = floating_texts[i]
+		var ttl: float = float(ft.get("ttl", 0.0)) - delta
+		if ttl <= 0.0:
+			floating_texts.remove_at(i)
+			continue
+		ft["ttl"] = ttl
+		floating_texts[i] = ft
 
 func _roll_drop_rarity() -> String:
 	var white_w: int = int(drop_weights.get("white", 0))
@@ -622,6 +645,20 @@ func _draw() -> void:
 			enemy_pos + Vector2(enemy_radius + 6.0, 5.0),
 			"敌 HP:%d" % hp,
 			Color.WHITE,
+			ENEMY_LABEL_SIZE,
+			true
+		)
+
+	for ft_any in floating_texts:
+		var ft: Dictionary = ft_any
+		var ttl: float = float(ft.get("ttl", 0.0))
+		var text: String = str(ft.get("text", ""))
+		var pos: Vector2 = ft.get("pos", Vector2.ZERO)
+		var rise: float = (FLOAT_TEXT_TTL - ttl) * 20.0
+		_draw_label(
+			pos + Vector2(0.0, -rise),
+			text,
+			Color(1.0, 1.0, 1.0, 0.95),
 			ENEMY_LABEL_SIZE,
 			true
 		)
