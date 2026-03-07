@@ -61,7 +61,7 @@ vertical_alignment = 1
 [node name="Hint" type="Label" parent="RootVBox/Header/HeaderRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "遇到即解锁"
+text = "遇到即解锁（奖励手动领取）"
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -106,6 +106,13 @@ theme_override_font_sizes/normal_font_size = 22
 fit_content = false
 scroll_active = true
 text = "—"
+
+[node name="BtnClaim" type="Button" parent="RootVBox/DetailPanel/DetailVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "未解锁不可领取"
 
 [node name="BottomNav" type="HBoxContainer" parent="RootVBox"]
 custom_minimum_size = Vector2(0, 96)

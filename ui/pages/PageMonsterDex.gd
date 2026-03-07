@@ -11,6 +11,7 @@ const PAGE_MAP := "res://ui/pages/PageMap.tscn"
 @onready var _monster_list: VBoxContainer = $RootVBox/MonsterScroll/MonsterList
 @onready var _detail_title: Label = $RootVBox/DetailPanel/DetailVBox/DetailTitle
 @onready var _detail_text: RichTextLabel = $RootVBox/DetailPanel/DetailVBox/DetailScroll/DetailText
+@onready var _btn_claim: Button = $RootVBox/DetailPanel/DetailVBox/BtnClaim
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
 @onready var _btn_nav_skills: Button = $RootVBox/BottomNav/BtnNavSkills
 @onready var _btn_nav_battle: Button = $RootVBox/BottomNav/BtnNavBattle
@@ -36,9 +37,10 @@ func _ready() -> void:
 
 func _apply_i18n() -> void:
 	_title.text = "怪物图鉴"
-	_hint.text = "遇到即解锁"
+	_hint.text = "遇到即解锁（奖励手动领取）"
 	_btn_back.text = "返回"
 	_detail_title.text = "怪物详情"
+	_btn_claim.text = "未解锁不可领取"
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
 	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
@@ -46,6 +48,10 @@ func _apply_i18n() -> void:
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
 	_btn_nav_map.text = I18nService.t("ui.nav.map", "地图")
 	_btn_nav_dex.disabled = true
+	_btn_nav_bag.disabled = false
+	_btn_nav_character.disabled = false
+	_btn_nav_skills.disabled = false
+	_btn_nav_battle.disabled = false
 	_btn_nav_map.disabled = false
 
 func _connect_signals() -> void:
@@ -59,8 +65,12 @@ func _connect_signals() -> void:
 		_btn_nav_skills.pressed.connect(_on_nav_skills_pressed)
 	if not _btn_nav_battle.pressed.is_connected(_on_nav_battle_pressed):
 		_btn_nav_battle.pressed.connect(_on_nav_battle_pressed)
+	if not _btn_nav_bag.pressed.is_connected(_on_nav_bag_pressed):
+		_btn_nav_bag.pressed.connect(_on_nav_bag_pressed)
 	if not _btn_nav_map.pressed.is_connected(_on_nav_map_pressed):
 		_btn_nav_map.pressed.connect(_on_nav_map_pressed)
+	if not _btn_claim.pressed.is_connected(_on_claim_pressed):
+		_btn_claim.pressed.connect(_on_claim_pressed)
 
 func _load_monsters() -> void:
 	_monsters.clear()
@@ -150,6 +160,20 @@ func _rebuild_list() -> void:
 		btn.add_theme_font_size_override("font_size", 20)
 		btn.text = "查看"
 		btn.pressed.connect(_on_select_pressed.bind(i))
+		var claim_btn := Button.new()
+		claim_btn.custom_minimum_size = Vector2(86, 44)
+		claim_btn.add_theme_font_size_override("font_size", 18)
+		if MonsterDexModel.can_claim(monster_id):
+			claim_btn.disabled = false
+			claim_btn.text = "领取"
+			claim_btn.pressed.connect(_on_claim_row_pressed.bind(i))
+		elif unlocked:
+			claim_btn.disabled = true
+			claim_btn.text = "已领"
+		else:
+			claim_btn.disabled = true
+			claim_btn.text = "未解锁"
+		row.add_child(claim_btn)
 		row.add_child(btn)
 
 		_monster_list.add_child(panel)
@@ -163,6 +187,9 @@ func _select_monster(idx: int) -> void:
 func _refresh_detail() -> void:
 	if _selected_idx < 0 or _selected_idx >= _monsters.size():
 		_detail_text.text = "请选择怪物"
+		_btn_claim.disabled = true
+		_btn_claim.text = "未解锁不可领取"
+		_btn_claim.visible = true
 		return
 	var m: Dictionary = _monsters[_selected_idx]
 	var monster_id := str(m.get("id", ""))
@@ -186,11 +213,39 @@ func _refresh_detail() -> void:
 	lines.append("经验：%d" % int(m.get("exp", 0)))
 	lines.append("掉落加成：%d%%" % int(m.get("drop_bonus_percent", 0)))
 	lines.append("解锁状态：%s" % ("已解锁" if unlocked else "未解锁"))
-	lines.append("解锁奖励：金币%d（%s）" % [reward_gold, "已领取" if got_reward else "未领取（遇到即可领取）"])
+	lines.append("解锁奖励：金币%d（%s）" % [reward_gold, "已领取" if got_reward else "未领取（点击领取）"])
 	_detail_text.text = "\n".join(lines)
+
+	if MonsterDexModel.can_claim(monster_id):
+		_btn_claim.visible = true
+		_btn_claim.disabled = false
+		_btn_claim.text = "领取奖励（金币+%d）" % reward_gold
+	elif unlocked:
+		_btn_claim.visible = true
+		_btn_claim.disabled = true
+		_btn_claim.text = "奖励已领取"
+	else:
+		_btn_claim.visible = true
+		_btn_claim.disabled = true
+		_btn_claim.text = "未解锁不可领取"
 
 func _on_select_pressed(idx: int) -> void:
 	_select_monster(idx)
+
+func _on_claim_pressed() -> void:
+	if _selected_idx < 0 or _selected_idx >= _monsters.size():
+		return
+	var monster: Dictionary = _monsters[_selected_idx]
+	if MonsterDexModel.claim(monster):
+		_on_model_changed()
+
+func _on_claim_row_pressed(idx: int) -> void:
+	if idx < 0 or idx >= _monsters.size():
+		return
+	var monster: Dictionary = _monsters[idx]
+	if MonsterDexModel.claim(monster):
+		_selected_idx = idx
+		_on_model_changed()
 
 func _kind_name(kind: String) -> String:
 	match kind:
@@ -241,6 +296,9 @@ func _on_nav_skills_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_SKILLS)
 
 func _on_nav_battle_pressed() -> void:
+	get_tree().change_scene_to_file(PAGE_BATTLE)
+
+func _on_nav_bag_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_BATTLE)
 
 func _on_nav_map_pressed() -> void:

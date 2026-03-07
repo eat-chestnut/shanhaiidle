@@ -52,17 +52,30 @@ func mark_seen(monster_def: Dictionary) -> void:
 	var monster_id := str(monster_def.get("id", ""))
 	if monster_id.is_empty():
 		return
-	var reward_gold := maxi(0, int(monster_def.get("dex_gold", 5)))
 	var was_unlocked := bool(unlocked.get(monster_id, false))
 	if not was_unlocked:
 		unlocked[monster_id] = true
-	if not bool(rewarded.get(monster_id, false)):
-		if reward_gold > 0:
-			PlayerModel.add_gold(reward_gold)
-		rewarded[monster_id] = true
-		EventBus.add_log("图鉴解锁：%s 金币+%d" % [str(monster_def.get("name", monster_id)), reward_gold])
-	elif was_unlocked:
+		EventBus.add_log("图鉴解锁：%s（可领取奖励）" % str(monster_def.get("name", monster_id)))
+	else:
 		return
 
 	save_data()
 	EventBus.notify_inventory_updated()
+
+func can_claim(monster_id: String) -> bool:
+	return bool(unlocked.get(monster_id, false)) and not bool(rewarded.get(monster_id, false))
+
+func claim(monster_def: Dictionary) -> bool:
+	var monster_id := str(monster_def.get("id", ""))
+	if monster_id.is_empty():
+		return false
+	if not can_claim(monster_id):
+		return false
+	var gold := maxi(0, int(monster_def.get("dex_gold", 5)))
+	if gold > 0:
+		PlayerModel.add_gold(gold)
+	rewarded[monster_id] = true
+	save_data()
+	EventBus.add_log("领取图鉴奖励：%s 金币+%d" % [str(monster_def.get("name", monster_id)), gold])
+	EventBus.notify_inventory_updated()
+	return true

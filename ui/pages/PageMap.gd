@@ -36,6 +36,7 @@ func _apply_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_map.text = I18nService.t("ui.nav.map", "地图")
+	_btn_nav_bag.disabled = false
 	_btn_nav_map.disabled = true
 	_current_stage.text = "当前地图：—"
 
@@ -46,6 +47,8 @@ func _connect_signals() -> void:
 		_btn_nav_skills.pressed.connect(_on_nav_skills_pressed)
 	if not _btn_nav_battle.pressed.is_connected(_on_nav_battle_pressed):
 		_btn_nav_battle.pressed.connect(_on_nav_battle_pressed)
+	if not _btn_nav_bag.pressed.is_connected(_on_nav_bag_pressed):
+		_btn_nav_bag.pressed.connect(_on_nav_bag_pressed)
 	if not _btn_dex.pressed.is_connected(_on_nav_dex_pressed):
 		_btn_dex.pressed.connect(_on_nav_dex_pressed)
 	if not EventBus.inventory_updated.is_connected(_on_model_changed):
@@ -170,6 +173,9 @@ func _on_nav_skills_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_SKILLS)
 
 func _on_nav_battle_pressed() -> void:
+	get_tree().change_scene_to_file(PAGE_BATTLE)
+
+func _on_nav_bag_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_BATTLE)
 
 func _on_nav_dex_pressed() -> void:

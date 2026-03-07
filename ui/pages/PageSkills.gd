@@ -46,7 +46,9 @@ func _rebuild_skill_nodes() -> void:
 	var skills := _active_skills_for_current_class()
 	for skill in skills:
 		var skill_id := str(skill.get("id", ""))
-		var cur_lv := SkillModel.get_skill_level(skill_id)
+		var base_lv := SkillModel.get_skill_level(skill_id)
+		var eff_lv := SkillModel.get_effective_level(skill_id)
+		var bonus_lv := eff_lv - base_lv
 		var max_lv := maxi(1, int(skill.get("max_level", 1)))
 		var min_lv := maxi(1, int(skill.get("min_level", 1)))
 		var cost_qi := maxi(0, int(skill.get("cost_qi", 0)))
@@ -70,13 +72,23 @@ func _rebuild_skill_nodes() -> void:
 
 		var title := Label.new()
 		title.add_theme_font_size_override("font_size", 22)
-		title.text = "%s  Lv.%d/%d" % [str(skill.get("name", skill_id)), cur_lv, max_lv]
+		if bonus_lv > 0:
+			title.text = "%s  Lv.%d(+%d)/%d" % [str(skill.get("name", skill_id)), base_lv, bonus_lv, max_lv]
+		else:
+			title.text = "%s  Lv.%d/%d" % [str(skill.get("name", skill_id)), base_lv, max_lv]
 		info.add_child(title)
 
 		var meta := Label.new()
 		meta.add_theme_font_size_override("font_size", 16)
 		meta.text = "需Lv%d  Qi:%d  CD:%.1fs" % [min_lv, cost_qi, cd_sec]
 		info.add_child(meta)
+
+		var desc := Label.new()
+		desc.add_theme_font_size_override("font_size", 16)
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.modulate = Color(0.8, 0.8, 0.8, 1.0)
+		desc.text = _build_skill_desc(skill)
+		info.add_child(desc)
 
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(52, 40)
@@ -90,6 +102,44 @@ func _rebuild_skill_nodes() -> void:
 		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		panel.add_child(row)
 		_skill_list.add_child(panel)
+
+func _build_skill_desc(skill: Dictionary) -> String:
+	var tags_any = skill.get("tags", [])
+	var tags: Array = tags_any if tags_any is Array else []
+	var is_aoe := tags.has("aoe") or tags.has("multi")
+	var dmg_any = skill.get("damage", {})
+	if dmg_any is Dictionary and (dmg_any as Dictionary).has("aoe"):
+		is_aoe = true
+	var prefix := "群体" if is_aoe else "单体"
+
+	var damage_txt := "伤害 0%攻击，每级+0%"
+	if dmg_any is Dictionary:
+		var dmg: Dictionary = dmg_any
+		var base := float(dmg.get("base_coef", 0.0))
+		var per := float(dmg.get("per_level", 0.0))
+		damage_txt = "伤害 %.0f%%攻击，每级+%.0f%%" % [base * 100.0, per * 100.0]
+
+	var debuff_txt := ""
+	var debuffs_any = skill.get("debuffs", [])
+	if debuffs_any is Array and not (debuffs_any as Array).is_empty():
+		var first_any = (debuffs_any as Array)[0]
+		if first_any is Dictionary:
+			var first: Dictionary = first_any
+			var pct := float(first.get("armor_reduction_pct", 0.0))
+			var dur := float(first.get("duration_sec", 0.0))
+			if pct > 0.0 and dur > 0.0:
+				debuff_txt = "；破甲 -%.0f%% 持续%.0fs" % [pct * 100.0, dur]
+
+	var milestone_txt := ""
+	var milestones_any = skill.get("milestones", {})
+	if milestones_any is Dictionary and (
+		(milestones_any as Dictionary).has("5")
+		or (milestones_any as Dictionary).has("10")
+		or (milestones_any as Dictionary).has("15")
+	):
+		milestone_txt = "（Lv5/10/15有特性）"
+
+	return "%s：%s%s%s" % [prefix, damage_txt, debuff_txt, milestone_txt]
 
 func _active_skills_for_current_class() -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []

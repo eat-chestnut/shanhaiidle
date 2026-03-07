@@ -90,6 +90,8 @@ var kills := 0
 var battle_time := 0.0
 var attack_timer := 0.0
 var hit_log_cd := 0.0
+var player_last_hit_at := 0.0
+var hp_regen_accum := 0.0
 var auto_seek_moving := false
 var manual_seek_off_fired := false
 var player_pos_inited := false
@@ -231,6 +233,7 @@ func _process(delta: float) -> void:
 	_move_enemies(delta)
 	_update_skill_runtime(delta)
 	_enemy_attack_player(delta)
+	_player_regen(delta)
 	_update_loot(delta)
 
 	attack_timer += delta
@@ -662,6 +665,8 @@ func _reset_runtime_for_stage_switch() -> void:
 	special_present = ""
 	attack_timer = 0.0
 	hit_log_cd = 0.0
+	player_last_hit_at = battle_time
+	hp_regen_accum = 0.0
 	auto_seek_moving = false
 	manual_seek_off_fired = false
 	gcd_left = 0.0
@@ -981,6 +986,8 @@ func _enemy_attack_player(delta: float) -> void:
 
 	var hp_now := maxi(0, int(player.get("hp", 0)) - total_damage)
 	player["hp"] = hp_now
+	player_last_hit_at = battle_time
+	hp_regen_accum = 0.0
 	if hit_log_cd <= 0.0:
 		EventBus.add_log("受击 -%d（HP %d/%d）" % [total_damage, hp_now, int(player.get("max_hp", hp_now))])
 		hit_log_cd = HIT_LOG_INTERVAL
@@ -1462,6 +1469,7 @@ func _apply_damage_to_enemy(index: int, damage: int) -> bool:
 		special_present = ""
 		EventBus.add_log("已击败：%s" % enemy_name)
 	kills += 1
+	_heal_on_kill(enemy_kind)
 	PerfTracker.record_kill(enemy_kind, enemy_exp)
 	ProgressModel.add_exp(enemy_exp, "online")
 	TaskService.on_kill(enemy_kind, 1)
@@ -1904,6 +1912,8 @@ func _on_player_dead() -> void:
 	events.clear()
 	attack_timer = 0.0
 	hit_log_cd = 0.0
+	player_last_hit_at = battle_time
+	hp_regen_accum = 0.0
 	auto_seek_moving = false
 	manual_seek_off_fired = false
 	gcd_left = 0.0
@@ -1916,6 +1926,36 @@ func _on_player_dead() -> void:
 	spawn_rt["alive_count"] = 0
 	spawn_rt["next_spawn_at"] = battle_time
 	_log_loot_bonus_info()
+
+func _player_regen(delta: float) -> void:
+	var hp := int(player.get("hp", 0))
+	var max_hp := int(player.get("max_hp", hp))
+	if hp <= 0:
+		return
+	if hp >= max_hp:
+		return
+	if battle_time - player_last_hit_at < 1.2:
+		return
+	var attrs_any = ProgressModel.attrs
+	var attrs: Dictionary = attrs_any if attrs_any is Dictionary else {}
+	var physique := maxi(0, int(attrs.get("physique", 0)))
+	var regen_rate := 0.35 + float(physique) * 0.02
+	hp_regen_accum += regen_rate * delta
+	var add := int(floor(hp_regen_accum))
+	if add <= 0:
+		return
+	hp_regen_accum -= float(add)
+	player["hp"] = mini(max_hp, hp + add)
+
+func _heal_on_kill(kind: String) -> void:
+	var max_hp := int(player.get("max_hp", 10))
+	var hp := int(player.get("hp", 10))
+	var add := 1
+	if kind == "elite":
+		add = 2
+	elif kind == "boss":
+		add = 4
+	player["hp"] = mini(max_hp, hp + add)
 
 func _decrease_spawn_alive(spawn_id: String) -> void:
 	if spawn_id != str(spawn_rt.get("id", "sp_1")):

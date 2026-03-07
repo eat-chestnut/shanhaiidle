@@ -4,16 +4,16 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
 bg_color = Color(0.91, 0.18, 0.2, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
 
 [node name="Badge" type="Control"]
 visible = false
-custom_minimum_size = Vector2(28, 28)
-offset_right = 28.0
-offset_bottom = 28.0
+custom_minimum_size = Vector2(22, 18)
+offset_right = 22.0
+offset_bottom = 18.0
 mouse_filter = 2
 script = ExtResource("1_v2w3x")
 
@@ -34,7 +34,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
