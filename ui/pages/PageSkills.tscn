@@ -1,0 +1,168 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/pages/PageSkills.gd" id="1_7yjnh"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_skills.png" id="2_mt76n"]
+[ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="3_badge"]
+
+[node name="PageSkills" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7yjnh")
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_mt76n")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="RootVBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "技能"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SectBar" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="LblCurrentSect" type="Label" parent="RootVBox/SectBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "当前宗门："
+vertical_alignment = 1
+
+[node name="LblSectName" type="Label" parent="RootVBox/SectBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "兵宗"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="RootVBox/SectBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnSwitchSect" type="Button" parent="RootVBox/SectBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "切换宗门"
+
+[node name="LblSwitchNeed" type="Label" parent="RootVBox/SectBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "切换需 宗门令×1（当前0）"
+vertical_alignment = 1
+
+[node name="SkillPointBar" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblSkillPoints" type="Label" parent="RootVBox/SkillPointBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "技能点：0"
+vertical_alignment = 1
+
+[node name="SkillScroll" type="ScrollContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SkillList" type="VBoxContainer" parent="RootVBox/SkillScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BottomNav" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnNavCharacter" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "人物"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavCharacter" instance=ExtResource("3_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavSkills" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "技能"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavSkills" instance=ExtResource("3_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavBattle" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "战斗"
+
+[node name="BtnNavBag" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "背包"
+disabled = true
+
+[node name="BtnNavDex" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "图鉴"
+
+[node name="BtnNavMap" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "地图"
+disabled = true

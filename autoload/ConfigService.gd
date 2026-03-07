@@ -11,6 +11,11 @@ func load_cfg() -> void:
 	if battle_cfg is Dictionary:
 		cfg.merge(battle_cfg, true)
 
+	var balance_cfg: Variant = _load_json_file("res://data/balance_v1.json")
+	if not (balance_cfg is Dictionary):
+		balance_cfg = {}
+	cfg["balance"] = balance_cfg
+
 	var items_db: Variant = _load_json_file("res://data/items.json")
 	if not (items_db is Dictionary):
 		items_db = {
@@ -26,6 +31,42 @@ func load_cfg() -> void:
 			"equip_templates": [],
 		}
 	cfg["equip_db"] = equip_db
+
+	var leveling_cfg: Variant = _load_json_file("res://data/leveling.json")
+	if not (leveling_cfg is Dictionary):
+		leveling_cfg = {
+			"level_cap": 60,
+			"exp_curve": {
+				"base": 20,
+				"linear": 6,
+				"quadratic": 0.2,
+			},
+			"kill_exp": 2,
+		}
+	cfg["leveling"] = leveling_cfg
+
+	var stages_db: Variant = _load_json_file("res://data/stages_v1.json")
+	if not (stages_db is Dictionary):
+		stages_db = {
+			"stages": [],
+		}
+	cfg["stages_db"] = stages_db
+
+	var upgrade_db: Variant = _load_json_file("res://data/upgrade_v1.json")
+	if not (upgrade_db is Dictionary):
+		upgrade_db = {
+			"tier_names": ["凡", "灵", "玄"],
+			"tier_bonus": {"0": 0, "1": 1, "2": 2},
+			"recipes": {},
+		}
+	cfg["upgrade_db"] = upgrade_db
+
+	cfg["ui_frames"] = {
+		"empty": "res://assets/ui_frames/common_board_quality_mask.png",
+		"white": "res://assets/ui_frames/common_board_quality_white.png",
+		"blue": "res://assets/ui_frames/common_board_quality_blue.png",
+		"gold": "res://assets/ui_frames/common_board_quality_orange.png",
+	}
 
 func get_cfg() -> Dictionary:
 	return cfg

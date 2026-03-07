@@ -52,7 +52,7 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "装备"
+text = "装备对比"
 vertical_alignment = 1
 
 [node name="BtnClose" type="Button" parent="Panel/VBox/TopBar"]
@@ -60,13 +60,88 @@ custom_minimum_size = Vector2(72, 40)
 layout_mode = 2
 text = "关闭"
 
-[node name="RichDetail" type="RichTextLabel" parent="Panel/VBox"]
+[node name="CompareRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 240)
+theme_override_constants/separation = 10
+
+[node name="LeftBox" type="VBoxContainer" parent="Panel/VBox/CompareRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="LeftTitle" type="Label" parent="Panel/VBox/CompareRow/LeftBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "待装备"
+
+[node name="LeftDetail" type="RichTextLabel" parent="Panel/VBox/CompareRow/LeftBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 fit_content = false
 scroll_active = true
-text = "详情"
+text = "—"
+
+[node name="RightBox" type="VBoxContainer" parent="Panel/VBox/CompareRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="RightTitle" type="Label" parent="Panel/VBox/CompareRow/RightBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "当前装备"
+
+[node name="RightDetail" type="RichTextLabel" parent="Panel/VBox/CompareRow/RightBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+fit_content = false
+scroll_active = true
+text = "—"
+
+[node name="DeltaDetail" type="RichTextLabel" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 110)
+fit_content = false
+scroll_active = true
+text = "变化预览"
+
+[node name="SocketRow" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 72)
+theme_override_constants/separation = 8
+
+[node name="SocketBtn0" type="Button" parent="Panel/VBox/SocketRow"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "×"
+
+[node name="SocketBtn1" type="Button" parent="Panel/VBox/SocketRow"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "×"
+
+[node name="SocketBtn2" type="Button" parent="Panel/VBox/SocketRow"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "×"
+
+[node name="SocketBtn3" type="Button" parent="Panel/VBox/SocketRow"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "×"
 
 [node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
@@ -84,7 +159,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "卸下"
 
+[node name="BtnUpgrade" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "进阶"
+
+[node name="BtnPunch" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "打孔"
+
 [node name="BtnCancel" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "取消"
+
+[node name="LblUpgradeHint" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+text = ""

@@ -1,9 +1,15 @@
 {
   "items": [
-    { "id": "桂枝", "name": "桂枝", "rarity": "white" },
-    { "id": "玉屑", "name": "玉屑", "rarity": "white" },
-    { "id": "白玉碎", "name": "白玉碎", "rarity": "blue" },
-    { "id": "妖核", "name": "妖核", "rarity": "gold" }
+    { "id": "桂枝", "name": "桂枝", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_ld_01.png" },
+    { "id": "玉屑", "name": "玉屑", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_ld_02.png" },
+    { "id": "白玉碎", "name": "白玉碎", "rarity": "blue", "type": "item", "icon": "res://assets/icons/icon_ld_03.png" },
+    { "id": "妖核", "name": "妖核", "rarity": "gold", "type": "item", "icon": "res://assets/icons/icon_killskill.png" },
+    { "id": "宗门令", "name": "宗门令", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_key_01.png" },
+    { "id": "打孔石", "name": "打孔石", "rarity": "blue", "type": "item", "icon": "res://assets/icons/icon_key_02.png" },
+    { "id": "妖王核心", "name": "妖王核心", "rarity": "gold", "type": "gem", "trait": "妖王之力：战斗中可灌注武器（未启用），后续可解锁特殊效果。", "gem_effect": { "stat": "LOOT_BONUS_PERCENT", "val": 3 }, "icon": "res://assets/icons/icon_killskill.png" },
+    { "id": "赤晶石", "name": "赤晶石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "ATK", "val": 1 }, "icon": "res://assets/icons/icon_ld_01.png" },
+    { "id": "沧澜石", "name": "沧澜石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "DEF", "val": 1 }, "icon": "res://assets/icons/icon_ld_02.png" },
+    { "id": "青木石", "name": "青木石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "HP", "val": 2 }, "icon": "res://assets/icons/icon_ld_03.png" }
   ],
   "rarity_colors": {
     "white": { "r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0 },

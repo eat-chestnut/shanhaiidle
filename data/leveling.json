@@ -1,0 +1,9 @@
+{
+  "level_cap": 60,
+  "exp_curve": {
+    "base": 20,
+    "linear": 6,
+    "quadratic": 0.2
+  },
+  "kill_exp": 2
+}

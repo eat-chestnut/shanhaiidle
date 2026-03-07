@@ -1,25 +1,46 @@
 {
   "slots": ["weapon","helm","armor","pants","shoes","cloak","ring","bracelet"],
+  "socket_weights": { "0":60, "1":25, "2":10, "3":4, "4":1 },
   "equip_templates": [
     {
       "id":"eq_weapon_001","name":"木牙兵刃","slot":"weapon","rarity":"white",
-      "main_stat":"ATK","main_min":2,"main_max":4
+      "main_stat":"ATK","main_min":1,"main_max":2,
+      "effects":[
+        {"type":"stat","stat":"ATK","val":1}
+      ],
+      "icon":"res://assets/icons/icon_jian_10005.png"
     },
     {
       "id":"eq_armor_001","name":"麻布护甲","slot":"armor","rarity":"white",
-      "main_stat":"HP","main_min":10,"main_max":18
+      "main_stat":"HP","main_min":2,"main_max":4,
+      "effects":[
+        {"type":"stat","stat":"HP","val":2}
+      ],
+      "icon":"res://assets/icons/icon_key_01.png"
     },
     {
       "id":"eq_ring_001","name":"青石戒","slot":"ring","rarity":"blue",
-      "main_stat":"CRIT","main_min":1,"main_max":3
+      "main_stat":"CRIT","main_min":1,"main_max":2,
+      "effects":[
+        {"type":"stat","stat":"LOOT_BONUS_PERCENT","val":2}
+      ],
+      "icon":"res://assets/icons/icon_jiezhi_10001.png"
     },
     {
       "id":"eq_weapon_002","name":"玉锋兵刃","slot":"weapon","rarity":"blue",
-      "main_stat":"ATK","main_min":4,"main_max":6
+      "main_stat":"ATK","main_min":2,"main_max":3,
+      "effects":[
+        {"type":"skill_level","skill_id":"BING_01","val":1}
+      ],
+      "icon":"res://assets/icons/icon_jian_20001.png"
     },
     {
       "id":"eq_armor_002","name":"鳞纹护甲","slot":"armor","rarity":"blue",
-      "main_stat":"DEF","main_min":2,"main_max":4
+      "main_stat":"DEF","main_min":1,"main_max":2,
+      "effects":[
+        {"type":"stat","stat":"DEF","val":1}
+      ],
+      "icon":"res://assets/icons/icon_key_02.png"
     }
   ]
 }

@@ -147,20 +147,29 @@ func _draw_hud(spawn: Dictionary, player_state: Dictionary, enemy_count: int) ->
 		"已进入" if aggro_on else "未进入",
 		"开" if auto_seek else "关"
 	]
+	var elite_progress: int = int(local_state.get("elite_progress", 0))
+	var elite_need: int = maxi(1, int(local_state.get("elite_need", 40)))
+	var boss_progress: int = int(local_state.get("boss_progress", 0))
+	var boss_need: int = maxi(1, int(local_state.get("boss_need", 120)))
+	var line_3 := "精英 %d/%d    Boss %d/%d" % [elite_progress, elite_need, boss_progress, boss_need]
 
 	var hud_pos_1 := Vector2(12, 36)
 	var hud_pos_2 := hud_pos_1 + Vector2(0, 28)
-	var hud_bg_width := maxf(
+	var hud_pos_3 := hud_pos_2 + Vector2(0, 24)
+	var hud_text_w := maxf(
 		_measure_text_width(line_1, HUD_LABEL_SIZE),
 		_measure_text_width(line_2, HUD_SUB_LABEL_SIZE)
-	) + 20.0
+	)
+	hud_text_w = maxf(hud_text_w, _measure_text_width(line_3, HUD_SUB_LABEL_SIZE))
+	var hud_bg_width := hud_text_w + 20.0
 	hud_bg_width = minf(size.x - 16.0, hud_bg_width)
 	hud_bg_width = minf(hud_bg_width, 420.0)
-	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 48))
+	var hud_bg_rect := Rect2(hud_pos_1 + Vector2(-8, -16), Vector2(hud_bg_width, 80))
 	draw_rect(hud_bg_rect, Color(0, 0, 0, 0.6), true)
 
 	_draw_label(hud_pos_1, line_1, Color.WHITE, HUD_LABEL_SIZE, true)
 	_draw_label(hud_pos_2, line_2, Color.WHITE, HUD_SUB_LABEL_SIZE, true)
+	_draw_label(hud_pos_3, line_3, Color.WHITE, HUD_SUB_LABEL_SIZE, true)
 
 func _drop_color_for_rarity(rarity: String) -> Color:
 	match rarity:

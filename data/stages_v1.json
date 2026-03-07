@@ -1,0 +1,208 @@
+{
+  "stages": [
+    {
+      "id": "nan_01",
+      "name": "南山·招摇",
+      "unlock_min_level": 1,
+      "elite_every_kills": 40,
+      "boss_every_kills": 120,
+      "spawn_patch": { "respawn_s": 1.70, "max_alive": 10, "spawn_radius": 220 },
+      "drops_patch": {
+        "drop_chance": 0.27,
+        "rarity_weights": { "white": 90, "blue": 9, "gold": 1 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.02,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.12,
+            "extra_gem_chance": 0.06,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.35,
+            "extra_gem_chance": 0.18,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nan_02",
+      "name": "南山·青丘",
+      "unlock_min_level": 5,
+      "elite_every_kills": 36,
+      "boss_every_kills": 108,
+      "spawn_patch": { "respawn_s": 1.65, "max_alive": 11, "spawn_radius": 228 },
+      "drops_patch": {
+        "drop_chance": 0.28,
+        "rarity_weights": { "white": 88, "blue": 10, "gold": 2 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.02,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.14,
+            "extra_gem_chance": 0.07,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.39,
+            "extra_gem_chance": 0.20,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nan_03",
+      "name": "南山·涂山",
+      "unlock_min_level": 9,
+      "elite_every_kills": 34,
+      "boss_every_kills": 102,
+      "spawn_patch": { "respawn_s": 1.58, "max_alive": 12, "spawn_radius": 236 },
+      "drops_patch": {
+        "drop_chance": 0.29,
+        "rarity_weights": { "white": 85, "blue": 13, "gold": 2 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.025,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.16,
+            "extra_gem_chance": 0.08,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.43,
+            "extra_gem_chance": 0.22,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nan_04",
+      "name": "南山·丹穴",
+      "unlock_min_level": 13,
+      "elite_every_kills": 32,
+      "boss_every_kills": 96,
+      "spawn_patch": { "respawn_s": 1.52, "max_alive": 13, "spawn_radius": 244 },
+      "drops_patch": {
+        "drop_chance": 0.30,
+        "rarity_weights": { "white": 83, "blue": 15, "gold": 2 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.025,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.18,
+            "extra_gem_chance": 0.09,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.47,
+            "extra_gem_chance": 0.24,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nan_05",
+      "name": "南山·诸沃",
+      "unlock_min_level": 19,
+      "elite_every_kills": 30,
+      "boss_every_kills": 90,
+      "spawn_patch": { "respawn_s": 1.46, "max_alive": 14, "spawn_radius": 252 },
+      "drops_patch": {
+        "drop_chance": 0.31,
+        "rarity_weights": { "white": 80, "blue": 17, "gold": 3 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.03,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.20,
+            "extra_gem_chance": 0.10,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.51,
+            "extra_gem_chance": 0.26,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    },
+    {
+      "id": "nan_06",
+      "name": "南山·堂庭",
+      "unlock_min_level": 25,
+      "elite_every_kills": 28,
+      "boss_every_kills": 84,
+      "spawn_patch": { "respawn_s": 1.40, "max_alive": 15, "spawn_radius": 260 },
+      "drops_patch": {
+        "drop_chance": 0.31,
+        "rarity_weights": { "white": 78, "blue": 19, "gold": 3 },
+        "items_by_rarity": {
+          "white": ["桂枝", "玉屑"],
+          "blue": ["白玉碎"],
+          "gold": ["妖核"]
+        },
+        "special": {
+          "normal": {
+            "extra_gem_chance": 0.03,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "elite": {
+            "punch_stone_chance": 0.22,
+            "extra_gem_chance": 0.12,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          },
+          "boss": {
+            "core_guarantee": "妖王核心",
+            "punch_stone_chance": 0.55,
+            "extra_gem_chance": 0.28,
+            "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+          }
+        }
+      }
+    }
+  ]
+}

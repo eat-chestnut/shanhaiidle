@@ -3,25 +3,27 @@
     "stage_name": "山海经｜刷怪点（单点）",
     "arena_padding": 26,
     "player": {
-      "hp": 200,
+      "hp": 10,
       "radius": 18,
-      "atk": 12,
-      "def": 4,
+      "atk": 1,
+      "def": 0,
       "speed": 140,
-      "attack_interval": 0.25,
+      "attack_interval": 0.35,
       "attack_range": 10
     },
     "monsters": [
       {
         "id": "mob_a",
         "name": "小妖",
-        "hp": 30,
-        "def": 2,
-        "atk": 6,
+        "dex_gold": 3,
+        "exp": 1,
+        "hp": 6,
+        "def": 0,
+        "atk": 1,
         "radius": 14,
         "speed": 85,
         "aggro_range": 220,
-        "attack_interval": 0.9,
+        "attack_interval": 1.1,
         "attack_range": 8
       }
     ],
@@ -36,6 +38,40 @@
         "monster_id": "mob_a"
       }
     ],
+    "spawn_rules": {
+      "elite_every_kills": 40,
+      "boss_every_kills": 120
+    },
+    "elite_monster": {
+      "id": "elite_a",
+      "name": "精英·小妖",
+      "dex_gold": 8,
+      "hp": 18,
+      "def": 1,
+      "atk": 2,
+      "radius": 16,
+      "speed": 92,
+      "aggro_range": 260,
+      "attack_interval": 1.0,
+      "attack_range": 10,
+      "exp": 5,
+      "drop_bonus_percent": 30
+    },
+    "boss_monster": {
+      "id": "boss_a",
+      "name": "Boss·妖王",
+      "dex_gold": 20,
+      "hp": 45,
+      "def": 2,
+      "atk": 3,
+      "radius": 20,
+      "speed": 80,
+      "aggro_range": 320,
+      "attack_interval": 0.9,
+      "attack_range": 12,
+      "exp": 12,
+      "drop_bonus_percent": 80
+    },
     "drops": {
       "drop_chance": 0.25,
       "rarity_weights": {
@@ -61,6 +97,18 @@
         ],
         "gold": []
       },
+      "items_by_rarity": {
+        "white": [
+          "桂枝",
+          "玉屑"
+        ],
+        "blue": [
+          "白玉碎"
+        ],
+        "gold": [
+          "妖核"
+        ]
+      },
       "items": {
         "white": [
           "桂枝",
@@ -71,6 +119,35 @@
         ],
         "gold": [
           "妖核"
+        ]
+      }
+    },
+    "special_drops": {
+      "normal": {
+        "extra_gem_chance": 0.03,
+        "extra_gems": [
+          "赤晶石",
+          "沧澜石",
+          "青木石"
+        ]
+      },
+      "elite": {
+        "punch_stone_chance": 0.18,
+        "extra_gem_chance": 0.10,
+        "extra_gems": [
+          "赤晶石",
+          "沧澜石",
+          "青木石"
+        ]
+      },
+      "boss": {
+        "core_guarantee": "妖王核心",
+        "punch_stone_chance": 0.45,
+        "extra_gem_chance": 0.25,
+        "extra_gems": [
+          "赤晶石",
+          "沧澜石",
+          "青木石"
         ]
       }
     }

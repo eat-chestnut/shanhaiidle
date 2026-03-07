@@ -1,0 +1,228 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/AttributePopup.gd" id="1_ikjpf"]
+
+[node name="AttributePopup" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_ikjpf")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -280.0
+offset_right = 250.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "加点"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LblPoints" type="Label" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "属性点：0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Rows" type="VBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="Row_str" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_str"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "力道"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_str"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_str"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Row_vit" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_vit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "体魄"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_vit"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_vit"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Row_agi" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_agi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "身法"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_agi"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_agi"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Row_spi" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_spi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "神识"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_spi"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_spi"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Row_qi" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_qi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "真元"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_qi"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_qi"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="Row_luck" type="HBoxContainer" parent="Panel/VBox/Rows"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Panel/VBox/Rows/Row_luck"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "运势"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="Panel/VBox/Rows/Row_luck"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnPlus" type="Button" parent="Panel/VBox/Rows/Row_luck"]
+custom_minimum_size = Vector2(56, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "+"
+
+[node name="BtnClose" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "关闭"

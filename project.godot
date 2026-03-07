@@ -17,12 +17,22 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+SaveService="*res://autoload/SaveService.gd"
 EventBus="*res://autoload/EventBus.gd"
 ConfigService="*res://autoload/ConfigService.gd"
 I18nService="*res://autoload/I18nService.gd"
 GameSettings="*res://autoload/GameSettings.gd"
+PlayerModel="*res://autoload/PlayerModel.gd"
+MonsterDexModel="*res://autoload/MonsterDexModel.gd"
 InventoryModel="*res://autoload/InventoryModel.gd"
+GemSlotModel="*res://autoload/GemSlotModel.gd"
+ProgressModel="*res://autoload/ProgressModel.gd"
 EquipmentModel="*res://autoload/EquipmentModel.gd"
+SkillModel="*res://autoload/SkillModel.gd"
+TaskService="*res://autoload/TaskService.gd"
+PerfTracker="*res://autoload/PerfTracker.gd"
+OfflineService="*res://autoload/OfflineService.gd"
+GrindModel="*res://autoload/GrindModel.gd"
 BattleService="*res://autoload/BattleService.gd"
 
 [display]

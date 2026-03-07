@@ -7,11 +7,20 @@ const LOG_VIEW_EXPANDED := 2
 @onready var _log_wrap: PanelContainer = $RootVBox/LogWrap
 @onready var _log_panel: Control = $RootVBox/LogWrap/LogBox/LogPanel
 @onready var _btn_log_toggle: Button = $RootVBox/LogWrap/LogBox/LogHeader/BtnLogToggle
-@onready var _btn_auto_seek: Button = $RootVBox/BattleWrap/BattleLayer/BtnAutoSeek
-@onready var _btn_bag: BaseButton = $RootVBox/BottomMenu/BagGroup/BtnBag
+@onready var _btn_auto_seek: Button = $RootVBox/BattleWrap/BattleLayer/TopRightControls/BtnAutoSeek
+@onready var _btn_strategy: Button = $RootVBox/BattleWrap/BattleLayer/TopRightControls/BtnStrategy
+@onready var _btn_nav_character: Button = $RootVBox/BottomMenu/BtnNavCharacter
+@onready var _btn_nav_skills: Button = $RootVBox/BottomMenu/BtnNavSkills
+@onready var _btn_nav_battle: Button = $RootVBox/BottomMenu/BtnNavBattle
+@onready var _btn_bag: BaseButton = $RootVBox/BottomMenu/BtnNavBag
+@onready var _btn_nav_dex: Button = $RootVBox/BottomMenu/BtnNavDex
+@onready var _btn_nav_map: Button = $RootVBox/BottomMenu/BtnNavMap
+@onready var _badge_char: Node = $RootVBox/BottomMenu/BtnNavCharacter/Badge
+@onready var _badge_skill: Node = $RootVBox/BottomMenu/BtnNavSkills/Badge
 @onready var _battle_canvas: Control = $RootVBox/BattleWrap/BattleLayer/BattleCanvas
 @onready var _joystick: CanvasItem = $RootVBox/BattleWrap/BattleLayer/VirtualJoystick
 @onready var _inventory_overlay: Node = $InventoryOverlay
+@onready var _offline_popup: Control = $OfflinePopup
 
 var _log_view_state := LOG_VIEW_HALF
 var _overlay_open := false
@@ -26,12 +35,28 @@ func _ready() -> void:
 
 	if not _btn_auto_seek.pressed.is_connected(_on_auto_seek_pressed):
 		_btn_auto_seek.pressed.connect(_on_auto_seek_pressed)
+	if not _btn_strategy.pressed.is_connected(_on_strategy_pressed):
+		_btn_strategy.pressed.connect(_on_strategy_pressed)
 	if not GameSettings.auto_seek_changed.is_connected(_on_auto_seek_changed):
 		GameSettings.auto_seek_changed.connect(_on_auto_seek_changed)
 	_refresh_auto_seek_button(GameSettings.auto_seek_enabled)
+	_refresh_strategy_button()
+	_apply_nav_i18n()
 
 	if not _btn_bag.pressed.is_connected(_on_bag_pressed):
 		_btn_bag.pressed.connect(_on_bag_pressed)
+	if not _btn_nav_character.pressed.is_connected(_on_nav_character_pressed):
+		_btn_nav_character.pressed.connect(_on_nav_character_pressed)
+	if not _btn_nav_skills.pressed.is_connected(_on_nav_skills_pressed):
+		_btn_nav_skills.pressed.connect(_on_nav_skills_pressed)
+	if not _btn_nav_dex.pressed.is_connected(_on_nav_dex_pressed):
+		_btn_nav_dex.pressed.connect(_on_nav_dex_pressed)
+	if not _btn_nav_map.pressed.is_connected(_on_nav_map_pressed):
+		_btn_nav_map.pressed.connect(_on_nav_map_pressed)
+	if not EventBus.inventory_updated.is_connected(_on_badge_data_changed):
+		EventBus.inventory_updated.connect(_on_badge_data_changed)
+	_refresh_badges()
+	_refresh_strategy_button()
 	if _inventory_overlay != null:
 		var opened_cb := Callable(self, "_on_inventory_opened")
 		var closed_cb := Callable(self, "_on_inventory_closed")
@@ -42,6 +67,10 @@ func _ready() -> void:
 	_overlay_open = false
 	if _joystick != null:
 		_joystick.visible = true
+
+	var s := OfflineService.consume_pending_summary()
+	if not s.is_empty() and _offline_popup != null and _offline_popup.has_method("open"):
+		_offline_popup.call("open", s)
 
 	var spawn_count := 1
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -66,8 +95,21 @@ func _process(_delta: float) -> void:
 			input_vec = vec_any
 	BattleService.set_manual_input(input_vec)
 
+	if _offline_popup != null and not _offline_popup.visible:
+		var s2 := OfflineService.consume_pending_summary()
+		if not s2.is_empty() and _offline_popup.has_method("open"):
+			_offline_popup.call("open", s2)
+
 func _on_auto_seek_pressed() -> void:
 	GameSettings.set_auto_seek(not GameSettings.auto_seek_enabled, "按钮切换")
+
+func _on_strategy_pressed() -> void:
+	SkillModel.cycle_ai_profile()
+	EventBus.add_log("%s：%s" % [
+		I18nService.t("ui.strategy.changed", "切换策略"),
+		SkillModel.get_ai_profile_name(),
+	])
+	_refresh_strategy_button()
 
 func _on_auto_seek_changed(enabled: bool) -> void:
 	_refresh_auto_seek_button(enabled)
@@ -85,6 +127,14 @@ func _refresh_auto_seek_button(enabled: bool) -> void:
 		_btn_auto_seek.add_theme_color_override("font_hover_color", dim)
 		_btn_auto_seek.add_theme_color_override("font_pressed_color", dim)
 		_btn_auto_seek.add_theme_color_override("font_focus_color", dim)
+
+func _refresh_strategy_button() -> void:
+	if _btn_strategy == null:
+		return
+	_btn_strategy.text = "%s：%s" % [
+		I18nService.t("ui.strategy", "策略"),
+		SkillModel.get_ai_profile_name(),
+	]
 
 func _on_log_toggle_pressed() -> void:
 	_log_view_state = (_log_view_state + 1) % 3
@@ -129,3 +179,36 @@ func _on_inventory_closed() -> void:
 	_overlay_open = false
 	if _joystick != null:
 		_joystick.visible = true
+
+func _apply_nav_i18n() -> void:
+	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
+	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
+	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
+	_btn_bag.text = I18nService.t("ui.nav.bag", "背包")
+	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
+	_btn_nav_map.text = I18nService.t("ui.nav.map", "地图")
+	_btn_nav_battle.disabled = true
+	_btn_nav_dex.disabled = false
+	_btn_nav_map.disabled = false
+
+func _on_nav_character_pressed() -> void:
+	get_tree().change_scene_to_file("res://ui/pages/PageCharacter.tscn")
+
+func _on_nav_skills_pressed() -> void:
+	get_tree().change_scene_to_file("res://ui/pages/PageSkills.tscn")
+
+func _on_nav_dex_pressed() -> void:
+	get_tree().change_scene_to_file("res://ui/pages/PageMonsterDex.tscn")
+
+func _on_nav_map_pressed() -> void:
+	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
+
+func _on_badge_data_changed() -> void:
+	_refresh_badges()
+	_refresh_strategy_button()
+
+func _refresh_badges() -> void:
+	if _badge_char != null and _badge_char.has_method("set_dot"):
+		_badge_char.call("set_dot", ProgressModel.free_attr_points > 0)
+	if _badge_skill != null and _badge_skill.has_method("set_value"):
+		_badge_skill.call("set_value", int(SkillModel.skill_points), false)

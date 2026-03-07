@@ -1,0 +1,389 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://ui/pages/PageCharacter.gd" id="1_85aqh"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_character.png" id="2_l41bl"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_jian_10005.png" id="3_6oe3u"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_key_01.png" id="4_alubp"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_jiezhi_10001.png" id="5_h35fr"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_jlc.png" id="6_44cae"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_jt.png" id="7_uqvwc"]
+[ext_resource type="Texture2D" path="res://assets/icons/icon_ld_03.png" id="8_o2s74"]
+[ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="9_badge"]
+
+[node name="PageCharacter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_85aqh")
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_l41bl")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="RootVBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "人物"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Main" type="HBoxContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="LeftPanel" type="PanelContainer" parent="RootVBox/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.7
+
+[node name="LeftVBox" type="VBoxContainer" parent="RootVBox/Main/LeftPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="AttrEffectTitle" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "属性作用"
+vertical_alignment = 1
+
+[node name="AttrRows" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="RowStr" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowStr"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("3_6oe3u")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowStr"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowStr/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "力道 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowStr/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "攻击+1/点；物伤系数+12‰/点"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowStr"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RowVit" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowVit"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("4_alubp")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowVit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowVit/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "体魄 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowVit/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "生命+1/点；每10点额外+1生命"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowVit"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RowAgi" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowAgi"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("5_h35fr")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowAgi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowAgi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "身法 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowAgi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "暴击率每4点≈+1%（显示整数%）"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowAgi"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RowSpi" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowSpi"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("6_44cae")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowSpi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowSpi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "神识 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowSpi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "术伤系数+12‰/点（预留）"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowSpi"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RowQi" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowQi"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("7_uqvwc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowQi"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowQi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "真元 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowQi/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "气上限+1/点（预留）"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowQi"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RowLuck" type="HBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowLuck"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("8_o2s74")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Texts" type="VBoxContainer" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowLuck"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="NameValue" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowLuck/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "运势 0"
+vertical_alignment = 1
+
+[node name="Desc" type="Label" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowLuck/Texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "掉落加成≈+0.6%/点（显示整数%）"
+autowrap_mode = 3
+
+[node name="BtnPlus" type="Button" parent="RootVBox/Main/LeftPanel/LeftVBox/AttrRows/RowLuck"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "+"
+
+[node name="RightPanel" type="PanelContainer" parent="RootVBox/Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.2
+
+[node name="RightVBox" type="VBoxContainer" parent="RootVBox/Main/RightPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="StatsTitle" type="Label" parent="RootVBox/Main/RightPanel/RightVBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "总属性"
+vertical_alignment = 1
+
+[node name="StatsText" type="RichTextLabel" parent="RootVBox/Main/RightPanel/RightVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 22
+fit_content = false
+scroll_active = true
+text = "Lv 1"
+
+[node name="BottomNav" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnNavCharacter" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "人物"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavCharacter" instance=ExtResource("9_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavSkills" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "技能"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavSkills" instance=ExtResource("9_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavBattle" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "战斗"
+
+[node name="BtnNavBag" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "背包"
+disabled = true
+
+[node name="BtnNavDex" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "图鉴"
+
+[node name="BtnNavMap" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "地图"
+disabled = true

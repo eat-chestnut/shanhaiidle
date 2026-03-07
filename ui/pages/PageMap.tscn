@@ -1,0 +1,138 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://ui/pages/PageMap.gd" id="1_h1u2m"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/bg_map.png" id="2_6k5y0"]
+[ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="3_badge"]
+
+[node name="PageMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_h1u2m")
+
+[node name="BG" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_6k5y0")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HeaderRow" type="HBoxContainer" parent="RootVBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="RootVBox/Header/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 34
+text = "地图"
+vertical_alignment = 1
+
+[node name="CurrentStage" type="Label" parent="RootVBox/Header/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(260, 0)
+theme_override_font_sizes/font_size = 20
+text = "当前：南山·招摇"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BtnDex" type="Button" parent="RootVBox/Header/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(96, 44)
+theme_override_font_sizes/font_size = 20
+text = "图鉴"
+
+[node name="StageScroll" type="ScrollContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="StageList" type="VBoxContainer" parent="RootVBox/StageScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BottomNav" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnNavCharacter" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "人物"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavCharacter" instance=ExtResource("3_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavSkills" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "技能"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavSkills" instance=ExtResource("3_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavBattle" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "战斗"
+
+[node name="BtnNavBag" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "背包"
+disabled = true
+
+[node name="BtnNavMap" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "地图"
+disabled = true
