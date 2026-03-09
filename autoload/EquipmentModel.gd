@@ -667,6 +667,72 @@ func get_all_effects(inst: Dictionary) -> Array[Dictionary]:
 	out.append_array(extra_effects)
 	return out
 
+func calc_score(inst: Dictionary) -> int:
+	if not is_identified(inst):
+		return -1
+
+	var rarity := str(inst.get("rarity", "white"))
+	var score := 0
+	match rarity:
+		"gold":
+			score += 500
+		"blue":
+			score += 220
+		_:
+			score += 100
+
+	var main_stat := _normalize_stat_key(str(inst.get("main_stat", "ATK")))
+	var main_val := int(inst.get("main_val", 0))
+	var main_w := 18
+	if main_stat == "ATK" or main_stat == "DEF":
+		main_w = 25
+	elif main_stat == "HP":
+		main_w = 12
+	score += main_val * main_w
+
+	score += clampi(int(inst.get("refine_lv", 0)), 0, REFINE_MAX) * 80
+
+	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKETS)
+	score += sockets * 45
+	var filled := 0
+	var gems_any = inst.get("socket_gems", [])
+	if gems_any is Array:
+		for gem_any in (gems_any as Array):
+			var gem_id := str(gem_any).strip_edges()
+			if not gem_id.is_empty() and gem_id != "0":
+				filled += 1
+	score += filled * 25
+
+	if not str(inst.get("set_id", "")).strip_edges().is_empty():
+		score += 60
+
+	for effect_any in get_all_effects(inst):
+		if not (effect_any is Dictionary):
+			continue
+		var effect: Dictionary = effect_any
+		var effect_type := str(effect.get("type", ""))
+		var val := int(effect.get("val", 0))
+		if val <= 0:
+			continue
+		if effect_type == "stat":
+			var stat := _normalize_stat_key(str(effect.get("stat", "")))
+			var w := 30
+			if stat == "ATK":
+				w = 70
+			elif stat == "DEF":
+				w = 55
+			elif stat == "HP":
+				w = 35
+			elif stat == "CRIT_PERCENT":
+				w = 45
+			elif stat == "LOOT_BONUS_PERCENT":
+				w = 30
+			score += val * w
+		elif effect_type == "skill_level":
+			score += val * 90
+
+	return maxi(0, score)
+
 func can_refine(inst: Dictionary) -> bool:
 	return int(inst.get("refine_lv", 0)) < REFINE_MAX
 

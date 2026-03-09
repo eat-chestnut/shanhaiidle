@@ -84,6 +84,23 @@ horizontal_alignment = 2
 vertical_alignment = 1
 text = "未鉴定"
 
+[node name="ScoreText" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -46.0
+offset_top = -24.0
+offset_right = -6.0
+offset_bottom = -6.0
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.85)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="LockIcon" type="TextureRect" parent="."]
 visible = false
 layout_mode = 1

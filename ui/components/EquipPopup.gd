@@ -343,6 +343,7 @@ func _format_inst_detail(inst: Dictionary, slot_key: String) -> String:
 	lines.append("槽位：%s" % slot_text)
 	lines.append("阶位：%s" % _tier_name(tier))
 	lines.append("进阶：+%d/%d" % [refine_lv, EquipmentModel.REFINE_MAX])
+	lines.append("评分：%d" % EquipmentModel.calc_score(inst))
 	if not main_stat.is_empty() and effective_main_val != 0:
 		var stat_text := _stat_value_text(main_stat, effective_main_val)
 		if main_min != main_max:
@@ -384,6 +385,7 @@ func _format_unidentified_detail(inst: Dictionary, resolved_slot: String) -> Str
 	lines.append("[b]未鉴定%s[/b]" % slot_text)
 	lines.append("稀有度：%s" % rarity_text)
 	lines.append("进阶：+%d/%d" % [refine_lv, EquipmentModel.REFINE_MAX])
+	lines.append("评分：？？")
 	lines.append("主属性：？？？")
 	lines.append("特效：？？？")
 	lines.append("孔位：？？？")

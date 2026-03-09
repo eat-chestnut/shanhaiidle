@@ -174,6 +174,14 @@ func refresh() -> void:
 					slot.call("set_locked", bool(row.get("locked", false)))
 				else:
 					slot.call("set_locked", false)
+			if slot.has_method("set_score_text"):
+				if _tab == "equip":
+					if unidentified:
+						slot.call("set_score_text", "??")
+					else:
+						slot.call("set_score_text", str(EquipmentModel.calc_score(row)))
+				else:
+					slot.call("set_score_text", "")
 			if slot.has_method("set_tag"):
 				if _tab == "equip" and unidentified:
 					slot.call("set_tag", "未鉴定")
@@ -184,6 +192,8 @@ func refresh() -> void:
 			slot.call("clear")
 			if slot.has_method("set_locked"):
 				slot.call("set_locked", false)
+			if slot.has_method("set_score_text"):
+				slot.call("set_score_text", "")
 			if slot.has_method("clear_tag"):
 				slot.call("clear_tag")
 			_slot_rows[i] = {}
@@ -360,6 +370,7 @@ func _setup_filter_controls() -> void:
 	_opt_sort.add_item("稀有度↓")
 	_opt_sort.add_item("主属性↓")
 	_opt_sort.add_item("孔位↓")
+	_opt_sort.add_item("评分↓")
 	_opt_sort.select(0)
 
 	_rebuild_set_options()
@@ -408,7 +419,7 @@ func _rebuild_set_options() -> void:
 func _sync_filter_state_from_ui() -> void:
 	var rarity_map := ["all", "white", "blue", "gold"]
 	var state_map := ["all", "identified", "unidentified", "locked"]
-	var sort_map := ["default", "rarity_desc", "main_desc", "sockets_desc"]
+	var sort_map := ["default", "rarity_desc", "main_desc", "sockets_desc", "score_desc"]
 	var rarity_idx := clampi(_opt_rarity.selected, 0, rarity_map.size() - 1)
 	var state_idx := clampi(_opt_state.selected, 0, state_map.size() - 1)
 	var sort_idx := clampi(_opt_sort.selected, 0, sort_map.size() - 1)
@@ -503,6 +514,15 @@ func _apply_filters_and_sort(raw_rows: Array) -> Array:
 					return va > vb
 				return _rarity_rank(str(a.get("rarity", "white"))) > _rarity_rank(str(b.get("rarity", "white")))
 			)
+		"score_desc":
+			if _tab == "equip":
+				out.sort_custom(func(a, b) -> bool:
+					var sa := EquipmentModel.calc_score(a)
+					var sb := EquipmentModel.calc_score(b)
+					if sa != sb:
+						return sa > sb
+					return _rarity_rank(str(a.get("rarity", "white"))) > _rarity_rank(str(b.get("rarity", "white")))
+				)
 		_:
 			pass
 	return out

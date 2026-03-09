@@ -5,6 +5,7 @@ extends Control
 @onready var _name_label: Label = $Name
 @onready var _count_label: Label = $Count
 @onready var _tag_label: Label = $LblTag
+@onready var _score_label: Label = $ScoreText
 @onready var _lock_icon: TextureRect = $LockIcon
 
 var _tex_cache: Dictionary = {}
@@ -29,6 +30,7 @@ func set_item(item_id: String, name: String, rarity: String, count: int, icon_pa
 	_name_label.text = name if not name.is_empty() else item_id
 	_count_label.text = "x%d" % count if count > 1 else ""
 	clear_tag()
+	set_score_text("")
 	set_locked(false)
 
 func clear() -> void:
@@ -40,6 +42,7 @@ func clear() -> void:
 	_name_label.text = ""
 	_count_label.text = ""
 	clear_tag()
+	set_score_text("")
 	set_locked(false)
 
 func set_locked(is_slot_locked: bool) -> void:
@@ -56,6 +59,11 @@ func set_tag(text: String) -> void:
 func clear_tag() -> void:
 	_tag_label.text = ""
 	_tag_label.visible = false
+
+func set_score_text(t: String) -> void:
+	var score_text := t.strip_edges()
+	_score_label.text = score_text
+	_score_label.visible = not score_text.is_empty()
 
 func _on_resized() -> void:
 	var side := minf(size.x, size.y)
