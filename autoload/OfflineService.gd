@@ -68,6 +68,10 @@ func apply_offline_rewards() -> Dictionary:
 	var offline_elite := int(round(float(int(totals.get("kills_elite", 0))) * scale))
 	var offline_boss := int(round(float(int(totals.get("kills_boss", 0))) * scale))
 	var offline_exp := int(round(float(int(totals.get("exp", 0))) * scale))
+	if offline_boss > 0:
+		var sid := str(GrindModel.stage_id).strip_edges()
+		if not sid.is_empty():
+			MapProgressModel.add_boss_kill(sid, offline_boss)
 
 	TaskService.begin_batch()
 	TaskService.on_kill("normal", offline_kills)

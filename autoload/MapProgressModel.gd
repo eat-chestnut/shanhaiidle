@@ -86,7 +86,7 @@ func set_unlocked_diff(stage_id: String, v: int) -> void:
 	save_data()
 	EventBus.notify_inventory_updated()
 
-func can_upgrade(stage_id: String, next_diff_index: int, stage_def: Dictionary) -> Dictionary:
+func can_upgrade(stage_id: String, stage_def: Dictionary, next_diff_index: int) -> Dictionary:
 	var out := {
 		"ok": false,
 		"reason": "invalid",
@@ -145,6 +145,7 @@ func upgrade(stage_id: String, stage_def: Dictionary) -> Dictionary:
 		"ok": false,
 		"reason": "invalid",
 		"new_diff": 0,
+		"reward": {},
 	}
 	var cur := get_unlocked_diff(stage_id)
 	var next := cur + 1
@@ -157,9 +158,12 @@ func upgrade(stage_id: String, stage_def: Dictionary) -> Dictionary:
 		out["reason"] = "max"
 		return out
 
-	var chk := can_upgrade(stage_id, next, stage_def)
+	var chk := can_upgrade(stage_id, stage_def, next)
 	if not bool(chk.get("ok", false)):
 		out["reason"] = str(chk.get("reason", "invalid"))
+		out["need_kills"] = int(chk.get("need_kills", 0))
+		out["have_kills"] = int(chk.get("have_kills", 0))
+		out["need_items"] = chk.get("need_items", {})
 		return out
 
 	var need_items_any = chk.get("need_items", {})
@@ -185,7 +189,62 @@ func upgrade(stage_id: String, stage_def: Dictionary) -> Dictionary:
 		spent.append({"id": item_id, "count": need})
 
 	set_unlocked_diff(stage_id, next)
+	var reward := grant_upgrade_reward(stage_def, next)
 	out["ok"] = true
 	out["reason"] = ""
 	out["new_diff"] = next
+	out["reward"] = reward
+	return out
+
+func grant_upgrade_reward(stage_def: Dictionary, diff_index: int) -> Dictionary:
+	var out := {
+		"gold": 0,
+		"skill_points": 0,
+		"items": {},
+	}
+	var diffs_any = stage_def.get("difficulties", [])
+	if not (diffs_any is Array):
+		return out
+	var diffs: Array = diffs_any
+	if diff_index < 0 or diff_index >= diffs.size():
+		return out
+	var diff_any = diffs[diff_index]
+	if not (diff_any is Dictionary):
+		return out
+	var diff_def: Dictionary = diff_any
+	var unlock_any = diff_def.get("unlock", {})
+	if not (unlock_any is Dictionary):
+		return out
+	var unlock: Dictionary = unlock_any
+	var reward_any = unlock.get("reward", {})
+	if not (reward_any is Dictionary):
+		return out
+	var reward: Dictionary = reward_any
+
+	var gold := maxi(0, int(reward.get("gold", 0)))
+	var skill_points := maxi(0, int(reward.get("skill_points", 0)))
+	var items_any = reward.get("items", {})
+	var items: Dictionary = {}
+	if items_any is Dictionary:
+		for item_id_any in (items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			items[item_id] = cnt
+
+	if gold > 0:
+		PlayerModel.add_gold(gold)
+	if skill_points > 0:
+		SkillModel.grant_skill_points(skill_points, "")
+	for item_id_any in items.keys():
+		var item_id := str(item_id_any)
+		var cnt := int(items.get(item_id_any, 0))
+		if item_id.is_empty() or cnt <= 0:
+			continue
+		InventoryModel.add_item(item_id, cnt, "system")
+
+	out["gold"] = gold
+	out["skill_points"] = skill_points
+	out["items"] = items
 	return out

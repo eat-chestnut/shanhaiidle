@@ -338,6 +338,23 @@ func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -
 					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost 存在空物品ID" % [stage_index, j]}
 				if cnt < 0:
 					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost.%s 不能为负数" % [stage_index, j, item_id]}
+			if unlock.has("reward"):
+				var reward_any: Variant = unlock.get("reward", {})
+				if not (reward_any is Dictionary):
+					push_warning("RemoteConfigService: 忽略非法 reward，stage[%d] difficulties[%d]" % [stage_index, j])
+				else:
+					var reward: Dictionary = reward_any
+					if int(reward.get("gold", 0)) < 0 or int(reward.get("skill_points", 0)) < 0:
+						push_warning("RemoteConfigService: 忽略非法 reward 数值，stage[%d] difficulties[%d]" % [stage_index, j])
+					var reward_items_any: Variant = reward.get("items", {})
+					if reward_items_any is Dictionary:
+						var reward_items: Dictionary = reward_items_any
+						for rid_any in reward_items.keys():
+							var rid := str(rid_any).strip_edges()
+							var rcnt := int(reward_items.get(rid_any, 0))
+							if rid.is_empty() or rcnt < 0:
+								push_warning("RemoteConfigService: 忽略非法 reward.items，stage[%d] difficulties[%d]" % [stage_index, j])
+								break
 
 		var mult_any: Variant = diff.get("monster_mult", {})
 		if mult_any is Dictionary:

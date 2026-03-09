@@ -12,6 +12,7 @@ const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 @onready var _next_info: Label = $Panel/VBox/UpgradeBox/NextInfo
 @onready var _need_kills: Label = $Panel/VBox/UpgradeBox/NeedKills
 @onready var _need_items: Label = $Panel/VBox/UpgradeBox/NeedItems
+@onready var _reward_line: Label = $Panel/VBox/UpgradeBox/RewardLine
 @onready var _btn_upgrade: Button = $Panel/VBox/UpgradeBox/BtnUpgrade
 @onready var _btn_cancel: Button = $Panel/VBox/BottomButtons/BtnCancel
 
@@ -276,7 +277,7 @@ func _rebuild_upgrade_box() -> void:
 	var next_diff_any = diffs[next]
 	var next_diff: Dictionary = next_diff_any if next_diff_any is Dictionary else {}
 	var next_name := str(next_diff.get("name", "困难"))
-	var chk := MapProgressModel.can_upgrade(_stage_id, next, _stage_def)
+	var chk := MapProgressModel.can_upgrade(_stage_id, _stage_def, next)
 
 	var need_kills := maxi(0, int(chk.get("need_kills", 0)))
 	var have_kills := maxi(0, int(chk.get("have_kills", 0)))
@@ -286,6 +287,7 @@ func _rebuild_upgrade_box() -> void:
 	var need_items_any = chk.get("need_items", {})
 	var need_items: Dictionary = need_items_any if need_items_any is Dictionary else {}
 	_need_items.text = _build_need_items_text(need_items)
+	_reward_line.text = _build_reward_preview_text(next_diff)
 
 	_btn_upgrade.disabled = not bool(chk.get("ok", false))
 	_btn_upgrade.text = "升级解锁" if bool(chk.get("ok", false)) else "升级条件不足"
@@ -327,7 +329,15 @@ func _on_upgrade_pressed() -> void:
 		var row_any = diffs[new_diff]
 		if row_any is Dictionary:
 			diff_name = str((row_any as Dictionary).get("name", diff_name))
-	EventBus.add_log("地图升级成功：%s 解锁%s" % [str(_stage_def.get("name", _stage_id)), diff_name])
+	var reward_any = ret.get("reward", {})
+	var reward: Dictionary = reward_any if reward_any is Dictionary else {}
+	EventBus.add_log(
+		"地图升级成功：%s 解锁%s，奖励：%s" % [
+			str(_stage_def.get("name", _stage_id)),
+			diff_name,
+			_build_reward_summary_text(reward),
+		]
+	)
 	_rebuild_all()
 
 func _get_unlocked_diff_clamped(diff_count: int) -> int:
@@ -349,6 +359,7 @@ func _resolved_difficulties(stage: Dictionary) -> Array:
 			"unlock": {
 				"boss_kills_required": 0,
 				"material_cost": {},
+				"reward": {},
 			},
 			"recommend_score": 0,
 			"monster_mult": {
@@ -359,6 +370,45 @@ func _resolved_difficulties(stage: Dictionary) -> Array:
 			"drops_override": {},
 		})
 	return out
+
+func _build_reward_preview_text(diff_def: Dictionary) -> String:
+	var unlock_any = diff_def.get("unlock", {})
+	if not (unlock_any is Dictionary):
+		return "升级奖励：无"
+	var unlock: Dictionary = unlock_any
+	var reward_any = unlock.get("reward", {})
+	if not (reward_any is Dictionary):
+		return "升级奖励：无"
+	var reward: Dictionary = reward_any
+	return "升级奖励：" + _build_reward_summary_text(reward)
+
+func _build_reward_summary_text(reward: Dictionary) -> String:
+	if reward.is_empty():
+		return "无"
+	var parts: Array[String] = []
+	var gold := maxi(0, int(reward.get("gold", 0)))
+	if gold > 0:
+		parts.append("金币+%d" % gold)
+	var skill_points := maxi(0, int(reward.get("skill_points", 0)))
+	if skill_points > 0:
+		parts.append("技能点+%d" % skill_points)
+	var items_any = reward.get("items", {})
+	if items_any is Dictionary:
+		var item_parts: Array[String] = []
+		for item_id_any in (items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			item_parts.append("%s+%d" % [item_id, cnt])
+		item_parts.sort()
+		if item_parts.size() > 4:
+			item_parts = item_parts.slice(0, 4)
+			item_parts.append("...")
+		parts.append_array(item_parts)
+	if parts.is_empty():
+		return "无"
+	return " ".join(parts)
 
 func _on_dim_bg_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

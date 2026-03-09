@@ -102,6 +102,13 @@ theme_override_font_sizes/font_size = 18
 text = "材料：无"
 autowrap_mode = 2
 
+[node name="RewardLine" type="Label" parent="Panel/VBox/UpgradeBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "升级奖励：无"
+modulate = Color(0.78, 0.78, 0.78, 1)
+autowrap_mode = 2
+
 [node name="BtnUpgrade" type="Button" parent="Panel/VBox/UpgradeBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 48)
