@@ -45,6 +45,7 @@ class StagesSeeder extends Seeder
                     'monsters_patch' => $this->normalizeMonstersPatch($stage['monsters'] ?? null),
                     'spawn_patch' => is_array($stage['spawn_patch'] ?? null) ? $stage['spawn_patch'] : null,
                     'drops_patch' => is_array($stage['drops_patch'] ?? null) ? $stage['drops_patch'] : null,
+                    'difficulties' => is_array($stage['difficulties'] ?? null) ? $stage['difficulties'] : null,
                     'sort_order' => (int) ($stage['sort_order'] ?? $index),
                     'is_enabled' => (bool) ($stage['is_enabled'] ?? true),
                 ]
@@ -118,6 +119,7 @@ class StagesSeeder extends Seeder
                         ],
                     ],
                 ],
+                'difficulties' => $this->defaultDifficulties(),
                 'is_enabled' => true,
             ];
         };
@@ -129,6 +131,65 @@ class StagesSeeder extends Seeder
             $make('nan_04', '南山·丹穴', 13, 32, 96, 1.52, 7, 244, 83, 15, 2, 0.025, 0.18, 0.09, 0.47, 0.24),
             $make('nan_05', '南山·诸沃', 19, 30, 90, 1.46, 8, 252, 80, 17, 3, 0.03, 0.20, 0.10, 0.51, 0.26),
             $make('nan_06', '南山·堂庭', 25, 28, 84, 1.40, 9, 260, 78, 19, 3, 0.03, 0.22, 0.12, 0.55, 0.28),
+        ];
+    }
+
+    private function defaultDifficulties(): array
+    {
+        return [
+            [
+                'name' => '普通',
+                'unlock' => [
+                    'boss_kills_required' => 0,
+                    'material_cost' => [],
+                    'reward' => ['gold' => 0, 'skill_points' => 0, 'items' => []],
+                ],
+                'first_clear_reward' => ['gold' => 0, 'skill_points' => 0, 'items' => []],
+                'recommend_score' => 0,
+                'monster_mult' => ['hp' => 1.0, 'atk' => 1.0, 'def' => 1.0],
+                'drops_override' => [],
+            ],
+            [
+                'name' => '困难I',
+                'unlock' => [
+                    'boss_kills_required' => 3,
+                    'material_cost' => ['玉屑' => 20, '桂枝' => 20],
+                    'reward' => ['gold' => 80, 'skill_points' => 1, 'items' => ['玉屑' => 10]],
+                ],
+                'first_clear_reward' => ['gold' => 120, 'skill_points' => 1, 'items' => ['玉屑' => 15]],
+                'recommend_score' => 900,
+                'monster_mult' => ['hp' => 1.4, 'atk' => 1.2, 'def' => 1.2],
+                'drops_override' => [
+                    'rarity_weights' => ['white' => 78, 'blue' => 19, 'gold' => 3],
+                ],
+            ],
+            [
+                'name' => '困难II',
+                'unlock' => [
+                    'boss_kills_required' => 10,
+                    'material_cost' => ['白玉碎' => 12, '妖核' => 2],
+                    'reward' => ['gold' => 150, 'skill_points' => 1, 'items' => ['白玉碎' => 8, '妖核' => 1]],
+                ],
+                'first_clear_reward' => ['gold' => 240, 'skill_points' => 1, 'items' => ['白玉碎' => 10, '妖核' => 1]],
+                'recommend_score' => 1600,
+                'monster_mult' => ['hp' => 1.8, 'atk' => 1.35, 'def' => 1.35],
+                'drops_override' => [
+                    'rarity_weights' => ['white' => 70, 'blue' => 24, 'gold' => 6],
+                    'special' => [
+                        'elite' => [
+                            'punch_stone_chance' => 0.22,
+                            'extra_gem_chance' => 0.12,
+                            'extra_gems' => ['赤晶石', '沧澜石', '青木石'],
+                        ],
+                        'boss' => [
+                            'core_guarantee' => '妖王核心',
+                            'punch_stone_chance' => 0.55,
+                            'extra_gem_chance' => 0.30,
+                            'extra_gems' => ['赤晶石', '沧澜石', '青木石'],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 

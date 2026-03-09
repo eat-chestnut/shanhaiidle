@@ -23,6 +23,7 @@ class Stage extends Model
         'spawn_patch',
         'drops_patch',
         'monsters_patch',
+        'difficulties',
         'sort_order',
         'is_enabled',
     ];
@@ -31,6 +32,7 @@ class Stage extends Model
         'spawn_patch' => 'array',
         'drops_patch' => 'array',
         'monsters_patch' => 'array',
+        'difficulties' => 'array',
         'is_enabled' => 'boolean',
     ];
 }
