@@ -23,12 +23,11 @@ const PAGE_MAP := "res://ui/pages/PageMap.tscn"
 
 var _monsters: Array[Dictionary] = []
 var _selected_idx := -1
-var _scene_index: Dictionary = {}
 
 func _ready() -> void:
 	_apply_i18n()
 	_connect_signals()
-	_rebuild_scene_index()
+	SourceGuideService.rebuild_indexes()
 	_load_monsters()
 	_rebuild_list()
 	if not _monsters.is_empty():
@@ -119,70 +118,6 @@ func _load_monsters() -> void:
 		var boss: Dictionary = (boss_any as Dictionary).duplicate(true)
 		boss["kind"] = "boss"
 		_monsters.append(boss)
-
-func _rebuild_scene_index() -> void:
-	_scene_index.clear()
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var stages_db_any = cfg.get("stages_db", {})
-	if not (stages_db_any is Dictionary):
-		return
-	var stages_any = (stages_db_any as Dictionary).get("stages", [])
-	if not (stages_any is Array):
-		return
-
-	for s_any in stages_any:
-		if not (s_any is Dictionary):
-			continue
-		var stage: Dictionary = s_any
-		var stage_name := str(stage.get("name", stage.get("id", ""))).strip_edges()
-		if stage_name.is_empty():
-			continue
-		var monsters_any = stage.get("monsters", {})
-		if not (monsters_any is Dictionary):
-			continue
-		var monsters: Dictionary = monsters_any
-
-		_collect_stage_role(stage_name, "普通", monsters, "normal")
-		_collect_stage_role(stage_name, "精英", monsters, "elite")
-		_collect_stage_role(stage_name, "Boss", monsters, "boss")
-
-func _collect_stage_role(stage_name: String, role_label: String, monsters: Dictionary, kind: String) -> void:
-	var pool_key := "%s_pool" % kind
-	if monsters.has(pool_key) and monsters.get(pool_key) is Array:
-		var pool: Array = monsters.get(pool_key, [])
-		for e_any in pool:
-			if not (e_any is Dictionary):
-				continue
-			var entry: Dictionary = e_any
-			var mid := str(entry.get("id", "")).strip_edges()
-			if mid.is_empty():
-				continue
-			_add_scene(mid, stage_name, role_label)
-		return
-
-	if monsters.has(kind) and monsters.get(kind) is String:
-		var legacy_id := str(monsters.get(kind, "")).strip_edges()
-		if legacy_id.is_empty():
-			return
-		_add_scene(legacy_id, stage_name, role_label)
-
-func _add_scene(monster_id: String, stage_name: String, role_label: String) -> void:
-	var rows: Array[String] = []
-	var rows_any = _scene_index.get(monster_id, [])
-	if rows_any is Array:
-		for line_any in rows_any:
-			rows.append(str(line_any))
-
-	for i in range(rows.size()):
-		var line := rows[i]
-		if line.begins_with(stage_name + "（"):
-			if line.find(role_label) == -1:
-				rows[i] = line.replace("）", "、%s）" % role_label)
-			_scene_index[monster_id] = rows
-			return
-
-	rows.append("%s（%s）" % [stage_name, role_label])
-	_scene_index[monster_id] = rows
 
 func _normalize_kind(raw_kind: String) -> String:
 	var kind := raw_kind.strip_edges().to_lower()
@@ -325,11 +260,7 @@ func _refresh_detail() -> void:
 	lines.append("解锁状态：%s" % ("已解锁" if unlocked else "未解锁"))
 	lines.append("解锁奖励：金币%d（%s）" % [reward_gold, "已领取" if got_reward else "未领取（点击领取）"])
 	lines.append("")
-	var scenes_any = _scene_index.get(monster_id, [])
-	var scenes: Array[String] = []
-	if scenes_any is Array:
-		for scene_any in scenes_any:
-			scenes.append(str(scene_any))
+	var scenes: Array[String] = SourceGuideService.get_monster_spawn_lines(monster_id, 8)
 	if scenes.is_empty():
 		lines.append("出现场景：暂无")
 	else:
@@ -394,6 +325,7 @@ func _on_model_changed() -> void:
 	var selected_id := ""
 	if _selected_idx >= 0 and _selected_idx < _monsters.size():
 		selected_id = str(_monsters[_selected_idx].get("id", ""))
+	SourceGuideService.rebuild_indexes()
 	_load_monsters()
 	_rebuild_list()
 	if selected_id.is_empty():

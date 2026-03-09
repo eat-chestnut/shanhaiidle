@@ -6,6 +6,7 @@ const LOOT_TTL := 20.0
 const LOOT_PICKUP_RADIUS := 28.0
 const DEFAULT_MONSTER_ID := "mob_a"
 const DEFAULT_ENEMY_ATK := 1
+const DEFAULT_DROP_RARITIES := ["white", "blue", "gold", "purple", "orange"]
 
 var stage_name: String = "未命名关卡"
 var current_stage_id: String = ""
@@ -350,32 +351,13 @@ func _set_difficulty_monster_mult(mult_any: Variant) -> void:
 	_difficulty_monster_mult["def"] = maxf(0.01, float(mult.get("def", 1.0)))
 
 func _apply_difficulty_drop_override(override_any: Variant) -> void:
-	if not (override_any is Dictionary):
-		return
-	var override: Dictionary = override_any
-	var merged_drop := _stage_drop.duplicate(true)
-	var merged_special := _stage_special.duplicate(true)
-
-	if override.has("drop_chance"):
-		merged_drop["drop_chance"] = clampf(float(override.get("drop_chance", merged_drop.get("drop_chance", 0.0))), 0.0, 1.0)
-	if override.has("rarity_weights"):
-		var override_weights := _normalize_rarity_weights(
-			override.get("rarity_weights", {}),
-			merged_drop.get("rarity_weights", {})
-		)
-		var w_sum := int(override_weights.get("white", 0)) + int(override_weights.get("blue", 0)) + int(override_weights.get("gold", 0))
-		if w_sum > 0:
-			merged_drop["rarity_weights"] = override_weights
-	if override.has("items_by_rarity"):
-		merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
-			override.get("items_by_rarity", {}),
-			merged_drop.get("items_by_rarity", {})
-		)
-	if override.has("special"):
-		merged_special = _normalize_special_drops(override.get("special", {}), merged_special)
-
-	_stage_drop = merged_drop
-	_stage_special = merged_special
+	var bundle := {
+		"drop": _stage_drop.duplicate(true),
+		"special": _stage_special.duplicate(true),
+	}
+	bundle = _apply_drop_override_to_bundle(bundle, override_any)
+	_stage_drop = bundle.get("drop", {}).duplicate(true)
+	_stage_special = bundle.get("special", {}).duplicate(true)
 
 func _apply_monster_difficulty_mult(template: Dictionary) -> Dictionary:
 	if template.is_empty():
@@ -419,58 +401,89 @@ func _set_stage_drop_mult(mult_any: Variant) -> void:
 	stage_drop_mult["punch"] = maxf(0.0, float(mult.get("punch", 1.0)))
 
 func _apply_stage_drop_patch(patch_any: Variant) -> void:
-	var merged_drop := {
-		"drop_chance": clampf(drop_chance, 0.0, 1.0),
-		"rarity_weights": _normalize_rarity_weights(drop_weights, {}),
-		"items_by_rarity": _normalize_items_by_rarity(drop_items, {}),
+	var bundle := _resolve_final_drop_bundle(patch_any, {})
+	_stage_drop = bundle.get("drop", {}).duplicate(true)
+	_stage_special = bundle.get("special", {}).duplicate(true)
+
+func get_final_drops_for_stage_difficulty(stage_cfg: Dictionary, difficulty_cfg: Dictionary) -> Dictionary:
+	var stage_patch_any: Variant = stage_cfg.get("drops_patch", {})
+	var diff_override_any: Variant = difficulty_cfg.get("drops_override", {})
+	var bundle := _resolve_final_drop_bundle(stage_patch_any, diff_override_any)
+	var drop_any: Variant = bundle.get("drop", {})
+	var special_any: Variant = bundle.get("special", {})
+	var drop: Dictionary = drop_any if drop_any is Dictionary else {}
+	var special: Dictionary = special_any if special_any is Dictionary else {}
+	var out := drop.duplicate(true)
+	out["special"] = special.duplicate(true)
+	return out
+
+func _resolve_final_drop_bundle(stage_patch_any: Variant, diff_override_any: Variant) -> Dictionary:
+	var base_bundle := {
+		"drop": {
+			"drop_chance": clampf(drop_chance, 0.0, 1.0),
+			"rarity_weights": _normalize_rarity_weights(drop_weights, {}),
+			"items_by_rarity": _normalize_items_by_rarity(drop_items, {}),
+		},
+		"special": _normalize_special_drops(special_drops, {}),
 	}
-	var merged_special := _normalize_special_drops(special_drops, {})
+	base_bundle = _apply_drop_override_to_bundle(base_bundle, stage_patch_any)
+	base_bundle = _apply_drop_override_to_bundle(base_bundle, diff_override_any)
+	return base_bundle
 
-	if patch_any is Dictionary:
-		var patch: Dictionary = patch_any
-		if patch.has("drop_chance"):
-			merged_drop["drop_chance"] = clampf(float(patch.get("drop_chance", merged_drop["drop_chance"])), 0.0, 1.0)
-		if patch.has("rarity_weights"):
-			merged_drop["rarity_weights"] = _normalize_rarity_weights(
-				patch.get("rarity_weights", {}),
-				merged_drop.get("rarity_weights", {})
-			)
-		if patch.has("items_by_rarity"):
-			merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
-				patch.get("items_by_rarity", {}),
-				merged_drop.get("items_by_rarity", {})
-			)
-		if patch.has("special"):
-			merged_special = _normalize_special_drops(patch.get("special", {}), merged_special)
+func _apply_drop_override_to_bundle(bundle_any: Variant, override_any: Variant) -> Dictionary:
+	var bundle: Dictionary = bundle_any if bundle_any is Dictionary else {}
+	var merged_drop_any: Variant = bundle.get("drop", {})
+	var merged_special_any: Variant = bundle.get("special", {})
+	var merged_drop: Dictionary = merged_drop_any if merged_drop_any is Dictionary else {}
+	var merged_special: Dictionary = merged_special_any if merged_special_any is Dictionary else {}
+	if not (override_any is Dictionary):
+		return {"drop": merged_drop, "special": merged_special}
 
-	_stage_drop = merged_drop
-	_stage_special = merged_special
+	var override: Dictionary = override_any
+
+	if override.has("drop_chance"):
+		merged_drop["drop_chance"] = clampf(float(override.get("drop_chance", merged_drop.get("drop_chance", 0.0))), 0.0, 1.0)
+
+	if override.has("rarity_weights"):
+		var override_weights := _normalize_rarity_weights(
+			override.get("rarity_weights", {}),
+			{}
+		)
+		if _sum_rarity_weights(override_weights) > 0:
+			merged_drop["rarity_weights"] = override_weights
+
+	if override.has("items_by_rarity"):
+		# NOTE: items_by_rarity 按 rarity 逐项覆盖。空数组/空值表示“继承”，不是“清空”。
+		merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
+			override.get("items_by_rarity", {}),
+			merged_drop.get("items_by_rarity", {})
+		)
+
+	if override.has("special") and override.get("special", {}) is Dictionary:
+		# special 为整块覆盖（不是逐字段 merge）。
+		merged_special = _normalize_special_drops(override.get("special", {}), {})
+
+	return {"drop": merged_drop, "special": merged_special}
 
 func _normalize_rarity_weights(weights_any: Variant, fallback_any: Variant) -> Dictionary:
-	var out := {
-		"white": 0,
-		"blue": 0,
-		"gold": 0,
-	}
+	var out: Dictionary = {}
+	var keys := _collect_rarity_keys(weights_any, fallback_any)
 	if fallback_any is Dictionary:
 		var fallback: Dictionary = fallback_any
-		for rarity in ["white", "blue", "gold"]:
+		for rarity in keys:
 			out[rarity] = maxi(0, int(fallback.get(rarity, out.get(rarity, 0))))
 	if weights_any is Dictionary:
 		var weights: Dictionary = weights_any
-		for rarity in ["white", "blue", "gold"]:
+		for rarity in keys:
 			out[rarity] = maxi(0, int(weights.get(rarity, out.get(rarity, 0))))
 	return out
 
 func _normalize_items_by_rarity(items_any: Variant, fallback_any: Variant) -> Dictionary:
-	var out := {
-		"white": [],
-		"blue": [],
-		"gold": [],
-	}
+	var out: Dictionary = {}
+	var keys := _collect_rarity_keys(items_any, fallback_any)
 	if fallback_any is Dictionary:
 		var fallback: Dictionary = fallback_any
-		for rarity in ["white", "blue", "gold"]:
+		for rarity in keys:
 			var list_any = fallback.get(rarity, [])
 			if list_any is Array:
 				var names: Array[String] = []
@@ -482,10 +495,11 @@ func _normalize_items_by_rarity(items_any: Variant, fallback_any: Variant) -> Di
 				out[rarity] = names
 	if items_any is Dictionary:
 		var items_dict: Dictionary = items_any
-		for rarity in ["white", "blue", "gold"]:
+		for rarity in keys:
 			if not items_dict.has(rarity):
 				continue
 			var list_any = items_dict.get(rarity, [])
+			# NOTE: 空数组表示“继承上层掉落池”，不是“清空该 rarity 池”。
 			if not (list_any is Array):
 				continue
 			var names: Array[String] = []
@@ -497,6 +511,39 @@ func _normalize_items_by_rarity(items_any: Variant, fallback_any: Variant) -> Di
 			if names.size() > 0:
 				out[rarity] = names
 	return out
+
+func _sum_rarity_weights(weights: Dictionary) -> int:
+	var total := 0
+	for rarity_any in weights.keys():
+		total += maxi(0, int(weights.get(rarity_any, 0)))
+	return total
+
+func _collect_rarity_keys(primary_any: Variant, fallback_any: Variant) -> Array[String]:
+	var ordered: Array[String] = []
+	var seen: Dictionary = {}
+	for rarity in DEFAULT_DROP_RARITIES:
+		ordered.append(rarity)
+		seen[rarity] = true
+
+	if fallback_any is Dictionary:
+		var fallback: Dictionary = fallback_any
+		for key_any in fallback.keys():
+			var key := str(key_any).strip_edges()
+			if key.is_empty() or seen.has(key):
+				continue
+			ordered.append(key)
+			seen[key] = true
+
+	if primary_any is Dictionary:
+		var primary: Dictionary = primary_any
+		for key_any in primary.keys():
+			var key := str(key_any).strip_edges()
+			if key.is_empty() or seen.has(key):
+				continue
+			ordered.append(key)
+			seen[key] = true
+
+	return ordered
 
 func _normalize_special_drops(special_any: Variant, fallback_any: Variant) -> Dictionary:
 	var out: Dictionary = {}
@@ -776,18 +823,30 @@ func _load_drop_cfg(battle_cfg: Dictionary) -> void:
 	var rarity_weights_any = drops.get("rarity_weights", {})
 	if rarity_weights_any is Dictionary:
 		var rarity_weights: Dictionary = rarity_weights_any
-		for rarity in ["white", "blue", "gold"]:
-			drop_weights[rarity] = maxi(0, int(rarity_weights.get(rarity, 0)))
+		for rarity_any in rarity_weights.keys():
+			var rarity := str(rarity_any).strip_edges()
+			if rarity.is_empty():
+				continue
+			drop_weights[rarity] = maxi(0, int(rarity_weights.get(rarity_any, 0)))
+	for rarity in DEFAULT_DROP_RARITIES:
+		if not drop_weights.has(rarity):
+			drop_weights[rarity] = 0
 
 	var items_any = drops.get("items_by_rarity", drops.get("items", {}))
 	if items_any is Dictionary:
 		var items_dict: Dictionary = items_any
-		for rarity in ["white", "blue", "gold"]:
-			var list_any = items_dict.get(rarity, [])
+		for rarity_any in items_dict.keys():
+			var rarity := str(rarity_any).strip_edges()
+			if rarity.is_empty():
+				continue
+			var list_any = items_dict.get(rarity_any, [])
 			if list_any is Array:
 				var names: Array[String] = []
 				for item_any in list_any:
-					names.append(str(item_any))
+					var item_id := str(item_any).strip_edges()
+					if item_id.is_empty():
+						continue
+					names.append(item_id)
 				drop_items[rarity] = names
 
 	equip_drop_chance = clampf(float(drops.get("equip_chance", 0.0)), 0.0, 1.0)
@@ -2243,18 +2302,19 @@ func _resolve_equip_name(template_id: String) -> String:
 	return template_id
 
 func _roll_weighted_rarity(weights: Dictionary) -> String:
-	var white_w := maxi(0, int(weights.get("white", 0)))
-	var blue_w := maxi(0, int(weights.get("blue", 0)))
-	var gold_w := maxi(0, int(weights.get("gold", 0)))
-	var total := white_w + blue_w + gold_w
+	var total := _sum_rarity_weights(weights)
 	if total <= 0:
 		return ""
 	var roll := randi() % total
-	if roll < white_w:
-		return "white"
-	if roll < white_w + blue_w:
-		return "blue"
-	return "gold"
+	var acc := 0
+	for rarity in _collect_rarity_keys(weights, {}):
+		var w := maxi(0, int(weights.get(rarity, 0)))
+		if w <= 0:
+			continue
+		acc += w
+		if roll < acc:
+			return rarity
+	return ""
 
 func _rarity_tag(rarity: String) -> String:
 	match rarity:
@@ -2262,6 +2322,10 @@ func _rarity_tag(rarity: String) -> String:
 			return "[蓝]"
 		"gold":
 			return "[金]"
+		"purple":
+			return "[紫]"
+		"orange":
+			return "[橙]"
 		_:
 			return "[白]"
 
@@ -2279,16 +2343,21 @@ func _apply_kill_drop_bonus(effective_drop: float, kill_drop_bonus_percent: int)
 	return clampf(effective_drop, 0.0, 0.90)
 
 func _calc_effective_rarity_weights(weights: Dictionary, loot_bonus: int) -> Dictionary:
-	var w_white: int = maxi(0, int(weights.get("white", 0)))
-	var w_blue: int = maxi(0, int(weights.get("blue", 0)))
-	var w_gold: int = maxi(0, int(weights.get("gold", 0)))
+	var out: Dictionary = {}
+	for rarity_any in weights.keys():
+		var rarity := str(rarity_any).strip_edges()
+		if rarity.is_empty():
+			continue
+		out[rarity] = maxi(0, int(weights.get(rarity_any, 0)))
+	var w_white: int = maxi(0, int(out.get("white", 0)))
+	var w_blue: int = maxi(0, int(out.get("blue", 0)))
+	var w_gold: int = maxi(0, int(out.get("gold", 0)))
 	var blue_bonus: int = int(floor(float(loot_bonus) / 3.0))
 	var gold_bonus: int = int(floor(float(loot_bonus) / 8.0))
-	return {
-		"white": w_white,
-		"blue": w_blue + blue_bonus,
-		"gold": w_gold + gold_bonus,
-	}
+	out["white"] = w_white
+	out["blue"] = w_blue + blue_bonus
+	out["gold"] = w_gold + gold_bonus
+	return out
 
 func _normalize_enemy_kind(kind: String) -> String:
 	var k := kind.strip_edges().to_lower()

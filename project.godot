@@ -37,6 +37,7 @@ OfflineService="*res://autoload/OfflineService.gd"
 GrindModel="*res://autoload/GrindModel.gd"
 MapProgressModel="*res://autoload/MapProgressModel.gd"
 BattleService="*res://autoload/BattleService.gd"
+SourceGuideService="*res://autoload/SourceGuideService.gd"
 
 [display]
 

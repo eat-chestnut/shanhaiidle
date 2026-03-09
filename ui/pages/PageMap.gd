@@ -208,6 +208,7 @@ func _on_update_cfg_pressed() -> void:
 			ConfigService.load_all()
 			if not GrindModel.stage_id.is_empty():
 				BattleService.set_stage(GrindModel.stage_id, int(BattleService.current_diff_index), true)
+			SourceGuideService.rebuild_indexes()
 			refresh_list()
 			_refresh_cfg_version()
 			_refresh_bundle_id()

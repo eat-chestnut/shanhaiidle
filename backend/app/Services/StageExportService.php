@@ -281,7 +281,7 @@ class StageExportService
 
         $itemsRaw = is_array($dropsRaw['items_by_rarity'] ?? null) ? $dropsRaw['items_by_rarity'] : [];
         $itemsOut = [];
-        foreach (['white', 'blue', 'gold'] as $rarity) {
+        foreach ($this->dropRarityKeys($itemsRaw) as $rarity) {
             $rows = $this->normalizeStringArray($itemsRaw[$rarity] ?? []);
             if ($rows === []) {
                 continue;
@@ -450,6 +450,20 @@ class StageExportService
     private function asJsonMap(array $map): array|object
     {
         return $map === [] ? (object) [] : $map;
+    }
+
+    private function dropRarityKeys(array $itemsByRarity): array
+    {
+        $keys = ['white', 'blue', 'gold', 'purple', 'orange'];
+        foreach ($itemsByRarity as $key => $_value) {
+            $rarity = trim((string) $key);
+            if ($rarity === '' || in_array($rarity, $keys, true)) {
+                continue;
+            }
+            $keys[] = $rarity;
+        }
+
+        return $keys;
     }
 
     private function cleanupHistory(int $keep): void

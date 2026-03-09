@@ -65,9 +65,6 @@ func _rebuild_list() -> void:
 	var score := EquipmentModel.get_equipped_total_score()
 	var recommend := int((diffs[mini(unlocked, diffs.size() - 1)] as Dictionary).get("recommend_score", 0))
 	_power_line.text = "当前战力%d / 建议战力%d" % [score, recommend]
-	var base_drops_any = _stage_def.get("drops_patch", {})
-	var base_drops: Dictionary = base_drops_any if base_drops_any is Dictionary else {}
-
 	for i in range(diffs.size()):
 		var diff_any = diffs[i]
 		if not (diff_any is Dictionary):
@@ -138,13 +135,13 @@ func _rebuild_list() -> void:
 			enter_btn.pressed.connect(_on_enter_pressed.bind(i))
 		row.add_child(enter_btn)
 
-		var override_any = diff.get("drops_override", {})
-		var override_drops: Dictionary = override_any if override_any is Dictionary else {}
-		var final_drops := _merge_drops(base_drops, override_drops)
+		var final_drops := BattleService.get_final_drops_for_stage_difficulty(_stage_def, diff)
 		var weights_any = final_drops.get("rarity_weights", {})
 		var special_any = final_drops.get("special", {})
+		var pools_any = final_drops.get("items_by_rarity", {})
 		var weights: Dictionary = weights_any if weights_any is Dictionary else {}
 		var special: Dictionary = special_any if special_any is Dictionary else {}
+		var pools: Dictionary = pools_any if pools_any is Dictionary else {}
 
 		var drop1_lb := Label.new()
 		drop1_lb.name = "LblDrop1"
@@ -160,10 +157,11 @@ func _rebuild_list() -> void:
 		drop2_lb.name = "LblDrop2"
 		drop2_lb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		drop2_lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		drop2_lb.clip_text = true
+		drop2_lb.clip_text = false
+		drop2_lb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		drop2_lb.add_theme_font_size_override("font_size", 14)
 		drop2_lb.modulate = Color(0.78, 0.78, 0.78, 1.0)
-		drop2_lb.text = _special_preview_text(special)
+		drop2_lb.text = "%s  %s" % [_items_pool_preview_text(pools), _special_preview_text(special)]
 		card.add_child(drop2_lb)
 
 		var first_clear_lb := Label.new()
@@ -178,83 +176,82 @@ func _rebuild_list() -> void:
 
 		_difficulty_list.add_child(panel)
 
-func _merge_drops(stage_drops: Dictionary, override: Dictionary) -> Dictionary:
-	var result := stage_drops.duplicate(true)
-
-	if override.has("drop_chance"):
-		result["drop_chance"] = float(override.get("drop_chance", result.get("drop_chance", 0.0)))
-
-	if override.has("rarity_weights"):
-		var base_weights_any = result.get("rarity_weights", {})
-		var base_weights: Dictionary = base_weights_any if base_weights_any is Dictionary else {}
-		var out_weights := base_weights.duplicate(true)
-		var over_weights_any = override.get("rarity_weights", {})
-		if over_weights_any is Dictionary:
-			var over_weights: Dictionary = over_weights_any
-			for k in over_weights.keys():
-				out_weights[str(k)] = int(over_weights.get(k, out_weights.get(str(k), 0)))
-		var w_sum := int(out_weights.get("white", 0)) + int(out_weights.get("blue", 0)) + int(out_weights.get("gold", 0))
-		if w_sum > 0:
-			result["rarity_weights"] = out_weights
-
-	if override.has("items_by_rarity"):
-		var base_items_any = result.get("items_by_rarity", {})
-		var base_items: Dictionary = base_items_any if base_items_any is Dictionary else {}
-		var out_items := base_items.duplicate(true)
-		var over_items_any = override.get("items_by_rarity", {})
-		if over_items_any is Dictionary:
-			var over_items: Dictionary = over_items_any
-			for k in over_items.keys():
-				var arr_any = over_items.get(k, [])
-				if arr_any is Array:
-					var rows := (arr_any as Array).duplicate(true)
-					if rows.size() > 0:
-						out_items[str(k)] = rows
-		result["items_by_rarity"] = out_items
-
-	if override.has("special"):
-		var base_special_any = result.get("special", {})
-		var base_special: Dictionary = base_special_any if base_special_any is Dictionary else {}
-		var out_special := base_special.duplicate(true)
-		var over_special_any = override.get("special", {})
-		if over_special_any is Dictionary:
-			var over_special: Dictionary = over_special_any
-			for kind in ["normal", "elite", "boss"]:
-				if not over_special.has(kind):
-					continue
-				var src_any = over_special.get(kind, {})
-				if not (src_any is Dictionary):
-					continue
-				var src: Dictionary = src_any
-				var dst_any = out_special.get(kind, {})
-				var dst: Dictionary = dst_any if dst_any is Dictionary else {}
-				var merged := dst.duplicate(true)
-				for sk in src.keys():
-					var sval: Variant = src.get(sk)
-					if sval is Array:
-						merged[str(sk)] = (sval as Array).duplicate(true)
-					elif sval is Dictionary:
-						merged[str(sk)] = (sval as Dictionary).duplicate(true)
-					else:
-						merged[str(sk)] = sval
-				out_special[kind] = merged
-		result["special"] = out_special
-
-	return result
-
 func _weights_to_percent_text(weights: Dictionary) -> String:
 	if weights.is_empty():
 		return "稀有度：未知"
-	var white_w := int(weights.get("white", 0))
-	var blue_w := int(weights.get("blue", 0))
-	var gold_w := int(weights.get("gold", 0))
-	var sum_w := white_w + blue_w + gold_w
+	var sum_w := 0
+	for key_any in weights.keys():
+		sum_w += maxi(0, int(weights.get(key_any, 0)))
 	if sum_w <= 0:
 		return "稀有度：未知"
-	var pw := int(round(float(white_w) * 100.0 / float(sum_w)))
-	var pb := int(round(float(blue_w) * 100.0 / float(sum_w)))
-	var pg := maxi(0, 100 - pw - pb)
-	return "稀有度：白%d%% 蓝%d%% 金%d%%" % [pw, pb, pg]
+	var parts: Array[String] = []
+	var ordered: Array[String] = ["white", "blue", "gold", "purple", "orange"]
+	for key_any in weights.keys():
+		var key := str(key_any).strip_edges()
+		if key.is_empty() or ordered.has(key):
+			continue
+		ordered.append(key)
+	for rarity in ordered:
+		if not weights.has(rarity):
+			continue
+		var w := maxi(0, int(weights.get(rarity, 0)))
+		if w <= 0:
+			continue
+		var p := int(round(float(w) * 100.0 / float(sum_w)))
+		parts.append("%s%d%%" % [_rarity_cn(rarity), p])
+	if parts.is_empty():
+		return "稀有度：未知"
+	return "稀有度：" + " ".join(parts)
+
+func _items_pool_preview_text(pools: Dictionary) -> String:
+	if pools.is_empty():
+		return "掉落池：未知"
+	var parts: Array[String] = []
+	var ordered: Array[String] = ["white", "blue", "gold", "purple", "orange"]
+	for key_any in pools.keys():
+		var key := str(key_any).strip_edges()
+		if key.is_empty() or ordered.has(key):
+			continue
+		ordered.append(key)
+	for rarity in ordered:
+		if not pools.has(rarity):
+			continue
+		var arr_any = pools.get(rarity, [])
+		if not (arr_any is Array):
+			continue
+		var arr: Array = arr_any
+		if arr.is_empty():
+			continue
+		var names: Array[String] = []
+		for item_any in arr:
+			var item_id := str(item_any).strip_edges()
+			if item_id.is_empty():
+				continue
+			names.append(item_id)
+			if names.size() >= 2:
+				break
+		if names.is_empty():
+			continue
+		var suffix := "…" if arr.size() > names.size() else ""
+		parts.append("%s[%s%s]" % [_rarity_cn(rarity), "、".join(names), suffix])
+	if parts.is_empty():
+		return "掉落池：未知"
+	return "掉落池：" + " ".join(parts)
+
+func _rarity_cn(rarity: String) -> String:
+	match rarity:
+		"white":
+			return "白"
+		"blue":
+			return "蓝"
+		"gold":
+			return "金"
+		"purple":
+			return "紫"
+		"orange":
+			return "橙"
+		_:
+			return rarity
 
 func _special_preview_text(special: Dictionary) -> String:
 	if special.is_empty():

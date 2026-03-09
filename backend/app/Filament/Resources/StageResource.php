@@ -244,6 +244,7 @@ class StageResource extends Resource
                                             ])
                                             ->columns(2),
                                         Fieldset::make('掉落覆盖（可选）')
+                                            ->helperText('按稀有度覆盖该难度的掉落池；留空或空数组将继承地图默认池。本版不支持追加/删除差分，仅支持整池覆盖。')
                                             ->schema([
                                                 TextInput::make('drops_override.drop_chance')
                                                     ->label('掉落概率覆盖')
@@ -266,14 +267,27 @@ class StageResource extends Resource
                                                 MultiSelect::make('drops_override.white_items')
                                                     ->label('白色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
+                                                    ->searchable()
                                                     ->default([]),
                                                 MultiSelect::make('drops_override.blue_items')
                                                     ->label('蓝色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
+                                                    ->searchable()
                                                     ->default([]),
                                                 MultiSelect::make('drops_override.gold_items')
                                                     ->label('金色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
+                                                    ->searchable()
+                                                    ->default([]),
+                                                MultiSelect::make('drops_override.purple_items')
+                                                    ->label('紫色掉落池覆盖')
+                                                    ->options(fn (): array => static::itemOptions())
+                                                    ->searchable()
+                                                    ->default([]),
+                                                MultiSelect::make('drops_override.orange_items')
+                                                    ->label('橙色掉落池覆盖')
+                                                    ->options(fn (): array => static::itemOptions())
+                                                    ->searchable()
                                                     ->default([]),
                                                 TextInput::make('drops_override.special.normal.extra_gem_chance')
                                                     ->label('普通宝石概率')
@@ -507,7 +521,15 @@ class StageResource extends Resource
             ->where('is_enabled', true)
             ->where('type', 'item')
             ->orderBy('sort_order')
-            ->pluck('name', 'id')
+            ->get(['id', 'name', 'rarity'])
+            ->mapWithKeys(fn (Item $item): array => [
+                (string) $item->id => sprintf(
+                    '%s（%s｜%s）',
+                    (string) $item->name,
+                    (string) $item->id,
+                    (string) $item->rarity
+                ),
+            ])
             ->all();
     }
 
@@ -809,7 +831,7 @@ class StageResource extends Resource
             }
 
             $itemsByRarity = is_array($drops['items_by_rarity'] ?? null) ? $drops['items_by_rarity'] : [];
-            foreach (['white', 'blue', 'gold'] as $color) {
+            foreach (static::dropRarityKeys() as $color) {
                 $items = static::normalizeStringArray($itemsByRarity[$color] ?? []);
                 foreach ($items as $itemId) {
                     if (! in_array($itemId, $itemIds, true)) {
@@ -1032,6 +1054,8 @@ class StageResource extends Resource
         $whiteItems = static::normalizeStringArray($dropsRaw['white_items'] ?? ($itemsRaw['white'] ?? []));
         $blueItems = static::normalizeStringArray($dropsRaw['blue_items'] ?? ($itemsRaw['blue'] ?? []));
         $goldItems = static::normalizeStringArray($dropsRaw['gold_items'] ?? ($itemsRaw['gold'] ?? []));
+        $purpleItems = static::normalizeStringArray($dropsRaw['purple_items'] ?? ($itemsRaw['purple'] ?? []));
+        $orangeItems = static::normalizeStringArray($dropsRaw['orange_items'] ?? ($itemsRaw['orange'] ?? []));
         $itemsOut = [];
         if ($whiteItems !== []) {
             $itemsOut['white'] = $whiteItems;
@@ -1041,6 +1065,12 @@ class StageResource extends Resource
         }
         if ($goldItems !== []) {
             $itemsOut['gold'] = $goldItems;
+        }
+        if ($purpleItems !== []) {
+            $itemsOut['purple'] = $purpleItems;
+        }
+        if ($orangeItems !== []) {
+            $itemsOut['orange'] = $orangeItems;
         }
         if ($itemsOut !== []) {
             $out['items_by_rarity'] = $itemsOut;
@@ -1168,6 +1198,8 @@ class StageResource extends Resource
                 'white_items' => static::normalizeStringArray(($drops['items_by_rarity']['white'] ?? [])),
                 'blue_items' => static::normalizeStringArray(($drops['items_by_rarity']['blue'] ?? [])),
                 'gold_items' => static::normalizeStringArray(($drops['items_by_rarity']['gold'] ?? [])),
+                'purple_items' => static::normalizeStringArray(($drops['items_by_rarity']['purple'] ?? [])),
+                'orange_items' => static::normalizeStringArray(($drops['items_by_rarity']['orange'] ?? [])),
                 'special' => [
                     'normal' => [
                         'extra_gem_chance' => array_key_exists('extra_gem_chance', $special['normal'] ?? []) ? (float) $special['normal']['extra_gem_chance'] : null,
@@ -1245,6 +1277,11 @@ class StageResource extends Resource
         }
 
         return array_values(array_keys($arr));
+    }
+
+    protected static function dropRarityKeys(): array
+    {
+        return ['white', 'blue', 'gold', 'purple', 'orange'];
     }
 
     protected static function normalizeFloat(float $value, float $default = 1.0): float

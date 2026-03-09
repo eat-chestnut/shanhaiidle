@@ -409,16 +409,17 @@ func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -
 					push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity，stage[%d] difficulties[%d]" % [stage_index, j])
 				else:
 					var items_by_rarity: Dictionary = items_any
-					for rarity in ["white", "blue", "gold"]:
-						if not items_by_rarity.has(rarity):
+					for rarity_any in items_by_rarity.keys():
+						var rarity := str(rarity_any).strip_edges()
+						if rarity.is_empty():
 							continue
-						var arr_any = items_by_rarity.get(rarity, [])
+						var arr_any = items_by_rarity.get(rarity_any, [])
 						if not (arr_any is Array):
 							push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
 							continue
 						var arr: Array = arr_any
+						# NOTE: 空数组表示“继承上层掉落池”，是合法输入，不是错误。
 						if arr.is_empty():
-							push_warning("RemoteConfigService: 忽略空的 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
 							continue
 						var valid := true
 						for item_any in arr:
