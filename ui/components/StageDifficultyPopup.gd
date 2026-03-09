@@ -94,7 +94,7 @@ func _rebuild_list() -> void:
 		panel.add_theme_stylebox_override("panel", sb)
 
 		var card := VBoxContainer.new()
-		card.custom_minimum_size = Vector2(0, 120)
+		card.custom_minimum_size = Vector2(0, 150)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.add_theme_constant_override("separation", 2)
 		panel.add_child(card)
@@ -165,6 +165,16 @@ func _rebuild_list() -> void:
 		drop2_lb.modulate = Color(0.78, 0.78, 0.78, 1.0)
 		drop2_lb.text = _special_preview_text(special)
 		card.add_child(drop2_lb)
+
+		var first_clear_lb := Label.new()
+		first_clear_lb.name = "LblFirstClear"
+		first_clear_lb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		first_clear_lb.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		first_clear_lb.clip_text = true
+		first_clear_lb.add_theme_font_size_override("font_size", 14)
+		first_clear_lb.modulate = Color(0.78, 0.78, 0.78, 1.0)
+		first_clear_lb.text = _build_first_clear_preview_text(diff, i)
+		card.add_child(first_clear_lb)
 
 		_difficulty_list.add_child(panel)
 
@@ -361,6 +371,7 @@ func _resolved_difficulties(stage: Dictionary) -> Array:
 				"material_cost": {},
 				"reward": {},
 			},
+			"first_clear_reward": {},
 			"recommend_score": 0,
 			"monster_mult": {
 				"hp": 1.0,
@@ -409,6 +420,35 @@ func _build_reward_summary_text(reward: Dictionary) -> String:
 	if parts.is_empty():
 		return "无"
 	return " ".join(parts)
+
+func _build_first_clear_preview_text(diff_def: Dictionary, diff_index: int) -> String:
+	var reward := _normalize_reward(diff_def.get("first_clear_reward", {}))
+	var summary := _build_reward_summary_text(reward)
+	var claimed := MapProgressModel.is_first_clear_claimed(_stage_id, diff_index)
+	return "首通奖励：%s（%s）" % [summary, "已领取" if claimed else "未领取"]
+
+func _normalize_reward(reward_any: Variant) -> Dictionary:
+	var out := {
+		"gold": 0,
+		"skill_points": 0,
+		"items": {},
+	}
+	if not (reward_any is Dictionary):
+		return out
+	var reward: Dictionary = reward_any
+	out["gold"] = maxi(0, int(reward.get("gold", 0)))
+	out["skill_points"] = maxi(0, int(reward.get("skill_points", 0)))
+	var items: Dictionary = {}
+	var items_any = reward.get("items", {})
+	if items_any is Dictionary:
+		for item_id_any in (items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			items[item_id] = cnt
+	out["items"] = items
+	return out
 
 func _on_dim_bg_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

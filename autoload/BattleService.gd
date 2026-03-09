@@ -109,10 +109,11 @@ func _ready() -> void:
 	set_process(true)
 	_load_battle_cfg()
 	var saved_stage := GrindModel.stage_id
+	var saved_diff := maxi(0, int(GrindModel.diff_index))
 	if saved_stage.is_empty():
 		saved_stage = _default_stage_id()
 	if not saved_stage.is_empty():
-		set_stage(saved_stage, 0, true)
+		set_stage(saved_stage, saved_diff, true)
 	_reset_player_pos_if_needed()
 	_sync_player_combat_stats(true)
 	_log_loot_bonus_info()
@@ -127,12 +128,11 @@ func set_stage(stage_id: String, diff_index: int = 0, silent: bool = false) -> v
 		_load_battle_cfg()
 
 	current_stage_id = stage_id
-	if not silent:
-		GrindModel.set_stage(stage_id)
 
 	var battle_cfg: Dictionary = _base_battle_cfg.duplicate(true)
 	_apply_battle_cfg(battle_cfg)
 	_apply_stage_overrides(stage, diff_index)
+	GrindModel.set_stage_and_diff(current_stage_id, current_diff_index, not silent)
 	_reset_runtime_for_stage_switch()
 	if not silent:
 		EventBus.add_log("切换地图：%s" % stage_name)
@@ -1713,7 +1713,7 @@ func _apply_damage_to_enemy(index: int, damage: int) -> bool:
 	else:
 		special_present = ""
 		if enemy_kind == "boss" and not current_stage_id.is_empty():
-			MapProgressModel.add_boss_kill(current_stage_id, 1)
+			MapProgressModel.add_boss_kill(current_stage_id, current_diff_index, 1)
 		EventBus.add_log("已击败：%s" % enemy_name)
 	kills += 1
 	_heal_on_kill(enemy_kind)

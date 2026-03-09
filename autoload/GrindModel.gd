@@ -3,12 +3,14 @@ extends Node
 const SAVE_PATH := "user://grind.json"
 
 var stage_id: String = "nan_01"
+var diff_index: int = 0
 
 func _ready() -> void:
 	load_data()
 
 func load_data() -> void:
 	stage_id = "nan_01"
+	diff_index = 0
 	if not FileAccess.file_exists(SAVE_PATH):
 		save_data()
 		return
@@ -17,21 +19,32 @@ func load_data() -> void:
 	if not (parsed is Dictionary):
 		save_data()
 		return
-	stage_id = str((parsed as Dictionary).get("stage_id", "nan_01"))
+	var data: Dictionary = parsed
+	stage_id = str(data.get("stage_id", "nan_01"))
 	if stage_id.is_empty():
 		stage_id = "nan_01"
+	diff_index = maxi(0, int(data.get("diff_index", 0)))
 
 func save_data() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_string(JSON.stringify({"stage_id": stage_id}))
+	f.store_string(JSON.stringify({
+		"stage_id": stage_id,
+		"diff_index": diff_index,
+	}))
 
 func set_stage(id: String) -> void:
+	set_stage_and_diff(id, diff_index)
+
+func set_stage_and_diff(id: String, diff: int, emit_update: bool = true) -> void:
 	if id.is_empty():
 		return
-	if stage_id == id:
+	var next_diff := maxi(0, diff)
+	if stage_id == id and diff_index == next_diff:
 		return
 	stage_id = id
+	diff_index = next_diff
 	save_data()
-	EventBus.notify_inventory_updated()
+	if emit_update:
+		EventBus.notify_inventory_updated()

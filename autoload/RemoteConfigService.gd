@@ -355,6 +355,23 @@ func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -
 							if rid.is_empty() or rcnt < 0:
 								push_warning("RemoteConfigService: 忽略非法 reward.items，stage[%d] difficulties[%d]" % [stage_index, j])
 								break
+		if diff.has("first_clear_reward"):
+			var first_reward_any: Variant = diff.get("first_clear_reward", {})
+			if not (first_reward_any is Dictionary):
+				push_warning("RemoteConfigService: 忽略非法 first_clear_reward，stage[%d] difficulties[%d]" % [stage_index, j])
+			else:
+				var first_reward: Dictionary = first_reward_any
+				if int(first_reward.get("gold", 0)) < 0 or int(first_reward.get("skill_points", 0)) < 0:
+					push_warning("RemoteConfigService: 忽略非法 first_clear_reward 数值，stage[%d] difficulties[%d]" % [stage_index, j])
+				var first_items_any: Variant = first_reward.get("items", {})
+				if first_items_any is Dictionary:
+					var first_items: Dictionary = first_items_any
+					for fid_any in first_items.keys():
+						var fid := str(fid_any).strip_edges()
+						var fcnt := int(first_items.get(fid_any, 0))
+						if fid.is_empty() or fcnt < 0:
+							push_warning("RemoteConfigService: 忽略非法 first_clear_reward.items，stage[%d] difficulties[%d]" % [stage_index, j])
+							break
 
 		var mult_any: Variant = diff.get("monster_mult", {})
 		if mult_any is Dictionary:

@@ -94,7 +94,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -123,6 +124,13 @@
               "white": 78,
               "blue": 19,
               "gold": 3
+            }
+          },
+          "first_clear_reward": {
+            "gold": 120,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 15
             }
           }
         },
@@ -175,6 +183,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 240,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 10,
+              "妖核": 1
             }
           }
         }
@@ -274,7 +290,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -303,6 +320,13 @@
               "white": 76,
               "blue": 21,
               "gold": 3
+            }
+          },
+          "first_clear_reward": {
+            "gold": 140,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 17
             }
           }
         },
@@ -355,6 +379,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 270,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 12,
+              "妖核": 1
             }
           }
         }
@@ -454,7 +486,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -483,6 +516,13 @@
               "white": 74,
               "blue": 22,
               "gold": 4
+            }
+          },
+          "first_clear_reward": {
+            "gold": 160,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 19
             }
           }
         },
@@ -535,6 +575,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 300,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 14,
+              "妖核": 2
             }
           }
         }
@@ -634,7 +682,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -663,6 +712,13 @@
               "white": 72,
               "blue": 23,
               "gold": 5
+            }
+          },
+          "first_clear_reward": {
+            "gold": 180,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 21
             }
           }
         },
@@ -715,6 +771,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 330,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 16,
+              "妖核": 2
             }
           }
         }
@@ -814,7 +878,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -843,6 +908,13 @@
               "white": 70,
               "blue": 24,
               "gold": 6
+            }
+          },
+          "first_clear_reward": {
+            "gold": 200,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 23
             }
           }
         },
@@ -895,6 +967,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 360,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 18,
+              "妖核": 3
             }
           }
         }
@@ -994,7 +1074,8 @@
             "atk": 1.0,
             "def": 1.0
           },
-          "drops_override": {}
+          "drops_override": {},
+          "first_clear_reward": {}
         },
         {
           "name": "困难I",
@@ -1023,6 +1104,13 @@
               "white": 68,
               "blue": 25,
               "gold": 7
+            }
+          },
+          "first_clear_reward": {
+            "gold": 220,
+            "skill_points": 1,
+            "items": {
+              "玉屑": 25
             }
           }
         },
@@ -1075,6 +1163,14 @@
                   "青木石"
                 ]
               }
+            }
+          },
+          "first_clear_reward": {
+            "gold": 390,
+            "skill_points": 1,
+            "items": {
+              "白玉碎": 20,
+              "妖核": 3
             }
           }
         }
