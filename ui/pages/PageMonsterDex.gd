@@ -4,10 +4,15 @@ const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 const PAGE_CHARACTER := "res://ui/pages/PageCharacter.tscn"
 const PAGE_SKILLS := "res://ui/pages/PageSkills.tscn"
 const PAGE_MAP := "res://ui/pages/PageMap.tscn"
+const PAGE_ITEM_DEX := "res://ui/pages/PageItemDex.tscn"
+const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
 
 @onready var _title: Label = $RootVBox/Header/HeaderRow/Title
 @onready var _hint: Label = $RootVBox/Header/HeaderRow/Hint
 @onready var _btn_back: Button = $RootVBox/Header/HeaderRow/BtnBack
+@onready var _btn_tab_monster: Button = $RootVBox/DexTabs/BtnTabMonster
+@onready var _btn_tab_item: Button = $RootVBox/DexTabs/BtnTabItem
+@onready var _btn_tab_equip: Button = $RootVBox/DexTabs/BtnTabEquip
 @onready var _monster_list: VBoxContainer = $RootVBox/MonsterScroll/MonsterList
 @onready var _detail_title: Label = $RootVBox/DetailPanel/DetailVBox/DetailTitle
 @onready var _detail_text: RichTextLabel = $RootVBox/DetailPanel/DetailVBox/DetailScroll/DetailText
@@ -40,6 +45,10 @@ func _apply_i18n() -> void:
 	_title.text = "怪物图鉴"
 	_hint.text = "遇到即解锁（奖励手动领取）"
 	_btn_back.text = "返回"
+	_btn_tab_monster.text = "怪物"
+	_btn_tab_item.text = "材料"
+	_btn_tab_equip.text = "装备"
+	_btn_tab_monster.disabled = true
 	_detail_title.text = "怪物详情"
 	_btn_claim.text = "未解锁不可领取"
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
@@ -60,6 +69,10 @@ func _connect_signals() -> void:
 		EventBus.inventory_updated.connect(_on_model_changed)
 	if not _btn_back.pressed.is_connected(_on_back_pressed):
 		_btn_back.pressed.connect(_on_back_pressed)
+	if not _btn_tab_item.pressed.is_connected(_on_tab_item_pressed):
+		_btn_tab_item.pressed.connect(_on_tab_item_pressed)
+	if not _btn_tab_equip.pressed.is_connected(_on_tab_equip_pressed):
+		_btn_tab_equip.pressed.connect(_on_tab_equip_pressed)
 	if not _btn_nav_character.pressed.is_connected(_on_nav_character_pressed):
 		_btn_nav_character.pressed.connect(_on_nav_character_pressed)
 	if not _btn_nav_skills.pressed.is_connected(_on_nav_skills_pressed):
@@ -348,6 +361,12 @@ func _on_nav_character_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_MAP)
+
+func _on_tab_item_pressed() -> void:
+	get_tree().change_scene_to_file(PAGE_ITEM_DEX)
+
+func _on_tab_equip_pressed() -> void:
+	get_tree().change_scene_to_file(PAGE_EQUIP_DEX)
 
 func _on_nav_skills_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_SKILLS)

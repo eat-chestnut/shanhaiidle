@@ -274,7 +274,7 @@ func _refresh_upgrade_button() -> void:
 	_refresh_refine_missing_hint(cost)
 
 func _refresh_punch_button(sockets: int, active_uid: int) -> void:
-	var stone_count := InventoryModel.get_count(PUNCH_ITEM_ID)
+	var stone_count: int = InventoryModel.get_count(PUNCH_ITEM_ID)
 	_btn_punch.remove_theme_stylebox_override("normal")
 
 	if active_uid <= 0:
@@ -949,7 +949,7 @@ func _refresh_refine_missing_hint(cost: Dictionary) -> void:
 			var need := int((items_any as Dictionary).get(key_any, 0))
 			if mat_id.is_empty() or need <= 0:
 				continue
-			var have := InventoryModel.get_count(mat_id)
+			var have: int = InventoryModel.get_count(mat_id)
 			if have < need:
 				missing[mat_id] = need - have
 
@@ -982,7 +982,7 @@ func _has_enough_cost_items(cost_any: Variant) -> bool:
 		var need := int(cost.get(key_any, 0))
 		if mat_id.is_empty() or need <= 0:
 			continue
-		var have := InventoryModel.get_count(mat_id)
+		var have: int = InventoryModel.get_count(mat_id)
 		if have < need:
 			return false
 	return true

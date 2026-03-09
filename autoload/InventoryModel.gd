@@ -21,17 +21,24 @@ func add_item(item_id: String, count: int = 1, source: String = "online", emit_u
 
 func add_items_bulk(rewards: Dictionary, source: String = "online", emit_update: bool = true) -> void:
 	var changed := false
+	var gained_ids: Array[String] = []
+	var gained_seen: Dictionary = {}
 	for item_id_any in rewards.keys():
 		var item_id := str(item_id_any).strip_edges()
 		var count := int(rewards.get(item_id_any, 0))
 		if item_id.is_empty() or count <= 0:
 			continue
 		items[item_id] = int(items.get(item_id, 0)) + count
+		if not gained_seen.has(item_id):
+			gained_seen[item_id] = true
+			gained_ids.append(item_id)
 		if source == "online":
 			PerfTracker.record_item_gain(item_id, count)
 		changed = true
 	if not changed:
 		return
+	if has_node("/root/ItemDexModel"):
+		ItemDexModel.unlock_many(gained_ids, false)
 	if emit_update:
 		EventBus.notify_inventory_updated()
 	_request_save()
@@ -63,15 +70,24 @@ func _load_save() -> void:
 		var txt := FileAccess.get_file_as_string(SAVE_PATH)
 		var parsed: Variant = JSON.parse_string(txt)
 		if parsed is Dictionary:
-			var it: Variant = (parsed as Dictionary).get("items", {})
-			if it is Dictionary:
-				for key_any in (it as Dictionary).keys():
-					var item_id := str(key_any)
-					if item_id.is_empty():
-						continue
-					var cnt := int((it as Dictionary).get(key_any, 0))
-					if cnt > 0:
-						items[item_id] = cnt
+				var it: Variant = (parsed as Dictionary).get("items", {})
+				if it is Dictionary:
+					for key_any in (it as Dictionary).keys():
+						var item_id := str(key_any)
+						if item_id.is_empty():
+							continue
+						var cnt := int((it as Dictionary).get(key_any, 0))
+						if cnt > 0:
+							items[item_id] = cnt
+	if has_node("/root/ItemDexModel") and not items.is_empty():
+		var ids: Array[String] = []
+		for key_any in items.keys():
+			var item_id := str(key_any).strip_edges()
+			if item_id.is_empty():
+				continue
+			if int(items.get(key_any, 0)) > 0:
+				ids.append(item_id)
+		ItemDexModel.unlock_many(ids, false)
 	EventBus.notify_inventory_updated()
 
 func _request_save() -> void:

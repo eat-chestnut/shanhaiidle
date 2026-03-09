@@ -79,6 +79,8 @@ func add_equip(template_id: String, source: String = "online") -> void:
 	if inst.is_empty():
 		return
 	bag.append(inst)
+	if has_node("/root/EquipDexModel"):
+		EquipDexModel.unlock(template_id, false)
 	if source == "online":
 		PerfTracker.record_equip_gain(template_id, 1)
 	EventBus.notify_inventory_updated()
@@ -1178,6 +1180,30 @@ func _load_save() -> void:
 		max_uid = maxi(max_uid, int(uid_k))
 	if next_uid <= max_uid:
 		next_uid = max_uid + 1
+
+	if has_node("/root/EquipDexModel"):
+		var template_ids: Array[String] = []
+		var seen: Dictionary = {}
+		for e_any in bag:
+			if not (e_any is Dictionary):
+				continue
+			var inst: Dictionary = e_any
+			var tpl_id := str(inst.get("template_id", "")).strip_edges()
+			if tpl_id.is_empty() or seen.has(tpl_id):
+				continue
+			seen[tpl_id] = true
+			template_ids.append(tpl_id)
+		for uid_any in equipped_store.keys():
+			var inst_any = equipped_store.get(uid_any, {})
+			if not (inst_any is Dictionary):
+				continue
+			var inst: Dictionary = inst_any
+			var tpl_id := str(inst.get("template_id", "")).strip_edges()
+			if tpl_id.is_empty() or seen.has(tpl_id):
+				continue
+			seen[tpl_id] = true
+			template_ids.append(tpl_id)
+		EquipDexModel.unlock_many(template_ids, false)
 
 	EventBus.notify_inventory_updated()
 

@@ -1,16 +1,16 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://ui/pages/PageMonsterDex.gd" id="1_u4kbx"]
+[ext_resource type="Script" path="res://ui/pages/PageItemDex.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="2_badge"]
 
-[node name="PageMonsterDex" type="Control"]
+[node name="PageItemDex" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_u4kbx")
+script = ExtResource("1_script")
 
 [node name="BG" type="ColorRect" parent="."]
 layout_mode = 1
@@ -55,13 +55,13 @@ text = "返回"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 34
-text = "怪物图鉴"
+text = "材料图鉴"
 vertical_alignment = 1
 
 [node name="Hint" type="Label" parent="RootVBox/Header/HeaderRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "遇到即解锁（奖励手动领取）"
+text = "获得后自动解锁，奖励手动领取"
 horizontal_alignment = 2
 vertical_alignment = 1
 
@@ -76,13 +76,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "怪物"
-disabled = true
 
 [node name="BtnTabItem" type="Button" parent="RootVBox/DexTabs"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "材料"
+disabled = true
 
 [node name="BtnTabEquip" type="Button" parent="RootVBox/DexTabs"]
 layout_mode = 2
@@ -90,12 +90,45 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "装备"
 
-[node name="MonsterScroll" type="ScrollContainer" parent="RootVBox"]
+[node name="FilterBar" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="TxtSearch" type="LineEdit" parent="RootVBox/FilterBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "搜索（名称/ID）"
+clear_button_enabled = true
+
+[node name="OptUnlock" type="OptionButton" parent="RootVBox/FilterBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+
+[node name="OptRarity" type="OptionButton" parent="RootVBox/FilterBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 0)
+
+[node name="OptType" type="OptionButton" parent="RootVBox/FilterBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 0)
+
+[node name="OptSort" type="OptionButton" parent="RootVBox/FilterBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+
+[node name="BtnClear" type="Button" parent="RootVBox/FilterBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(96, 0)
+text = "清除"
+
+[node name="ListScroll" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MonsterList" type="VBoxContainer" parent="RootVBox/MonsterScroll"]
+[node name="ListContainer" type="VBoxContainer" parent="RootVBox/ListScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
@@ -115,7 +148,7 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "怪物详情"
+text = "材料详情"
 vertical_alignment = 1
 
 [node name="DetailScroll" type="ScrollContainer" parent="RootVBox/DetailPanel/DetailVBox"]
@@ -188,7 +221,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "背包"
-disabled = true
 
 [node name="BtnNavDex" type="Button" parent="RootVBox/BottomNav"]
 layout_mode = 2
@@ -202,4 +234,3 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "地图"
-disabled = true
