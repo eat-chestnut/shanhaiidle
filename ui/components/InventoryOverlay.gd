@@ -533,6 +533,34 @@ func _set_detail_tip() -> void:
 		"点击装备栏槽位或下方装备查看详情"
 	)
 
+func _show_item_detail(row: Dictionary) -> void:
+	var item_id := str(row.get("id", "")).strip_edges()
+	var item_name := str(row.get("name", item_id)).strip_edges()
+	var rarity := str(row.get("rarity", "white")).strip_edges().to_lower()
+	var count := maxi(0, int(row.get("count", 0)))
+	var item_type := str(row.get("type", "item")).strip_edges()
+
+	var lines: Array[String] = []
+	lines.append(item_name if not item_name.is_empty() else "未命名物品")
+	if not item_id.is_empty():
+		lines.append("ID：%s" % item_id)
+	lines.append("稀有度：%s" % _rarity_name_cn(rarity))
+	if not item_type.is_empty():
+		lines.append("类型：%s" % item_type)
+	lines.append("数量：%d" % count)
+	lines.append("")
+	lines.append("获取途径")
+
+	var source_lines: Array[String] = []
+	if has_node("/root/SourceGuideService"):
+		source_lines = SourceGuideService.get_item_drop_lines(item_id, 8)
+	if source_lines.is_empty():
+		lines.append("暂无掉落来源")
+	else:
+		for line in source_lines:
+			lines.append("• %s" % line)
+	_detail_text.text = "\n".join(lines)
+
 func _refresh_tab_visual() -> void:
 	var active := Color(1.0, 1.0, 1.0, 1.0)
 	var inactive := Color(0.68, 0.68, 0.68, 1.0)
@@ -794,6 +822,10 @@ func _on_slot_clicked(index: int) -> void:
 			_gem_popup.call("open", row)
 		return
 
+	if _tab == "items":
+		_show_item_detail(row)
+		return
+
 	if _tab != "equip":
 		return
 
@@ -860,3 +892,16 @@ func _rarity_rank(r: String) -> int:
 			return 2
 		_:
 			return 1
+
+func _rarity_name_cn(rarity: String) -> String:
+	match rarity:
+		"blue":
+			return "蓝色"
+		"gold":
+			return "金色"
+		"purple":
+			return "紫色"
+		"orange":
+			return "橙色"
+		_:
+			return "白色"

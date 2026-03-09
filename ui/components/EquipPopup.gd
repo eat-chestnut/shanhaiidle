@@ -371,6 +371,8 @@ func _format_inst_detail(inst: Dictionary, slot_key: String) -> String:
 		lines.append("特效：")
 		for line in effect_lines:
 			lines.append("• %s" % line)
+
+	_append_equip_source_lines(lines, inst)
 	return "\n".join(lines)
 
 func _format_unidentified_detail(inst: Dictionary, resolved_slot: String) -> String:
@@ -392,6 +394,7 @@ func _format_unidentified_detail(inst: Dictionary, resolved_slot: String) -> Str
 	lines.append("套装：？？？")
 	lines.append("提示：鉴定后揭示主属性/特效/孔位/套装")
 	lines.append("鉴定费用：金币 %d" % cost)
+	_append_equip_source_lines(lines, inst)
 	return "\n".join(lines)
 
 func _format_delta_detail() -> String:
@@ -583,6 +586,30 @@ func _skill_name(skill_id: String) -> String:
 	if has_node("/root/SkillNameService"):
 		return SkillNameService.name(skill_id)
 	return skill_id
+
+func _append_equip_source_lines(lines: Array[String], inst: Dictionary) -> void:
+	lines.append("")
+	lines.append("推荐刷取")
+
+	if not has_node("/root/SourceGuideService"):
+		lines.append("暂无推荐刷取信息")
+		return
+
+	var source_lines: Array[String] = []
+	var template_id := str(inst.get("template_id", "")).strip_edges()
+	if not template_id.is_empty():
+		source_lines = SourceGuideService.get_equip_template_lines(template_id, 8)
+
+	if source_lines.is_empty():
+		var rarity := str(inst.get("rarity", "")).strip_edges().to_lower()
+		if not rarity.is_empty():
+			source_lines = SourceGuideService.get_equip_rarity_lines(rarity, 8)
+
+	if source_lines.is_empty():
+		lines.append("暂无推荐刷取信息")
+		return
+	for line in source_lines:
+		lines.append("• %s" % line)
 
 func _active_inst() -> Dictionary:
 	if _mode == "bag":
