@@ -11,6 +11,7 @@ var _equip_template_sources: Dictionary = {} # template_id -> Array[Dictionary]
 var _equip_template_source_keys: Dictionary = {} # template_id -> Dictionary
 var _equip_templates_by_rarity: Dictionary = {} # rarity -> Array[String]
 var _stage_order: Dictionary = {} # stage_id -> int
+var _stage_unlock_level: Dictionary = {} # stage_id -> unlock_min_level
 var _indexes_ready := false
 
 func _ready() -> void:
@@ -25,6 +26,7 @@ func rebuild_indexes() -> void:
 	_equip_template_source_keys.clear()
 	_equip_templates_by_rarity.clear()
 	_stage_order.clear()
+	_stage_unlock_level.clear()
 	_indexes_ready = false
 
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -51,6 +53,7 @@ func rebuild_indexes() -> void:
 			continue
 		var stage_name := _resolve_stage_name(stage)
 		_stage_order[stage_id] = stage_idx
+		_stage_unlock_level[stage_id] = maxi(1, int(stage.get("unlock_min_level", 1)))
 
 		var diffs := _resolve_difficulties(stage)
 		for diff_idx in range(diffs.size()):
@@ -137,6 +140,18 @@ func get_equip_rarity_lines(rarity: String, max_count: int = 8) -> Array[String]
 			break
 	return _build_lines_from_sources(rows, max_count, Callable(self, "_format_equip_source_line"))
 
+func get_monster_farm_targets(monster_id: String, max_count: int = 3) -> Array[Dictionary]:
+	var sources := get_monster_spawn_sources(monster_id)
+	return _build_farm_targets(sources, max_count, Callable(self, "_format_monster_source_line"))
+
+func get_item_farm_targets(item_id: String, max_count: int = 3) -> Array[Dictionary]:
+	var sources := get_item_drop_sources(item_id)
+	return _build_farm_targets(sources, max_count, Callable(self, "_format_item_source_line"))
+
+func get_equip_farm_targets(template_id: String, max_count: int = 3) -> Array[Dictionary]:
+	var sources := get_equip_template_sources(template_id)
+	return _build_farm_targets(sources, max_count, Callable(self, "_format_equip_source_line"))
+
 func _resolve_stage_name(stage_cfg: Dictionary) -> String:
 	var stage_name := str(stage_cfg.get("name", stage_cfg.get("id", ""))).strip_edges()
 	return stage_name if not stage_name.is_empty() else str(stage_cfg.get("id", ""))
@@ -181,6 +196,7 @@ func _collect_stage_monster_sources(stage_id: String, stage_name: String, diff_i
 				"difficulty_name": diff_name,
 				"role": role,
 				"role_name": _role_name(role),
+				"sort_stage_index": _stage_index(stage_id),
 			}
 			_add_monster_source(monster_id, source)
 
@@ -227,6 +243,7 @@ func _append_item_pool_sources(stage_id: String, stage_name: String, diff_index:
 				"difficulty_name": diff_name,
 				"rarity": rarity,
 				"source_type": "items_by_rarity",
+				"sort_stage_index": _stage_index(stage_id),
 			}
 			_add_item_source(item_id, source)
 
@@ -314,6 +331,7 @@ func _append_equip_template_sources(stage_id: String, stage_name: String, diff_i
 			"difficulty_index": diff_index,
 			"difficulty_name": diff_name,
 			"rarity": rarity,
+			"sort_stage_index": _stage_index(stage_id),
 		}
 
 		var explicit_pool := _as_clean_string_array(pool.get(rarity, []))
@@ -611,6 +629,67 @@ func _build_lines_from_sources(sources: Array[Dictionary], max_count: int, forma
 		if out.size() >= cap:
 			break
 	return out
+
+func _build_farm_targets(sources: Array[Dictionary], max_count: int, formatter: Callable) -> Array[Dictionary]:
+	if sources.is_empty():
+		return []
+	var cap := maxi(0, max_count)
+	if cap <= 0:
+		return []
+
+	var unlocked_rows: Array[Dictionary] = []
+	var locked_rows: Array[Dictionary] = []
+	var seen: Dictionary = {}
+
+	for source in sources:
+		if not (source is Dictionary):
+			continue
+		var src: Dictionary = source
+		var stage_id := str(src.get("stage_id", "")).strip_edges()
+		var diff_index := maxi(0, int(src.get("difficulty_index", 0)))
+		var line := str(formatter.call(src)).strip_edges()
+		if stage_id.is_empty() or line.is_empty():
+			continue
+		var dedup_key := "%s|%d|%s|%s|%s" % [
+			stage_id,
+			diff_index,
+			str(src.get("role", "")),
+			str(src.get("rarity", "")),
+			str(src.get("source_type", "")),
+		]
+		if seen.has(dedup_key):
+			continue
+		seen[dedup_key] = true
+
+		var unlocked := _is_stage_diff_unlocked(stage_id, diff_index)
+		var row := src.duplicate(true)
+		row["unlocked"] = unlocked
+		row["summary_line"] = line
+		row["sort_stage_index"] = int(row.get("sort_stage_index", _stage_index(stage_id)))
+		if unlocked:
+			unlocked_rows.append(row)
+		else:
+			locked_rows.append(row)
+
+	var out: Array[Dictionary] = []
+	for row in unlocked_rows:
+		out.append(row)
+		if out.size() >= cap:
+			return out
+	for row in locked_rows:
+		out.append(row)
+		if out.size() >= cap:
+			return out
+	return out
+
+func _is_stage_diff_unlocked(stage_id: String, diff_index: int) -> bool:
+	var sid := stage_id.strip_edges()
+	if sid.is_empty():
+		return false
+	var need_level := maxi(1, int(_stage_unlock_level.get(sid, 1)))
+	if ProgressModel.level < need_level:
+		return false
+	return MapProgressModel.get_unlocked_diff(sid) >= maxi(0, diff_index)
 
 func _copy_source_array(raw_any: Variant) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []

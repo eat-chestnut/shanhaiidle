@@ -6,23 +6,25 @@ const PUNCH_ITEM_ID := "打孔石"
 @onready var _dim_bg: ColorRect = $DimBG
 @onready var _lbl_title: Label = $Panel/VBox/TopBar/LblTitle
 @onready var _btn_close: Button = $Panel/VBox/TopBar/BtnClose
-@onready var _left_title: Label = $Panel/VBox/CompareRow/LeftBox/LeftTitle
-@onready var _left_detail: RichTextLabel = $Panel/VBox/CompareRow/LeftBox/LeftDetail
-@onready var _right_title: Label = $Panel/VBox/CompareRow/RightBox/RightTitle
-@onready var _right_detail: RichTextLabel = $Panel/VBox/CompareRow/RightBox/RightDetail
-@onready var _delta_detail: RichTextLabel = $Panel/VBox/DeltaDetail
+@onready var _left_title: Label = $Panel/VBox/CompareScroll/CompareContent/CompareRow/LeftBox/LeftTitle
+@onready var _left_detail: RichTextLabel = $Panel/VBox/CompareScroll/CompareContent/CompareRow/LeftBox/LeftDetail
+@onready var _right_title: Label = $Panel/VBox/CompareScroll/CompareContent/CompareRow/RightBox/RightTitle
+@onready var _right_detail: RichTextLabel = $Panel/VBox/CompareScroll/CompareContent/CompareRow/RightBox/RightDetail
+@onready var _delta_detail: RichTextLabel = $Panel/VBox/CompareScroll/CompareContent/DeltaDetail
 @onready var _btn_identify: Button = $Panel/VBox/ActionBar/BtnIdentify
 @onready var _btn_lock: Button = $Panel/VBox/ActionBar/BtnLock
 @onready var _btn_salvage: Button = $Panel/VBox/ActionBar/BtnSalvage
 @onready var _btn_equip: Button = $Panel/VBox/ActionBar/BtnEquip
 @onready var _btn_unequip: Button = $Panel/VBox/ActionBar/BtnUnequip
 @onready var _btn_upgrade: Button = $Panel/VBox/ActionBar/BtnUpgrade
+@onready var _btn_gem: Button = $Panel/VBox/ActionBar/BtnGem
 @onready var _btn_punch: Button = $Panel/VBox/ActionBar/BtnPunch
 @onready var _btn_cancel: Button = $Panel/VBox/ActionBar/BtnCancel
 @onready var _lbl_upgrade_hint: Label = $Panel/VBox/LblUpgradeHint
 @onready var _dlg_salvage: ConfirmationDialog = $ConfirmSalvage
-@onready var _dlg_refine: ConfirmationDialog = $ConfirmRefine
 @onready var _gem_select_popup: Node = $"../GemSelectPopup"
+@onready var _equip_gem_popup: Node = $"../EquipGemPopup"
+@onready var _star_popup: Node = $"../StarUpPopup"
 
 var _mode := ""
 var _uid := 0
@@ -30,7 +32,6 @@ var _target_slot := ""
 var _candidate: Dictionary = {}
 var _current: Dictionary = {}
 var _last_new_effect: Dictionary = {}
-var _socket_btns: Array[Button] = []
 var _punch_ready_style: StyleBoxFlat
 
 func _ready() -> void:
@@ -46,7 +47,8 @@ func _ready() -> void:
 	_btn_salvage.text = I18nService.t("ui.btn.salvage", "分解")
 	_btn_equip.text = I18nService.t("ui.btn.equip")
 	_btn_unequip.text = I18nService.t("ui.btn.unequip")
-	_btn_upgrade.text = "进阶"
+	_btn_upgrade.text = "升星"
+	_btn_gem.text = I18nService.t("ui.tab.gem", "宝石")
 	_btn_punch.text = I18nService.t("ui.btn.punch", "打孔")
 	_btn_cancel.text = I18nService.t("ui.btn.cancel")
 	_build_punch_style()
@@ -67,26 +69,16 @@ func _ready() -> void:
 		_btn_unequip.pressed.connect(_on_btn_unequip_pressed)
 	if not _btn_upgrade.pressed.is_connected(_on_btn_upgrade_pressed):
 		_btn_upgrade.pressed.connect(_on_btn_upgrade_pressed)
+	if not _btn_gem.pressed.is_connected(_on_btn_gem_pressed):
+		_btn_gem.pressed.connect(_on_btn_gem_pressed)
 	if not _btn_punch.pressed.is_connected(_on_btn_punch_pressed):
 		_btn_punch.pressed.connect(_on_btn_punch_pressed)
 	if not _dim_bg.gui_input.is_connected(_on_dim_bg_gui_input):
 		_dim_bg.gui_input.connect(_on_dim_bg_gui_input)
 	if not _dlg_salvage.confirmed.is_connected(_on_salvage_confirmed):
 		_dlg_salvage.confirmed.connect(_on_salvage_confirmed)
-	if not _dlg_refine.confirmed.is_connected(_on_refine_confirmed):
-		_dlg_refine.confirmed.connect(_on_refine_confirmed)
 	if not EventBus.inventory_updated.is_connected(_on_inventory_updated):
 		EventBus.inventory_updated.connect(_on_inventory_updated)
-
-	_socket_btns.clear()
-	for i in range(MAX_SOCKET_BTNS):
-		var btn_any = get_node_or_null("Panel/VBox/SocketRow/SocketBtn%d" % i)
-		if not (btn_any is Button):
-			continue
-		var btn: Button = btn_any
-		if not btn.pressed.is_connected(_on_socket_btn_pressed.bind(i)):
-			btn.pressed.connect(_on_socket_btn_pressed.bind(i))
-		_socket_btns.append(btn)
 
 func open_for_bag(uid: int) -> void:
 	_last_new_effect = {}
@@ -125,6 +117,10 @@ func close() -> void:
 	_candidate = {}
 	_current = {}
 	_last_new_effect = {}
+	if _equip_gem_popup != null and _equip_gem_popup.has_method("close"):
+		_equip_gem_popup.call("close")
+	if _star_popup != null and _star_popup.has_method("close"):
+		_star_popup.call("close")
 
 func _refresh_ui() -> void:
 	if _mode == "bag":
@@ -195,8 +191,8 @@ func _refresh_ui() -> void:
 		_btn_unequip.disabled = true
 
 	_refresh_lock_button()
-	_refresh_socket_buttons()
 	_refresh_upgrade_button()
+	_refresh_gem_and_punch_buttons()
 
 func _refresh_lock_button() -> void:
 	var uid := _active_uid()
@@ -210,68 +206,70 @@ func _refresh_lock_button() -> void:
 	_btn_lock.disabled = false
 	_btn_lock.text = I18nService.t("ui.btn.unlock", "解锁") if locked else I18nService.t("ui.btn.lock", "锁定")
 
-func _refresh_socket_buttons() -> void:
+func _refresh_gem_and_punch_buttons() -> void:
 	var inst := _active_inst()
 	if inst.is_empty():
-		for btn in _socket_btns:
-			btn.text = "×"
-			btn.disabled = true
+		_btn_gem.disabled = true
+		_btn_gem.visible = false
 		_refresh_punch_button(0, 0)
 		return
+	_btn_gem.visible = true
+	_btn_gem.disabled = false
 	if _mode == "bag" and not EquipmentModel.is_identified(inst):
-		for btn in _socket_btns:
-			btn.text = "？"
-			btn.disabled = true
+		_btn_gem.disabled = true
 		_refresh_punch_button(0, 0)
 		return
 	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKET_BTNS)
-	var socket_gems := _normalize_socket_gems(inst.get("socket_gems", []), sockets)
-	for i in range(_socket_btns.size()):
-		var btn := _socket_btns[i]
-		if i >= sockets:
-			btn.text = "×"
-			btn.disabled = true
-			continue
-		var gem_id := socket_gems[i]
-		btn.text = "○" if gem_id.is_empty() else gem_id
-		btn.disabled = false
 	_refresh_punch_button(sockets, int(inst.get("uid", 0)))
 
 func _refresh_upgrade_button() -> void:
 	var uid := _active_uid()
 	if uid <= 0:
 		_btn_upgrade.disabled = true
-		_btn_upgrade.text = "进阶"
+		_btn_upgrade.text = "升星"
 		_set_upgrade_hint("", Color(0.75, 0.75, 0.75, 1.0))
 		return
 	var inst := _active_inst()
 	if inst.is_empty():
 		_btn_upgrade.disabled = true
-		_btn_upgrade.text = "进阶"
+		_btn_upgrade.text = "升星"
 		_set_upgrade_hint("", Color(0.75, 0.75, 0.75, 1.0))
 		return
-	var refine_lv := clampi(int(inst.get("refine_lv", 0)), 0, EquipmentModel.REFINE_MAX)
-	if refine_lv >= EquipmentModel.REFINE_MAX:
+	var info: Dictionary = EquipmentModel.can_star_up(uid)
+	var current_star := int(info.get("current_star", 0))
+	var target_star := int(info.get("target_star", current_star))
+	var star_max := int(info.get("star_max", 10))
+	if current_star >= star_max:
 		_btn_upgrade.disabled = true
-		_btn_upgrade.text = "已满级（+%d）" % EquipmentModel.REFINE_MAX
+		_btn_upgrade.text = "已满星（+%d）" % star_max
 		_set_upgrade_hint("", Color(0.75, 0.75, 0.75, 1.0))
 		return
-	var rarity := str(inst.get("rarity", "white"))
-	var cost := EquipmentModel.get_refine_cost(rarity)
-	var items_text := _format_cost_text(cost.get("items", {}))
-	if items_text == "—":
-		_btn_upgrade.text = "进阶（消耗：金币%d）" % int(cost.get("gold", 0))
-	else:
-		_btn_upgrade.text = "进阶（消耗：金币%d，%s）" % [int(cost.get("gold", 0)), items_text]
+	var gold_need := maxi(0, int(info.get("required_gold", 0)))
+	var selected_any = info.get("selected_option", {})
+	var selected: Dictionary = selected_any if selected_any is Dictionary else {}
+	var item_id := str(selected.get("item_id", "")).strip_edges()
+	var item_cnt := maxi(0, int(selected.get("count", 0)))
+	var item_text := "—"
+	if not item_id.is_empty() and item_cnt > 0:
+		item_text = "%sx%d" % [item_id, item_cnt]
+	_btn_upgrade.text = "升星 +%d→+%d（金币%d，%s）" % [current_star, target_star, gold_need, item_text]
 
-	var gold_need := maxi(0, int(cost.get("gold", 0)))
-	var gold_ok := PlayerModel.can_spend_gold(gold_need)
-	var item_ok := _has_enough_cost_items(cost.get("items", {}))
-	_btn_upgrade.disabled = not (gold_ok and item_ok)
-	if gold_ok and item_ok:
-		_set_upgrade_hint("材料齐全", Color(0.75, 0.75, 0.75, 1.0))
+	_btn_upgrade.disabled = not bool(info.get("can_star_up", false))
+	if not _btn_upgrade.disabled:
+		_set_upgrade_hint("升星 100% 成功", Color(0.75, 0.85, 0.95, 1.0))
 		return
-	_refresh_refine_missing_hint(cost)
+	var reason := str(info.get("reason", "")).strip_edges()
+	match reason:
+		"no_gold":
+			_set_upgrade_hint("金币不足", Color(1.0, 0.55, 0.55, 1.0))
+		"no_material":
+			_set_upgrade_hint("升星材料不足", Color(1.0, 0.55, 0.55, 1.0))
+		"no_rule":
+			_set_upgrade_hint("未配置升星规则", Color(1.0, 0.55, 0.55, 1.0))
+		"no_material_option":
+			_set_upgrade_hint("未配置升星材料", Color(1.0, 0.55, 0.55, 1.0))
+		_:
+			_set_upgrade_hint("当前不可升星", Color(1.0, 0.55, 0.55, 1.0))
 
 func _refresh_punch_button(sockets: int, active_uid: int) -> void:
 	var stone_count: int = InventoryModel.get_count(PUNCH_ITEM_ID)
@@ -328,28 +326,24 @@ func _format_inst_detail(inst: Dictionary, slot_key: String) -> String:
 	var rarity := str(inst.get("rarity", "white"))
 	var rarity_text := I18nService.t("rarity.%s" % rarity, rarity)
 	var slot_text := I18nService.t("slot.%s" % resolved_slot, resolved_slot)
-	var main_stat := _normalize_stat_key(str(inst.get("main_stat", "")))
-	var tier := clampi(int(inst.get("tier", 0)), 0, 2)
-	var refine_lv := clampi(int(inst.get("refine_lv", 0)), 0, EquipmentModel.REFINE_MAX)
-	var effective_main_val := EquipmentModel.get_effective_main_val(inst)
-	var main_min := int(inst.get("main_min", effective_main_val))
-	var main_max := int(inst.get("main_max", effective_main_val))
+	var star_lv := EquipmentModel.get_star_level(inst)
+	var star_max := EquipmentModel.get_instance_star_max(inst)
 	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKET_BTNS)
 	var socket_gems := _normalize_socket_gems(inst.get("socket_gems", []), sockets)
 	var gem_filled := _count_filled_sockets(socket_gems)
+	var template_stats := EquipmentModel.get_instance_template_stats(inst)
 
 	lines.append("[b]%s[/b]" % name)
 	lines.append("稀有度：%s" % rarity_text)
 	lines.append("槽位：%s" % slot_text)
-	lines.append("阶位：%s" % _tier_name(tier))
-	lines.append("进阶：+%d/%d" % [refine_lv, EquipmentModel.REFINE_MAX])
+	lines.append("星级：+%d/%d" % [star_lv, star_max])
 	lines.append("评分：%d" % EquipmentModel.calc_score(inst))
-	if not main_stat.is_empty() and effective_main_val != 0:
-		var stat_text := _stat_value_text(main_stat, effective_main_val)
-		if main_min != main_max:
-			lines.append("主属性：%s（区间 %d~%d）" % [stat_text, main_min, main_max])
-		else:
-			lines.append("主属性：%s" % stat_text)
+	if not template_stats.is_empty():
+		lines.append("属性：")
+		for row in _format_stat_lines(template_stats):
+			lines.append("• %s" % row)
+	else:
+		lines.append("属性：无")
 	lines.append("宝石孔：%d/4，镶嵌 %d" % [sockets, gem_filled])
 	lines.append("孔位：%s" % _socket_summary_text(inst))
 	var set_id := str(inst.get("set_id", "")).strip_edges()
@@ -383,10 +377,11 @@ func _format_unidentified_detail(inst: Dictionary, resolved_slot: String) -> Str
 	var rarity := str(inst.get("rarity", "white"))
 	var rarity_text := I18nService.t("rarity.%s" % rarity, rarity)
 	var cost := EquipmentModel.get_identify_cost_by_rarity(rarity)
-	var refine_lv := clampi(int(inst.get("refine_lv", 0)), 0, EquipmentModel.REFINE_MAX)
+	var star_lv := EquipmentModel.get_star_level(inst)
+	var star_max := EquipmentModel.get_instance_star_max(inst)
 	lines.append("[b]未鉴定%s[/b]" % slot_text)
 	lines.append("稀有度：%s" % rarity_text)
-	lines.append("进阶：+%d/%d" % [refine_lv, EquipmentModel.REFINE_MAX])
+	lines.append("星级：+%d/%d" % [star_lv, star_max])
 	lines.append("评分：？？")
 	lines.append("主属性：？？？")
 	lines.append("特效：？？？")
@@ -501,10 +496,12 @@ func _calc_instance_stat_contrib(inst: Dictionary) -> Dictionary:
 	if inst.is_empty():
 		return totals
 
-	var main_stat := _normalize_stat_key(str(inst.get("main_stat", "")))
-	var main_val := EquipmentModel.get_effective_main_val(inst)
-	if totals.has(main_stat):
-		totals[main_stat] = int(totals.get(main_stat, 0)) + main_val
+	var template_stats := EquipmentModel.get_instance_template_stats(inst)
+	for stat_any in template_stats.keys():
+		var stat := _normalize_stat_key(str(stat_any))
+		var val := int(template_stats.get(stat_any, 0))
+		if totals.has(stat):
+			totals[stat] = int(totals.get(stat, 0)) + val
 
 	for effect in EquipmentModel.get_all_effects(inst):
 		if str(effect.get("type", "")) != "stat":
@@ -641,6 +638,26 @@ func _stat_value_text(stat: String, val: int) -> String:
 	var is_percent := stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT"
 	return "%s +%d%s" % [_stat_label(stat), val, "%" if is_percent else ""]
 
+func _format_stat_lines(stats: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	var ordered := ["HP", "ATK", "DEF", "CRIT_PERCENT", "LOOT_BONUS_PERCENT", "QI"]
+	for stat in ordered:
+		if not stats.has(stat):
+			continue
+		var val := int(stats.get(stat, 0))
+		if val == 0:
+			continue
+		out.append(_stat_value_text(stat, val))
+	for key_any in stats.keys():
+		var stat := str(key_any)
+		if ordered.find(stat) != -1:
+			continue
+		var val := int(stats.get(key_any, 0))
+		if val == 0:
+			continue
+		out.append(_stat_value_text(stat, val))
+	return out
+
 func _stat_label(stat: String) -> String:
 	return I18nService.stat(stat)
 
@@ -748,77 +765,25 @@ func _on_btn_punch_pressed() -> void:
 	if EquipmentModel.add_socket(uid):
 		_reload_instance_and_refresh()
 
-func _on_btn_upgrade_pressed() -> void:
-	var uid := _active_uid()
-	if uid <= 0:
-		return
-	var inst := _active_inst()
-	if inst.is_empty():
-		return
-	var refine_lv := clampi(int(inst.get("refine_lv", 0)), 0, EquipmentModel.REFINE_MAX)
-	if refine_lv >= EquipmentModel.REFINE_MAX:
-		EventBus.add_log("已满级")
-		return
-	var rarity := str(inst.get("rarity", "white"))
-	var cost := EquipmentModel.get_refine_cost(rarity)
-	_dlg_refine.title = "装备进阶"
-	_dlg_refine.dialog_text = _build_refine_confirm_text(refine_lv, cost)
-	_dlg_refine.popup_centered()
-
-func _on_refine_confirmed() -> void:
-	var uid := _active_uid()
-	if uid <= 0:
-		return
-	var ret: Dictionary = EquipmentModel.refine(uid)
-	if bool(ret.get("ok", false)):
-		var lv := int(ret.get("lv", 0))
-		var cost_any = ret.get("cost", {})
-		var cost: Dictionary = cost_any if cost_any is Dictionary else {"gold": 0, "items": {}}
-		var line := "进阶成功：+%d（金币-%d" % [lv, int(cost.get("gold", 0))]
-		var item_text := _format_cost_text(cost.get("items", {}))
-		if item_text != "—":
-			line += "，%s" % item_text
-		line += "）"
-		var new_effect_any = ret.get("new_effect", {})
-		if new_effect_any is Dictionary and not (new_effect_any as Dictionary).is_empty():
-			line += " 新增词条：%s" % _format_effect_cn(new_effect_any)
-			_last_new_effect = (new_effect_any as Dictionary).duplicate(true)
-		else:
-			_last_new_effect = {}
-		EventBus.add_log(line)
-		_reload_instance_and_refresh()
-		return
-	var reason := str(ret.get("reason", ""))
-	match reason:
-		"max":
-			EventBus.add_log("已满级")
-		"no_gold":
-			var cost_any = ret.get("cost", {})
-			var cost: Dictionary = cost_any if cost_any is Dictionary else {"gold": 0}
-			EventBus.add_log("金币不足：需要%d" % int(cost.get("gold", 0)))
-		"no_items":
-			EventBus.add_log("材料不足")
-		_:
-			EventBus.add_log("进阶失败")
-
-func _on_socket_btn_pressed(socket_idx: int) -> void:
+func _on_btn_gem_pressed() -> void:
 	var inst := _active_inst()
 	if inst.is_empty():
 		return
 	var uid := int(inst.get("uid", 0))
 	if uid <= 0:
 		return
-	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKET_BTNS)
-	if socket_idx < 0 or socket_idx >= sockets:
+	if _mode == "bag" and not EquipmentModel.is_identified(inst):
+		EventBus.add_log("请先鉴定装备")
 		return
-	var socket_gems := _normalize_socket_gems(inst.get("socket_gems", []), sockets)
-	var gem_id := socket_gems[socket_idx]
-	if gem_id.is_empty():
-		if _gem_select_popup != null and _gem_select_popup.has_method("open_for_equip_socket"):
-			_gem_select_popup.call("open_for_equip_socket", uid, socket_idx)
+	if _equip_gem_popup != null and _equip_gem_popup.has_method("open_for_equip"):
+		_equip_gem_popup.call("open_for_equip", uid)
+
+func _on_btn_upgrade_pressed() -> void:
+	var uid := _active_uid()
+	if uid <= 0:
 		return
-	if EquipmentModel.remove_socket_gem(uid, socket_idx):
-		_reload_instance_and_refresh()
+	if _star_popup != null and _star_popup.has_method("open_for_equip"):
+		_star_popup.call("open_for_equip", uid)
 
 func _on_inventory_updated() -> void:
 	if visible:
@@ -862,16 +827,6 @@ func _build_salvage_preview_text() -> String:
 	var reward := EquipmentModel.get_salvage_reward_by_rarity(rarity)
 	return "确定分解该装备？\n将获得：%s" % _format_salvage_gain(reward)
 
-func _build_refine_confirm_text(cur_lv: int, cost: Dictionary) -> String:
-	var next_lv := mini(cur_lv + 1, EquipmentModel.REFINE_MAX)
-	var parts: Array[String] = []
-	var gold := maxi(0, int(cost.get("gold", 0)))
-	parts.append("金币%d" % gold)
-	var items_text := _format_cost_text(cost.get("items", {}))
-	if items_text != "—":
-		parts.append(items_text)
-	return "进阶到 +%d 将消耗：%s\n是否确认？" % [next_lv, "，".join(parts)]
-
 func _format_salvage_gain(reward: Dictionary) -> String:
 	var parts: Array[String] = []
 	var gold := maxi(0, int(reward.get("gold", 0)))
@@ -907,22 +862,6 @@ func _format_effect_cn(e: Dictionary) -> String:
 		return "%s+%d级" % [skill_name, val]
 	return "未知词条"
 
-func _format_cost_text(cost_any: Variant) -> String:
-	if not (cost_any is Dictionary):
-		return "—"
-	var cost: Dictionary = cost_any
-	var parts: Array[String] = []
-	for key_any in cost.keys():
-		var item_id := str(key_any)
-		var cnt := int(cost.get(key_any, 0))
-		if item_id.is_empty() or cnt <= 0:
-			continue
-		parts.append("%sx%d" % [item_id, cnt])
-	if parts.is_empty():
-		return "—"
-	parts.sort()
-	return " ".join(parts)
-
 func _tier_name(tier: int) -> String:
 	var cfg: Dictionary = ConfigService.get_cfg()
 	var upgrade_db_any = cfg.get("upgrade_db", {})
@@ -939,144 +878,6 @@ func _tier_name(tier: int) -> String:
 			return "玄"
 		_:
 			return "凡"
-
-func _refresh_refine_missing_hint(cost: Dictionary) -> void:
-	var missing: Dictionary = {}
-	var items_any = cost.get("items", {})
-	if items_any is Dictionary:
-		for key_any in (items_any as Dictionary).keys():
-			var mat_id := str(key_any)
-			var need := int((items_any as Dictionary).get(key_any, 0))
-			if mat_id.is_empty() or need <= 0:
-				continue
-			var have: int = InventoryModel.get_count(mat_id)
-			if have < need:
-				missing[mat_id] = need - have
-
-	var need_gold := maxi(0, int(cost.get("gold", 0)))
-	var lack_gold := maxi(0, need_gold - PlayerModel.gold)
-	if missing.is_empty() and lack_gold <= 0:
-		_set_upgrade_hint("材料齐全", Color(0.75, 0.75, 0.75, 1.0))
-		return
-
-	var parts: Array[String] = []
-	if lack_gold > 0:
-		parts.append("金币x%d" % lack_gold)
-	for mat_any in missing.keys():
-		var mat_id := str(mat_any)
-		parts.append("%sx%d" % [mat_id, int(missing.get(mat_id, 0))])
-	parts.sort()
-	var hint := "缺：%s" % " ".join(parts)
-
-	var recommendations := _recommend_stages_for_materials(missing)
-	if not recommendations.is_empty():
-		hint += "\n推荐地图：%s" % " / ".join(recommendations)
-	_set_upgrade_hint(hint, Color(1.0, 0.55, 0.55, 1.0))
-
-func _has_enough_cost_items(cost_any: Variant) -> bool:
-	if not (cost_any is Dictionary):
-		return true
-	var cost: Dictionary = cost_any
-	for key_any in cost.keys():
-		var mat_id := str(key_any)
-		var need := int(cost.get(key_any, 0))
-		if mat_id.is_empty() or need <= 0:
-			continue
-		var have: int = InventoryModel.get_count(mat_id)
-		if have < need:
-			return false
-	return true
-
-func _recommend_stages_for_materials(missing: Dictionary) -> Array[String]:
-	var out: Array[String] = []
-	if missing.is_empty():
-		return out
-
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("stages_db", {})
-	if not (db_any is Dictionary):
-		return out
-	var stages_any = (db_any as Dictionary).get("stages", [])
-	if not (stages_any is Array):
-		return out
-
-	var scored: Array[Dictionary] = []
-	for stage_any in stages_any:
-		if not (stage_any is Dictionary):
-			continue
-		var stage: Dictionary = stage_any
-		var stage_name := str(stage.get("name", ""))
-		if stage_name.is_empty():
-			continue
-		var score := 0
-		var items_by_rarity := _stage_items_by_rarity(stage)
-		for mat_any in missing.keys():
-			var mat_id := str(mat_any)
-			if mat_id.is_empty():
-				continue
-			if _stage_has_material(items_by_rarity, mat_id):
-				score += 10
-		scored.append({
-			"name": stage_name,
-			"score": score,
-		})
-
-	scored.sort_custom(_sort_stage_score_desc)
-	for row_any in scored:
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		var score := int(row.get("score", 0))
-		if score <= 0:
-			continue
-		out.append(str(row.get("name", "")))
-		if out.size() >= 2:
-			break
-	return out
-
-func _stage_items_by_rarity(stage: Dictionary) -> Dictionary:
-	var out := {
-		"white": [],
-		"blue": [],
-		"gold": [],
-	}
-	var patch_any = stage.get("drops_patch", {})
-	if not (patch_any is Dictionary):
-		return out
-	var patch: Dictionary = patch_any
-	var items_any = patch.get("items_by_rarity", patch.get("items", {}))
-	if not (items_any is Dictionary):
-		return out
-	var items_dict: Dictionary = items_any
-	for rarity in ["white", "blue", "gold"]:
-		var list_any = items_dict.get(rarity, [])
-		if not (list_any is Array):
-			continue
-		var names: Array[String] = []
-		for item_any in list_any:
-			var item_id := str(item_any)
-			if item_id.is_empty():
-				continue
-			names.append(item_id)
-		out[rarity] = names
-	return out
-
-func _stage_has_material(items_by_rarity: Dictionary, material_id: String) -> bool:
-	for rarity in ["white", "blue", "gold"]:
-		var list_any = items_by_rarity.get(rarity, [])
-		if not (list_any is Array):
-			continue
-		for item_any in (list_any as Array):
-			if str(item_any) == material_id:
-				return true
-	return false
-
-func _sort_stage_score_desc(a: Dictionary, b: Dictionary) -> bool:
-	var sa := int(a.get("score", 0))
-	var sb := int(b.get("score", 0))
-	if sa != sb:
-		return sa > sb
-	return str(a.get("name", "")) < str(b.get("name", ""))
 
 func _set_upgrade_hint(text: String, color: Color) -> void:
 	_lbl_upgrade_hint.text = text

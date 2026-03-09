@@ -18,6 +18,7 @@ const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
 @onready var _detail_title: Label = $RootVBox/DetailPanel/DetailVBox/DetailTitle
 @onready var _detail_text: RichTextLabel = $RootVBox/DetailPanel/DetailVBox/DetailScroll/DetailText
 @onready var _btn_claim: Button = $RootVBox/DetailPanel/DetailVBox/BtnClaim
+@onready var _btn_farm: Button = $RootVBox/DetailPanel/DetailVBox/BtnFarm
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
 @onready var _btn_nav_skills: Button = $RootVBox/BottomNav/BtnNavSkills
 @onready var _btn_nav_battle: Button = $RootVBox/BottomNav/BtnNavBattle
@@ -29,6 +30,7 @@ const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
 
 var _monsters: Array[Dictionary] = []
 var _selected_idx := -1
+var _selected_farm_targets: Array[Dictionary] = []
 
 func _ready() -> void:
 	_apply_i18n()
@@ -52,6 +54,8 @@ func _apply_i18n() -> void:
 	_btn_tab_monster.disabled = true
 	_detail_title.text = "怪物详情"
 	_btn_claim.text = "未解锁不可领取"
+	_btn_farm.text = "前往刷图"
+	_btn_farm.disabled = true
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
 	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
@@ -86,6 +90,8 @@ func _connect_signals() -> void:
 		_btn_nav_map.pressed.connect(_on_nav_map_pressed)
 	if not _btn_claim.pressed.is_connected(_on_claim_pressed):
 		_btn_claim.pressed.connect(_on_claim_pressed)
+	if not _btn_farm.pressed.is_connected(_on_farm_pressed):
+		_btn_farm.pressed.connect(_on_farm_pressed)
 
 func _load_monsters() -> void:
 	_monsters.clear()
@@ -249,6 +255,8 @@ func _refresh_detail() -> void:
 		_btn_claim.disabled = true
 		_btn_claim.text = "未解锁不可领取"
 		_btn_claim.visible = true
+		_selected_farm_targets.clear()
+		_btn_farm.disabled = true
 		return
 	var m: Dictionary = _monsters[_selected_idx]
 	var monster_id := str(m.get("id", ""))
@@ -284,6 +292,23 @@ func _refresh_detail() -> void:
 			lines.append("- %s" % scenes[i])
 		if scenes.size() > max_show:
 			lines.append("...（共%d处）" % scenes.size())
+
+	lines.append("")
+	lines.append("推荐刷图")
+	_selected_farm_targets = SourceGuideService.get_monster_farm_targets(monster_id, 3)
+	if _selected_farm_targets.is_empty():
+		lines.append("暂无推荐刷图信息")
+		_btn_farm.disabled = true
+	else:
+		for row_any in _selected_farm_targets:
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var summary := str(row.get("summary_line", "")).strip_edges()
+			if summary.is_empty():
+				continue
+			lines.append("- %s" % summary)
+		_btn_farm.disabled = false
 	_detail_text.text = "\n".join(lines)
 
 	if MonsterDexModel.can_claim(monster_id):
@@ -298,6 +323,21 @@ func _refresh_detail() -> void:
 		_btn_claim.visible = true
 		_btn_claim.disabled = true
 		_btn_claim.text = "未解锁不可领取"
+
+func _on_farm_pressed() -> void:
+	if _selected_farm_targets.is_empty():
+		return
+	var row_any = _selected_farm_targets[0]
+	if not (row_any is Dictionary):
+		return
+	var row: Dictionary = row_any
+	var stage_id := str(row.get("stage_id", "")).strip_edges()
+	if stage_id.is_empty():
+		return
+	var diff_index := int(row.get("difficulty_index", -1))
+	if has_node("/root/MapNavTargetModel"):
+		MapNavTargetModel.set_target(stage_id, diff_index, "monster_dex")
+	get_tree().change_scene_to_file(PAGE_MAP)
 
 func _on_select_pressed(idx: int) -> void:
 	_select_monster(idx)

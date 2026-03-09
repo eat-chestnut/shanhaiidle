@@ -30,9 +30,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -260.0
-offset_top = -260.0
+offset_top = -420.0
 offset_right = 260.0
-offset_bottom = 260.0
+offset_bottom = 420.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
@@ -60,88 +60,67 @@ custom_minimum_size = Vector2(72, 40)
 layout_mode = 2
 text = "关闭"
 
-[node name="CompareRow" type="HBoxContainer" parent="Panel/VBox"]
+[node name="CompareScroll" type="ScrollContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-custom_minimum_size = Vector2(0, 240)
+custom_minimum_size = Vector2(0, 260)
+horizontal_scroll_mode = 0
+
+[node name="CompareContent" type="VBoxContainer" parent="Panel/VBox/CompareScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="LeftBox" type="VBoxContainer" parent="Panel/VBox/CompareRow"]
+[node name="CompareRow" type="HBoxContainer" parent="Panel/VBox/CompareScroll/CompareContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="LeftBox" type="VBoxContainer" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 6
 
-[node name="LeftTitle" type="Label" parent="Panel/VBox/CompareRow/LeftBox"]
+[node name="LeftTitle" type="Label" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow/LeftBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "待装备"
 
-[node name="LeftDetail" type="RichTextLabel" parent="Panel/VBox/CompareRow/LeftBox"]
+[node name="LeftDetail" type="RichTextLabel" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow/LeftBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-fit_content = false
-scroll_active = true
+fit_content = true
+scroll_active = false
 text = "—"
 
-[node name="RightBox" type="VBoxContainer" parent="Panel/VBox/CompareRow"]
+[node name="RightBox" type="VBoxContainer" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 6
 
-[node name="RightTitle" type="Label" parent="Panel/VBox/CompareRow/RightBox"]
+[node name="RightTitle" type="Label" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow/RightBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "当前装备"
 
-[node name="RightDetail" type="RichTextLabel" parent="Panel/VBox/CompareRow/RightBox"]
+[node name="RightDetail" type="RichTextLabel" parent="Panel/VBox/CompareScroll/CompareContent/CompareRow/RightBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-fit_content = false
-scroll_active = true
+fit_content = true
+scroll_active = false
 text = "—"
 
-[node name="DeltaDetail" type="RichTextLabel" parent="Panel/VBox"]
+[node name="DeltaDetail" type="RichTextLabel" parent="Panel/VBox/CompareScroll/CompareContent"]
 layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 110)
-fit_content = false
-scroll_active = true
+fit_content = true
+scroll_active = false
 text = "变化预览"
-
-[node name="SocketRow" type="HBoxContainer" parent="Panel/VBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 72)
-theme_override_constants/separation = 8
-
-[node name="SocketBtn0" type="Button" parent="Panel/VBox/SocketRow"]
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "×"
-
-[node name="SocketBtn1" type="Button" parent="Panel/VBox/SocketRow"]
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "×"
-
-[node name="SocketBtn2" type="Button" parent="Panel/VBox/SocketRow"]
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "×"
-
-[node name="SocketBtn3" type="Button" parent="Panel/VBox/SocketRow"]
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "×"
 
 [node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
 layout_mode = 2
@@ -177,7 +156,12 @@ text = "卸下"
 [node name="BtnUpgrade" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "进阶"
+text = "升星"
+
+[node name="BtnGem" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "宝石"
 
 [node name="BtnPunch" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
@@ -201,8 +185,3 @@ text = ""
 title = "分解装备"
 ok_button_text = "确定"
 dialog_text = "确定分解该装备？"
-
-[node name="ConfirmRefine" type="ConfirmationDialog" parent="."]
-title = "装备进阶"
-ok_button_text = "确定"
-dialog_text = "确认进阶？"

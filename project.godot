@@ -41,6 +41,8 @@ MapProgressModel="*res://autoload/MapProgressModel.gd"
 BattleService="*res://autoload/BattleService.gd"
 SourceGuideService="*res://autoload/SourceGuideService.gd"
 DexHubService="*res://autoload/DexHubService.gd"
+MapNavTargetModel="*res://autoload/MapNavTargetModel.gd"
+DebugBootstrapService="*res://autoload/DebugBootstrapService.gd"
 
 [display]
 

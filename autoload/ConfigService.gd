@@ -19,6 +19,7 @@ func load_all() -> void:
 
 	_load_items_cfg()
 	_load_equip_cfg()
+	_load_star_rules_cfg()
 	_load_equipment_sets_cfg()
 
 	var leveling_cfg: Variant = _load_json_file("res://data/leveling.json")
@@ -193,6 +194,36 @@ func _load_equipment_sets_cfg() -> void:
 			return
 
 	push_warning("ConfigService: local equipment sets invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_star_rules_cfg() -> void:
+	var fallback: Dictionary = {
+		"star_rules": {
+			"tiers": {}
+		}
+	}
+	cfg["star_rules_db"] = fallback
+	var source_text := RemoteConfigService.get_active_text("star_rules_v1.json", "res://data/star_rules_v1.json")
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_star_rules_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed_any: Variant = JSON.parse_string(source_text)
+		if parsed_any is Dictionary:
+			cfg["star_rules_db"] = parsed_any
+			return
+
+	push_warning("ConfigService: remote star rules invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/star_rules_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_star_rules_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed_any: Variant = JSON.parse_string(local_text)
+		if local_parsed_any is Dictionary:
+			cfg["star_rules_db"] = local_parsed_any
+			return
+
+	push_warning("ConfigService: local star rules invalid: %s" % str(local_check.get("reason", "unknown")))
 
 func _load_skills_catalog_cfg() -> void:
 	cfg.erase("skills_catalog_db")

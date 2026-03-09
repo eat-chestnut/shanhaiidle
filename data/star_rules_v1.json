@@ -1,0 +1,192 @@
+{
+  "meta": {
+    "key": "star_rules",
+    "version": 1,
+    "exported_at": "2026-03-10 00:00:00",
+    "sha256": ""
+  },
+  "star_rules": {
+    "tiers": {
+      "T1": {
+        "level_range": [1, 19],
+        "stages": {
+          "1_3": {
+            "min_star": 0,
+            "max_star": 2,
+            "target_star_max": 3,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t1_common", "count": 1 }
+            ],
+            "gold_cost": 100
+          },
+          "4_6": {
+            "min_star": 3,
+            "max_star": 5,
+            "target_star_max": 6,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t1_common", "count": 2 }
+            ],
+            "gold_cost": 220
+          },
+          "7_9": {
+            "min_star": 6,
+            "max_star": 8,
+            "target_star_max": 9,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t1_common", "count": 3 }
+            ],
+            "gold_cost": 380
+          },
+          "10": {
+            "min_star": 9,
+            "max_star": 9,
+            "target_star_max": 10,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t1_common", "count": 4 }
+            ],
+            "gold_cost": 600
+          }
+        }
+      },
+      "T2": {
+        "level_range": [20, 39],
+        "stages": {
+          "1_3": {
+            "min_star": 0,
+            "max_star": 2,
+            "target_star_max": 3,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t2_common", "count": 1 }
+            ],
+            "gold_cost": 180
+          },
+          "4_6": {
+            "min_star": 3,
+            "max_star": 5,
+            "target_star_max": 6,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t2_common", "count": 2 }
+            ],
+            "gold_cost": 360
+          },
+          "7_9": {
+            "min_star": 6,
+            "max_star": 8,
+            "target_star_max": 9,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t2_common", "count": 3 }
+            ],
+            "gold_cost": 560
+          },
+          "10": {
+            "min_star": 9,
+            "max_star": 9,
+            "target_star_max": 10,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t2_common", "count": 4 }
+            ],
+            "gold_cost": 860
+          }
+        }
+      },
+      "T3": {
+        "level_range": [40, 59],
+        "stages": {
+          "1_3": {
+            "min_star": 0,
+            "max_star": 2,
+            "target_star_max": 3,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t3_common", "count": 1 }
+            ],
+            "gold_cost": 280
+          },
+          "4_6": {
+            "min_star": 3,
+            "max_star": 5,
+            "target_star_max": 6,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t3_common", "count": 2 }
+            ],
+            "gold_cost": 520
+          },
+          "7_9": {
+            "min_star": 6,
+            "max_star": 8,
+            "target_star_max": 9,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t3_common", "count": 3 }
+            ],
+            "gold_cost": 760
+          },
+          "10": {
+            "min_star": 9,
+            "max_star": 9,
+            "target_star_max": 10,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t3_common", "count": 4 }
+            ],
+            "gold_cost": 1120
+          }
+        }
+      },
+      "T4": {
+        "level_range": [60, 79],
+        "stages": {
+          "1_3": {
+            "min_star": 0,
+            "max_star": 2,
+            "target_star_max": 3,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t4_common", "count": 1 }
+            ],
+            "gold_cost": 400
+          },
+          "4_6": {
+            "min_star": 3,
+            "max_star": 5,
+            "target_star_max": 6,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t4_common", "count": 2 }
+            ],
+            "gold_cost": 760
+          },
+          "7_9": {
+            "min_star": 6,
+            "max_star": 8,
+            "target_star_max": 9,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t4_common", "count": 3 }
+            ],
+            "gold_cost": 1060
+          },
+          "10": {
+            "min_star": 9,
+            "max_star": 9,
+            "target_star_max": 10,
+            "applicable_slot_groups": ["weapon", "armor", "cloak", "accessory"],
+            "material_options": [
+              { "item_id": "star_stone_t4_common", "count": 4 }
+            ],
+            "gold_cost": 1560
+          }
+        }
+      }
+    }
+  }
+}

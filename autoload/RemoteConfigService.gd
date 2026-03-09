@@ -16,6 +16,10 @@ const FILE_KEY_ORDER := [
 	"battle_defaults",
 ]
 
+const OPTIONAL_FILE_KEYS := [
+	"star_rules",
+]
+
 const FILE_KEY_TO_NAME := {
 	"stages": "stages_v1.json",
 	"items": "items.json",
@@ -24,6 +28,7 @@ const FILE_KEY_TO_NAME := {
 	"monsters": "monsters.json",
 	"skills_catalog": "skills_catalog.json",
 	"battle_defaults": "battle_defaults.json",
+	"star_rules": "star_rules_v1.json",
 }
 
 func get_stages_json_text() -> String:
@@ -47,6 +52,9 @@ func get_skills_catalog_text() -> String:
 func get_battle_defaults_text() -> String:
 	return get_active_text("battle_defaults.json", "res://data/battle_defaults.json")
 
+func get_star_rules_text() -> String:
+	return get_active_text("star_rules_v1.json", "res://data/star_rules_v1.json")
+
 func get_active_text(filename: String, fallback_res_path: String) -> String:
 	var active_path := "%s/%s" % [ACTIVE_DIR, filename]
 	if FileAccess.file_exists(active_path):
@@ -64,6 +72,7 @@ func get_active_versions() -> Dictionary:
 		"monsters": 0,
 		"skills_catalog": 0,
 		"battle_defaults": 0,
+		"star_rules": 0,
 	}
 	if not FileAccess.file_exists(ACTIVE_MANIFEST):
 		return out
@@ -585,6 +594,28 @@ func validate_equip_templates_json(text: String) -> Dictionary:
 			return {"ok": false, "reason": "equip_templates[%d] 缺少核心字段" % i}
 		if int(row.get("main_min", -1)) < 0 or int(row.get("main_max", -1)) < 0:
 			return {"ok": false, "reason": "equip_templates[%d] main_min/main_max 非法" % i}
+		if row.has("base_stats"):
+			var base_stats_any = row.get("base_stats", {})
+			if not (base_stats_any is Dictionary):
+				return {"ok": false, "reason": "equip_templates[%d].base_stats 必须是对象" % i}
+			var base_stats: Dictionary = base_stats_any
+			for stat_any in base_stats.keys():
+				if int(base_stats.get(stat_any, 0)) < 0:
+					return {"ok": false, "reason": "equip_templates[%d].base_stats.%s 不能为负数" % [i, str(stat_any)]}
+		if row.has("star_growth"):
+			var growth_any = row.get("star_growth", {})
+			if not (growth_any is Dictionary):
+				return {"ok": false, "reason": "equip_templates[%d].star_growth 必须是对象" % i}
+			var growth: Dictionary = growth_any
+			for stat_any in growth.keys():
+				if int(growth.get(stat_any, 0)) < 0:
+					return {"ok": false, "reason": "equip_templates[%d].star_growth.%s 不能为负数" % [i, str(stat_any)]}
+		if row.has("star_max") and int(row.get("star_max", 0)) < 0:
+			return {"ok": false, "reason": "equip_templates[%d].star_max 不能为负数" % i}
+		if row.has("max_sockets") and int(row.get("max_sockets", 0)) < 0:
+			return {"ok": false, "reason": "equip_templates[%d].max_sockets 不能为负数" % i}
+		if row.has("default_socket_count") and int(row.get("default_socket_count", 0)) < 0:
+			return {"ok": false, "reason": "equip_templates[%d].default_socket_count 不能为负数" % i}
 
 	return {"ok": true}
 
@@ -717,6 +748,106 @@ func validate_battle_defaults(text: String) -> Dictionary:
 			}
 
 	return {"ok": true, "refine_effect_pool_ok": true}
+
+func validate_star_rules_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "升星规则内容为空"}
+
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "升星规则JSON根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "star_rules")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+
+	var rules_any: Variant = root.get("star_rules", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 star_rules 对象"}
+	var rules: Dictionary = rules_any
+	var tiers_any: Variant = rules.get("tiers", {})
+	if not (tiers_any is Dictionary):
+		return {"ok": false, "reason": "star_rules.tiers 必须是对象"}
+	var tiers: Dictionary = tiers_any
+	if tiers.is_empty():
+		return {"ok": false, "reason": "star_rules.tiers 不能为空"}
+
+	for tier_key_any in tiers.keys():
+		var tier_key := str(tier_key_any).strip_edges()
+		if tier_key.is_empty():
+			return {"ok": false, "reason": "star_rules.tiers 存在空tier键名"}
+		var tier_any: Variant = tiers.get(tier_key_any, {})
+		if not (tier_any is Dictionary):
+			return {"ok": false, "reason": "star_rules.tiers.%s 必须是对象" % tier_key}
+		var tier: Dictionary = tier_any
+
+		var range_any: Variant = tier.get("level_range", [])
+		if not (range_any is Array):
+			return {"ok": false, "reason": "star_rules.tiers.%s.level_range 必须是数组" % tier_key}
+		var level_range: Array = range_any
+		if level_range.size() < 2:
+			return {"ok": false, "reason": "star_rules.tiers.%s.level_range 至少2项" % tier_key}
+		var lv_min := int(level_range[0])
+		var lv_max := int(level_range[1])
+		if lv_min < 1 or lv_max < lv_min:
+			return {"ok": false, "reason": "star_rules.tiers.%s.level_range 非法" % tier_key}
+
+		var stages_any: Variant = tier.get("stages", {})
+		if not (stages_any is Dictionary):
+			return {"ok": false, "reason": "star_rules.tiers.%s.stages 必须是对象" % tier_key}
+		var stages: Dictionary = stages_any
+		if stages.is_empty():
+			return {"ok": false, "reason": "star_rules.tiers.%s.stages 不能为空" % tier_key}
+
+		for stage_key_any in stages.keys():
+			var stage_key := str(stage_key_any).strip_edges()
+			if stage_key.is_empty():
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages 存在空阶段键名" % tier_key}
+			var stage_any: Variant = stages.get(stage_key_any, {})
+			if not (stage_any is Dictionary):
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s 必须是对象" % [tier_key, stage_key]}
+			var stage: Dictionary = stage_any
+			var min_star := int(stage.get("min_star", -1))
+			var max_star := int(stage.get("max_star", -1))
+			var target_star_max := int(stage.get("target_star_max", 0))
+			if min_star < 0 or max_star < min_star:
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s 星级区间非法" % [tier_key, stage_key]}
+			if target_star_max < 1:
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.target_star_max 必须 >= 1" % [tier_key, stage_key]}
+			if target_star_max > 10:
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.target_star_max 不能超过10" % [tier_key, stage_key]}
+
+			var gold_cost := int(stage.get("gold_cost", -1))
+			if gold_cost < 0:
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.gold_cost 不能为负数" % [tier_key, stage_key]}
+
+			if stage.has("applicable_slot_groups"):
+				var groups_any: Variant = stage.get("applicable_slot_groups", [])
+				if not (groups_any is Array):
+					return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.applicable_slot_groups 必须是数组" % [tier_key, stage_key]}
+				for g_any in groups_any:
+					if str(g_any).strip_edges().is_empty():
+						return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.applicable_slot_groups 含空值" % [tier_key, stage_key]}
+
+			var options_any: Variant = stage.get("material_options", [])
+			if not (options_any is Array):
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.material_options 必须是数组" % [tier_key, stage_key]}
+			var options: Array = options_any
+			if options.is_empty():
+				return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.material_options 不能为空" % [tier_key, stage_key]}
+			for i in range(options.size()):
+				var opt_any: Variant = options[i]
+				if not (opt_any is Dictionary):
+					return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.material_options[%d] 必须是对象" % [tier_key, stage_key, i]}
+				var opt: Dictionary = opt_any
+				var item_id := str(opt.get("item_id", "")).strip_edges()
+				var count := int(opt.get("count", 0))
+				if item_id.is_empty():
+					return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.material_options[%d].item_id 不能为空" % [tier_key, stage_key, i]}
+				if count <= 0:
+					return {"ok": false, "reason": "star_rules.tiers.%s.stages.%s.material_options[%d].count 必须 > 0" % [tier_key, stage_key, i]}
+
+	return {"ok": true}
 
 func is_valid_refine_effect_pool(pool_any: Variant) -> bool:
 	var ret := _validate_refine_effect_pool(pool_any)
@@ -903,6 +1034,20 @@ func _validate_bundle_manifest(text: String) -> Dictionary:
 			return {"ok": false, "reason": "%s 文件名不匹配：%s" % [key, actual_filename]}
 		ordered.append(row)
 
+	for key_any in OPTIONAL_FILE_KEYS:
+		var key := str(key_any)
+		if not by_key.has(key):
+			continue
+		var row_any = by_key.get(key, {})
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "manifest 文件项格式错误：%s" % key}
+		var row: Dictionary = row_any
+		var expected_filename := str(FILE_KEY_TO_NAME.get(key, ""))
+		var actual_filename := str(row.get("filename", ""))
+		if actual_filename != expected_filename:
+			return {"ok": false, "reason": "%s 文件名不匹配：%s" % [key, actual_filename]}
+		ordered.append(row)
+
 	return {
 		"ok": true,
 		"bundle_id": bundle_id,
@@ -925,6 +1070,8 @@ func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 			return validate_skills_catalog(text)
 		"battle_defaults":
 			return validate_battle_defaults(text)
+		"star_rules":
+			return validate_star_rules_json(text)
 		_:
 			return {"ok": false, "reason": "未知配置 key：%s" % key}
 

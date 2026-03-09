@@ -18,6 +18,7 @@ const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 
 var _stage_def: Dictionary = {}
 var _stage_id: String = ""
+var _preferred_diff_index := -1
 
 func _ready() -> void:
 	visible = false
@@ -35,8 +36,12 @@ func _ready() -> void:
 		_dim_bg.gui_input.connect(_on_dim_bg_gui_input)
 
 func open(stage_def: Dictionary) -> void:
+	open_with_target(stage_def, -1)
+
+func open_with_target(stage_def: Dictionary, preferred_diff_index: int = -1) -> void:
 	_stage_def = stage_def.duplicate(true)
 	_stage_id = str(_stage_def.get("id", "")).strip_edges()
+	_preferred_diff_index = preferred_diff_index
 	if _stage_id.is_empty():
 		return
 	visible = true
@@ -44,6 +49,7 @@ func open(stage_def: Dictionary) -> void:
 
 func close() -> void:
 	visible = false
+	_preferred_diff_index = -1
 
 func _rebuild_all() -> void:
 	var stage_name := str(_stage_def.get("name", _stage_id))
@@ -73,6 +79,7 @@ func _rebuild_list() -> void:
 		var name := str(diff.get("name", "难度%d" % i))
 		var rec := maxi(0, int(diff.get("recommend_score", 0)))
 		var is_unlocked := i <= unlocked
+		var is_target := _preferred_diff_index >= 0 and i == _preferred_diff_index
 
 		var panel := PanelContainer.new()
 		panel.name = "DiffCard_%d" % i
@@ -80,6 +87,8 @@ func _rebuild_list() -> void:
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = Color(0.14, 0.14, 0.16, 0.92)
 		sb.border_color = Color(0.36, 0.36, 0.40, 1.0)
+		if is_target:
+			sb.border_color = Color(0.95, 0.80, 0.38, 1.0)
 		sb.border_width_left = 1
 		sb.border_width_top = 1
 		sb.border_width_right = 1
@@ -129,7 +138,12 @@ func _rebuild_list() -> void:
 		var enter_btn := Button.new()
 		enter_btn.name = "BtnEnter"
 		enter_btn.custom_minimum_size = Vector2(120, 46)
-		enter_btn.text = "进入" if is_unlocked else "未解锁"
+		if is_target and is_unlocked:
+			enter_btn.text = "进入目标"
+		elif is_target and not is_unlocked:
+			enter_btn.text = "目标未解锁"
+		else:
+			enter_btn.text = "进入" if is_unlocked else "未解锁"
 		enter_btn.disabled = not is_unlocked
 		if is_unlocked:
 			enter_btn.pressed.connect(_on_enter_pressed.bind(i))

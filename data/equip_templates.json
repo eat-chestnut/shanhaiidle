@@ -1,46 +1,276 @@
 {
-  "slots": ["weapon","helm","armor","pants","shoes","cloak","ring","bracelet"],
-  "socket_weights": { "0":60, "1":25, "2":10, "3":4, "4":1 },
+  "slots": ["weapon", "helm", "armor", "pants", "shoes", "cloak", "ring", "bracelet"],
+  "socket_weights": { "0": 60, "1": 25, "2": 10, "3": 4, "4": 1 },
   "equip_templates": [
     {
-      "id":"eq_weapon_001","name":"木牙兵刃","slot":"weapon","rarity":"white",
-      "main_stat":"ATK","main_min":1,"main_max":2,
-      "effects":[
-        {"type":"stat","stat":"ATK","val":1}
+      "id": "eq_weapon_001",
+      "name": "木牙兵刃",
+      "slot": "weapon",
+      "slot_group": "weapon",
+      "rarity": "white",
+      "main_stat": "ATK",
+      "main_min": 20,
+      "main_max": 20,
+      "base_stats": { "ATK": 20 },
+      "star_growth": { "ATK": 4 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T1",
+      "quality_tier": "normal",
+      "forge_family_id": "forge_weapon_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 1,
+      "effects": [
+        { "type": "stat", "stat": "ATK", "val": 1 }
       ],
-      "icon":"res://assets/icons/icon_jian_10005.png"
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.22,
+      "icon": "res://assets/icons/icon_jian_10005.png"
     },
     {
-      "id":"eq_armor_001","name":"麻布护甲","slot":"armor","rarity":"white",
-      "main_stat":"HP","main_min":2,"main_max":4,
-      "effects":[
-        {"type":"stat","stat":"HP","val":2}
+      "id": "eq_weapon_002",
+      "name": "玉锋兵刃",
+      "slot": "weapon",
+      "slot_group": "weapon",
+      "rarity": "blue",
+      "main_stat": "ATK",
+      "main_min": 26,
+      "main_max": 26,
+      "base_stats": { "ATK": 26 },
+      "star_growth": { "ATK": 5 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T2",
+      "quality_tier": "high",
+      "forge_family_id": "forge_weapon_01",
+      "upgrade_from_template_id": "eq_weapon_001",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 2,
+      "effects": [
+        { "type": "skill_level", "skill_id": "BING_01", "val": 1 }
       ],
-      "icon":"res://assets/icons/icon_key_01.png"
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.30,
+      "icon": "res://assets/icons/icon_jian_20001.png"
     },
     {
-      "id":"eq_ring_001","name":"青石戒","slot":"ring","rarity":"blue",
-      "main_stat":"CRIT","main_min":1,"main_max":2,
-      "effects":[
-        {"type":"stat","stat":"LOOT_BONUS_PERCENT","val":2}
+      "id": "eq_helm_001",
+      "name": "青纹头冠",
+      "slot": "helm",
+      "slot_group": "armor",
+      "rarity": "white",
+      "main_stat": "DEF",
+      "main_min": 10,
+      "main_max": 10,
+      "base_stats": { "DEF": 10 },
+      "star_growth": { "DEF": 2 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T1",
+      "quality_tier": "normal",
+      "forge_family_id": "forge_helm_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 1,
+      "effects": [
+        { "type": "stat", "stat": "DEF", "val": 1 }
       ],
-      "icon":"res://assets/icons/icon_jiezhi_10001.png"
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.20,
+      "icon": "res://assets/icons/icon_jtzj.png"
     },
     {
-      "id":"eq_weapon_002","name":"玉锋兵刃","slot":"weapon","rarity":"blue",
-      "main_stat":"ATK","main_min":2,"main_max":3,
-      "effects":[
-        {"type":"skill_level","skill_id":"BING_01","val":1}
+      "id": "eq_armor_001",
+      "name": "麻布护甲",
+      "slot": "armor",
+      "slot_group": "armor",
+      "rarity": "white",
+      "main_stat": "HP",
+      "main_min": 80,
+      "main_max": 80,
+      "base_stats": { "HP": 80 },
+      "star_growth": { "HP": 14 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T1",
+      "quality_tier": "normal",
+      "forge_family_id": "forge_armor_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 1,
+      "effects": [
+        { "type": "stat", "stat": "HP", "val": 2 }
       ],
-      "icon":"res://assets/icons/icon_jian_20001.png"
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.20,
+      "icon": "res://assets/icons/icon_key_01.png"
     },
     {
-      "id":"eq_armor_002","name":"鳞纹护甲","slot":"armor","rarity":"blue",
-      "main_stat":"DEF","main_min":1,"main_max":2,
-      "effects":[
-        {"type":"stat","stat":"DEF","val":1}
+      "id": "eq_armor_002",
+      "name": "鳞纹护甲",
+      "slot": "armor",
+      "slot_group": "armor",
+      "rarity": "blue",
+      "main_stat": "DEF",
+      "main_min": 16,
+      "main_max": 16,
+      "base_stats": { "DEF": 16 },
+      "star_growth": { "DEF": 3 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T2",
+      "quality_tier": "high",
+      "forge_family_id": "forge_armor_01",
+      "upgrade_from_template_id": "eq_armor_001",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 2,
+      "effects": [
+        { "type": "stat", "stat": "DEF", "val": 1 }
       ],
-      "icon":"res://assets/icons/icon_key_02.png"
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.28,
+      "icon": "res://assets/icons/icon_key_02.png"
+    },
+    {
+      "id": "eq_pants_001",
+      "name": "鹿皮护腿",
+      "slot": "pants",
+      "slot_group": "armor",
+      "rarity": "white",
+      "main_stat": "HP",
+      "main_min": 64,
+      "main_max": 64,
+      "base_stats": { "HP": 64 },
+      "star_growth": { "HP": 12 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T1",
+      "quality_tier": "normal",
+      "forge_family_id": "forge_pants_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 1,
+      "effects": [
+        { "type": "stat", "stat": "HP", "val": 1 }
+      ],
+      "set_id": "set_zhaoyao",
+      "unidentified_chance": 0.20,
+      "icon": "res://assets/icons/icon_kuzi_m_10001.png"
+    },
+    {
+      "id": "eq_shoes_001",
+      "name": "踏云短靴",
+      "slot": "shoes",
+      "slot_group": "armor",
+      "rarity": "white",
+      "main_stat": "DEF",
+      "main_min": 9,
+      "main_max": 9,
+      "base_stats": { "DEF": 9 },
+      "star_growth": { "DEF": 2 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T1",
+      "quality_tier": "normal",
+      "forge_family_id": "forge_shoes_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 1,
+      "effects": [
+        { "type": "stat", "stat": "DEF", "val": 1 }
+      ],
+      "set_id": "set_qingqiu",
+      "unidentified_chance": 0.18,
+      "icon": "res://assets/icons/icon_jlh.png"
+    },
+    {
+      "id": "eq_cloak_001",
+      "name": "流风披风",
+      "slot": "cloak",
+      "slot_group": "cloak",
+      "rarity": "blue",
+      "main_stat": "HP",
+      "main_min": 92,
+      "main_max": 92,
+      "base_stats": { "HP": 92 },
+      "star_growth": { "HP": 16 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T2",
+      "quality_tier": "high",
+      "forge_family_id": "forge_cloak_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 2,
+      "effects": [
+        { "type": "stat", "stat": "LOOT_BONUS_PERCENT", "val": 1 }
+      ],
+      "set_id": "set_qingqiu",
+      "unidentified_chance": 0.30,
+      "icon": "res://assets/icons/icon_jlc.png"
+    },
+    {
+      "id": "eq_ring_001",
+      "name": "青石戒",
+      "slot": "ring",
+      "slot_group": "accessory",
+      "rarity": "blue",
+      "main_stat": "CRIT_PERCENT",
+      "main_min": 2,
+      "main_max": 2,
+      "base_stats": { "CRIT_PERCENT": 2 },
+      "star_growth": { "CRIT_PERCENT": 1 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T2",
+      "quality_tier": "high",
+      "forge_family_id": "forge_ring_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 2,
+      "effects": [
+        { "type": "stat", "stat": "LOOT_BONUS_PERCENT", "val": 2 }
+      ],
+      "set_id": "set_qingqiu",
+      "unidentified_chance": 0.35,
+      "icon": "res://assets/icons/icon_jiezhi_10001.png"
+    },
+    {
+      "id": "eq_bracelet_001",
+      "name": "苍玉镯",
+      "slot": "bracelet",
+      "slot_group": "accessory",
+      "rarity": "blue",
+      "main_stat": "ATK",
+      "main_min": 15,
+      "main_max": 15,
+      "base_stats": { "ATK": 15 },
+      "star_growth": { "ATK": 3 },
+      "star_enabled": true,
+      "star_max": 10,
+      "star_rule_tier": "T2",
+      "quality_tier": "high",
+      "forge_family_id": "forge_bracelet_01",
+      "upgrade_from_template_id": "",
+      "forge_enabled": true,
+      "max_sockets": 4,
+      "default_socket_count": 2,
+      "effects": [
+        { "type": "stat", "stat": "ATK", "val": 1 }
+      ],
+      "set_id": "set_qingqiu",
+      "unidentified_chance": 0.30,
+      "icon": "res://assets/icons/icon_jz.png"
     }
   ]
 }

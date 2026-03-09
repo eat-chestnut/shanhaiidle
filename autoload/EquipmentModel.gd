@@ -4,6 +4,7 @@ const StatsServiceRef := preload("res://services/StatsService.gd")
 const SAVE_PATH := "user://equipment.json"
 const MAX_SOCKETS := 4
 const REFINE_MAX := 5
+const STAR_MAX_DEFAULT := 10
 
 var next_uid: int = 1
 var bag: Array = []
@@ -36,12 +37,10 @@ func create_instance(template_id: String) -> Dictionary:
 	if template.is_empty():
 		return {}
 
-	var stat_min: int = int(template.get("main_min", 0))
-	var stat_max: int = int(template.get("main_max", stat_min))
-	if stat_max < stat_min:
-		stat_max = stat_min
-	var main_val := randi_range(stat_min, stat_max)
-	var sockets := _roll_socket_count()
+	var main_stat := str(template.get("main_stat", "")).strip_edges()
+	var star_level := 0
+	var main_val := _template_main_value_for_star(template, main_stat, star_level)
+	var sockets := _template_default_socket_count(template)
 	var effects := _normalize_effects(template.get("effects", []))
 	var unidentified_chance := clampf(float(template.get("unidentified_chance", 0.0)), 0.0, 1.0)
 	var identified := randf() >= unidentified_chance
@@ -56,9 +55,9 @@ func create_instance(template_id: String) -> Dictionary:
 		"name": str(template.get("name", template_id)),
 		"slot": str(template.get("slot", "")),
 		"rarity": str(template.get("rarity", "white")),
-		"main_stat": str(template.get("main_stat", "")),
-		"main_min": stat_min,
-		"main_max": stat_max,
+		"main_stat": main_stat,
+		"main_min": main_val,
+		"main_max": main_val,
 		"main_val": main_val,
 		"tier": 0,
 		"set_id": str(template.get("set_id", "")),
@@ -69,8 +68,10 @@ func create_instance(template_id: String) -> Dictionary:
 		"icon": str(template.get("icon", "")),
 		"identified": identified,
 		"locked": false,
+		"star_level": star_level,
 		"refine_lv": 0,
 	}
+	instance = _sync_legacy_main_fields(instance)
 	next_uid += 1
 	return instance
 
@@ -85,6 +86,9 @@ func add_equip(template_id: String, source: String = "online") -> void:
 		PerfTracker.record_equip_gain(template_id, 1)
 	EventBus.notify_inventory_updated()
 	_request_save()
+
+func get_instance(uid: int) -> Dictionary:
+	return _get_instance_by_uid(uid)
 
 func equip_uid(uid: int) -> bool:
 	if uid <= 0:
@@ -422,13 +426,13 @@ func _calc_totals_from_equipped(equipped_map: Dictionary, equipped_store_map: Di
 			continue
 		var inst: Dictionary = inst_any
 		inst = _ensure_socket_fields(inst)
-		var main_stat := str(inst.get("main_stat", ""))
-		var main_val := get_effective_main_val(inst)
-		if main_stat.is_empty() or main_val == 0:
-			pass
-		else:
-			var normalized := _normalize_stat_key(main_stat)
-			totals[normalized] = int(totals.get(normalized, 0)) + main_val
+		var inst_stats := get_instance_template_stats(inst)
+		for stat_any in inst_stats.keys():
+			var stat := _normalize_stat_key(str(stat_any))
+			var val := int(inst_stats.get(stat_any, 0))
+			if stat.is_empty() or val == 0:
+				continue
+			totals[stat] = int(totals.get(stat, 0)) + val
 		_apply_effect_stat_bonus(totals, inst)
 		_apply_socket_gem_bonus_from_instance(totals, inst)
 
@@ -651,15 +655,14 @@ func _get_instance_for_slot_with_override(slot_key: String, override_equipped: D
 	return get_equipped_instance(slot_key)
 
 func get_effective_main_val(inst: Dictionary) -> int:
-	var base := int(inst.get("main_val", 0))
-	var tier := clampi(int(inst.get("tier", 0)), 0, 2)
-	var upgrade_db := _upgrade_db()
-	var tier_bonus_any: Variant = upgrade_db.get("tier_bonus", {})
-	if not (tier_bonus_any is Dictionary):
-		return base
-	var tier_bonus: Dictionary = tier_bonus_any
-	var bonus := int(tier_bonus.get(str(tier), tier_bonus.get(tier, 0)))
-	return base + bonus
+	var main_stat := _normalize_stat_key(str(inst.get("main_stat", "")).strip_edges())
+	if main_stat.is_empty():
+		return int(inst.get("main_val", 0))
+	var stats := get_instance_template_stats(inst)
+	var base_val := int(stats.get(main_stat, 0))
+	if base_val != 0:
+		return base_val
+	return int(inst.get("main_val", 0))
 
 func get_all_effects(inst: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
@@ -684,7 +687,7 @@ func calc_score(inst: Dictionary) -> int:
 			score += 100
 
 	var main_stat := _normalize_stat_key(str(inst.get("main_stat", "ATK")))
-	var main_val := int(inst.get("main_val", 0))
+	var main_val := get_effective_main_val(inst)
 	var main_w := 18
 	if main_stat == "ATK" or main_stat == "DEF":
 		main_w = 25
@@ -692,7 +695,7 @@ func calc_score(inst: Dictionary) -> int:
 		main_w = 12
 	score += main_val * main_w
 
-	score += clampi(int(inst.get("refine_lv", 0)), 0, REFINE_MAX) * 80
+	score += get_star_level(inst) * 80
 
 	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKETS)
 	score += sockets * 45
@@ -746,6 +749,284 @@ func get_equipped_total_score() -> int:
 		if score > 0:
 			total += score
 	return total
+
+# 固定模板制：最终属性 = 模板基础 + 星级成长（宝石/套装在总属性汇总时叠加）。
+func get_instance_template_stats(inst: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	if inst.is_empty():
+		return out
+	var template_id := str(inst.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	var star_level := get_star_level(inst)
+	if not template.is_empty():
+		var base_stats_any = template.get("base_stats", {})
+		if base_stats_any is Dictionary:
+			var base_stats: Dictionary = base_stats_any
+			for stat_any in base_stats.keys():
+				var stat := _normalize_stat_key(str(stat_any))
+				if stat.is_empty():
+					continue
+				out[stat] = int(base_stats.get(stat_any, 0))
+		var growth_any = template.get("star_growth", {})
+		if growth_any is Dictionary and star_level > 0:
+			var growth: Dictionary = growth_any
+			for stat_any in growth.keys():
+				var stat := _normalize_stat_key(str(stat_any))
+				if stat.is_empty():
+					continue
+				var add := int(growth.get(stat_any, 0)) * star_level
+				if add == 0:
+					continue
+				out[stat] = int(out.get(stat, 0)) + add
+
+	if out.is_empty():
+		# 兼容旧实例：没有模板基础字段时退回旧主属性字段。
+		var main_stat := _normalize_stat_key(str(inst.get("main_stat", "")).strip_edges())
+		var legacy_main := int(inst.get("main_val", 0))
+		if not main_stat.is_empty() and legacy_main != 0:
+			out[main_stat] = legacy_main
+
+	return out
+
+func get_star_level(inst: Dictionary) -> int:
+	var star_max := get_instance_star_max(inst)
+	return clampi(int(inst.get("star_level", 0)), 0, star_max)
+
+func get_instance_star_max(inst: Dictionary) -> int:
+	var template_id := str(inst.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	return _template_star_max(template)
+
+func is_star_enabled(inst: Dictionary) -> bool:
+	var template_id := str(inst.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	return _template_star_enabled(template)
+
+func can_star_up(uid: int) -> Dictionary:
+	var result := {
+		"can_star_up": false,
+		"reason": "not_found",
+		"current_star": 0,
+		"target_star": 0,
+		"star_max": STAR_MAX_DEFAULT,
+		"required_gold": 0,
+		"material_options": [],
+		"owned_materials": {},
+		"selected_option": {},
+	}
+	if uid <= 0:
+		result["reason"] = "invalid"
+		return result
+
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		return result
+	var template_id := str(inst.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	if template.is_empty():
+		result["reason"] = "template_not_found"
+		return result
+	if not _template_star_enabled(template):
+		result["reason"] = "star_disabled"
+		return result
+
+	var star_max := _template_star_max(template)
+	var current_star := clampi(int(inst.get("star_level", 0)), 0, star_max)
+	result["current_star"] = current_star
+	result["star_max"] = star_max
+	if current_star >= star_max:
+		result["reason"] = "max"
+		result["target_star"] = current_star
+		return result
+	result["target_star"] = current_star + 1
+
+	var rule := _resolve_star_rule_for_instance(inst, template, current_star)
+	if rule.is_empty():
+		result["reason"] = "no_rule"
+		return result
+	var gold_cost := maxi(0, int(rule.get("gold_cost", 0)))
+	result["required_gold"] = gold_cost
+	var material_options := _normalize_material_options(rule.get("material_options", []))
+	result["material_options"] = material_options
+	if material_options.is_empty():
+		result["reason"] = "no_material_option"
+		return result
+
+	var owned: Dictionary = {}
+	for opt_any in material_options:
+		if not (opt_any is Dictionary):
+			continue
+		var opt: Dictionary = opt_any
+		var item_id := str(opt.get("item_id", "")).strip_edges()
+		if item_id.is_empty():
+			continue
+		if not owned.has(item_id):
+			owned[item_id] = InventoryModel.get_count(item_id)
+	result["owned_materials"] = owned
+
+	var selected := _pick_affordable_material_option(material_options, owned)
+	if selected.is_empty():
+		selected = material_options[0]
+	result["selected_option"] = selected
+
+	var has_gold := PlayerModel.can_spend_gold(gold_cost)
+	var has_material := not _pick_affordable_material_option(material_options, owned).is_empty()
+	if not has_gold:
+		result["reason"] = "no_gold"
+		return result
+	if not has_material:
+		result["reason"] = "no_material"
+		return result
+	result["can_star_up"] = true
+	result["reason"] = ""
+	return result
+
+func get_star_up_preview(uid: int) -> Dictionary:
+	var info := can_star_up(uid)
+	var preview := info.duplicate(true)
+	preview["ok"] = bool(info.get("can_star_up", false))
+	preview["current_stats"] = {}
+	preview["next_stats"] = {}
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		return preview
+	var now_stats := get_instance_template_stats(inst)
+	var next_inst := inst.duplicate(true)
+	next_inst["star_level"] = clampi(get_star_level(inst) + 1, 0, get_instance_star_max(inst))
+	var next_stats := get_instance_template_stats(next_inst)
+	preview["current_stats"] = now_stats
+	preview["next_stats"] = next_stats
+	return preview
+
+func do_star_up(uid: int) -> Dictionary:
+	var result := {
+		"ok": false,
+		"reason": "invalid",
+		"uid": uid,
+		"current_star": 0,
+		"target_star": 0,
+		"required_gold": 0,
+		"selected_option": {},
+	}
+	var info := can_star_up(uid)
+	result["reason"] = str(info.get("reason", "invalid"))
+	result["current_star"] = int(info.get("current_star", 0))
+	result["target_star"] = int(info.get("target_star", 0))
+	result["required_gold"] = int(info.get("required_gold", 0))
+	result["selected_option"] = info.get("selected_option", {})
+	if not bool(info.get("can_star_up", false)):
+		return result
+
+	var selected_any = info.get("selected_option", {})
+	if not (selected_any is Dictionary):
+		result["reason"] = "no_material"
+		return result
+	var selected: Dictionary = selected_any
+	var item_id := str(selected.get("item_id", "")).strip_edges()
+	var need_count := maxi(0, int(selected.get("count", 0)))
+	if item_id.is_empty() or need_count <= 0:
+		result["reason"] = "no_material"
+		return result
+
+	var gold_cost := maxi(0, int(info.get("required_gold", 0)))
+	if not PlayerModel.spend_gold(gold_cost):
+		result["reason"] = "no_gold"
+		return result
+	if not InventoryModel.consume_item(item_id, need_count, "system"):
+		if gold_cost > 0:
+			PlayerModel.add_gold(gold_cost)
+		result["reason"] = "no_material"
+		return result
+
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		InventoryModel.add_item(item_id, need_count, "system")
+		if gold_cost > 0:
+			PlayerModel.add_gold(gold_cost)
+		result["reason"] = "not_found"
+		return result
+	inst["star_level"] = clampi(int(inst.get("star_level", 0)) + 1, 0, get_instance_star_max(inst))
+	inst = _sync_legacy_main_fields(inst)
+	if not _set_instance_by_uid(uid, inst):
+		InventoryModel.add_item(item_id, need_count, "system")
+		if gold_cost > 0:
+			PlayerModel.add_gold(gold_cost)
+		result["reason"] = "not_found"
+		return result
+
+	result["ok"] = true
+	result["reason"] = ""
+	result["current_star"] = clampi(int(inst.get("star_level", 0)) - 1, 0, get_instance_star_max(inst))
+	result["target_star"] = int(inst.get("star_level", 0))
+	EventBus.notify_inventory_updated()
+	_request_save()
+	return result
+
+func upgrade_quality_from_base(base_uid: int, target_template_id: String) -> Dictionary:
+	var result := {
+		"ok": false,
+		"reason": "invalid",
+		"new_uid": 0,
+	}
+	if base_uid <= 0 or target_template_id.strip_edges().is_empty():
+		return result
+	var target_tpl := _find_template(target_template_id)
+	if target_tpl.is_empty():
+		result["reason"] = "target_template_not_found"
+		return result
+
+	var location := _find_instance_location(base_uid)
+	var base_inst_any = location.get("inst", {})
+	if not (base_inst_any is Dictionary):
+		result["reason"] = "base_not_found"
+		return result
+	var base_inst: Dictionary = base_inst_any
+	var from_bag := bool(location.get("in_bag", false))
+	var bag_idx := int(location.get("bag_index", -1))
+	var equipped_slot := str(location.get("equipped_slot", "")).strip_edges()
+
+	var new_inst := create_instance(target_template_id)
+	if new_inst.is_empty():
+		result["reason"] = "create_failed"
+		return result
+	new_inst["star_level"] = mini(get_star_level(base_inst), _template_star_max(target_tpl))
+	var target_max_sockets := _template_max_sockets(target_tpl)
+	var base_sockets := clampi(int(base_inst.get("sockets", 0)), 0, MAX_SOCKETS)
+	var sockets := mini(base_sockets, target_max_sockets)
+	new_inst["sockets"] = sockets
+	var base_gems := _normalize_socket_gems(base_inst.get("socket_gems", []), base_sockets)
+	var inherited_gems: Array[String] = []
+	inherited_gems.resize(sockets)
+	for i in range(sockets):
+		inherited_gems[i] = base_gems[i]
+	new_inst["socket_gems"] = inherited_gems
+	new_inst["locked"] = bool(base_inst.get("locked", false))
+	new_inst["identified"] = bool(base_inst.get("identified", true))
+	new_inst = _sync_legacy_main_fields(new_inst)
+
+	if from_bag and bag_idx >= 0 and bag_idx < bag.size():
+		bag.remove_at(bag_idx)
+	elif not equipped_slot.is_empty():
+		equipped_store.erase(base_uid)
+		if equipped.has(equipped_slot):
+			equipped[equipped_slot] = 0
+	else:
+		result["reason"] = "base_not_found"
+		return result
+
+	if not equipped_slot.is_empty() and equipped.has(equipped_slot):
+		var new_uid := int(new_inst.get("uid", 0))
+		equipped[equipped_slot] = new_uid
+		equipped_store[new_uid] = new_inst
+	else:
+		bag.append(new_inst)
+
+	result["ok"] = true
+	result["reason"] = ""
+	result["new_uid"] = int(new_inst.get("uid", 0))
+	EventBus.notify_inventory_updated()
+	_request_save()
+	return result
 
 func can_refine(inst: Dictionary) -> bool:
 	return int(inst.get("refine_lv", 0)) < REFINE_MAX
@@ -1244,6 +1525,232 @@ func _find_template(template_id: String) -> Dictionary:
 			return tpl
 	return {}
 
+func get_template(template_id: String) -> Dictionary:
+	return _find_template(template_id)
+
+func _template_star_enabled(template: Dictionary) -> bool:
+	if template.is_empty():
+		return false
+	if template.has("star_enabled"):
+		return bool(template.get("star_enabled", false))
+	return true
+
+func _template_star_max(template: Dictionary) -> int:
+	if template.is_empty():
+		return STAR_MAX_DEFAULT
+	var max_star := int(template.get("star_max", STAR_MAX_DEFAULT))
+	return clampi(max_star, 0, STAR_MAX_DEFAULT)
+
+func _template_max_sockets(template: Dictionary) -> int:
+	if template.is_empty():
+		return MAX_SOCKETS
+	return clampi(int(template.get("max_sockets", MAX_SOCKETS)), 0, MAX_SOCKETS)
+
+func _template_default_socket_count(template: Dictionary) -> int:
+	if template.is_empty():
+		return 0
+	var default_count := int(template.get("default_socket_count", 0))
+	return clampi(default_count, 0, _template_max_sockets(template))
+
+func _template_main_value_for_star(template: Dictionary, main_stat: String, star_level: int) -> int:
+	var stat := _normalize_stat_key(main_stat)
+	if template.is_empty() or stat.is_empty():
+		return 0
+	var base := 0
+	var base_stats_any = template.get("base_stats", {})
+	if base_stats_any is Dictionary:
+		base = int((base_stats_any as Dictionary).get(stat, 0))
+	if base == 0:
+		base = int(template.get("main_min", 0))
+	var growth := 0
+	var growth_any = template.get("star_growth", {})
+	if growth_any is Dictionary:
+		growth = int((growth_any as Dictionary).get(stat, 0))
+	return base + maxi(0, star_level) * growth
+
+func _sync_legacy_main_fields(inst: Dictionary) -> Dictionary:
+	var out := inst.duplicate(true)
+	var template_id := str(out.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	var main_stat := str(out.get("main_stat", "")).strip_edges()
+	if main_stat.is_empty():
+		main_stat = str(template.get("main_stat", "")).strip_edges()
+	out["main_stat"] = main_stat
+	var star_level := clampi(int(out.get("star_level", 0)), 0, _template_star_max(template))
+	out["star_level"] = star_level
+
+	if not template.is_empty():
+		out["name"] = str(template.get("name", out.get("name", template_id)))
+		out["slot"] = str(template.get("slot", out.get("slot", "")))
+		out["rarity"] = str(template.get("rarity", out.get("rarity", "white")))
+		out["icon"] = str(template.get("icon", out.get("icon", "")))
+		if str(out.get("set_id", "")).strip_edges().is_empty():
+			out["set_id"] = str(template.get("set_id", ""))
+		if not out.has("effects") or _normalize_effects(out.get("effects", [])).is_empty():
+			out["effects"] = _normalize_effects(template.get("effects", []))
+
+	var legacy_main := _template_main_value_for_star(template, main_stat, star_level)
+	if legacy_main == 0:
+		legacy_main = int(out.get("main_val", 0))
+	out["main_val"] = legacy_main
+	out["main_min"] = legacy_main
+	out["main_max"] = legacy_main
+	out = _ensure_socket_fields(out)
+	return out
+
+func _find_instance_location(uid: int) -> Dictionary:
+	var bag_idx := _find_bag_index(uid)
+	if bag_idx >= 0:
+		var bag_any = bag[bag_idx]
+		if bag_any is Dictionary:
+			return {
+				"in_bag": true,
+				"bag_index": bag_idx,
+				"equipped_slot": "",
+				"inst": (bag_any as Dictionary).duplicate(true),
+			}
+	for slot_key_any in equipped.keys():
+		var slot_key := str(slot_key_any)
+		if int(equipped.get(slot_key, 0)) != uid:
+			continue
+		var inst_any = equipped_store.get(uid, {})
+		if inst_any is Dictionary:
+			return {
+				"in_bag": false,
+				"bag_index": -1,
+				"equipped_slot": slot_key,
+				"inst": (inst_any as Dictionary).duplicate(true),
+			}
+	return {}
+
+func _star_rules_root() -> Dictionary:
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var db_any = cfg.get("star_rules_db", {})
+	if not (db_any is Dictionary):
+		return {}
+	var db: Dictionary = db_any
+	var rules_any = db.get("star_rules", {})
+	if rules_any is Dictionary:
+		return rules_any
+	return {}
+
+func _resolve_star_tier_for_template(template: Dictionary) -> String:
+	var explicit := str(template.get("star_rule_tier", "")).strip_edges()
+	if not explicit.is_empty():
+		return explicit
+	var level := maxi(1, int(ProgressModel.level))
+	var tiers_any = _star_rules_root().get("tiers", {})
+	if not (tiers_any is Dictionary):
+		return "T1"
+	var tiers: Dictionary = tiers_any
+	for tier_key_any in tiers.keys():
+		var tier_key := str(tier_key_any)
+		var tier_any = tiers.get(tier_key_any, {})
+		if not (tier_any is Dictionary):
+			continue
+		var tier: Dictionary = tier_any
+		var range_any = tier.get("level_range", [])
+		if not (range_any is Array):
+			continue
+		var range: Array = range_any
+		if range.size() < 2:
+			continue
+		var min_lv := int(range[0])
+		var max_lv := int(range[1])
+		if level >= min_lv and level <= max_lv:
+			return tier_key
+	return "T1"
+
+func _resolve_star_rule_for_instance(inst: Dictionary, template: Dictionary, current_star: int) -> Dictionary:
+	var rules := _star_rules_root()
+	var tiers_any = rules.get("tiers", {})
+	if not (tiers_any is Dictionary):
+		return {}
+	var tier_id := _resolve_star_tier_for_template(template)
+	var tier_any = (tiers_any as Dictionary).get(tier_id, {})
+	if not (tier_any is Dictionary):
+		return {}
+	var tier: Dictionary = tier_any
+	var stages_any = tier.get("stages", {})
+	if not (stages_any is Dictionary):
+		return {}
+	var stages: Dictionary = stages_any
+	var slot_group := str(template.get("slot_group", _slot_group_from_slot(str(template.get("slot", ""))))).strip_edges()
+	var stage_rows: Array[Dictionary] = []
+	for stage_key_any in stages.keys():
+		var stage_any = stages.get(stage_key_any, {})
+		if not (stage_any is Dictionary):
+			continue
+		var stage: Dictionary = stage_any
+		var row := stage.duplicate(true)
+		row["_stage_key"] = str(stage_key_any)
+		stage_rows.append(row)
+	stage_rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var amin := int(a.get("min_star", 0))
+		var bmin := int(b.get("min_star", 0))
+		if amin != bmin:
+			return amin < bmin
+		var amax := int(a.get("max_star", -1))
+		var bmax := int(b.get("max_star", -1))
+		if amax != bmax:
+			return amax < bmax
+		return str(a.get("_stage_key", "")) < str(b.get("_stage_key", ""))
+	)
+	for stage in stage_rows:
+		var min_star := int(stage.get("min_star", 0))
+		var max_star := int(stage.get("max_star", -1))
+		if current_star < min_star or (max_star >= 0 and current_star > max_star):
+			continue
+		var target_cap := int(stage.get("target_star_max", STAR_MAX_DEFAULT))
+		if current_star + 1 > target_cap:
+			continue
+		var groups_any = stage.get("applicable_slot_groups", [])
+		if groups_any is Array and not (groups_any as Array).is_empty():
+			var groups: Array = groups_any
+			if slot_group.is_empty() or groups.find(slot_group) == -1:
+				continue
+		return stage.duplicate(true)
+	return {}
+
+func _normalize_material_options(options_any: Variant) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not (options_any is Array):
+		return out
+	for option_any in (options_any as Array):
+		if not (option_any is Dictionary):
+			continue
+		var option: Dictionary = option_any
+		var item_id := str(option.get("item_id", "")).strip_edges()
+		var count := maxi(0, int(option.get("count", 0)))
+		if item_id.is_empty() or count <= 0:
+			continue
+		out.append({
+			"item_id": item_id,
+			"count": count,
+		})
+	return out
+
+func _pick_affordable_material_option(options: Array[Dictionary], owned: Dictionary) -> Dictionary:
+	for option in options:
+		var item_id := str(option.get("item_id", "")).strip_edges()
+		var need := maxi(0, int(option.get("count", 0)))
+		if item_id.is_empty() or need <= 0:
+			continue
+		var have := maxi(0, int(owned.get(item_id, InventoryModel.get_count(item_id))))
+		if have >= need:
+			return option.duplicate(true)
+	return {}
+
+func _slot_group_from_slot(slot: String) -> String:
+	var key := slot.strip_edges().to_lower()
+	if key == "weapon":
+		return "weapon"
+	if key == "armor" or key == "pants" or key == "helm" or key == "shoes":
+		return "armor"
+	if key == "cloak":
+		return "cloak"
+	return "accessory"
+
 func _equipment_sets_array() -> Array:
 	var cfg: Dictionary = ConfigService.get_cfg()
 	var db_any = cfg.get("equipment_sets_db", {})
@@ -1443,12 +1950,13 @@ func _get_instance_by_uid(uid: int) -> Dictionary:
 	return {}
 
 func _set_instance_by_uid(uid: int, inst: Dictionary) -> bool:
+	var normalized := _normalize_loaded_instance(inst)
 	var bag_idx := _find_bag_index(uid)
 	if bag_idx >= 0:
-		bag[bag_idx] = inst
+		bag[bag_idx] = normalized
 		return true
 	if equipped_store.has(uid):
-		equipped_store[uid] = inst
+		equipped_store[uid] = normalized
 		return true
 	return false
 
@@ -1691,11 +2199,13 @@ func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
 		out["set_id"] = str(tpl.get("set_id", ""))
 	out["identified"] = bool(out.get("identified", true))
 	out["locked"] = bool(out.get("locked", false))
+	out["star_level"] = clampi(int(out.get("star_level", 0)), 0, _template_star_max(tpl))
 	out["refine_lv"] = clampi(int(out.get("refine_lv", 0)), 0, REFINE_MAX)
 	out["effects"] = _normalize_effects(out.get("effects", []))
 	out["extra_effects"] = _normalize_effects(out.get("extra_effects", []))
 	if str(out.get("icon", "")).is_empty():
 		out["icon"] = str(tpl.get("icon", ""))
+	out = _sync_legacy_main_fields(out)
 	return out
 
 func _add_one_extra_effect(inst: Dictionary) -> Dictionary:

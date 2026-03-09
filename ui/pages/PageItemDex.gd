@@ -24,6 +24,7 @@ const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
 @onready var _detail_title: Label = $RootVBox/DetailPanel/DetailVBox/DetailTitle
 @onready var _detail_text: RichTextLabel = $RootVBox/DetailPanel/DetailVBox/DetailScroll/DetailText
 @onready var _btn_claim: Button = $RootVBox/DetailPanel/DetailVBox/BtnClaim
+@onready var _btn_farm: Button = $RootVBox/DetailPanel/DetailVBox/BtnFarm
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
 @onready var _btn_nav_skills: Button = $RootVBox/BottomNav/BtnNavSkills
 @onready var _btn_nav_battle: Button = $RootVBox/BottomNav/BtnNavBattle
@@ -37,6 +38,7 @@ var _rows: Array[Dictionary] = []
 var _view_rows: Array[Dictionary] = []
 var _selected_idx := -1
 var _icon_cache: Dictionary = {}
+var _selected_farm_targets: Array[Dictionary] = []
 
 var _query := ""
 var _filter_unlock := "all"
@@ -62,6 +64,8 @@ func _apply_i18n() -> void:
 	_btn_clear.text = "清除"
 	_detail_title.text = "材料详情"
 	_btn_claim.text = "未解锁不可领取"
+	_btn_farm.text = "前往刷图"
+	_btn_farm.disabled = true
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
 	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
@@ -126,6 +130,8 @@ func _connect_signals() -> void:
 		_btn_clear.pressed.connect(_on_clear_pressed)
 	if not _btn_claim.pressed.is_connected(_on_claim_pressed):
 		_btn_claim.pressed.connect(_on_claim_pressed)
+	if not _btn_farm.pressed.is_connected(_on_farm_pressed):
+		_btn_farm.pressed.connect(_on_farm_pressed)
 	if not _btn_nav_character.pressed.is_connected(_on_nav_character_pressed):
 		_btn_nav_character.pressed.connect(_on_nav_character_pressed)
 	if not _btn_nav_skills.pressed.is_connected(_on_nav_skills_pressed):
@@ -327,6 +333,8 @@ func _refresh_detail() -> void:
 		_detail_text.text = "请选择条目"
 		_btn_claim.disabled = true
 		_btn_claim.text = "未解锁不可领取"
+		_selected_farm_targets.clear()
+		_btn_farm.disabled = true
 		return
 	var row: Dictionary = _view_rows[_selected_idx]
 	var item_id := str(row.get("id", ""))
@@ -342,11 +350,11 @@ func _refresh_detail() -> void:
 	lines.append("ID：%s" % item_id)
 	lines.append("稀有度：%s" % _rarity_name(rarity))
 	lines.append("类别：%s" % _item_type_name(item_type))
-	var trait := str(row.get("trait", "")).strip_edges()
-	if trait.is_empty():
-		trait = str(row.get("desc", "")).strip_edges()
-	if not trait.is_empty():
-		lines.append("描述：%s" % trait)
+	var trait_text := str(row.get("trait", "")).strip_edges()
+	if trait_text.is_empty():
+		trait_text = str(row.get("desc", "")).strip_edges()
+	if not trait_text.is_empty():
+		lines.append("描述：%s" % trait_text)
 	lines.append("奖励：金币%d（%s）" % [reward_gold, "已领取" if claimed else "未领取（点击领取）"])
 	lines.append("")
 	lines.append("掉落来源")
@@ -356,6 +364,23 @@ func _refresh_detail() -> void:
 	else:
 		for line in source_lines:
 			lines.append("- %s" % line)
+
+	lines.append("")
+	lines.append("推荐刷图")
+	_selected_farm_targets = SourceGuideService.get_item_farm_targets(item_id, 3)
+	if _selected_farm_targets.is_empty():
+		lines.append("暂无推荐刷图信息")
+		_btn_farm.disabled = true
+	else:
+		for row_any in _selected_farm_targets:
+			if not (row_any is Dictionary):
+				continue
+			var target_row: Dictionary = row_any
+			var summary := str(target_row.get("summary_line", "")).strip_edges()
+			if summary.is_empty():
+				continue
+			lines.append("- %s" % summary)
+		_btn_farm.disabled = false
 	_detail_text.text = "\n".join(lines)
 
 	if ItemDexModel.can_claim(item_id):
@@ -367,6 +392,21 @@ func _refresh_detail() -> void:
 	else:
 		_btn_claim.disabled = true
 		_btn_claim.text = "未解锁不可领取"
+
+func _on_farm_pressed() -> void:
+	if _selected_farm_targets.is_empty():
+		return
+	var row_any = _selected_farm_targets[0]
+	if not (row_any is Dictionary):
+		return
+	var row: Dictionary = row_any
+	var stage_id := str(row.get("stage_id", "")).strip_edges()
+	if stage_id.is_empty():
+		return
+	var diff_index := int(row.get("difficulty_index", -1))
+	if has_node("/root/MapNavTargetModel"):
+		MapNavTargetModel.set_target(stage_id, diff_index, "item_dex")
+	get_tree().change_scene_to_file(PAGE_MAP)
 
 func _find_view_index(item_id: String) -> int:
 	for i in range(_view_rows.size()):

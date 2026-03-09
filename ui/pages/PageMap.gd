@@ -34,6 +34,7 @@ func _ready() -> void:
 	_refresh_cfg_version()
 	_refresh_bundle_id()
 	_refresh_badges()
+	_consume_pending_target()
 
 func _apply_i18n() -> void:
 	_title.text = I18nService.t("ui.nav.map", "地图")
@@ -254,6 +255,25 @@ func _on_model_changed() -> void:
 	_refresh_cfg_version()
 	_refresh_bundle_id()
 	_refresh_badges()
+
+func _consume_pending_target() -> void:
+	if not has_node("/root/MapNavTargetModel"):
+		return
+	var target := MapNavTargetModel.consume_target()
+	if target.is_empty():
+		return
+	var stage_id := str(target.get("stage_id", "")).strip_edges()
+	var diff_index := int(target.get("difficulty_index", -1))
+	if stage_id.is_empty():
+		return
+	var stage := _find_stage(stage_id)
+	if stage.is_empty():
+		EventBus.add_log("目标地图不存在：%s" % stage_id)
+		return
+	if _diff_popup != null and _diff_popup.has_method("open_with_target"):
+		_diff_popup.call("open_with_target", stage, diff_index)
+	elif _diff_popup != null and _diff_popup.has_method("open"):
+		_diff_popup.call("open", stage)
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):
