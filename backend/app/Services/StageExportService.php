@@ -280,13 +280,16 @@ class StageExportService
         }
 
         $itemsRaw = is_array($dropsRaw['items_by_rarity'] ?? null) ? $dropsRaw['items_by_rarity'] : [];
-        $items = [
-            'white' => $this->normalizeStringArray($itemsRaw['white'] ?? []),
-            'blue' => $this->normalizeStringArray($itemsRaw['blue'] ?? []),
-            'gold' => $this->normalizeStringArray($itemsRaw['gold'] ?? []),
-        ];
-        if ($items['white'] !== [] || $items['blue'] !== [] || $items['gold'] !== []) {
-            $out['items_by_rarity'] = $items;
+        $itemsOut = [];
+        foreach (['white', 'blue', 'gold'] as $rarity) {
+            $rows = $this->normalizeStringArray($itemsRaw[$rarity] ?? []);
+            if ($rows === []) {
+                continue;
+            }
+            $itemsOut[$rarity] = $rows;
+        }
+        if ($itemsOut !== []) {
+            $out['items_by_rarity'] = $itemsOut;
         }
 
         $specialRaw = is_array($dropsRaw['special'] ?? null) ? $dropsRaw['special'] : [];

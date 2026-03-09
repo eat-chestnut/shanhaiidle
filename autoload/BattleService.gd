@@ -359,10 +359,13 @@ func _apply_difficulty_drop_override(override_any: Variant) -> void:
 	if override.has("drop_chance"):
 		merged_drop["drop_chance"] = clampf(float(override.get("drop_chance", merged_drop.get("drop_chance", 0.0))), 0.0, 1.0)
 	if override.has("rarity_weights"):
-		merged_drop["rarity_weights"] = _normalize_rarity_weights(
+		var override_weights := _normalize_rarity_weights(
 			override.get("rarity_weights", {}),
 			merged_drop.get("rarity_weights", {})
 		)
+		var w_sum := int(override_weights.get("white", 0)) + int(override_weights.get("blue", 0)) + int(override_weights.get("gold", 0))
+		if w_sum > 0:
+			merged_drop["rarity_weights"] = override_weights
 	if override.has("items_by_rarity"):
 		merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
 			override.get("items_by_rarity", {}),
@@ -491,7 +494,8 @@ func _normalize_items_by_rarity(items_any: Variant, fallback_any: Variant) -> Di
 				if item_id.is_empty():
 					continue
 				names.append(item_id)
-			out[rarity] = names
+			if names.size() > 0:
+				out[rarity] = names
 	return out
 
 func _normalize_special_drops(special_any: Variant, fallback_any: Variant) -> Dictionary:

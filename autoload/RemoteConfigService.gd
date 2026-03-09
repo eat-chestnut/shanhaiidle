@@ -403,6 +403,30 @@ func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -
 					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 不能为负数" % [stage_index, j]}
 				if white_w + blue_w + gold_w <= 0:
 					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 总和必须 > 0" % [stage_index, j]}
+			if drops_override.has("items_by_rarity"):
+				var items_any = drops_override.get("items_by_rarity", {})
+				if not (items_any is Dictionary):
+					push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity，stage[%d] difficulties[%d]" % [stage_index, j])
+				else:
+					var items_by_rarity: Dictionary = items_any
+					for rarity in ["white", "blue", "gold"]:
+						if not items_by_rarity.has(rarity):
+							continue
+						var arr_any = items_by_rarity.get(rarity, [])
+						if not (arr_any is Array):
+							push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
+							continue
+						var arr: Array = arr_any
+						if arr.is_empty():
+							push_warning("RemoteConfigService: 忽略空的 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
+							continue
+						var valid := true
+						for item_any in arr:
+							if str(item_any).strip_edges().is_empty():
+								valid = false
+								break
+						if not valid:
+							push_warning("RemoteConfigService: 忽略包含空物品ID的 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
 			if drops_override.has("special"):
 				var special_any = drops_override.get("special", {})
 				if not (special_any is Dictionary):

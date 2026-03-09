@@ -193,7 +193,9 @@ func _merge_drops(stage_drops: Dictionary, override: Dictionary) -> Dictionary:
 			var over_weights: Dictionary = over_weights_any
 			for k in over_weights.keys():
 				out_weights[str(k)] = int(over_weights.get(k, out_weights.get(str(k), 0)))
-		result["rarity_weights"] = out_weights
+		var w_sum := int(out_weights.get("white", 0)) + int(out_weights.get("blue", 0)) + int(out_weights.get("gold", 0))
+		if w_sum > 0:
+			result["rarity_weights"] = out_weights
 
 	if override.has("items_by_rarity"):
 		var base_items_any = result.get("items_by_rarity", {})
@@ -205,7 +207,9 @@ func _merge_drops(stage_drops: Dictionary, override: Dictionary) -> Dictionary:
 			for k in over_items.keys():
 				var arr_any = over_items.get(k, [])
 				if arr_any is Array:
-					out_items[str(k)] = (arr_any as Array).duplicate(true)
+					var rows := (arr_any as Array).duplicate(true)
+					if rows.size() > 0:
+						out_items[str(k)] = rows
 		result["items_by_rarity"] = out_items
 
 	if override.has("special"):

@@ -263,15 +263,15 @@ class StageResource extends Resource
                                                     ->label('金色权重')
                                                     ->integer()
                                                     ->minValue(0),
-                                                MultiSelect::make('drops_override.items_by_rarity.white')
+                                                MultiSelect::make('drops_override.white_items')
                                                     ->label('白色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
                                                     ->default([]),
-                                                MultiSelect::make('drops_override.items_by_rarity.blue')
+                                                MultiSelect::make('drops_override.blue_items')
                                                     ->label('蓝色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
                                                     ->default([]),
-                                                MultiSelect::make('drops_override.items_by_rarity.gold')
+                                                MultiSelect::make('drops_override.gold_items')
                                                     ->label('金色掉落池覆盖')
                                                     ->options(fn (): array => static::itemOptions())
                                                     ->default([]),
@@ -1029,12 +1029,20 @@ class StageResource extends Resource
         }
 
         $itemsRaw = is_array($dropsRaw['items_by_rarity'] ?? null) ? $dropsRaw['items_by_rarity'] : [];
-        $itemsOut = [
-            'white' => static::normalizeStringArray($itemsRaw['white'] ?? []),
-            'blue' => static::normalizeStringArray($itemsRaw['blue'] ?? []),
-            'gold' => static::normalizeStringArray($itemsRaw['gold'] ?? []),
-        ];
-        if ($itemsOut['white'] !== [] || $itemsOut['blue'] !== [] || $itemsOut['gold'] !== []) {
+        $whiteItems = static::normalizeStringArray($dropsRaw['white_items'] ?? ($itemsRaw['white'] ?? []));
+        $blueItems = static::normalizeStringArray($dropsRaw['blue_items'] ?? ($itemsRaw['blue'] ?? []));
+        $goldItems = static::normalizeStringArray($dropsRaw['gold_items'] ?? ($itemsRaw['gold'] ?? []));
+        $itemsOut = [];
+        if ($whiteItems !== []) {
+            $itemsOut['white'] = $whiteItems;
+        }
+        if ($blueItems !== []) {
+            $itemsOut['blue'] = $blueItems;
+        }
+        if ($goldItems !== []) {
+            $itemsOut['gold'] = $goldItems;
+        }
+        if ($itemsOut !== []) {
             $out['items_by_rarity'] = $itemsOut;
         }
 
@@ -1157,11 +1165,9 @@ class StageResource extends Resource
             'drops_override' => [
                 'drop_chance' => array_key_exists('drop_chance', $drops) ? (float) $drops['drop_chance'] : null,
                 'rarity_weights' => is_array($drops['rarity_weights'] ?? null) ? $drops['rarity_weights'] : [],
-                'items_by_rarity' => [
-                    'white' => static::normalizeStringArray(($drops['items_by_rarity']['white'] ?? [])),
-                    'blue' => static::normalizeStringArray(($drops['items_by_rarity']['blue'] ?? [])),
-                    'gold' => static::normalizeStringArray(($drops['items_by_rarity']['gold'] ?? [])),
-                ],
+                'white_items' => static::normalizeStringArray(($drops['items_by_rarity']['white'] ?? [])),
+                'blue_items' => static::normalizeStringArray(($drops['items_by_rarity']['blue'] ?? [])),
+                'gold_items' => static::normalizeStringArray(($drops['items_by_rarity']['gold'] ?? [])),
                 'special' => [
                     'normal' => [
                         'extra_gem_chance' => array_key_exists('extra_gem_chance', $special['normal'] ?? []) ? (float) $special['normal']['extra_gem_chance'] : null,
