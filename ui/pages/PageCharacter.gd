@@ -51,6 +51,7 @@ const ATTR_ROWS := [
 @onready var _btn_nav_map: Button = $RootVBox/BottomNav/BtnNavMap
 @onready var _badge_char: Node = $RootVBox/BottomNav/BtnNavCharacter/Badge
 @onready var _badge_skill: Node = $RootVBox/BottomNav/BtnNavSkills/Badge
+@onready var _badge_dex: Node = $RootVBox/BottomNav/BtnNavDex/Badge
 
 var _row_nodes: Dictionary = {}
 
@@ -178,7 +179,7 @@ func _on_nav_battle_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageBattle.tscn")
 
 func _on_nav_dex_pressed() -> void:
-	get_tree().change_scene_to_file("res://ui/pages/PageMonsterDex.tscn")
+	get_tree().change_scene_to_file("res://ui/pages/PageDexHome.tscn")
 
 func _on_nav_map_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
@@ -188,3 +189,5 @@ func _refresh_badges() -> void:
 		_badge_char.call("set_dot", ProgressModel.free_attr_points > 0)
 	if _badge_skill != null and _badge_skill.has_method("set_value"):
 		_badge_skill.call("set_value", int(SkillModel.skill_points), false)
+	if _badge_dex != null and _badge_dex.has_method("set_dot"):
+		_badge_dex.call("set_dot", DexHubService.has_pending_rewards())

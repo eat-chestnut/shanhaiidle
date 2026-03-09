@@ -103,6 +103,16 @@ custom_minimum_size = Vector2(96, 44)
 theme_override_font_sizes/font_size = 20
 text = "图鉴"
 
+[node name="Badge" parent="RootVBox/Header/HeaderRow/BtnDex" instance=ExtResource("3_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
 [node name="BtnUpdateConfig" type="Button" parent="RootVBox/Header/HeaderRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(96, 44)

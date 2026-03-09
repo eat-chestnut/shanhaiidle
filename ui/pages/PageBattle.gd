@@ -17,6 +17,7 @@ const LOG_VIEW_EXPANDED := 2
 @onready var _btn_nav_map: Button = $RootVBox/BottomMenu/BtnNavMap
 @onready var _badge_char: Node = $RootVBox/BottomMenu/BtnNavCharacter/Badge
 @onready var _badge_skill: Node = $RootVBox/BottomMenu/BtnNavSkills/Badge
+@onready var _badge_dex: Node = $RootVBox/BottomMenu/BtnNavDex/Badge
 @onready var _battle_canvas: Control = $RootVBox/BattleWrap/BattleLayer/BattleCanvas
 @onready var _joystick: CanvasItem = $RootVBox/BattleWrap/BattleLayer/VirtualJoystick
 @onready var _inventory_overlay: Node = $InventoryOverlay
@@ -198,7 +199,7 @@ func _on_nav_skills_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageSkills.tscn")
 
 func _on_nav_dex_pressed() -> void:
-	get_tree().change_scene_to_file("res://ui/pages/PageMonsterDex.tscn")
+	get_tree().change_scene_to_file("res://ui/pages/PageDexHome.tscn")
 
 func _on_nav_map_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
@@ -212,3 +213,5 @@ func _refresh_badges() -> void:
 		_badge_char.call("set_dot", ProgressModel.free_attr_points > 0)
 	if _badge_skill != null and _badge_skill.has_method("set_value"):
 		_badge_skill.call("set_value", int(SkillModel.skill_points), false)
+	if _badge_dex != null and _badge_dex.has_method("set_dot"):
+		_badge_dex.call("set_dot", DexHubService.has_pending_rewards())

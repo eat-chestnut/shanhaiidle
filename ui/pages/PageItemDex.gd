@@ -4,6 +4,7 @@ const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 const PAGE_CHARACTER := "res://ui/pages/PageCharacter.tscn"
 const PAGE_SKILLS := "res://ui/pages/PageSkills.tscn"
 const PAGE_MAP := "res://ui/pages/PageMap.tscn"
+const PAGE_DEX_HOME := "res://ui/pages/PageDexHome.tscn"
 const PAGE_MONSTER_DEX := "res://ui/pages/PageMonsterDex.tscn"
 const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
 
@@ -490,7 +491,7 @@ func _on_model_changed() -> void:
 	_refresh_badges()
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file(PAGE_MAP)
+	get_tree().change_scene_to_file(PAGE_DEX_HOME)
 
 func _on_tab_monster_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_MONSTER_DEX)

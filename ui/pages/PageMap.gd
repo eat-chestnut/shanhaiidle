@@ -3,7 +3,7 @@ extends Control
 const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 const PAGE_CHARACTER := "res://ui/pages/PageCharacter.tscn"
 const PAGE_SKILLS := "res://ui/pages/PageSkills.tscn"
-const PAGE_DEX := "res://ui/pages/PageMonsterDex.tscn"
+const PAGE_DEX := "res://ui/pages/PageDexHome.tscn"
 const STAGE_ICON_PATH := "res://assets/icons/stage_node_placeholder.png"
 
 @onready var _title: Label = $RootVBox/Header/HeaderRow/Title
@@ -12,6 +12,7 @@ const STAGE_ICON_PATH := "res://assets/icons/stage_node_placeholder.png"
 @onready var _lbl_bundle_id: Label = $RootVBox/Header/HeaderRow/CurrentInfo/LblBundleId
 @onready var _btn_dex: Button = $RootVBox/Header/HeaderRow/BtnDex
 @onready var _btn_update_cfg: Button = $RootVBox/Header/HeaderRow/BtnUpdateConfig
+@onready var _badge_dex_entry: Node = $RootVBox/Header/HeaderRow/BtnDex/Badge
 @onready var _stage_list: VBoxContainer = $RootVBox/StageScroll/StageList
 @onready var _diff_popup: Control = $StageDifficultyPopup
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
@@ -259,6 +260,8 @@ func _refresh_badges() -> void:
 		_badge_char.call("set_dot", ProgressModel.free_attr_points > 0)
 	if _badge_skill != null and _badge_skill.has_method("set_value"):
 		_badge_skill.call("set_value", int(SkillModel.skill_points), false)
+	if _badge_dex_entry != null and _badge_dex_entry.has_method("set_dot"):
+		_badge_dex_entry.call("set_dot", DexHubService.has_pending_rewards())
 
 func _refresh_current_stage_text() -> void:
 	var target_id := GrindModel.stage_id

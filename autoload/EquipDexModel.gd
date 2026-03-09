@@ -86,7 +86,49 @@ func claim_reward(template_def: Dictionary) -> Dictionary:
 	return {"ok": true, "gold": gold}
 
 func get_unlock_count() -> int:
-	return unlocked.size()
+	var count := 0
+	for template_id in get_total_entry_ids():
+		if is_unlocked(template_id):
+			count += 1
+	return count
+
+func get_total_entry_ids() -> Array[String]:
+	var ids: Array[String] = []
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var equip_db_any = cfg.get("equip_db", {})
+	if not (equip_db_any is Dictionary):
+		return ids
+	var rows_any = (equip_db_any as Dictionary).get("equip_templates", [])
+	if not (rows_any is Array):
+		return ids
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if row.has("is_enabled") and not bool(row.get("is_enabled", true)):
+			continue
+		var template_id := str(row.get("id", "")).strip_edges()
+		if template_id.is_empty():
+			continue
+		ids.append(template_id)
+	return ids
+
+func get_reward_claimed_count() -> int:
+	var count := 0
+	for template_id in get_total_entry_ids():
+		if is_reward_claimed(template_id):
+			count += 1
+	return count
+
+func get_reward_pending_count() -> int:
+	var count := 0
+	for template_id in get_total_entry_ids():
+		if can_claim(template_id):
+			count += 1
+	return count
+
+func has_pending_rewards() -> bool:
+	return get_reward_pending_count() > 0
 
 func _resolve_reward_gold(template_def: Dictionary) -> int:
 	if template_def.has("dex_gold"):
