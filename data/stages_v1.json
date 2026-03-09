@@ -37,7 +37,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 0,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 3, "material_cost": { "玉屑": 20, "桂枝": 20 } },
+          "recommend_score": 900,
+          "monster_mult": { "hp": 1.4, "atk": 1.2, "def": 1.2 },
+          "drops_override": {
+            "rarity_weights": { "white": 78, "blue": 19, "gold": 3 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 10, "material_cost": { "白玉碎": 12, "妖核": 2 } },
+          "recommend_score": 1600,
+          "monster_mult": { "hp": 1.8, "atk": 1.35, "def": 1.35 },
+          "drops_override": {
+            "rarity_weights": { "white": 70, "blue": 24, "gold": 6 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.22,
+                "extra_gem_chance": 0.12,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.55,
+                "extra_gem_chance": 0.30,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "id": "nan_02",
@@ -76,7 +116,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 320,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 4, "material_cost": { "玉屑": 22, "桂枝": 22 } },
+          "recommend_score": 1050,
+          "monster_mult": { "hp": 1.45, "atk": 1.22, "def": 1.22 },
+          "drops_override": {
+            "rarity_weights": { "white": 76, "blue": 21, "gold": 3 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 12, "material_cost": { "白玉碎": 14, "妖核": 3 } },
+          "recommend_score": 1800,
+          "monster_mult": { "hp": 1.9, "atk": 1.38, "def": 1.38 },
+          "drops_override": {
+            "rarity_weights": { "white": 68, "blue": 25, "gold": 7 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.24,
+                "extra_gem_chance": 0.13,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.58,
+                "extra_gem_chance": 0.31,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "id": "nan_03",
@@ -115,7 +195,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 620,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 5, "material_cost": { "玉屑": 25, "桂枝": 25 } },
+          "recommend_score": 1280,
+          "monster_mult": { "hp": 1.5, "atk": 1.25, "def": 1.25 },
+          "drops_override": {
+            "rarity_weights": { "white": 74, "blue": 22, "gold": 4 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 14, "material_cost": { "白玉碎": 16, "妖核": 3 } },
+          "recommend_score": 2050,
+          "monster_mult": { "hp": 2.0, "atk": 1.42, "def": 1.42 },
+          "drops_override": {
+            "rarity_weights": { "white": 66, "blue": 27, "gold": 7 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.25,
+                "extra_gem_chance": 0.14,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.60,
+                "extra_gem_chance": 0.32,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "id": "nan_04",
@@ -154,7 +274,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 900,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 6, "material_cost": { "玉屑": 28, "桂枝": 28 } },
+          "recommend_score": 1520,
+          "monster_mult": { "hp": 1.56, "atk": 1.28, "def": 1.28 },
+          "drops_override": {
+            "rarity_weights": { "white": 72, "blue": 23, "gold": 5 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 16, "material_cost": { "白玉碎": 18, "妖核": 4 } },
+          "recommend_score": 2360,
+          "monster_mult": { "hp": 2.1, "atk": 1.46, "def": 1.46 },
+          "drops_override": {
+            "rarity_weights": { "white": 64, "blue": 28, "gold": 8 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.27,
+                "extra_gem_chance": 0.15,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.62,
+                "extra_gem_chance": 0.33,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "id": "nan_05",
@@ -193,7 +353,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 1200,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 8, "material_cost": { "玉屑": 32, "桂枝": 32 } },
+          "recommend_score": 1780,
+          "monster_mult": { "hp": 1.62, "atk": 1.31, "def": 1.31 },
+          "drops_override": {
+            "rarity_weights": { "white": 70, "blue": 24, "gold": 6 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 18, "material_cost": { "白玉碎": 20, "妖核": 4 } },
+          "recommend_score": 2700,
+          "monster_mult": { "hp": 2.2, "atk": 1.5, "def": 1.5 },
+          "drops_override": {
+            "rarity_weights": { "white": 62, "blue": 29, "gold": 9 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.29,
+                "extra_gem_chance": 0.16,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.64,
+                "extra_gem_chance": 0.34,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     },
     {
       "id": "nan_06",
@@ -232,7 +432,47 @@
             "extra_gems": ["赤晶石", "沧澜石", "青木石"]
           }
         }
-      }
+      },
+      "difficulties": [
+        {
+          "name": "普通",
+          "unlock": { "boss_kills_required": 0, "material_cost": {} },
+          "recommend_score": 1500,
+          "monster_mult": { "hp": 1.0, "atk": 1.0, "def": 1.0 },
+          "drops_override": {}
+        },
+        {
+          "name": "困难I",
+          "unlock": { "boss_kills_required": 10, "material_cost": { "玉屑": 36, "桂枝": 36 } },
+          "recommend_score": 2100,
+          "monster_mult": { "hp": 1.7, "atk": 1.35, "def": 1.35 },
+          "drops_override": {
+            "rarity_weights": { "white": 68, "blue": 25, "gold": 7 }
+          }
+        },
+        {
+          "name": "困难II",
+          "unlock": { "boss_kills_required": 20, "material_cost": { "白玉碎": 22, "妖核": 5 } },
+          "recommend_score": 3200,
+          "monster_mult": { "hp": 2.35, "atk": 1.56, "def": 1.56 },
+          "drops_override": {
+            "rarity_weights": { "white": 60, "blue": 30, "gold": 10 },
+            "special": {
+              "elite": {
+                "punch_stone_chance": 0.32,
+                "extra_gem_chance": 0.18,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              },
+              "boss": {
+                "core_guarantee": "妖王核心",
+                "punch_stone_chance": 0.68,
+                "extra_gem_chance": 0.36,
+                "extra_gems": ["赤晶石", "沧澜石", "青木石"]
+              }
+            }
+          }
+        }
+      ]
     }
   ]
 }

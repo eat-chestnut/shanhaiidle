@@ -1,0 +1,119 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/StageDifficultyPopup.gd" id="1_stgdf"]
+
+[node name="StageDifficultyPopup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+script = ExtResource("1_stgdf")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.62)
+
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(620, 700)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -350.0
+offset_right = 310.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "选择难度"
+
+[node name="BtnClose" type="Button" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(90, 40)
+theme_override_font_sizes/font_size = 20
+text = "关闭"
+
+[node name="StageName" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "地图：-"
+
+[node name="PowerLine" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "当前战力0 / 建议战力0"
+modulate = Color(0.78, 0.78, 0.8, 1)
+
+[node name="ListScroll" type="ScrollContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DifficultyList" type="VBoxContainer" parent="Panel/VBox/ListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBox"]
+layout_mode = 2
+
+[node name="UpgradeBox" type="VBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NextInfo" type="Label" parent="Panel/VBox/UpgradeBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "升级解锁：困难I"
+
+[node name="NeedKills" type="Label" parent="Panel/VBox/UpgradeBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Boss击杀：0/0"
+
+[node name="NeedItems" type="Label" parent="Panel/VBox/UpgradeBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "材料：无"
+autowrap_mode = 2
+
+[node name="BtnUpgrade" type="Button" parent="Panel/VBox/UpgradeBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 48)
+theme_override_font_sizes/font_size = 22
+text = "升级解锁"
+
+[node name="BottomButtons" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+alignment = 2
+
+[node name="BtnCancel" type="Button" parent="Panel/VBox/BottomButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 44)
+theme_override_font_sizes/font_size = 22
+text = "取消"

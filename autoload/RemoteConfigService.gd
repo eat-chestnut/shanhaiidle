@@ -299,6 +299,101 @@ func validate_stages_json(text: String) -> Dictionary:
 					if not _check_probability(def, "extra_gem_chance"):
 						return {"ok": false, "reason": "stage[%d].special.boss.extra_gem_chance 需在0~1" % i}
 
+		if stage.has("difficulties"):
+			var diff_check := _validate_stage_difficulties(stage.get("difficulties", []), i)
+			if not bool(diff_check.get("ok", false)):
+				return diff_check
+
+	return {"ok": true}
+
+func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -> Dictionary:
+	if not (difficulties_any is Array):
+		return {"ok": false, "reason": "stage[%d].difficulties 必须是数组" % stage_index}
+	var difficulties: Array = difficulties_any
+	if difficulties.is_empty():
+		return {"ok": false, "reason": "stage[%d].difficulties 不能为空" % stage_index}
+	for j in range(difficulties.size()):
+		var diff_any: Variant = difficulties[j]
+		if not (diff_any is Dictionary):
+			return {"ok": false, "reason": "stage[%d].difficulties[%d] 必须是对象" % [stage_index, j]}
+		var diff: Dictionary = diff_any
+		if str(diff.get("name", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].name 不能为空" % [stage_index, j]}
+		if int(diff.get("recommend_score", 0)) < 0:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].recommend_score 不能为负数" % [stage_index, j]}
+
+		var unlock_any: Variant = diff.get("unlock", {})
+		if unlock_any is Dictionary:
+			var unlock: Dictionary = unlock_any
+			if int(unlock.get("boss_kills_required", 0)) < 0:
+				return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.boss_kills_required 不能为负数" % [stage_index, j]}
+			var material_any: Variant = unlock.get("material_cost", {})
+			if not (material_any is Dictionary):
+				return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost 必须是对象" % [stage_index, j]}
+			var material_cost: Dictionary = material_any
+			for item_id_any in material_cost.keys():
+				var item_id := str(item_id_any).strip_edges()
+				var cnt := int(material_cost.get(item_id_any, 0))
+				if item_id.is_empty():
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost 存在空物品ID" % [stage_index, j]}
+				if cnt < 0:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost.%s 不能为负数" % [stage_index, j, item_id]}
+
+		var mult_any: Variant = diff.get("monster_mult", {})
+		if mult_any is Dictionary:
+			var mult: Dictionary = mult_any
+			for key in ["hp", "atk", "def"]:
+				var v := float(mult.get(key, 1.0))
+				if v <= 0.0:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].monster_mult.%s 必须 > 0" % [stage_index, j, key]}
+		elif diff.has("monster_mult"):
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].monster_mult 必须是对象" % [stage_index, j]}
+
+		if diff.has("drops_override") and not (diff.get("drops_override", {}) is Dictionary):
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override 必须是对象" % [stage_index, j]}
+		if diff.has("drops_override"):
+			var drops_override: Dictionary = diff.get("drops_override", {})
+			if drops_override.has("drop_chance"):
+				var drop_chance := float(drops_override.get("drop_chance", -1.0))
+				if drop_chance < 0.0 or drop_chance > 1.0:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.drop_chance 需在0~1" % [stage_index, j]}
+			if drops_override.has("rarity_weights"):
+				var rarity_any = drops_override.get("rarity_weights", {})
+				if not (rarity_any is Dictionary):
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 必须是对象" % [stage_index, j]}
+				var rarity_weights: Dictionary = rarity_any
+				var white_w := int(rarity_weights.get("white", 0))
+				var blue_w := int(rarity_weights.get("blue", 0))
+				var gold_w := int(rarity_weights.get("gold", 0))
+				if white_w < 0 or blue_w < 0 or gold_w < 0:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 不能为负数" % [stage_index, j]}
+				if white_w + blue_w + gold_w <= 0:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 总和必须 > 0" % [stage_index, j]}
+			if drops_override.has("special"):
+				var special_any = drops_override.get("special", {})
+				if not (special_any is Dictionary):
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.special 必须是对象" % [stage_index, j]}
+				var special: Dictionary = special_any
+				for kind in ["normal", "elite", "boss"]:
+					if not special.has(kind):
+						continue
+					var def_any = special.get(kind, {})
+					if not (def_any is Dictionary):
+						return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.special.%s 必须是对象" % [stage_index, j, kind]}
+					var def: Dictionary = def_any
+					if kind == "normal":
+						if not _check_probability(def, "extra_gem_chance"):
+							return {"ok": false, "reason": "stage[%d].difficulties[%d].normal.extra_gem_chance 需在0~1" % [stage_index, j]}
+					elif kind == "elite":
+						if not _check_probability(def, "punch_stone_chance"):
+							return {"ok": false, "reason": "stage[%d].difficulties[%d].elite.punch_stone_chance 需在0~1" % [stage_index, j]}
+						if not _check_probability(def, "extra_gem_chance"):
+							return {"ok": false, "reason": "stage[%d].difficulties[%d].elite.extra_gem_chance 需在0~1" % [stage_index, j]}
+					else:
+						if def.has("punch_stone_chance") and not _check_probability(def, "punch_stone_chance"):
+							return {"ok": false, "reason": "stage[%d].difficulties[%d].boss.punch_stone_chance 需在0~1" % [stage_index, j]}
+						if def.has("extra_gem_chance") and not _check_probability(def, "extra_gem_chance"):
+							return {"ok": false, "reason": "stage[%d].difficulties[%d].boss.extra_gem_chance 需在0~1" % [stage_index, j]}
 	return {"ok": true}
 
 func validate_monsters_json(text: String) -> Dictionary:

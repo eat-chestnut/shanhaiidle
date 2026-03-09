@@ -13,6 +13,7 @@ const STAGE_ICON_PATH := "res://assets/icons/stage_node_placeholder.png"
 @onready var _btn_dex: Button = $RootVBox/Header/HeaderRow/BtnDex
 @onready var _btn_update_cfg: Button = $RootVBox/Header/HeaderRow/BtnUpdateConfig
 @onready var _stage_list: VBoxContainer = $RootVBox/StageScroll/StageList
+@onready var _diff_popup: Control = $StageDifficultyPopup
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
 @onready var _btn_nav_skills: Button = $RootVBox/BottomNav/BtnNavSkills
 @onready var _btn_nav_battle: Button = $RootVBox/BottomNav/BtnNavBattle
@@ -155,9 +156,9 @@ func _rebuild_stage_list() -> void:
 
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(130, 50)
-		btn.text = "当前" if is_current else "前往"
+		btn.text = "进入"
 		btn.add_theme_font_size_override("font_size", 22)
-		btn.disabled = is_current or not unlocked
+		btn.disabled = not unlocked
 		if not btn.disabled:
 			btn.pressed.connect(_on_stage_pressed.bind(stage_id))
 		right.add_child(btn)
@@ -168,11 +169,16 @@ func _on_stage_pressed(stage_id: String) -> void:
 	if stage_id.is_empty():
 		return
 	var stage := _find_stage(stage_id)
+	if stage.is_empty():
+		return
 	var unlock_min_level := maxi(1, int(stage.get("unlock_min_level", 1)))
 	if ProgressModel.level < unlock_min_level:
 		EventBus.add_log("当前等级不足，需Lv%d" % unlock_min_level)
 		return
-	BattleService.set_stage(stage_id)
+	if _diff_popup != null and _diff_popup.has_method("open"):
+		_diff_popup.call("open", stage)
+		return
+	BattleService.set_stage(stage_id, 0, false)
 	_refresh_current_stage_text()
 	get_tree().change_scene_to_file(PAGE_BATTLE)
 
@@ -201,7 +207,7 @@ func _on_update_cfg_pressed() -> void:
 		if ok:
 			ConfigService.load_all()
 			if not GrindModel.stage_id.is_empty():
-				BattleService.set_stage(GrindModel.stage_id, true)
+				BattleService.set_stage(GrindModel.stage_id, int(BattleService.current_diff_index), true)
 			refresh_list()
 			_refresh_cfg_version()
 			_refresh_bundle_id()

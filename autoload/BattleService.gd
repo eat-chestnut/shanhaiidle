@@ -9,6 +9,13 @@ const DEFAULT_ENEMY_ATK := 1
 
 var stage_name: String = "未命名关卡"
 var current_stage_id: String = ""
+var current_diff_index := 0
+var _difficulty_def: Dictionary = {}
+var _difficulty_monster_mult := {
+	"hp": 1.0,
+	"atk": 1.0,
+	"def": 1.0,
+}
 var arena_size: Vector2 = DEFAULT_ARENA_SIZE
 var manual_vec: Vector2 = Vector2.ZERO
 var _base_battle_cfg: Dictionary = {}
@@ -105,12 +112,12 @@ func _ready() -> void:
 	if saved_stage.is_empty():
 		saved_stage = _default_stage_id()
 	if not saved_stage.is_empty():
-		set_stage(saved_stage, true)
+		set_stage(saved_stage, 0, true)
 	_reset_player_pos_if_needed()
 	_sync_player_combat_stats(true)
 	_log_loot_bonus_info()
 
-func set_stage(stage_id: String, silent: bool = false) -> void:
+func set_stage(stage_id: String, diff_index: int = 0, silent: bool = false) -> void:
 	if stage_id.is_empty():
 		return
 	var stage: Dictionary = _find_stage_cfg(stage_id)
@@ -125,10 +132,10 @@ func set_stage(stage_id: String, silent: bool = false) -> void:
 
 	var battle_cfg: Dictionary = _base_battle_cfg.duplicate(true)
 	_apply_battle_cfg(battle_cfg)
-	_apply_stage_overrides(stage)
+	_apply_stage_overrides(stage, diff_index)
 	_reset_runtime_for_stage_switch()
 	if not silent:
-		EventBus.add_log("切换地图：%s" % str(stage.get("name", stage_name)))
+		EventBus.add_log("切换地图：%s" % stage_name)
 
 func set_viewport_arena_size(px_size: Vector2) -> void:
 	if px_size.x <= 1.0 or px_size.y <= 1.0:
@@ -256,25 +263,128 @@ func _load_battle_cfg() -> void:
 		var stage: Dictionary = _find_stage_cfg(current_stage_id)
 		if not stage.is_empty():
 			_apply_battle_cfg(battle_cfg)
-			_apply_stage_overrides(stage)
+			_apply_stage_overrides(stage, current_diff_index)
 			return
 
 	_apply_battle_cfg(battle_cfg)
 
-func _apply_stage_overrides(stage: Dictionary) -> void:
+func _apply_stage_overrides(stage: Dictionary, requested_diff_index: int = 0) -> void:
 	if stage.is_empty():
+		current_diff_index = 0
+		_difficulty_def = _default_difficulty_def()
 		_apply_stage_monsters_patch({})
 		_apply_stage_spawn_patch({})
 		_set_stage_drop_mult({})
 		_apply_stage_drop_patch({})
+		_set_difficulty_monster_mult({})
 		return
-	stage_name = str(stage.get("name", stage_name))
+	var stage_base_name := str(stage.get("name", stage_name))
 	elite_need = maxi(1, int(stage.get("elite_every_kills", elite_need)))
 	boss_need = maxi(1, int(stage.get("boss_every_kills", boss_need)))
+
+	var difficulty := _resolve_stage_difficulty(stage, requested_diff_index)
+	var difficulty_name := str(difficulty.get("name", "普通"))
+	_difficulty_def = difficulty
+	stage_name = stage_base_name if difficulty_name.is_empty() else "%s（%s）" % [stage_base_name, difficulty_name]
+
 	_apply_stage_monsters_patch(stage.get("monsters", {}))
 	_apply_stage_spawn_patch(stage.get("spawn_patch", {}))
 	_set_stage_drop_mult(stage.get("drop_mult", {}))
 	_apply_stage_drop_patch(stage.get("drops_patch", {}))
+	_set_difficulty_monster_mult(difficulty.get("monster_mult", {}))
+	_apply_difficulty_drop_override(difficulty.get("drops_override", {}))
+
+func _default_difficulty_def() -> Dictionary:
+	return {
+		"name": "普通",
+		"unlock": {
+			"boss_kills_required": 0,
+			"material_cost": {},
+		},
+		"recommend_score": 0,
+		"monster_mult": {
+			"hp": 1.0,
+			"atk": 1.0,
+			"def": 1.0,
+		},
+		"drops_override": {},
+	}
+
+func _resolve_stage_difficulty(stage: Dictionary, requested_diff_index: int) -> Dictionary:
+	var default_diff := _default_difficulty_def()
+	var diffs_any = stage.get("difficulties", [])
+	if not (diffs_any is Array):
+		current_diff_index = 0
+		return default_diff
+	var diffs: Array = diffs_any
+	if diffs.is_empty():
+		current_diff_index = 0
+		return default_diff
+
+	var max_idx := diffs.size() - 1
+	var unlocked_idx := clampi(MapProgressModel.get_unlocked_diff(current_stage_id), 0, max_idx)
+	var target_idx := clampi(requested_diff_index, 0, max_idx)
+	if target_idx > unlocked_idx:
+		target_idx = unlocked_idx
+	current_diff_index = target_idx
+
+	var diff_any = diffs[target_idx]
+	if not (diff_any is Dictionary):
+		return default_diff
+	var diff: Dictionary = diff_any
+	var out := default_diff.duplicate(true)
+	out.merge(diff, true)
+	return out
+
+func _set_difficulty_monster_mult(mult_any: Variant) -> void:
+	_difficulty_monster_mult = {
+		"hp": 1.0,
+		"atk": 1.0,
+		"def": 1.0,
+	}
+	if not (mult_any is Dictionary):
+		return
+	var mult: Dictionary = mult_any
+	_difficulty_monster_mult["hp"] = maxf(0.01, float(mult.get("hp", 1.0)))
+	_difficulty_monster_mult["atk"] = maxf(0.01, float(mult.get("atk", 1.0)))
+	_difficulty_monster_mult["def"] = maxf(0.01, float(mult.get("def", 1.0)))
+
+func _apply_difficulty_drop_override(override_any: Variant) -> void:
+	if not (override_any is Dictionary):
+		return
+	var override: Dictionary = override_any
+	var merged_drop := _stage_drop.duplicate(true)
+	var merged_special := _stage_special.duplicate(true)
+
+	if override.has("drop_chance"):
+		merged_drop["drop_chance"] = clampf(float(override.get("drop_chance", merged_drop.get("drop_chance", 0.0))), 0.0, 1.0)
+	if override.has("rarity_weights"):
+		merged_drop["rarity_weights"] = _normalize_rarity_weights(
+			override.get("rarity_weights", {}),
+			merged_drop.get("rarity_weights", {})
+		)
+	if override.has("items_by_rarity"):
+		merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
+			override.get("items_by_rarity", {}),
+			merged_drop.get("items_by_rarity", {})
+		)
+	if override.has("special"):
+		merged_special = _normalize_special_drops(override.get("special", {}), merged_special)
+
+	_stage_drop = merged_drop
+	_stage_special = merged_special
+
+func _apply_monster_difficulty_mult(template: Dictionary) -> Dictionary:
+	if template.is_empty():
+		return {}
+	var out := template.duplicate(true)
+	var hp_mul := maxf(0.01, float(_difficulty_monster_mult.get("hp", 1.0)))
+	var atk_mul := maxf(0.01, float(_difficulty_monster_mult.get("atk", 1.0)))
+	var def_mul := maxf(0.01, float(_difficulty_monster_mult.get("def", 1.0)))
+	out["hp"] = maxi(1, int(round(float(out.get("hp", 1)) * hp_mul)))
+	out["atk"] = maxi(0, int(round(float(out.get("atk", DEFAULT_ENEMY_ATK)) * atk_mul)))
+	out["def"] = maxi(0, int(round(float(out.get("def", 0)) * def_mul)))
+	return out
 
 func _apply_stage_monsters_patch(monsters_any: Variant) -> void:
 	_stage_monsters.clear()
@@ -868,6 +978,7 @@ func _spawn_enemy() -> bool:
 	if template.is_empty():
 		return false
 	MonsterDexModel.mark_seen(template)
+	template = _apply_monster_difficulty_mult(template)
 	var monster_id: String = str(template.get("id", str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))))
 	if monster_id.is_empty():
 		monster_id = str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))
@@ -910,6 +1021,7 @@ func _spawn_special_enemy(kind: String) -> bool:
 	if template.is_empty():
 		return false
 	MonsterDexModel.mark_seen(template)
+	template = _apply_monster_difficulty_mult(template)
 
 	var monster_id := str(template.get("id", normalized_kind))
 	if monster_id.is_empty():
@@ -1600,6 +1712,8 @@ func _apply_damage_to_enemy(index: int, damage: int) -> bool:
 		boss_progress += 1
 	else:
 		special_present = ""
+		if enemy_kind == "boss" and not current_stage_id.is_empty():
+			MapProgressModel.add_boss_kill(current_stage_id, 1)
 		EventBus.add_log("已击败：%s" % enemy_name)
 	kills += 1
 	_heal_on_kill(enemy_kind)

@@ -733,6 +733,18 @@ func calc_score(inst: Dictionary) -> int:
 
 	return maxi(0, score)
 
+func get_equipped_total_score() -> int:
+	var total := 0
+	for uid_any in equipped_store.keys():
+		var inst_any = equipped_store.get(uid_any, {})
+		if not (inst_any is Dictionary):
+			continue
+		var inst: Dictionary = inst_any
+		var score := calc_score(inst)
+		if score > 0:
+			total += score
+	return total
+
 func can_refine(inst: Dictionary) -> bool:
 	return int(inst.get("refine_lv", 0)) < REFINE_MAX
 

@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://ui/pages/PageMap.gd" id="1_h1u2m"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/bg_map.png" id="2_6k5y0"]
 [ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="3_badge"]
+[ext_resource type="PackedScene" path="res://ui/components/StageDifficultyPopup.tscn" id="4_diff"]
 
 [node name="PageMap" type="Control"]
 layout_mode = 3
@@ -175,3 +176,6 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "地图"
 disabled = true
+
+[node name="StageDifficultyPopup" parent="." instance=ExtResource("4_diff")]
+layout_mode = 1
