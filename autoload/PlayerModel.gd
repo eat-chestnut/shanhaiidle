@@ -8,12 +8,26 @@ func _ready() -> void:
 	var d := SaveService.get_section("player")
 	apply_save_data(d)
 
-func add_gold(v: int) -> void:
+func add_gold(v: int, emit_update: bool = true) -> void:
 	if v == 0:
 		return
 	gold = maxi(0, gold + v)
+	if emit_update:
+		EventBus.notify_inventory_updated()
+	SaveService.set_section("player", get_save_data())
+
+func can_spend_gold(n: int) -> bool:
+	return n <= 0 or gold >= n
+
+func spend_gold(n: int) -> bool:
+	if n <= 0:
+		return true
+	if gold < n:
+		return false
+	gold -= n
 	EventBus.notify_inventory_updated()
 	SaveService.set_section("player", get_save_data())
+	return true
 
 func add_material(item_id: String, count: int = 1) -> void:
 	if item_id.is_empty() or count <= 0:

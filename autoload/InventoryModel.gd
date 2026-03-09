@@ -14,13 +14,26 @@ func _ready() -> void:
 	_save_timer.timeout.connect(_flush_save)
 	_load_save()
 
-func add_item(item_id: String, count: int = 1, source: String = "online") -> void:
+func add_item(item_id: String, count: int = 1, source: String = "online", emit_update: bool = true) -> void:
 	if item_id.is_empty() or count <= 0:
 		return
-	items[item_id] = int(items.get(item_id, 0)) + count
-	if source == "online":
-		PerfTracker.record_item_gain(item_id, count)
-	EventBus.notify_inventory_updated()
+	add_items_bulk({item_id: count}, source, emit_update)
+
+func add_items_bulk(rewards: Dictionary, source: String = "online", emit_update: bool = true) -> void:
+	var changed := false
+	for item_id_any in rewards.keys():
+		var item_id := str(item_id_any).strip_edges()
+		var count := int(rewards.get(item_id_any, 0))
+		if item_id.is_empty() or count <= 0:
+			continue
+		items[item_id] = int(items.get(item_id, 0)) + count
+		if source == "online":
+			PerfTracker.record_item_gain(item_id, count)
+		changed = true
+	if not changed:
+		return
+	if emit_update:
+		EventBus.notify_inventory_updated()
 	_request_save()
 
 func consume_item(item_id: String, count: int = 1, source: String = "system") -> bool:
@@ -102,6 +115,7 @@ func list_items_sorted(filter_type: String = "") -> Array[Dictionary]:
 			"icon": str(item_def.get("icon", "")),
 			"type": item_type,
 			"trait": str(item_def.get("trait", "")),
+			"gem_effect": item_def.get("gem_effect", {}),
 		})
 
 	result.sort_custom(_sort_item_rows)

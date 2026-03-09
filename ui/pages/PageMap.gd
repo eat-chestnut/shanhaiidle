@@ -7,8 +7,11 @@ const PAGE_DEX := "res://ui/pages/PageMonsterDex.tscn"
 const STAGE_ICON_PATH := "res://assets/icons/stage_node_placeholder.png"
 
 @onready var _title: Label = $RootVBox/Header/HeaderRow/Title
-@onready var _current_stage: Label = $RootVBox/Header/HeaderRow/CurrentStage
+@onready var _current_stage: Label = $RootVBox/Header/HeaderRow/CurrentInfo/CurrentStage
+@onready var _lbl_cfg_ver: Label = $RootVBox/Header/HeaderRow/CurrentInfo/LblCfgVersion
+@onready var _lbl_bundle_id: Label = $RootVBox/Header/HeaderRow/CurrentInfo/LblBundleId
 @onready var _btn_dex: Button = $RootVBox/Header/HeaderRow/BtnDex
+@onready var _btn_update_cfg: Button = $RootVBox/Header/HeaderRow/BtnUpdateConfig
 @onready var _stage_list: VBoxContainer = $RootVBox/StageScroll/StageList
 @onready var _btn_nav_character: Button = $RootVBox/BottomNav/BtnNavCharacter
 @onready var _btn_nav_skills: Button = $RootVBox/BottomNav/BtnNavSkills
@@ -26,11 +29,14 @@ func _ready() -> void:
 	_load_stages()
 	_rebuild_stage_list()
 	_refresh_current_stage_text()
+	_refresh_cfg_version()
+	_refresh_bundle_id()
 	_refresh_badges()
 
 func _apply_i18n() -> void:
 	_title.text = I18nService.t("ui.nav.map", "地图")
 	_btn_dex.text = I18nService.t("ui.nav.dex", "图鉴")
+	_btn_update_cfg.text = "更新配置"
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
 	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
@@ -39,6 +45,8 @@ func _apply_i18n() -> void:
 	_btn_nav_bag.disabled = false
 	_btn_nav_map.disabled = true
 	_current_stage.text = "当前地图：—"
+	_lbl_cfg_ver.text = "配置：地图v0 物品v0 装备v0 怪物v0 技能v0 战斗v0"
+	_lbl_bundle_id.text = "Bundle：内置"
 
 func _connect_signals() -> void:
 	if not _btn_nav_character.pressed.is_connected(_on_nav_character_pressed):
@@ -51,6 +59,8 @@ func _connect_signals() -> void:
 		_btn_nav_bag.pressed.connect(_on_nav_bag_pressed)
 	if not _btn_dex.pressed.is_connected(_on_nav_dex_pressed):
 		_btn_dex.pressed.connect(_on_nav_dex_pressed)
+	if not _btn_update_cfg.pressed.is_connected(_on_update_cfg_pressed):
+		_btn_update_cfg.pressed.connect(_on_update_cfg_pressed)
 	if not EventBus.inventory_updated.is_connected(_on_model_changed):
 		EventBus.inventory_updated.connect(_on_model_changed)
 
@@ -181,9 +191,60 @@ func _on_nav_bag_pressed() -> void:
 func _on_nav_dex_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_DEX)
 
+func _on_update_cfg_pressed() -> void:
+	var bundle_before := RemoteConfigService.get_active_bundle_id()
+	var ver_before := _read_cfg_versions()
+	_btn_update_cfg.disabled = true
+	RemoteConfigService.download_bundle(func(ok: bool, msg: String) -> void:
+		_btn_update_cfg.disabled = false
+		EventBus.add_log(msg)
+		if ok:
+			ConfigService.load_all()
+			if not GrindModel.stage_id.is_empty():
+				BattleService.set_stage(GrindModel.stage_id, true)
+			refresh_list()
+			_refresh_cfg_version()
+			_refresh_bundle_id()
+
+		var bundle_after := RemoteConfigService.get_active_bundle_id()
+		var ver_after := _read_cfg_versions()
+		var parts: Array[String] = []
+		var name_map := {
+			"stages": "地图",
+			"items": "物品",
+			"equip_templates": "装备",
+			"monsters": "怪物",
+			"skills_catalog": "技能",
+			"battle_defaults": "战斗",
+		}
+		for key in ["stages", "items", "equip_templates", "monsters", "skills_catalog", "battle_defaults"]:
+			var b := int(ver_before.get(key, 0))
+			var a := int(ver_after.get(key, 0))
+			if a != b:
+				parts.append("%s v%d→v%d" % [str(name_map.get(key, key)), b, a])
+
+		var bundle_part := ""
+		if bundle_before != bundle_after:
+			bundle_part = "（Bundle %s→%s）" % [bundle_before, bundle_after]
+		else:
+			bundle_part = "（Bundle 无变化）"
+
+		if parts.is_empty():
+			EventBus.add_log("版本变化：无变化" + bundle_part)
+		else:
+			EventBus.add_log("版本变化：" + "  ".join(parts) + bundle_part)
+	)
+
+func refresh_list() -> void:
+	_load_stages()
+	_rebuild_stage_list()
+	_refresh_current_stage_text()
+
 func _on_model_changed() -> void:
 	_rebuild_stage_list()
 	_refresh_current_stage_text()
+	_refresh_cfg_version()
+	_refresh_bundle_id()
 	_refresh_badges()
 
 func _refresh_badges() -> void:
@@ -204,6 +265,34 @@ func _refresh_current_stage_text() -> void:
 		stage_name = str(stage.get("name", target_id))
 		break
 	_current_stage.text = "当前地图：%s" % stage_name
+
+func _refresh_cfg_version() -> void:
+	var versions := _read_cfg_versions()
+
+	_lbl_cfg_ver.text = "配置：地图v%d 物品v%d 装备v%d 怪物v%d 技能v%d 战斗v%d" % [
+		int(versions.get("stages", 0)),
+		int(versions.get("items", 0)),
+		int(versions.get("equip_templates", 0)),
+		int(versions.get("monsters", 0)),
+		int(versions.get("skills_catalog", 0)),
+		int(versions.get("battle_defaults", 0)),
+	]
+
+func _refresh_bundle_id() -> void:
+	if _lbl_bundle_id == null:
+		return
+	_lbl_bundle_id.text = "Bundle：" + RemoteConfigService.get_active_bundle_id()
+
+func _read_cfg_versions() -> Dictionary:
+	var versions := RemoteConfigService.get_active_versions()
+	return {
+		"stages": int(versions.get("stages", 0)),
+		"items": int(versions.get("items", 0)),
+		"equip_templates": int(versions.get("equip_templates", 0)),
+		"monsters": int(versions.get("monsters", 0)),
+		"skills_catalog": int(versions.get("skills_catalog", 0)),
+		"battle_defaults": int(versions.get("battle_defaults", 0)),
+	}
 
 func _find_stage(stage_id: String) -> Dictionary:
 	for stage_any in _stages:

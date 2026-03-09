@@ -29,6 +29,14 @@ const SLOT_KEYS := [
 @onready var _btn_tab_items: BaseButton = $Panel/VBox/Tabs/TabItems/BtnTabItems
 @onready var _btn_tab_equip: BaseButton = $Panel/VBox/Tabs/TabEquip/BtnTabEquip
 @onready var _btn_tab_gem: BaseButton = $Panel/VBox/Tabs/TabGem/BtnTabGem
+@onready var _btn_bulk_salvage: Button = $Panel/VBox/Tabs/BtnBulkSalvage
+@onready var _filter_bar: HBoxContainer = $Panel/VBox/FilterBar
+@onready var _opt_rarity: OptionButton = $Panel/VBox/FilterBar/OptRarity
+@onready var _opt_state: OptionButton = $Panel/VBox/FilterBar/OptState
+@onready var _opt_set: OptionButton = $Panel/VBox/FilterBar/OptSet
+@onready var _opt_sort: OptionButton = $Panel/VBox/FilterBar/OptSort
+@onready var _txt_search: LineEdit = $Panel/VBox/FilterBar/TxtSearch
+@onready var _btn_clear: Button = $Panel/VBox/FilterBar/BtnClear
 @onready var _lbl_tab_items: Label = $Panel/VBox/Tabs/TabItems/LblTabItems
 @onready var _lbl_tab_equip: Label = $Panel/VBox/Tabs/TabEquip/LblTabEquip
 @onready var _lbl_tab_gem: Label = $Panel/VBox/Tabs/TabGem/LblTabGem
@@ -46,10 +54,16 @@ const SLOT_KEYS := [
 @onready var _attr_popup: Node = $AttributePopup
 @onready var _gem_popup: Node = $GemPopup
 @onready var _gem_select_popup: Node = $GemSelectPopup
+@onready var _bulk_popup: Node = $BulkSalvagePopup
 
 var _slots: Array[Control] = []
 var _slot_rows: Array = []
 var _tab := "items"
+var _f_rarity := "all"
+var _f_state := "all"
+var _f_set := "all"
+var _f_sort := "default"
+var _f_query := ""
 var _equip_slot_ui: Dictionary = {}
 var _gem_slot_ui: Dictionary = {}
 var _tex_cache: Dictionary = {}
@@ -60,6 +74,7 @@ func _ready() -> void:
 	_cache_equip_slot_nodes()
 	_cache_gem_slot_nodes()
 	_apply_i18n()
+	_setup_filter_controls()
 
 	if not _btn_close.pressed.is_connected(close):
 		_btn_close.pressed.connect(close)
@@ -69,6 +84,20 @@ func _ready() -> void:
 		_btn_tab_equip.pressed.connect(_on_tab_equip_pressed)
 	if not _btn_tab_gem.pressed.is_connected(_on_tab_gem_pressed):
 		_btn_tab_gem.pressed.connect(_on_tab_gem_pressed)
+	if not _btn_bulk_salvage.pressed.is_connected(_on_bulk_salvage_pressed):
+		_btn_bulk_salvage.pressed.connect(_on_bulk_salvage_pressed)
+	if not _opt_rarity.item_selected.is_connected(_on_filter_changed):
+		_opt_rarity.item_selected.connect(_on_filter_changed)
+	if not _opt_state.item_selected.is_connected(_on_filter_changed):
+		_opt_state.item_selected.connect(_on_filter_changed)
+	if not _opt_set.item_selected.is_connected(_on_filter_changed):
+		_opt_set.item_selected.connect(_on_filter_changed)
+	if not _opt_sort.item_selected.is_connected(_on_filter_changed):
+		_opt_sort.item_selected.connect(_on_filter_changed)
+	if not _txt_search.text_changed.is_connected(_on_search_changed):
+		_txt_search.text_changed.connect(_on_search_changed)
+	if not _btn_clear.pressed.is_connected(_on_filter_clear):
+		_btn_clear.pressed.connect(_on_filter_clear)
 	if not _btn_add_point.pressed.is_connected(_on_add_point_pressed):
 		_btn_add_point.pressed.connect(_on_add_point_pressed)
 	if not _dim_bg.gui_input.is_connected(_on_dim_bg_gui_input):
@@ -107,16 +136,19 @@ func close() -> void:
 		_gem_popup.call("close")
 	if _gem_select_popup != null and _gem_select_popup.has_method("close"):
 		_gem_select_popup.call("close")
+	if _bulk_popup != null and _bulk_popup.has_method("close"):
+		_bulk_popup.call("close")
 	closed.emit()
 
 func refresh() -> void:
-	var rows: Array = []
+	var raw_rows: Array = []
 	if _tab == "equip":
-		rows = EquipmentModel.list_bag_sorted()
+		raw_rows = EquipmentModel.list_bag_sorted()
 	elif _tab == "gem":
-		rows = InventoryModel.list_items_sorted("gem")
+		raw_rows = InventoryModel.list_items_sorted("gem")
 	else:
-		rows = InventoryModel.list_items_sorted("item")
+		raw_rows = InventoryModel.list_items_sorted("item")
+	var rows := _apply_filters_and_sort(raw_rows)
 
 	_slot_rows.clear()
 	_slot_rows.resize(_slots.size())
@@ -129,10 +161,31 @@ func refresh() -> void:
 			var rarity := str(row.get("rarity", "white"))
 			var count := int(row.get("count", 1))
 			var icon_path := str(row.get("icon", ""))
+			var unidentified := false
+			if _tab == "equip":
+				unidentified = not bool(row.get("identified", true))
+				if unidentified:
+					var base_slot := str(row.get("slot", ""))
+					var slot_name := I18nService.t("slot.%s" % base_slot, base_slot)
+					item_name = "未鉴定%s" % slot_name
 			slot.call("set_item", item_id, item_name, rarity, count, icon_path)
+			if slot.has_method("set_locked"):
+				if _tab == "equip":
+					slot.call("set_locked", bool(row.get("locked", false)))
+				else:
+					slot.call("set_locked", false)
+			if slot.has_method("set_tag"):
+				if _tab == "equip" and unidentified:
+					slot.call("set_tag", "未鉴定")
+				else:
+					slot.call("clear_tag")
 			_slot_rows[i] = row
 		else:
 			slot.call("clear")
+			if slot.has_method("set_locked"):
+				slot.call("set_locked", false)
+			if slot.has_method("clear_tag"):
+				slot.call("clear_tag")
 			_slot_rows[i] = {}
 
 	_refresh_equip_slots()
@@ -279,11 +332,180 @@ func _apply_i18n() -> void:
 	_lbl_tab_items.text = I18nService.t("ui.tab.items")
 	_lbl_tab_equip.text = I18nService.t("ui.tab.equip")
 	_lbl_tab_gem.text = I18nService.t("ui.tab.gem", "宝石")
+	_btn_bulk_salvage.text = I18nService.t("ui.btn.bulk_salvage", "一键分解")
+	_btn_clear.text = "清除"
 	_equip_title.text = I18nService.t("ui.panel.equip_slots", "装备栏")
 	_stats_title.text = I18nService.t("ui.panel.stats", "属性")
 	_btn_add_point.text = I18nService.t("ui.btn.add_point", "加点")
 	_detail_title.text = I18nService.t("ui.panel.detail", "详情")
 	_gem_title.text = I18nService.t("ui.tab.gem", "宝石") + "槽"
+
+func _setup_filter_controls() -> void:
+	_opt_rarity.clear()
+	_opt_rarity.add_item("全部")
+	_opt_rarity.add_item("白")
+	_opt_rarity.add_item("蓝")
+	_opt_rarity.add_item("金")
+	_opt_rarity.select(0)
+
+	_opt_state.clear()
+	_opt_state.add_item("全部")
+	_opt_state.add_item("已鉴定")
+	_opt_state.add_item("未鉴定")
+	_opt_state.add_item("已锁定")
+	_opt_state.select(0)
+
+	_opt_sort.clear()
+	_opt_sort.add_item("默认")
+	_opt_sort.add_item("稀有度↓")
+	_opt_sort.add_item("主属性↓")
+	_opt_sort.add_item("孔位↓")
+	_opt_sort.select(0)
+
+	_rebuild_set_options()
+	_sync_filter_state_from_ui()
+
+func _rebuild_set_options() -> void:
+	var keep_set := _f_set
+	_opt_set.clear()
+	_opt_set.add_item("套装：全部")
+	_opt_set.add_item("套装：无套装")
+
+	var cfg := ConfigService.get_cfg()
+	var db_any = cfg.get("equipment_sets_db", {})
+	var sets_any: Variant = []
+	if db_any is Dictionary:
+		sets_any = (db_any as Dictionary).get("equipment_sets", [])
+	if sets_any is Array:
+		for s_any in (sets_any as Array):
+			if not (s_any is Dictionary):
+				continue
+			var s: Dictionary = s_any
+			var sid := str(s.get("id", "")).strip_edges()
+			if sid.is_empty():
+				continue
+			var name := str(s.get("name", sid))
+			var idx := _opt_set.get_item_count()
+			_opt_set.add_item("套装：" + name)
+			_opt_set.set_item_metadata(idx, sid)
+
+	var target_idx := 0
+	if keep_set == "none":
+		target_idx = 1
+	elif keep_set != "all":
+		for i in range(2, _opt_set.get_item_count()):
+			if str(_opt_set.get_item_metadata(i)) == keep_set:
+				target_idx = i
+				break
+	_opt_set.select(target_idx)
+	if target_idx == 0:
+		_f_set = "all"
+	elif target_idx == 1:
+		_f_set = "none"
+	else:
+		_f_set = str(_opt_set.get_item_metadata(target_idx))
+
+func _sync_filter_state_from_ui() -> void:
+	var rarity_map := ["all", "white", "blue", "gold"]
+	var state_map := ["all", "identified", "unidentified", "locked"]
+	var sort_map := ["default", "rarity_desc", "main_desc", "sockets_desc"]
+	var rarity_idx := clampi(_opt_rarity.selected, 0, rarity_map.size() - 1)
+	var state_idx := clampi(_opt_state.selected, 0, state_map.size() - 1)
+	var sort_idx := clampi(_opt_sort.selected, 0, sort_map.size() - 1)
+	_f_rarity = rarity_map[rarity_idx]
+	_f_state = state_map[state_idx]
+	_f_sort = sort_map[sort_idx]
+
+	var set_idx := _opt_set.selected
+	if set_idx <= 0:
+		_f_set = "all"
+	elif set_idx == 1:
+		_f_set = "none"
+	else:
+		_f_set = str(_opt_set.get_item_metadata(set_idx))
+
+func _sanitize_filters_for_tab() -> void:
+	if _tab == "equip":
+		_rebuild_set_options()
+		return
+
+	_f_set = "all"
+	if _opt_set.get_item_count() > 0:
+		_opt_set.select(0)
+
+	if _f_state != "all":
+		_f_state = "all"
+		_opt_state.select(0)
+
+func _apply_filters_and_sort(raw_rows: Array) -> Array:
+	var out: Array = []
+	for row_any in raw_rows:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+
+		if _f_rarity != "all":
+			if str(row.get("rarity", "white")) != _f_rarity:
+				continue
+
+		if _f_state != "all":
+			if _tab == "equip":
+				var identified := bool(row.get("identified", true))
+				var locked := bool(row.get("locked", false))
+				if _f_state == "identified" and not identified:
+					continue
+				if _f_state == "unidentified" and identified:
+					continue
+				if _f_state == "locked" and not locked:
+					continue
+			else:
+				continue
+
+		if _tab == "equip" and _f_set != "all":
+			var sid := str(row.get("set_id", "")).strip_edges()
+			if _f_set == "none":
+				if not sid.is_empty():
+					continue
+			elif sid != _f_set:
+				continue
+
+		if not _f_query.is_empty():
+			var q := _f_query.to_lower()
+			var nm := str(row.get("name", "")).to_lower()
+			var item_id := str(row.get("id", row.get("template_id", ""))).to_lower()
+			if nm.find(q) == -1 and item_id.find(q) == -1:
+				continue
+
+		out.append(row)
+
+	match _f_sort:
+		"rarity_desc":
+			out.sort_custom(func(a, b) -> bool:
+				var ra := _rarity_rank(str(a.get("rarity", "white")))
+				var rb := _rarity_rank(str(b.get("rarity", "white")))
+				if ra != rb:
+					return ra > rb
+				return str(a.get("name", a.get("id", ""))) < str(b.get("name", b.get("id", "")))
+			)
+		"main_desc":
+			out.sort_custom(func(a, b) -> bool:
+				var va := int(a.get("main_val", 0))
+				var vb := int(b.get("main_val", 0))
+				if va != vb:
+					return va > vb
+				return _rarity_rank(str(a.get("rarity", "white"))) > _rarity_rank(str(b.get("rarity", "white")))
+			)
+		"sockets_desc":
+			out.sort_custom(func(a, b) -> bool:
+				var va := int(a.get("sockets", a.get("socket_count", 0)))
+				var vb := int(b.get("sockets", b.get("socket_count", 0)))
+				if va != vb:
+					return va > vb
+				return _rarity_rank(str(a.get("rarity", "white"))) > _rarity_rank(str(b.get("rarity", "white")))
+			)
+		_:
+			pass
+	return out
 
 func _set_detail_tip() -> void:
 	_detail_text.text = I18nService.t(
@@ -297,6 +519,9 @@ func _refresh_tab_visual() -> void:
 	_lbl_tab_items.modulate = active if _tab == "items" else inactive
 	_lbl_tab_equip.modulate = active if _tab == "equip" else inactive
 	_lbl_tab_gem.modulate = active if _tab == "gem" else inactive
+	_filter_bar.visible = true
+	_opt_set.visible = _tab == "equip"
+	_btn_bulk_salvage.visible = _tab == "equip"
 
 func _refresh_stats_panel() -> void:
 	var stats: Dictionary = EquipmentModel.get_total_stats()
@@ -317,15 +542,29 @@ func _refresh_stats_panel() -> void:
 	lines.append("%s：%d" % [I18nService.t("attr.fortune", "运势"), int(attrs.get("fortune", 0))])
 	lines.append("")
 	lines.append("%s" % I18nService.t("ui.panel.stats_total", "总属性"))
-	lines.append("HP %s" % _format_stat_value(stats.get("HP", 0)))
-	lines.append("ATK %s" % _format_stat_value(stats.get("ATK", 0)))
-	lines.append("DEF %s" % _format_stat_value(stats.get("DEF", 0)))
-	lines.append("Crit%% %s" % _format_stat_value(stats.get("CRIT_PERCENT", stats.get("CRIT", 0))))
-	lines.append("Qi %s" % _format_stat_value(stats.get("QI", 10)))
+	lines.append("%s %s" % [I18nService.stat("HP"), _format_stat_value(stats.get("HP", 0))])
+	lines.append("%s %s" % [I18nService.stat("ATK"), _format_stat_value(stats.get("ATK", 0))])
+	lines.append("%s %s" % [I18nService.stat("DEF"), _format_stat_value(stats.get("DEF", 0))])
+	lines.append("%s %s%%" % [I18nService.stat("CRIT_PERCENT"), _format_stat_value(stats.get("CRIT_PERCENT", stats.get("CRIT", 0)))])
+	lines.append("%s %s" % [I18nService.stat("QI"), _format_stat_value(stats.get("QI", 10))])
 	lines.append("%s %s%%" % [
-		I18nService.t("ui.loot_bonus", "掉落"),
+		I18nService.stat("LOOT_BONUS_PERCENT"),
 		_format_stat_value(stats.get("LOOT_BONUS_PERCENT", stats.get("DROP", 0))),
 	])
+
+	lines.append("")
+	lines.append("套装效果")
+	var set_info: Dictionary = EquipmentModel.get_active_set_bonuses()
+	var set_lines_any: Variant = set_info.get("lines", [])
+	var set_lines: Array = set_lines_any if set_lines_any is Array else []
+	if not set_lines.is_empty():
+		var max_show := mini(6, set_lines.size())
+		for i in range(max_show):
+			lines.append(str(set_lines[i]))
+		if set_lines.size() > max_show:
+			lines.append("...（共%d条）" % set_lines.size())
+	else:
+		lines.append("暂无")
 	_stats_text.text = "\n".join(lines)
 
 func _refresh_equip_slots() -> void:
@@ -466,15 +705,46 @@ func _build_items_def_map() -> Dictionary:
 
 func _on_tab_items_pressed() -> void:
 	_tab = "items"
+	_sanitize_filters_for_tab()
 	refresh()
 
 func _on_tab_equip_pressed() -> void:
 	_tab = "equip"
+	_sanitize_filters_for_tab()
 	refresh()
 
 func _on_tab_gem_pressed() -> void:
 	_tab = "gem"
+	_sanitize_filters_for_tab()
 	refresh()
+
+func _on_filter_changed(_index: int = -1) -> void:
+	_sync_filter_state_from_ui()
+	refresh()
+
+func _on_filter_clear() -> void:
+	_f_rarity = "all"
+	_f_state = "all"
+	_f_set = "all"
+	_f_sort = "default"
+	_f_query = ""
+	_opt_rarity.select(0)
+	_opt_state.select(0)
+	_rebuild_set_options()
+	_opt_sort.select(0)
+	_txt_search.text = ""
+	_sync_filter_state_from_ui()
+	refresh()
+
+func _on_search_changed(t: String) -> void:
+	_f_query = t.strip_edges()
+	refresh()
+
+func _on_bulk_salvage_pressed() -> void:
+	if _tab != "equip":
+		return
+	if _bulk_popup != null and _bulk_popup.has_method("open"):
+		_bulk_popup.call("open")
 
 func _on_slot_gui_input(event: InputEvent, index: int) -> void:
 	if event is InputEventMouseButton:
@@ -512,7 +782,7 @@ func _on_slot_clicked(index: int) -> void:
 		_equip_popup.call("open_for_bag", uid)
 
 func _on_equip_slot_pressed(slot_key: String) -> void:
-	var uid := EquipmentModel.get_equipped_uid(slot_key)
+	var uid: int = int(EquipmentModel.get_equipped_uid(slot_key))
 	if uid <= 0:
 		_set_detail_tip()
 		return
@@ -561,3 +831,12 @@ func _format_stat_value(v: Variant) -> String:
 	if v is float:
 		return str(int(round(float(v))))
 	return str(int(v))
+
+func _rarity_rank(r: String) -> int:
+	match r:
+		"gold":
+			return 3
+		"blue":
+			return 2
+		_:
+			return 1

@@ -149,6 +149,21 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 56)
 theme_override_constants/separation = 10
 
+[node name="BtnIdentify" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "鉴定"
+
+[node name="BtnLock" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "锁定"
+
+[node name="BtnSalvage" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "分解"
+
 [node name="BtnEquip" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -181,3 +196,13 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
 text = ""
+
+[node name="ConfirmSalvage" type="ConfirmationDialog" parent="."]
+title = "分解装备"
+ok_button_text = "确定"
+dialog_text = "确定分解该装备？"
+
+[node name="ConfirmRefine" type="ConfirmationDialog" parent="."]
+title = "装备进阶"
+ok_button_text = "确定"
+dialog_text = "确认进阶？"

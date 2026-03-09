@@ -70,7 +70,7 @@ func _draw_enemies(enemies: Array) -> void:
 		draw_circle(enemy_pos, enemy_radius, Color(0.86, 0.18, 0.18))
 		_draw_label(
 			enemy_pos + Vector2(enemy_radius + 6.0, 5.0),
-			"敌 HP:%d" % hp,
+			"敌%s:%d" % [I18nService.stat("HP"), hp],
 			Color.WHITE,
 			ENEMY_LABEL_SIZE,
 			true
@@ -140,7 +140,7 @@ func _draw_hud(spawn: Dictionary, player_state: Dictionary, enemy_count: int) ->
 	var alive_max: int = int(spawn.get("max", 0))
 	var aggro_on := bool(spawn.get("aggro_on", false))
 
-	var line_1 := "%s｜HP %d/%d｜击杀 %d｜场上 %d" % [stage_name, hp_now, hp_max, kills, enemy_count]
+	var line_1 := "%s｜%s %d/%d｜击杀 %d｜场上 %d" % [stage_name, I18nService.stat("HP"), hp_now, hp_max, kills, enemy_count]
 	var line_2 := "刷怪点 sp_1：%d/%d｜警戒：%s｜索敌：%s" % [
 		alive,
 		alive_max,

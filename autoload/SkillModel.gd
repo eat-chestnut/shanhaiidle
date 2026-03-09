@@ -89,27 +89,32 @@ func get_skill_level(skill_id: String) -> int:
 	return maxi(0, int(skill_levels.get(skill_id, 0)))
 
 func get_effective_level(skill_id: String) -> int:
+	return get_effective_level_with_override(skill_id, {})
+
+func get_effective_level_with_override(skill_id: String, override_equipped: Dictionary) -> int:
 	var base_level := get_skill_level(skill_id)
 	if skill_id.is_empty():
 		return base_level
 	var bonus := 0
 	for slot_key_any in EquipmentModel.equipped.keys():
 		var slot_key := str(slot_key_any)
-		var inst: Dictionary = EquipmentModel.get_equipped_instance(slot_key)
+		var inst := _get_inst_with_override(slot_key, override_equipped)
 		if inst.is_empty():
 			continue
-		var effects_any = inst.get("effects", [])
-		if not (effects_any is Array):
-			continue
-		for effect_any in effects_any:
+		for effect_any in EquipmentModel.get_all_effects(inst):
 			if not (effect_any is Dictionary):
 				continue
 			var effect: Dictionary = effect_any
 			if str(effect.get("type", "")) != "skill_level":
 				continue
-			if str(effect.get("skill_id", "")) != skill_id:
+			if str(effect.get("skill_id", "")).strip_edges() != skill_id:
 				continue
 			bonus += int(effect.get("val", 0))
+	var set_counts := EquipmentModel.get_set_counts_with_override(override_equipped)
+	var set_bonus := EquipmentModel.get_active_set_bonuses_from_counts(set_counts)
+	var set_skills_any = set_bonus.get("skills", {})
+	if set_skills_any is Dictionary:
+		bonus += int((set_skills_any as Dictionary).get(skill_id, 0))
 	return maxi(0, base_level + bonus)
 
 func load() -> void:
@@ -249,3 +254,11 @@ func _balance_cfg() -> Dictionary:
 
 func _is_valid_ai_profile(p: String) -> bool:
 	return p == "clear" or p == "boss" or p == "survival"
+
+func _get_inst_with_override(slot_key: String, override_equipped: Dictionary) -> Dictionary:
+	if override_equipped.has(slot_key):
+		var override_any = override_equipped.get(slot_key, {})
+		if override_any is Dictionary:
+			return override_any
+		return {}
+	return EquipmentModel.get_equipped_instance(slot_key)

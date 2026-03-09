@@ -3,6 +3,7 @@ extends Node
 const StatsServiceRef := preload("res://services/StatsService.gd")
 const SAVE_PATH := "user://equipment.json"
 const MAX_SOCKETS := 4
+const REFINE_MAX := 5
 
 var next_uid: int = 1
 var bag: Array = []
@@ -42,6 +43,8 @@ func create_instance(template_id: String) -> Dictionary:
 	var main_val := randi_range(stat_min, stat_max)
 	var sockets := _roll_socket_count()
 	var effects := _normalize_effects(template.get("effects", []))
+	var unidentified_chance := clampf(float(template.get("unidentified_chance", 0.0)), 0.0, 1.0)
+	var identified := randf() >= unidentified_chance
 	var socket_gems: Array[String] = []
 	socket_gems.resize(sockets)
 	for i in range(sockets):
@@ -58,10 +61,15 @@ func create_instance(template_id: String) -> Dictionary:
 		"main_max": stat_max,
 		"main_val": main_val,
 		"tier": 0,
+		"set_id": str(template.get("set_id", "")),
 		"effects": effects,
+		"extra_effects": [],
 		"sockets": sockets,
 		"socket_gems": socket_gems,
 		"icon": str(template.get("icon", "")),
+		"identified": identified,
+		"locked": false,
+		"refine_lv": 0,
 	}
 	next_uid += 1
 	return instance
@@ -87,6 +95,8 @@ func equip_uid(uid: int) -> bool:
 	if not (inst_any is Dictionary):
 		return false
 	var inst: Dictionary = inst_any
+	if not is_identified(inst):
+		return false
 	var slot: String = str(inst.get("slot", ""))
 	var slot_key := _resolve_slot_key_for_equip(slot)
 	if slot_key.is_empty() or not equipped.has(slot_key):
@@ -106,6 +116,218 @@ func equip_uid(uid: int) -> bool:
 	_request_save()
 	return true
 
+func is_identified(inst: Dictionary) -> bool:
+	return bool(inst.get("identified", true))
+
+func is_locked(inst: Dictionary) -> bool:
+	return bool(inst.get("locked", false))
+
+func toggle_lock(uid: int) -> bool:
+	if uid <= 0:
+		return false
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		return false
+	inst["locked"] = not is_locked(inst)
+	if not _set_instance_by_uid(uid, inst):
+		return false
+	EventBus.notify_inventory_updated()
+	_request_save()
+	return true
+
+func identify(uid: int) -> Dictionary:
+	var result := {
+		"ok": false,
+		"reason": "not_found",
+		"cost": 0,
+	}
+	if uid <= 0:
+		result["reason"] = "invalid"
+		return result
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		return result
+	if is_identified(inst):
+		result["reason"] = "already"
+		return result
+
+	var rarity := str(inst.get("rarity", "white"))
+	var cost := _identify_cost_for_rarity(rarity)
+	result["cost"] = cost
+	if not PlayerModel.spend_gold(cost):
+		result["reason"] = "no_gold"
+		return result
+
+	inst["identified"] = true
+	if not _set_instance_by_uid(uid, inst):
+		PlayerModel.add_gold(cost)
+		result["reason"] = "not_found"
+		return result
+
+	EventBus.notify_inventory_updated()
+	_request_save()
+	result["ok"] = true
+	result["reason"] = ""
+	return result
+
+func get_identify_cost_by_rarity(rarity: String) -> int:
+	return _identify_cost_for_rarity(rarity)
+
+func get_salvage_reward_for_rarity(rarity: String) -> Dictionary:
+	return _salvage_reward_for_rarity(rarity)
+
+func get_salvage_reward_by_rarity(rarity: String) -> Dictionary:
+	return _salvage_reward_for_rarity(rarity)
+
+func preview_salvage(uids: Array[int]) -> Dictionary:
+	var total_gold := 0
+	var total_items: Dictionary = {}
+	var count := 0
+	var seen: Dictionary = {}
+	for uid in uids:
+		if uid <= 0:
+			continue
+		var key := str(uid)
+		if seen.has(key):
+			continue
+		seen[key] = true
+		var idx := _find_bag_index(uid)
+		if idx < 0:
+			continue
+		var inst_any = bag[idx]
+		if not (inst_any is Dictionary):
+			continue
+		var inst: Dictionary = inst_any
+		if is_locked(inst):
+			continue
+		var rarity := str(inst.get("rarity", "white"))
+		var reward := _salvage_reward_for_rarity(rarity)
+		total_gold += maxi(0, int(reward.get("gold", 0)))
+		var items_any = reward.get("items", {})
+		if items_any is Dictionary:
+			for item_id_any in (items_any as Dictionary).keys():
+				var item_id := str(item_id_any).strip_edges()
+				var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+				if item_id.is_empty() or cnt <= 0:
+					continue
+				total_items[item_id] = int(total_items.get(item_id, 0)) + cnt
+		count += 1
+	return {
+		"count": count,
+		"gold": total_gold,
+		"items": total_items,
+	}
+
+func salvage_many(uids: Array[int]) -> Dictionary:
+	var count := 0
+	var total_gold := 0
+	var total_items: Dictionary = {}
+	var seen: Dictionary = {}
+	for uid in uids:
+		if uid <= 0:
+			continue
+		var key := str(uid)
+		if seen.has(key):
+			continue
+		seen[key] = true
+		var idx := _find_bag_index(uid)
+		if idx < 0:
+			continue
+		var inst_any = bag[idx]
+		if not (inst_any is Dictionary):
+			continue
+		var inst: Dictionary = inst_any
+		if is_locked(inst):
+			continue
+		var rarity := str(inst.get("rarity", "white"))
+		var reward := _salvage_reward_for_rarity(rarity)
+		total_gold += maxi(0, int(reward.get("gold", 0)))
+		var items_any = reward.get("items", {})
+		if items_any is Dictionary:
+			for item_id_any in (items_any as Dictionary).keys():
+				var item_id := str(item_id_any).strip_edges()
+				var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+				if item_id.is_empty() or cnt <= 0:
+					continue
+				total_items[item_id] = int(total_items.get(item_id, 0)) + cnt
+		bag.remove_at(idx)
+		count += 1
+	if count <= 0:
+		return {
+			"ok": false,
+			"reason": "empty",
+			"count": 0,
+			"gold": 0,
+			"items": {},
+		}
+
+	if total_gold > 0:
+		PlayerModel.add_gold(total_gold, false)
+	InventoryModel.add_items_bulk(total_items, "system", false)
+
+	_request_save()
+	EventBus.notify_inventory_updated()
+	return {
+		"ok": true,
+		"reason": "",
+		"count": count,
+		"gold": total_gold,
+		"items": total_items,
+	}
+
+func salvage(uid: int) -> Dictionary:
+	var result := {
+		"ok": false,
+		"reason": "not_found",
+		"name": "",
+		"gold": 0,
+		"items": {},
+	}
+	if uid <= 0:
+		result["reason"] = "invalid"
+		return result
+	if _is_uid_equipped(uid):
+		result["reason"] = "equipped"
+		return result
+
+	var idx := _find_bag_index(uid)
+	if idx < 0:
+		return result
+	var inst_any = bag[idx]
+	if not (inst_any is Dictionary):
+		return result
+	var inst: Dictionary = inst_any
+	if is_locked(inst):
+		result["reason"] = "locked"
+		return result
+	bag.remove_at(idx)
+
+	var rarity := str(inst.get("rarity", "white"))
+	var reward := _salvage_reward_for_rarity(rarity)
+	var gold := maxi(0, int(reward.get("gold", 0)))
+	var items_any = reward.get("items", {})
+	var reward_items: Dictionary = {}
+	if items_any is Dictionary:
+		for item_id_any in (items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			reward_items[item_id] = cnt
+
+	if gold > 0:
+		PlayerModel.add_gold(gold, false)
+	InventoryModel.add_items_bulk(reward_items, "system", false)
+
+	_request_save()
+	EventBus.notify_inventory_updated()
+	result["ok"] = true
+	result["reason"] = ""
+	result["name"] = str(inst.get("name", "装备"))
+	result["gold"] = gold
+	result["items"] = reward_items
+	return result
+
 func unequip(slot_key: String) -> void:
 	if not equipped.has(slot_key):
 		return
@@ -121,6 +343,61 @@ func unequip(slot_key: String) -> void:
 	_request_save()
 
 func get_total_stats() -> Dictionary:
+	return get_total_stats_with_override({})
+
+func get_total_stats_with_override(override_equipped: Dictionary) -> Dictionary:
+	var state := _build_override_equipped_state(override_equipped)
+	var sim_equipped_any: Variant = state.get("equipped", {})
+	var sim_store_any: Variant = state.get("store", {})
+	var sim_equipped: Dictionary = sim_equipped_any if sim_equipped_any is Dictionary else {}
+	var sim_store: Dictionary = sim_store_any if sim_store_any is Dictionary else {}
+	return _calc_totals_from_equipped(sim_equipped, sim_store)
+
+func get_total_stats_simulate_replace(slot_key: String, candidate_inst: Dictionary) -> Dictionary:
+	var override_equipped: Dictionary = {}
+	var normalized_slot := slot_key.strip_edges()
+	if not normalized_slot.is_empty():
+		override_equipped[normalized_slot] = candidate_inst if not candidate_inst.is_empty() else {}
+	return get_total_stats_with_override(override_equipped)
+
+func get_skill_level_bonuses(slot_key_override: String = "", candidate_inst: Dictionary = {}) -> Dictionary:
+	var state := _build_simulated_equipped_state(slot_key_override, candidate_inst)
+	var sim_store_any: Variant = state.get("store", {})
+	var sim_store: Dictionary = sim_store_any if sim_store_any is Dictionary else {}
+	var skill_bonuses: Dictionary = {}
+
+	for uid_any in sim_store.keys():
+		var inst_any = sim_store.get(uid_any, {})
+		if not (inst_any is Dictionary):
+			continue
+		var inst: Dictionary = inst_any
+		var effects := get_all_effects(inst)
+		for effect_any in effects:
+			if not (effect_any is Dictionary):
+				continue
+			var effect: Dictionary = effect_any
+			if str(effect.get("type", "")) != "skill_level":
+				continue
+			var skill_id := str(effect.get("skill_id", "")).strip_edges()
+			var val := int(effect.get("val", 0))
+			if skill_id.is_empty() or val == 0:
+				continue
+			skill_bonuses[skill_id] = int(skill_bonuses.get(skill_id, 0)) + val
+
+	var set_counts := _set_counts_from_store(sim_store)
+	var set_bonus := get_active_set_bonuses(set_counts)
+	var set_skills_any: Variant = set_bonus.get("skills", {})
+	if set_skills_any is Dictionary:
+		var set_skills: Dictionary = set_skills_any
+		for skill_id_any in set_skills.keys():
+			var skill_id := str(skill_id_any).strip_edges()
+			if skill_id.is_empty():
+				continue
+			skill_bonuses[skill_id] = int(skill_bonuses.get(skill_id, 0)) + int(set_skills.get(skill_id_any, 0))
+
+	return skill_bonuses
+
+func _calc_totals_from_equipped(equipped_map: Dictionary, equipped_store_map: Dictionary) -> Dictionary:
 	var base_stats: Dictionary = StatsServiceRef.calc_base_stats(ProgressModel.level, ProgressModel.attrs)
 	var totals := {
 		"HP": int(base_stats.get("HP", 10)),
@@ -133,12 +410,12 @@ func get_total_stats() -> Dictionary:
 		"SPELL_MUL_PERMILLE": int(base_stats.get("SPELL_MUL_PERMILLE", 1000)),
 	}
 
-	for slot_key_any in equipped.keys():
+	for slot_key_any in equipped_map.keys():
 		var slot_key := str(slot_key_any)
-		var uid := int(equipped.get(slot_key, 0))
+		var uid := int(equipped_map.get(slot_key, 0))
 		if uid == 0:
 			continue
-		var inst_any = equipped_store.get(uid, {})
+		var inst_any = equipped_store_map.get(uid, {})
 		if not (inst_any is Dictionary):
 			continue
 		var inst: Dictionary = inst_any
@@ -157,9 +434,219 @@ func get_total_stats() -> Dictionary:
 	for key in ["HP", "ATK", "DEF", "LOOT_BONUS_PERCENT"]:
 		totals[key] = int(totals.get(key, 0)) + int(gem_bonus.get(key, 0))
 
+	var set_counts := _set_counts_from_store(equipped_store_map)
+	var set_bonus: Dictionary = get_active_set_bonuses(set_counts)
+	var set_stats_any: Variant = set_bonus.get("stats", {})
+	if set_stats_any is Dictionary:
+		var set_stats: Dictionary = set_stats_any
+		for key_any in set_stats.keys():
+			var key := _normalize_stat_key(str(key_any))
+			var val := int(set_stats.get(key_any, 0))
+			if key.is_empty() or val == 0:
+				continue
+			totals[key] = int(totals.get(key, 0)) + val
+
 	totals["CRIT"] = int(totals.get("CRIT_PERCENT", 0))
 	totals["DROP"] = int(totals.get("LOOT_BONUS_PERCENT", 0))
 	return totals
+
+func get_set_counts(equipped_only: bool = true) -> Dictionary:
+	var counts := get_set_counts_with_override({})
+	if equipped_only:
+		return counts
+
+	for entry_any in bag:
+		if not (entry_any is Dictionary):
+			continue
+		var row: Dictionary = entry_any
+		var set_id := str(row.get("set_id", "")).strip_edges()
+		if set_id.is_empty():
+			continue
+		counts[set_id] = int(counts.get(set_id, 0)) + 1
+	return counts
+
+func get_set_counts_with_override(override_equipped: Dictionary) -> Dictionary:
+	var state := _build_override_equipped_state(override_equipped)
+	var sim_store_any: Variant = state.get("store", {})
+	var sim_store: Dictionary = sim_store_any if sim_store_any is Dictionary else {}
+	return _set_counts_from_store(sim_store)
+
+func get_set_counts_simulate_replace(target_slot: String, candidate_inst: Dictionary) -> Dictionary:
+	var override_equipped: Dictionary = {}
+	var slot_key := target_slot.strip_edges()
+	if not slot_key.is_empty():
+		override_equipped[slot_key] = candidate_inst if not candidate_inst.is_empty() else {}
+	return get_set_counts_with_override(override_equipped)
+
+func get_active_set_thresholds(set_counts: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	var sets := _equipment_sets_array()
+	for set_any in sets:
+		if not (set_any is Dictionary):
+			continue
+		var set_row: Dictionary = set_any
+		var set_id := str(set_row.get("id", "")).strip_edges()
+		if set_id.is_empty():
+			continue
+		var pieces := int(set_counts.get(set_id, 0))
+		var active_counts: Array[int] = []
+		var thresholds := _normalize_set_thresholds(set_row.get("thresholds", []))
+		for th_any in thresholds:
+			if not (th_any is Dictionary):
+				continue
+			var th: Dictionary = th_any
+			var need := maxi(1, int(th.get("count", 1)))
+			if pieces >= need:
+				active_counts.append(need)
+		if not active_counts.is_empty():
+			out[set_id] = active_counts
+	return out
+
+func get_new_set_activations(target_slot: String, candidate_inst: Dictionary) -> Array[Dictionary]:
+	var new_set := str(candidate_inst.get("set_id", "")).strip_edges()
+	if new_set.is_empty():
+		return []
+
+	var before_counts := get_set_counts(true)
+	var after_counts := get_set_counts_simulate_replace(target_slot, candidate_inst)
+	var before_active := get_active_set_thresholds(before_counts)
+	var after_active := get_active_set_thresholds(after_counts)
+	var activations: Array[Dictionary] = []
+
+	var sets := _equipment_sets_array()
+	for set_any in sets:
+		if not (set_any is Dictionary):
+			continue
+		var set_row: Dictionary = set_any
+		var set_id := str(set_row.get("id", "")).strip_edges()
+		if set_id.is_empty():
+			continue
+
+		var before_list_any = before_active.get(set_id, [])
+		var after_list_any = after_active.get(set_id, [])
+		var before_list: Array = before_list_any if before_list_any is Array else []
+		var after_list: Array = after_list_any if after_list_any is Array else []
+		if after_list.is_empty():
+			continue
+		for count_any in after_list:
+			var need := int(count_any)
+			if before_list.has(need):
+				continue
+			var bonuses := _bonuses_for_set_threshold(set_row, need)
+			var summary := _set_bonus_brief_text_limited(bonuses, 2)
+			activations.append({
+				"set_id": set_id,
+				"set_name": str(set_row.get("name", set_id)),
+				"count": need,
+				"summary": summary,
+			})
+	activations.sort_custom(_sort_activation_count_asc)
+	return activations
+
+func get_active_set_bonuses(set_counts_override: Dictionary = {}) -> Dictionary:
+	var stats := {
+		"HP": 0,
+		"ATK": 0,
+		"DEF": 0,
+		"QI": 0,
+		"CRIT_PERCENT": 0,
+		"LOOT_BONUS_PERCENT": 0,
+	}
+	var skills: Dictionary = {}
+	var lines: Array[String] = []
+	var set_counts: Dictionary = set_counts_override if not set_counts_override.is_empty() else get_set_counts(true)
+	var sets := _equipment_sets_array()
+	for set_any in sets:
+		if not (set_any is Dictionary):
+			continue
+		var set_row: Dictionary = set_any
+		var set_id := str(set_row.get("id", "")).strip_edges()
+		if set_id.is_empty():
+			continue
+		var set_name := str(set_row.get("name", set_id))
+		var max_pieces := maxi(1, int(set_row.get("max_pieces", 1)))
+		var pieces := int(set_counts.get(set_id, 0))
+		var thresholds := _normalize_set_thresholds(set_row.get("thresholds", []))
+		var next_line := ""
+		for th_any in thresholds:
+			if not (th_any is Dictionary):
+				continue
+			var th: Dictionary = th_any
+			var need := maxi(1, int(th.get("count", 1)))
+			var bonuses_any: Variant = th.get("bonuses", [])
+			var bonuses: Array = bonuses_any if bonuses_any is Array else []
+			var bonus_text := _set_bonus_brief_text(bonuses)
+			if pieces >= need:
+				_apply_set_bonus(stats, skills, bonuses)
+				if not bonus_text.is_empty():
+					lines.append("%s %d/%d：%d件 %s（已激活）" % [set_name, pieces, max_pieces, need, bonus_text])
+			elif next_line.is_empty():
+				if bonus_text.is_empty():
+					next_line = "%s：下一档 %d件" % [set_name, need]
+				else:
+					next_line = "%s：下一档 %d件 %s" % [set_name, need, bonus_text]
+		if not next_line.is_empty():
+			lines.append(next_line)
+
+	return {
+		"stats": stats,
+		"skills": skills,
+		"lines": lines,
+	}
+
+func get_active_set_bonuses_from_counts(set_counts: Dictionary) -> Dictionary:
+	return get_active_set_bonuses(set_counts)
+
+func _set_counts_from_store(store: Dictionary) -> Dictionary:
+	var counts: Dictionary = {}
+	for uid_any in store.keys():
+		var inst_any = store.get(uid_any, {})
+		if not (inst_any is Dictionary):
+			continue
+		var inst: Dictionary = inst_any
+		var set_id := str(inst.get("set_id", "")).strip_edges()
+		if set_id.is_empty():
+			continue
+		counts[set_id] = int(counts.get(set_id, 0)) + 1
+	return counts
+
+func _build_simulated_equipped_state(slot_key: String, candidate_inst: Dictionary) -> Dictionary:
+	var override_equipped: Dictionary = {}
+	var normalized_slot := slot_key.strip_edges()
+	if not normalized_slot.is_empty() and equipped.has(normalized_slot):
+		override_equipped[normalized_slot] = candidate_inst if not candidate_inst.is_empty() else {}
+	return _build_override_equipped_state(override_equipped)
+
+func _build_override_equipped_state(override_equipped: Dictionary) -> Dictionary:
+	var sim_equipped: Dictionary = {}
+	var sim_store: Dictionary = {}
+	var synthetic_uid := -1
+	for key_any in equipped.keys():
+		var slot_key := str(key_any)
+		var inst := _get_instance_for_slot_with_override(slot_key, override_equipped)
+		if inst.is_empty():
+			sim_equipped[slot_key] = 0
+			continue
+		inst = _ensure_socket_fields(inst)
+		var uid := int(inst.get("uid", 0))
+		if uid <= 0 or sim_store.has(uid):
+			uid = synthetic_uid
+			synthetic_uid -= 1
+			inst["uid"] = uid
+		sim_equipped[slot_key] = uid
+		sim_store[uid] = inst
+	return {
+		"equipped": sim_equipped,
+		"store": sim_store,
+	}
+
+func _get_instance_for_slot_with_override(slot_key: String, override_equipped: Dictionary) -> Dictionary:
+	if override_equipped.has(slot_key):
+		var override_any = override_equipped.get(slot_key, {})
+		if override_any is Dictionary:
+			return (override_any as Dictionary).duplicate(true)
+		return {}
+	return get_equipped_instance(slot_key)
 
 func get_effective_main_val(inst: Dictionary) -> int:
 	var base := int(inst.get("main_val", 0))
@@ -171,6 +658,167 @@ func get_effective_main_val(inst: Dictionary) -> int:
 	var tier_bonus: Dictionary = tier_bonus_any
 	var bonus := int(tier_bonus.get(str(tier), tier_bonus.get(tier, 0)))
 	return base + bonus
+
+func get_all_effects(inst: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var base_effects := _normalize_effects(inst.get("effects", []))
+	var extra_effects := _normalize_effects(inst.get("extra_effects", []))
+	out.append_array(base_effects)
+	out.append_array(extra_effects)
+	return out
+
+func can_refine(inst: Dictionary) -> bool:
+	return int(inst.get("refine_lv", 0)) < REFINE_MAX
+
+func get_refine_cost(rarity: String) -> Dictionary:
+	var defaults := {
+		"white": {"gold": 15, "items": {"玉屑": 2}},
+		"blue": {"gold": 40, "items": {"白玉碎": 2}},
+		"gold": {"gold": 100, "items": {"白玉碎": 5, "妖核": 1}},
+	}
+	var fallback_any = defaults.get(rarity, defaults.get("white", {}))
+	var fallback: Dictionary = fallback_any if fallback_any is Dictionary else {}
+	var out := {
+		"gold": maxi(0, int(fallback.get("gold", 0))),
+		"items": {},
+	}
+	var fallback_items_any = fallback.get("items", {})
+	if fallback_items_any is Dictionary:
+		out["items"] = (fallback_items_any as Dictionary).duplicate(true)
+
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var battle_any = cfg.get("battle", {})
+	if not (battle_any is Dictionary):
+		return out
+	var economy_any = (battle_any as Dictionary).get("economy", {})
+	if not (economy_any is Dictionary):
+		return out
+	var refine_any = (economy_any as Dictionary).get("refine_cost_by_rarity", {})
+	if not (refine_any is Dictionary):
+		return out
+	var row_any = (refine_any as Dictionary).get(rarity, {})
+	if not (row_any is Dictionary):
+		return out
+	var row: Dictionary = row_any
+	out["gold"] = maxi(0, int(row.get("gold", out.get("gold", 0))))
+
+	var cfg_items_any = row.get("items", {})
+	var cfg_items: Dictionary = {}
+	if cfg_items_any is Dictionary:
+		for item_id_any in (cfg_items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((cfg_items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			cfg_items[item_id] = cnt
+	out["items"] = cfg_items
+	return out
+
+func refine(uid: int) -> Dictionary:
+	var result := {
+		"ok": false,
+		"reason": "not_found",
+		"lv": 0,
+		"cost": {"gold": 0, "items": {}},
+		"new_effect": {},
+	}
+	if uid <= 0:
+		result["reason"] = "invalid"
+		return result
+
+	var inst := _get_instance_by_uid(uid)
+	if inst.is_empty():
+		return result
+
+	var lv := clampi(int(inst.get("refine_lv", 0)), 0, REFINE_MAX)
+	if lv >= REFINE_MAX:
+		result["reason"] = "max"
+		result["lv"] = lv
+		return result
+
+	var rarity := str(inst.get("rarity", "white"))
+	var cost := get_refine_cost(rarity)
+	var gold_cost := maxi(0, int(cost.get("gold", 0)))
+	result["cost"] = cost
+
+	if not PlayerModel.can_spend_gold(gold_cost):
+		result["reason"] = "no_gold"
+		return result
+
+	var cost_items_any = cost.get("items", {})
+	var cost_items: Dictionary = cost_items_any if cost_items_any is Dictionary else {}
+	for item_id_any in cost_items.keys():
+		var item_id := str(item_id_any).strip_edges()
+		var need := maxi(0, int(cost_items.get(item_id_any, 0)))
+		if item_id.is_empty() or need <= 0:
+			continue
+		if InventoryModel.get_count(item_id) < need:
+			result["reason"] = "no_items"
+			result["need_items"] = cost_items.duplicate(true)
+			return result
+
+	if not PlayerModel.spend_gold(gold_cost):
+		result["reason"] = "no_gold"
+		return result
+
+	var spent_items: Array[Dictionary] = []
+	for item_id_any in cost_items.keys():
+		var item_id := str(item_id_any).strip_edges()
+		var need := maxi(0, int(cost_items.get(item_id_any, 0)))
+		if item_id.is_empty() or need <= 0:
+			continue
+		if InventoryModel.consume_item(item_id, need, "system"):
+			spent_items.append({"id": item_id, "count": need})
+			continue
+		for row_any in spent_items:
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var rollback_id := str(row.get("id", "")).strip_edges()
+			var rollback_cnt := maxi(0, int(row.get("count", 0)))
+			if rollback_id.is_empty() or rollback_cnt <= 0:
+				continue
+			InventoryModel.add_item(rollback_id, rollback_cnt, "system")
+		if gold_cost > 0:
+			PlayerModel.add_gold(gold_cost)
+		result["reason"] = "no_items"
+		result["need_items"] = cost_items.duplicate(true)
+		return result
+
+	lv += 1
+	inst["refine_lv"] = lv
+	inst["main_min"] = int(inst.get("main_min", 0)) + 1
+	inst["main_max"] = int(inst.get("main_max", inst.get("main_min", 0))) + 1
+	inst["main_val"] = int(inst.get("main_val", 0)) + 1
+
+	var new_effect: Dictionary = {}
+	if lv == 3:
+		new_effect = _add_one_extra_effect(inst)
+	elif lv == 5:
+		new_effect = _add_one_extra_effect(inst)
+
+	if not _set_instance_by_uid(uid, inst):
+		for row_any in spent_items:
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var rollback_id := str(row.get("id", "")).strip_edges()
+			var rollback_cnt := maxi(0, int(row.get("count", 0)))
+			if rollback_id.is_empty() or rollback_cnt <= 0:
+				continue
+			InventoryModel.add_item(rollback_id, rollback_cnt, "system")
+		if gold_cost > 0:
+			PlayerModel.add_gold(gold_cost)
+		result["reason"] = "not_found"
+		return result
+
+	result["ok"] = true
+	result["reason"] = ""
+	result["lv"] = lv
+	result["new_effect"] = new_effect
+	EventBus.notify_inventory_updated()
+	_request_save()
+	return result
 
 func add_socket(uid: int) -> bool:
 	if uid <= 0:
@@ -347,14 +995,25 @@ func upgrade_equipment(uid: int) -> bool:
 func list_bag_sorted() -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	for entry_any in bag:
-		if entry_any is Dictionary:
-			var row := (entry_any as Dictionary).duplicate(true)
-			if str(row.get("icon", "")).is_empty():
-				var tpl: Dictionary = _find_template(str(row.get("template_id", "")))
-				row["icon"] = str(tpl.get("icon", ""))
-			rows.append(row)
+			if entry_any is Dictionary:
+				var row := _normalize_loaded_instance((entry_any as Dictionary).duplicate(true))
+				if str(row.get("icon", "")).is_empty():
+					var tpl: Dictionary = _find_template(str(row.get("template_id", "")))
+					row["icon"] = str(tpl.get("icon", ""))
+				rows.append(row)
 	rows.sort_custom(_sort_bag_rows)
 	return rows
+
+func remove_from_bag(uid: int) -> bool:
+	if uid <= 0:
+		return false
+	var idx := _find_bag_index(uid)
+	if idx < 0:
+		return false
+	bag.remove_at(idx)
+	_request_save()
+	EventBus.notify_inventory_updated()
+	return true
 
 func get_equipped_instance(slot_key: String) -> Dictionary:
 	if not equipped.has(slot_key):
@@ -411,12 +1070,11 @@ func _load_save() -> void:
 		var parsed: Variant = JSON.parse_string(txt)
 		if parsed is Dictionary:
 			next_uid = int((parsed as Dictionary).get("next_uid", 1))
-
 			var bag_any: Variant = (parsed as Dictionary).get("bag", [])
 			if bag_any is Array:
 				for e_any in bag_any:
 					if e_any is Dictionary:
-						bag.append((e_any as Dictionary).duplicate(true))
+						bag.append(_normalize_loaded_instance((e_any as Dictionary).duplicate(true)))
 
 			var eq_any: Variant = (parsed as Dictionary).get("equipped_items", {})
 			if eq_any is Dictionary:
@@ -427,7 +1085,7 @@ func _load_save() -> void:
 					var inst_any = (eq_any as Dictionary).get(slot_key_any, {})
 					if not (inst_any is Dictionary):
 						continue
-					var inst: Dictionary = (inst_any as Dictionary).duplicate(true)
+					var inst: Dictionary = _normalize_loaded_instance((inst_any as Dictionary).duplicate(true))
 					var uid := int(inst.get("uid", 0))
 					if uid <= 0:
 						continue
@@ -481,6 +1139,125 @@ func _find_template(template_id: String) -> Dictionary:
 		if str(tpl.get("id", "")) == template_id:
 			return tpl
 	return {}
+
+func _equipment_sets_array() -> Array:
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var db_any = cfg.get("equipment_sets_db", {})
+	if not (db_any is Dictionary):
+		return []
+	var rows_any = (db_any as Dictionary).get("equipment_sets", [])
+	if rows_any is Array:
+		return rows_any
+	return []
+
+func _normalize_set_thresholds(thresholds_any: Variant) -> Array:
+	var rows: Array[Dictionary] = []
+	if not (thresholds_any is Array):
+		return rows
+	for th_any in (thresholds_any as Array):
+		if not (th_any is Dictionary):
+			continue
+		var th_raw: Dictionary = th_any
+		var count := int(th_raw.get("count", 0))
+		if count < 1:
+			continue
+		var bonuses_any: Variant = th_raw.get("bonuses", [])
+		var bonuses: Array = bonuses_any if bonuses_any is Array else []
+		rows.append({
+			"count": count,
+			"bonuses": bonuses,
+		})
+	rows.sort_custom(_sort_threshold_count_asc)
+	return rows
+
+func _sort_threshold_count_asc(a: Dictionary, b: Dictionary) -> bool:
+	return int(a.get("count", 0)) < int(b.get("count", 0))
+
+func _sort_activation_count_asc(a: Dictionary, b: Dictionary) -> bool:
+	var ca := int(a.get("count", 0))
+	var cb := int(b.get("count", 0))
+	if ca != cb:
+		return ca < cb
+	return str(a.get("set_id", "")) < str(b.get("set_id", ""))
+
+func _bonuses_for_set_threshold(set_row: Dictionary, threshold_count: int) -> Array:
+	var thresholds := _normalize_set_thresholds(set_row.get("thresholds", []))
+	for th_any in thresholds:
+		if not (th_any is Dictionary):
+			continue
+		var th: Dictionary = th_any
+		if int(th.get("count", 0)) != threshold_count:
+			continue
+		var bonuses_any: Variant = th.get("bonuses", [])
+		if bonuses_any is Array:
+			return bonuses_any
+		return []
+	return []
+
+func _apply_set_bonus(stats: Dictionary, skills: Dictionary, bonuses: Array) -> void:
+	for bonus_any in bonuses:
+		if not (bonus_any is Dictionary):
+			continue
+		var bonus: Dictionary = bonus_any
+		var btype := str(bonus.get("type", ""))
+		if btype == "stat":
+			var stat := _normalize_stat_key(str(bonus.get("stat", "")))
+			var val := int(bonus.get("val", 0))
+			if stat.is_empty() or val == 0:
+				continue
+			stats[stat] = int(stats.get(stat, 0)) + val
+		elif btype == "skill_level":
+			var skill_id := str(bonus.get("skill_id", "")).strip_edges()
+			var sval := int(bonus.get("val", 0))
+			if skill_id.is_empty() or sval == 0:
+				continue
+			skills[skill_id] = int(skills.get(skill_id, 0)) + sval
+
+func _set_bonus_brief_text(bonuses: Array) -> String:
+	return _set_bonus_brief_text_limited(bonuses, -1)
+
+func _set_bonus_brief_text_limited(bonuses: Array, max_entries: int = -1) -> String:
+	var parts: Array[String] = []
+	var rendered := 0
+	var has_more := false
+	for bonus_any in bonuses:
+		if not (bonus_any is Dictionary):
+			continue
+		var bonus: Dictionary = bonus_any
+		var btype := str(bonus.get("type", ""))
+		var text := ""
+		if btype == "stat":
+			var stat := _normalize_stat_key(str(bonus.get("stat", "")))
+			var val := int(bonus.get("val", 0))
+			if stat.is_empty() or val == 0:
+				continue
+			var need_percent := stat == "CRIT_PERCENT" or stat == "LOOT_BONUS_PERCENT"
+			text = "%s+%d%s" % [I18nService.stat(stat), val, "%" if need_percent else ""]
+		elif btype == "skill_level":
+			var skill_id := str(bonus.get("skill_id", "")).strip_edges()
+			var sval := int(bonus.get("val", 0))
+			if skill_id.is_empty() or sval == 0:
+				continue
+			text = "%s+%d级" % [_skill_display_name(skill_id), sval]
+		else:
+			continue
+
+		if max_entries > 0 and rendered >= max_entries:
+			has_more = true
+			continue
+		parts.append(text)
+		rendered += 1
+
+	if max_entries > 0 and has_more:
+		parts.append("…")
+	return "，".join(parts)
+
+func _skill_display_name(skill_id: String) -> String:
+	if skill_id.is_empty():
+		return skill_id
+	if has_node("/root/SkillNameService"):
+		return SkillNameService.name(skill_id)
+	return skill_id
 
 func _upgrade_db() -> Dictionary:
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -679,7 +1456,7 @@ func _apply_socket_gem_bonus_from_instance(totals: Dictionary, inst: Dictionary)
 		totals[stat] = int(totals.get(stat, 0)) + val
 
 func _apply_effect_stat_bonus(totals: Dictionary, inst: Dictionary) -> void:
-	var effects := _normalize_effects(inst.get("effects", []))
+	var effects := get_all_effects(inst)
 	for effect in effects:
 		if not (effect is Dictionary):
 			continue
@@ -720,6 +1497,219 @@ func _normalize_effects(effects_any: Variant) -> Array[Dictionary]:
 			effect["val"] = bonus
 			out.append(effect)
 	return out
+
+func _identify_cost_for_rarity(rarity: String) -> int:
+	var defaults := {
+		"white": 20,
+		"blue": 60,
+		"gold": 160,
+	}
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var battle_any = cfg.get("battle", {})
+	if battle_any is Dictionary:
+		var economy_any = (battle_any as Dictionary).get("economy", {})
+		if economy_any is Dictionary:
+				var map_any = (economy_any as Dictionary).get("identify_cost_by_rarity", {})
+				if map_any is Dictionary:
+					return maxi(0, int((map_any as Dictionary).get(rarity, defaults.get(rarity, 20))))
+	return int(defaults.get(rarity, 20))
+
+func _salvage_reward_for_rarity(rarity: String) -> Dictionary:
+	var defaults := {
+		"white": {"gold": 8, "items": {"玉屑": 1}},
+		"blue": {"gold": 20, "items": {"白玉碎": 1}},
+		"gold": {"gold": 50, "items": {"白玉碎": 2, "妖核": 1}},
+	}
+	var fallback_any = defaults.get(rarity, defaults.get("white", {}))
+	var fallback: Dictionary = fallback_any if fallback_any is Dictionary else {}
+	var out := {
+		"gold": maxi(0, int(fallback.get("gold", 0))),
+		"items": {},
+	}
+	var fallback_items_any = fallback.get("items", {})
+	if fallback_items_any is Dictionary:
+		out["items"] = (fallback_items_any as Dictionary).duplicate(true)
+
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var battle_any = cfg.get("battle", {})
+	if not (battle_any is Dictionary):
+		return out
+	var economy_any = (battle_any as Dictionary).get("economy", {})
+	if not (economy_any is Dictionary):
+		return out
+	var salvage_any = (economy_any as Dictionary).get("salvage_reward_by_rarity", {})
+	if not (salvage_any is Dictionary):
+		return out
+	var row_any = (salvage_any as Dictionary).get(rarity, {})
+	if not (row_any is Dictionary):
+		return out
+	var row: Dictionary = row_any
+	out["gold"] = maxi(0, int(row.get("gold", out.get("gold", 0))))
+
+	var cfg_items_any = row.get("items", {})
+	var cfg_items: Dictionary = {}
+	if cfg_items_any is Dictionary:
+		for item_id_any in (cfg_items_any as Dictionary).keys():
+			var item_id := str(item_id_any).strip_edges()
+			var cnt := maxi(0, int((cfg_items_any as Dictionary).get(item_id_any, 0)))
+			if item_id.is_empty() or cnt <= 0:
+				continue
+			cfg_items[item_id] = cnt
+	out["items"] = cfg_items
+	return out
+
+func _is_uid_equipped(uid: int) -> bool:
+	if uid <= 0:
+		return false
+	for slot_key_any in equipped.keys():
+		if int(equipped.get(slot_key_any, 0)) == uid:
+			return true
+	return false
+
+func _pop_bag_instance(uid: int) -> Dictionary:
+	if uid <= 0:
+		return {}
+	var idx := _find_bag_index(uid)
+	if idx < 0:
+		return {}
+	var inst_any = bag[idx]
+	bag.remove_at(idx)
+	if inst_any is Dictionary:
+		return inst_any
+	return {}
+
+func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
+	var out := _ensure_socket_fields(inst)
+	var template_id := str(out.get("template_id", "")).strip_edges()
+	var tpl := _find_template(template_id)
+	var current_set := str(out.get("set_id", "")).strip_edges()
+	if current_set.is_empty():
+		out["set_id"] = str(tpl.get("set_id", ""))
+	out["identified"] = bool(out.get("identified", true))
+	out["locked"] = bool(out.get("locked", false))
+	out["refine_lv"] = clampi(int(out.get("refine_lv", 0)), 0, REFINE_MAX)
+	out["effects"] = _normalize_effects(out.get("effects", []))
+	out["extra_effects"] = _normalize_effects(out.get("extra_effects", []))
+	if str(out.get("icon", "")).is_empty():
+		out["icon"] = str(tpl.get("icon", ""))
+	return out
+
+func _add_one_extra_effect(inst: Dictionary) -> Dictionary:
+	var existing: Dictionary = {}
+	for old_any in get_all_effects(inst):
+		if not (old_any is Dictionary):
+			continue
+		var old_row: Dictionary = old_any
+		existing[_effect_key(old_row)] = true
+
+	var pool := _get_refine_effect_pool()
+	var picked: Dictionary = {}
+	for _i in range(5):
+		var row := _pick_weighted_effect(pool)
+		if row.is_empty():
+			continue
+		var key := _effect_key(row)
+		picked = row
+		if not existing.has(key):
+			break
+	if picked.is_empty():
+		return {}
+
+	var effect_type := str(picked.get("type", ""))
+	var clean := {
+		"type": effect_type,
+		"val": int(picked.get("val", 0)),
+	}
+	if effect_type == "stat":
+		clean["stat"] = str(picked.get("stat", ""))
+	elif effect_type == "skill_level":
+		clean["skill_id"] = str(picked.get("skill_id", ""))
+
+	var normalized_pick := _normalize_effects([clean])
+	if normalized_pick.is_empty():
+		return {}
+	var extras_any = inst.get("extra_effects", [])
+	var extras: Array[Dictionary] = []
+	if extras_any is Array:
+		extras = _normalize_effects(extras_any)
+	extras.append(normalized_pick[0])
+	inst["extra_effects"] = extras
+	return normalized_pick[0]
+
+func _effect_key(e: Dictionary) -> String:
+	var effect_type := str(e.get("type", ""))
+	if effect_type == "stat":
+		return "stat:%s" % str(e.get("stat", ""))
+	if effect_type == "skill_level":
+		return "skill:%s" % str(e.get("skill_id", ""))
+	return effect_type
+
+func _get_refine_effect_pool() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var battle_any = cfg.get("battle", {})
+	if battle_any is Dictionary:
+		var battle: Dictionary = battle_any
+		var pool_any = battle.get("refine_effect_pool", [])
+		var normalized := _normalize_weighted_refine_pool(pool_any)
+		if not normalized.is_empty():
+			return normalized
+	return _default_refine_effect_pool()
+
+func _default_refine_effect_pool() -> Array[Dictionary]:
+	return _normalize_weighted_refine_pool([
+		{"w": 40, "type": "stat", "stat": "ATK", "val": 1},
+		{"w": 30, "type": "stat", "stat": "DEF", "val": 1},
+		{"w": 20, "type": "stat", "stat": "HP", "val": 2},
+		{"w": 7, "type": "stat", "stat": "LOOT_BONUS_PERCENT", "val": 1},
+		{"w": 3, "type": "skill_level", "skill_id": "BING_01", "val": 1},
+	])
+
+func _normalize_weighted_refine_pool(pool_any: Variant) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not (pool_any is Array):
+		return out
+	var total_w := 0
+	for row_any in (pool_any as Array):
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var w := maxi(0, int(row.get("w", 0)))
+		if w <= 0:
+			continue
+		var normalized := _normalize_effects([row])
+		if normalized.is_empty():
+			continue
+		var effect: Dictionary = normalized[0].duplicate(true)
+		effect["w"] = w
+		out.append(effect)
+		total_w += w
+	if total_w <= 0:
+		return []
+	return out
+
+func _pick_weighted_effect(pool: Array[Dictionary]) -> Dictionary:
+	if pool.is_empty():
+		return {}
+	var total_w := 0
+	for row in pool:
+		total_w += maxi(0, int(row.get("w", 0)))
+	if total_w <= 0:
+		return {}
+	var r := randi() % total_w
+	var acc := 0
+	for row in pool:
+		var w := maxi(0, int(row.get("w", 0)))
+		if w <= 0:
+			continue
+		acc += w
+		if r < acc:
+			var picked := row.duplicate(true)
+			picked.erase("w")
+			return picked
+	var fallback := pool[0].duplicate(true)
+	fallback.erase("w")
+	return fallback
 
 func _find_item_def(item_id: String) -> Dictionary:
 	if item_id.is_empty():

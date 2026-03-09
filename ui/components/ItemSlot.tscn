@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://ui/components/ItemSlot.gd" id="1_2xnd8"]
 [ext_resource type="Texture2D" path="res://icon.svg" id="2_2bywn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_lock.png" id="3_lock"]
 
 [node name="ItemSlot" type="Control"]
 custom_minimum_size = Vector2(100, 100)
@@ -65,3 +66,36 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="LblTag" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 4.0
+offset_right = -6.0
+offset_bottom = 24.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.75, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 2
+vertical_alignment = 1
+text = "未鉴定"
+
+[node name="LockIcon" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -26.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 26.0
+mouse_filter = 2
+texture = ExtResource("3_lock")
+expand_mode = 1
+stretch_mode = 5

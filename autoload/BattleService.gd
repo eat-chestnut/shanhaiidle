@@ -60,6 +60,7 @@ var equip_drop_by_rarity: Dictionary = {}
 var special_drops: Dictionary = {}
 var _stage_drop: Dictionary = {}
 var _stage_special: Dictionary = {}
+var _stage_monsters: Dictionary = {}
 var stage_drop_mult := {
 	"item": 1.0,
 	"gem": 1.0,
@@ -262,6 +263,7 @@ func _load_battle_cfg() -> void:
 
 func _apply_stage_overrides(stage: Dictionary) -> void:
 	if stage.is_empty():
+		_apply_stage_monsters_patch({})
 		_apply_stage_spawn_patch({})
 		_set_stage_drop_mult({})
 		_apply_stage_drop_patch({})
@@ -269,9 +271,15 @@ func _apply_stage_overrides(stage: Dictionary) -> void:
 	stage_name = str(stage.get("name", stage_name))
 	elite_need = maxi(1, int(stage.get("elite_every_kills", elite_need)))
 	boss_need = maxi(1, int(stage.get("boss_every_kills", boss_need)))
+	_apply_stage_monsters_patch(stage.get("monsters", {}))
 	_apply_stage_spawn_patch(stage.get("spawn_patch", {}))
 	_set_stage_drop_mult(stage.get("drop_mult", {}))
 	_apply_stage_drop_patch(stage.get("drops_patch", {}))
+
+func _apply_stage_monsters_patch(monsters_any: Variant) -> void:
+	_stage_monsters.clear()
+	if monsters_any is Dictionary:
+		_stage_monsters = (monsters_any as Dictionary).duplicate(true)
 
 func _apply_stage_spawn_patch(patch_any: Variant) -> void:
 	if not (patch_any is Dictionary):
@@ -465,6 +473,133 @@ func _load_monsters_cfg(battle_cfg: Dictionary) -> void:
 			monsters_cfg[mon_id] = mon.duplicate(true)
 		if i == 0:
 			default_monster_cfg = mon.duplicate(true)
+
+func _get_monster_def_by_kind(kind: String) -> Dictionary:
+	var kind_key := _normalize_enemy_kind(kind)
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var monsters_db_any = cfg.get("monsters_db", {})
+	if monsters_db_any is Dictionary:
+		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
+		if monsters_any is Array:
+			for mon_any in monsters_any:
+				if not (mon_any is Dictionary):
+					continue
+				var mon: Dictionary = mon_any
+				if _normalize_enemy_kind(str(mon.get("kind", "normal"))) != kind_key:
+					continue
+				if mon.has("is_enabled") and not bool(mon.get("is_enabled", true)):
+					continue
+				return mon.duplicate(true)
+
+	match kind_key:
+		"elite":
+			if not elite_monster_cfg.is_empty():
+				return elite_monster_cfg.duplicate(true)
+		"boss":
+			if not boss_monster_cfg.is_empty():
+				return boss_monster_cfg.duplicate(true)
+		_:
+			var monster_id: String = str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))
+			var template_any = monsters_cfg.get(monster_id, default_monster_cfg)
+			if template_any is Dictionary:
+				return (template_any as Dictionary).duplicate(true)
+	return {}
+
+func _get_monster_def_by_id(monster_id: String) -> Dictionary:
+	var target_id := monster_id.strip_edges()
+	if target_id.is_empty():
+		return {}
+
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var monsters_db_any = cfg.get("monsters_db", {})
+	if monsters_db_any is Dictionary:
+		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
+		if monsters_any is Array:
+			for mon_any in monsters_any:
+				if not (mon_any is Dictionary):
+					continue
+				var mon: Dictionary = mon_any
+				if str(mon.get("id", "")).strip_edges() == target_id:
+					return mon.duplicate(true)
+
+	var battle_any = cfg.get("battle", {})
+	if battle_any is Dictionary:
+		var battle_cfg: Dictionary = battle_any
+		var normal_any = battle_cfg.get("monsters", [])
+		if normal_any is Array:
+			for mon_any in normal_any:
+				if not (mon_any is Dictionary):
+					continue
+				var mon: Dictionary = mon_any
+				if str(mon.get("id", "")).strip_edges() == target_id:
+					return mon.duplicate(true)
+
+		var elite_any = battle_cfg.get("elite_monster", {})
+		if elite_any is Dictionary:
+			var elite: Dictionary = elite_any
+			if str(elite.get("id", "")).strip_edges() == target_id:
+				return elite.duplicate(true)
+
+		var boss_any = battle_cfg.get("boss_monster", {})
+		if boss_any is Dictionary:
+			var boss: Dictionary = boss_any
+			if str(boss.get("id", "")).strip_edges() == target_id:
+				return boss.duplicate(true)
+
+	return {}
+
+func _get_monster_def_for_kind(kind: String) -> Dictionary:
+	var kind_key := _normalize_enemy_kind(kind)
+	var stage_monster_id := _get_monster_id_for_kind(kind_key)
+	if not stage_monster_id.is_empty():
+		var by_id := _get_monster_def_by_id(stage_monster_id)
+		if not by_id.is_empty():
+			by_id["kind"] = kind_key
+			return by_id
+
+	var fallback := _get_monster_def_by_kind(kind_key)
+	if not fallback.is_empty():
+		fallback["kind"] = kind_key
+	return fallback
+
+func _pick_from_pool(pool: Array) -> String:
+	var total := 0
+	for entry_any in pool:
+		if not (entry_any is Dictionary):
+			continue
+		var entry: Dictionary = entry_any
+		total += maxi(0, int(entry.get("w", 0)))
+	if total <= 0:
+		return ""
+
+	var roll := randi() % total
+	var acc := 0
+	for entry_any in pool:
+		if not (entry_any is Dictionary):
+			continue
+		var entry: Dictionary = entry_any
+		var w := maxi(0, int(entry.get("w", 0)))
+		acc += w
+		if roll < acc:
+			return str(entry.get("id", "")).strip_edges()
+	return ""
+
+func _get_monster_id_for_kind(kind: String) -> String:
+	var kind_key := _normalize_enemy_kind(kind)
+	if _stage_monsters.is_empty():
+		return ""
+
+	# pool structure: {normal_pool:[{id,w}], ...}
+	var pool_key := "%s_pool" % kind_key
+	var pool_any = _stage_monsters.get(pool_key, [])
+	if pool_any is Array:
+		var picked := _pick_from_pool(pool_any)
+		if not picked.is_empty():
+			return picked
+
+	# legacy structure: {normal:"mob_a", elite:"elite_a", boss:"boss_a"}
+	var legacy_id := str(_stage_monsters.get(kind_key, "")).strip_edges()
+	return legacy_id
 
 func _load_spawn_cfg(battle_cfg: Dictionary) -> void:
 	var spawn_points_any = battle_cfg.get("spawn_points", [])
@@ -723,18 +858,19 @@ func _process_spawn() -> void:
 	var respawn_s: float = maxf(0.05, float(spawn_rt.get("respawn_s", 1.6)))
 
 	if alive_count < max_alive and battle_time >= next_spawn_at:
-		_spawn_enemy()
-		alive_count += 1
-		spawn_rt["alive_count"] = alive_count
-		spawn_rt["next_spawn_at"] = battle_time + respawn_s
+		if _spawn_enemy():
+			alive_count += 1
+			spawn_rt["alive_count"] = alive_count
+			spawn_rt["next_spawn_at"] = battle_time + respawn_s
 
-func _spawn_enemy() -> void:
-	var monster_id: String = str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))
-	var template: Dictionary = default_monster_cfg
-	var template_any = monsters_cfg.get(monster_id, default_monster_cfg)
-	if template_any is Dictionary:
-		template = template_any
+func _spawn_enemy() -> bool:
+	var template: Dictionary = _get_monster_def_for_kind("normal")
+	if template.is_empty():
+		return false
 	MonsterDexModel.mark_seen(template)
+	var monster_id: String = str(template.get("id", str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))))
+	if monster_id.is_empty():
+		monster_id = str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))
 
 	var hp: int = int(template.get("hp", 30))
 	var enemy_radius: float = float(template.get("radius", 14.0))
@@ -766,14 +902,11 @@ func _spawn_enemy() -> void:
 		"drop_bonus_percent": maxi(0, int(template.get("drop_bonus_percent", 0))),
 	})
 	enemy_uid_seq += 1
+	return true
 
 func _spawn_special_enemy(kind: String) -> bool:
 	var normalized_kind := _normalize_enemy_kind(kind)
-	var template: Dictionary = {}
-	if normalized_kind == "boss":
-		template = boss_monster_cfg
-	elif normalized_kind == "elite":
-		template = elite_monster_cfg
+	var template: Dictionary = _get_monster_def_for_kind(normalized_kind)
 	if template.is_empty():
 		return false
 	MonsterDexModel.mark_seen(template)
@@ -989,7 +1122,7 @@ func _enemy_attack_player(delta: float) -> void:
 	player_last_hit_at = battle_time
 	hp_regen_accum = 0.0
 	if hit_log_cd <= 0.0:
-		EventBus.add_log("受击 -%d（HP %d/%d）" % [total_damage, hp_now, int(player.get("max_hp", hp_now))])
+		EventBus.add_log("受击 -%d（%s %d/%d）" % [total_damage, I18nService.stat("HP"), hp_now, int(player.get("max_hp", hp_now))])
 		hit_log_cd = HIT_LOG_INTERVAL
 
 	if hp_now <= 0:
@@ -1674,7 +1807,7 @@ func _log_skill_cast(skill_id: String, skill_name: String, damage: int) -> void:
 	if battle_time - last_ts < 0.3:
 		return
 	cast_log_recent[skill_id] = battle_time
-	EventBus.add_log("施放：%s 伤害%d Qi %d/%d" % [skill_name, maxi(0, damage), qi, qi_max])
+	EventBus.add_log("施放：%s 伤害%d %s %d/%d" % [skill_name, maxi(0, damage), I18nService.stat("QI"), qi, qi_max])
 
 func _build_ai_context() -> Dictionary:
 	var hp_now := maxi(0, int(player.get("hp", 0)))

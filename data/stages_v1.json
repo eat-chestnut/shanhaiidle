@@ -6,6 +6,11 @@
       "unlock_min_level": 1,
       "elite_every_kills": 40,
       "boss_every_kills": 120,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.70, "max_alive": 4, "spawn_radius": 220 },
       "drops_patch": {
         "drop_chance": 0.27,
@@ -40,6 +45,11 @@
       "unlock_min_level": 5,
       "elite_every_kills": 36,
       "boss_every_kills": 108,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.65, "max_alive": 5, "spawn_radius": 228 },
       "drops_patch": {
         "drop_chance": 0.28,
@@ -74,6 +84,11 @@
       "unlock_min_level": 9,
       "elite_every_kills": 34,
       "boss_every_kills": 102,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.58, "max_alive": 6, "spawn_radius": 236 },
       "drops_patch": {
         "drop_chance": 0.29,
@@ -108,6 +123,11 @@
       "unlock_min_level": 13,
       "elite_every_kills": 32,
       "boss_every_kills": 96,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.52, "max_alive": 7, "spawn_radius": 244 },
       "drops_patch": {
         "drop_chance": 0.30,
@@ -142,6 +162,11 @@
       "unlock_min_level": 19,
       "elite_every_kills": 30,
       "boss_every_kills": 90,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.46, "max_alive": 8, "spawn_radius": 252 },
       "drops_patch": {
         "drop_chance": 0.31,
@@ -176,6 +201,11 @@
       "unlock_min_level": 25,
       "elite_every_kills": 28,
       "boss_every_kills": 84,
+      "monsters": {
+        "normal_pool": [{ "id": "mob_a", "w": 100 }],
+        "elite_pool": [{ "id": "elite_a", "w": 100 }],
+        "boss_pool": [{ "id": "boss_a", "w": 100 }]
+      },
       "spawn_patch": { "respawn_s": 1.40, "max_alive": 9, "spawn_radius": 260 },
       "drops_patch": {
         "drop_chance": 0.31,

@@ -4,6 +4,8 @@ extends Control
 @onready var _icon: TextureRect = $Icon
 @onready var _name_label: Label = $Name
 @onready var _count_label: Label = $Count
+@onready var _tag_label: Label = $LblTag
+@onready var _lock_icon: TextureRect = $LockIcon
 
 var _tex_cache: Dictionary = {}
 
@@ -26,6 +28,8 @@ func set_item(item_id: String, name: String, rarity: String, count: int, icon_pa
 
 	_name_label.text = name if not name.is_empty() else item_id
 	_count_label.text = "x%d" % count if count > 1 else ""
+	clear_tag()
+	set_locked(false)
 
 func clear() -> void:
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -35,6 +39,23 @@ func clear() -> void:
 	_icon.visible = false
 	_name_label.text = ""
 	_count_label.text = ""
+	clear_tag()
+	set_locked(false)
+
+func set_locked(is_slot_locked: bool) -> void:
+	_lock_icon.visible = is_slot_locked
+
+func set_tag(text: String) -> void:
+	var tag := text.strip_edges()
+	if tag.is_empty():
+		clear_tag()
+		return
+	_tag_label.text = tag
+	_tag_label.visible = true
+
+func clear_tag() -> void:
+	_tag_label.text = ""
+	_tag_label.visible = false
 
 func _on_resized() -> void:
 	var side := minf(size.x, size.y)

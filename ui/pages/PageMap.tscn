@@ -64,19 +64,49 @@ theme_override_font_sizes/font_size = 34
 text = "地图"
 vertical_alignment = 1
 
-[node name="CurrentStage" type="Label" parent="RootVBox/Header/HeaderRow"]
+[node name="CurrentInfo" type="VBoxContainer" parent="RootVBox/Header/HeaderRow"]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-custom_minimum_size = Vector2(260, 0)
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="CurrentStage" type="Label" parent="RootVBox/Header/HeaderRow/CurrentInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "当前：南山·招摇"
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="LblCfgVersion" type="Label" parent="RootVBox/Header/HeaderRow/CurrentInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "配置：地图v0 物品v0 装备v0 怪物v0 技能v0 战斗v0"
+horizontal_alignment = 2
+vertical_alignment = 1
+modulate = Color(0.75, 0.75, 0.75, 1)
+
+[node name="LblBundleId" type="Label" parent="RootVBox/Header/HeaderRow/CurrentInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "Bundle：内置"
+horizontal_alignment = 2
+vertical_alignment = 1
+modulate = Color(0.75, 0.75, 0.75, 1)
 
 [node name="BtnDex" type="Button" parent="RootVBox/Header/HeaderRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(96, 44)
 theme_override_font_sizes/font_size = 20
 text = "图鉴"
+
+[node name="BtnUpdateConfig" type="Button" parent="RootVBox/Header/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(96, 44)
+theme_override_font_sizes/font_size = 20
+text = "更新配置"
 
 [node name="StageScroll" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2

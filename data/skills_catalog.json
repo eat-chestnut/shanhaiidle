@@ -1,0 +1,12 @@
+{
+  "skills_catalog": [
+    {
+      "id": "BING_01",
+      "name": "裂石击",
+      "desc": "",
+      "sect": "兵宗",
+      "sort_order": 10,
+      "is_enabled": true
+    }
+  ]
+}

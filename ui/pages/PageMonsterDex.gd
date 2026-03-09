@@ -23,10 +23,12 @@ const PAGE_MAP := "res://ui/pages/PageMap.tscn"
 
 var _monsters: Array[Dictionary] = []
 var _selected_idx := -1
+var _scene_index: Dictionary = {}
 
 func _ready() -> void:
 	_apply_i18n()
 	_connect_signals()
+	_rebuild_scene_index()
 	_load_monsters()
 	_rebuild_list()
 	if not _monsters.is_empty():
@@ -75,11 +77,31 @@ func _connect_signals() -> void:
 func _load_monsters() -> void:
 	_monsters.clear()
 	var cfg: Dictionary = ConfigService.get_cfg()
+
+	var monsters_db_any = cfg.get("monsters_db", {})
+	if monsters_db_any is Dictionary:
+		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
+		if monsters_any is Array and not (monsters_any as Array).is_empty():
+			var rows: Array[Dictionary] = []
+			for mon_any in monsters_any:
+				if not (mon_any is Dictionary):
+					continue
+				var mon: Dictionary = mon_any
+				if mon.has("is_enabled") and not bool(mon.get("is_enabled", true)):
+					continue
+				var row := mon.duplicate(true)
+				row["kind"] = _normalize_kind(str(row.get("kind", "normal")))
+				rows.append(row)
+			if not rows.is_empty():
+				rows.sort_custom(_sort_monster_rows)
+				for row in rows:
+					_monsters.append(row)
+				return
+
 	var battle_any = cfg.get("battle", {})
 	if not (battle_any is Dictionary):
 		return
 	var battle_cfg: Dictionary = battle_any
-
 	var normal_any = battle_cfg.get("monsters", [])
 	if normal_any is Array and not (normal_any as Array).is_empty():
 		var first_any = (normal_any as Array)[0]
@@ -87,18 +109,106 @@ func _load_monsters() -> void:
 			var normal: Dictionary = (first_any as Dictionary).duplicate(true)
 			normal["kind"] = "normal"
 			_monsters.append(normal)
-
 	var elite_any = battle_cfg.get("elite_monster", {})
 	if elite_any is Dictionary:
 		var elite: Dictionary = (elite_any as Dictionary).duplicate(true)
 		elite["kind"] = "elite"
 		_monsters.append(elite)
-
 	var boss_any = battle_cfg.get("boss_monster", {})
 	if boss_any is Dictionary:
 		var boss: Dictionary = (boss_any as Dictionary).duplicate(true)
 		boss["kind"] = "boss"
 		_monsters.append(boss)
+
+func _rebuild_scene_index() -> void:
+	_scene_index.clear()
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var stages_db_any = cfg.get("stages_db", {})
+	if not (stages_db_any is Dictionary):
+		return
+	var stages_any = (stages_db_any as Dictionary).get("stages", [])
+	if not (stages_any is Array):
+		return
+
+	for s_any in stages_any:
+		if not (s_any is Dictionary):
+			continue
+		var stage: Dictionary = s_any
+		var stage_name := str(stage.get("name", stage.get("id", ""))).strip_edges()
+		if stage_name.is_empty():
+			continue
+		var monsters_any = stage.get("monsters", {})
+		if not (monsters_any is Dictionary):
+			continue
+		var monsters: Dictionary = monsters_any
+
+		_collect_stage_role(stage_name, "普通", monsters, "normal")
+		_collect_stage_role(stage_name, "精英", monsters, "elite")
+		_collect_stage_role(stage_name, "Boss", monsters, "boss")
+
+func _collect_stage_role(stage_name: String, role_label: String, monsters: Dictionary, kind: String) -> void:
+	var pool_key := "%s_pool" % kind
+	if monsters.has(pool_key) and monsters.get(pool_key) is Array:
+		var pool: Array = monsters.get(pool_key, [])
+		for e_any in pool:
+			if not (e_any is Dictionary):
+				continue
+			var entry: Dictionary = e_any
+			var mid := str(entry.get("id", "")).strip_edges()
+			if mid.is_empty():
+				continue
+			_add_scene(mid, stage_name, role_label)
+		return
+
+	if monsters.has(kind) and monsters.get(kind) is String:
+		var legacy_id := str(monsters.get(kind, "")).strip_edges()
+		if legacy_id.is_empty():
+			return
+		_add_scene(legacy_id, stage_name, role_label)
+
+func _add_scene(monster_id: String, stage_name: String, role_label: String) -> void:
+	var rows: Array[String] = []
+	var rows_any = _scene_index.get(monster_id, [])
+	if rows_any is Array:
+		for line_any in rows_any:
+			rows.append(str(line_any))
+
+	for i in range(rows.size()):
+		var line := rows[i]
+		if line.begins_with(stage_name + "（"):
+			if line.find(role_label) == -1:
+				rows[i] = line.replace("）", "、%s）" % role_label)
+			_scene_index[monster_id] = rows
+			return
+
+	rows.append("%s（%s）" % [stage_name, role_label])
+	_scene_index[monster_id] = rows
+
+func _normalize_kind(raw_kind: String) -> String:
+	var kind := raw_kind.strip_edges().to_lower()
+	if kind == "elite" or kind == "boss":
+		return kind
+	return "normal"
+
+func _kind_sort_value(kind: String) -> int:
+	match kind:
+		"elite":
+			return 1
+		"boss":
+			return 2
+		_:
+			return 0
+
+func _sort_monster_rows(a: Dictionary, b: Dictionary) -> bool:
+	var ka := _kind_sort_value(_normalize_kind(str(a.get("kind", "normal"))))
+	var kb := _kind_sort_value(_normalize_kind(str(b.get("kind", "normal"))))
+	if ka != kb:
+		return ka < kb
+	var sa := int(a.get("sort_order", 0))
+	var sb := int(b.get("sort_order", 0))
+	if sa != sb:
+		return sa < sb
+	return str(a.get("id", "")) < str(b.get("id", ""))
 
 func _rebuild_list() -> void:
 	for child in _monster_list.get_children():
@@ -203,9 +313,9 @@ func _refresh_detail() -> void:
 	lines.append("%s（%s）" % [name, "已解锁" if unlocked else "未解锁"])
 	lines.append("ID：%s" % monster_id)
 	lines.append("类型：%s" % _kind_name(kind))
-	lines.append("HP：%d" % int(m.get("hp", 0)))
-	lines.append("ATK：%d" % int(m.get("atk", 0)))
-	lines.append("DEF：%d" % int(m.get("def", 0)))
+	lines.append("%s：%d" % [I18nService.stat("HP"), int(m.get("hp", 0))])
+	lines.append("%s：%d" % [I18nService.stat("ATK"), int(m.get("atk", 0))])
+	lines.append("%s：%d" % [I18nService.stat("DEF"), int(m.get("def", 0))])
 	lines.append("攻速：%.2f" % float(m.get("attack_interval", 0.0)))
 	lines.append("移速：%.0f" % float(m.get("speed", 0.0)))
 	lines.append("警戒范围：%.0f" % float(m.get("aggro_range", 0.0)))
@@ -214,6 +324,21 @@ func _refresh_detail() -> void:
 	lines.append("掉落加成：%d%%" % int(m.get("drop_bonus_percent", 0)))
 	lines.append("解锁状态：%s" % ("已解锁" if unlocked else "未解锁"))
 	lines.append("解锁奖励：金币%d（%s）" % [reward_gold, "已领取" if got_reward else "未领取（点击领取）"])
+	lines.append("")
+	var scenes_any = _scene_index.get(monster_id, [])
+	var scenes: Array[String] = []
+	if scenes_any is Array:
+		for scene_any in scenes_any:
+			scenes.append(str(scene_any))
+	if scenes.is_empty():
+		lines.append("出现场景：暂无")
+	else:
+		lines.append("出现场景：")
+		var max_show := mini(8, scenes.size())
+		for i in range(max_show):
+			lines.append("- %s" % scenes[i])
+		if scenes.size() > max_show:
+			lines.append("...（共%d处）" % scenes.size())
 	_detail_text.text = "\n".join(lines)
 
 	if MonsterDexModel.can_claim(monster_id):

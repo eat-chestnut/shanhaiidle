@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://btpnvleu3n2k1"]
+[gd_scene load_steps=8 format=3 uid="uid://btpnvleu3n2k1"]
 
 [ext_resource type="Script" uid="uid://cf13dvrwog3r2" path="res://ui/components/InventoryOverlay.gd" id="1_0xg2o"]
 [ext_resource type="Texture2D" uid="uid://bbedsxmsk4wlk" path="res://icon.svg" id="2_6f2ki"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://ui/components/AttributePopup.tscn" id="4_j4xkg"]
 [ext_resource type="PackedScene" path="res://ui/components/GemPopup.tscn" id="5_5v6f4"]
 [ext_resource type="PackedScene" path="res://ui/components/GemSelectPopup.tscn" id="6_07j2d"]
+[ext_resource type="PackedScene" path="res://ui/components/BulkSalvagePopup.tscn" id="7_gm4h2"]
 
 [node name="InventoryOverlay" type="Control"]
 layout_mode = 3
@@ -318,10 +319,10 @@ text = "属性"
 custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "HP 200
-ATK 12
-DEF 4
-CRIT 0"
+text = "生命 200
+攻击 12
+防御 4
+暴击 0%"
 scroll_active = false
 
 [node name="BtnAddPoint" type="Button" parent="Panel/VBox/TopSection/StatsPanel/VBox"]
@@ -438,6 +439,60 @@ theme_override_font_sizes/font_size = 22
 text = "宝石"
 vertical_alignment = 1
 
+[node name="TabSpacer" type="Control" parent="Panel/VBox/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnBulkSalvage" type="Button" parent="Panel/VBox/Tabs"]
+custom_minimum_size = Vector2(140, 48)
+layout_mode = 2
+text = "一键分解"
+
+[node name="FilterBar" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PadLeft" type="Control" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="OptRarity" type="OptionButton" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(108, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OptState" type="OptionButton" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(128, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OptSet" type="OptionButton" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OptSort" type="OptionButton" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TxtSearch" type="LineEdit" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(220, 40)
+layout_mode = 2
+placeholder_text = "搜索（名称/ID）"
+clear_button_enabled = true
+
+[node name="BtnClear" type="Button" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(96, 40)
+layout_mode = 2
+text = "清除"
+
+[node name="PadRight" type="Control" parent="Panel/VBox/FilterBar"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
 [node name="BottomScroll" type="ScrollContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -458,3 +513,5 @@ columns = 5
 [node name="GemPopup" parent="." instance=ExtResource("5_5v6f4")]
 
 [node name="GemSelectPopup" parent="." instance=ExtResource("6_07j2d")]
+
+[node name="BulkSalvagePopup" parent="." instance=ExtResource("7_gm4h2")]

@@ -21,3 +21,6 @@ func t(key: String, fallback: String = "") -> String:
 	if not fallback.is_empty():
 		return fallback
 	return key
+
+func stat(key: String) -> String:
+	return t("stat.%s" % key, key)

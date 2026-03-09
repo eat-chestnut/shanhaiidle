@@ -46,6 +46,7 @@ func _rebuild_skill_nodes() -> void:
 	var skills := _active_skills_for_current_class()
 	for skill in skills:
 		var skill_id := str(skill.get("id", ""))
+		var skill_name := SkillNameService.name(skill_id)
 		var base_lv := SkillModel.get_skill_level(skill_id)
 		var eff_lv := SkillModel.get_effective_level(skill_id)
 		var bonus_lv := eff_lv - base_lv
@@ -73,21 +74,22 @@ func _rebuild_skill_nodes() -> void:
 		var title := Label.new()
 		title.add_theme_font_size_override("font_size", 22)
 		if bonus_lv > 0:
-			title.text = "%s  Lv.%d(+%d)/%d" % [str(skill.get("name", skill_id)), base_lv, bonus_lv, max_lv]
+			title.text = "%s  Lv.%d(+%d)/%d" % [skill_name, base_lv, bonus_lv, max_lv]
 		else:
-			title.text = "%s  Lv.%d/%d" % [str(skill.get("name", skill_id)), base_lv, max_lv]
+			title.text = "%s  Lv.%d/%d" % [skill_name, base_lv, max_lv]
 		info.add_child(title)
 
 		var meta := Label.new()
 		meta.add_theme_font_size_override("font_size", 16)
-		meta.text = "需Lv%d  Qi:%d  CD:%.1fs" % [min_lv, cost_qi, cd_sec]
+		meta.text = "需Lv%d  %s:%d  CD:%.1fs" % [min_lv, I18nService.stat("QI"), cost_qi, cd_sec]
 		info.add_child(meta)
 
 		var desc := Label.new()
 		desc.add_theme_font_size_override("font_size", 16)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		desc.modulate = Color(0.8, 0.8, 0.8, 1.0)
-		desc.text = _build_skill_desc(skill)
+		var manual_desc := SkillNameService.desc(skill_id).strip_edges()
+		desc.text = manual_desc if not manual_desc.is_empty() else _build_skill_desc(skill)
 		info.add_child(desc)
 
 		var btn := Button.new()

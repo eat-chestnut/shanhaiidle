@@ -25,12 +25,24 @@ func open(item_row: Dictionary) -> void:
 
 	var rarity := str(item_row.get("rarity", "white"))
 	var trait_text := str(item_row.get("trait", ""))
+	var gem_effect_any = item_row.get("gem_effect", {})
+	var gem_effect: Dictionary = gem_effect_any if gem_effect_any is Dictionary else {}
 	var rarity_name := I18nService.t("rarity.%s" % rarity, rarity)
 	var trait_title := I18nService.t("ui.gem_trait", "特性")
 	var none_text := I18nService.t("ui.none", "暂无")
 
 	var lines: Array[String] = []
 	lines.append("%s：%s" % [I18nService.t("ui.popup.rarity", "稀有度"), rarity_name])
+	var effect_stat := str(gem_effect.get("stat", "")).strip_edges()
+	var effect_val := int(gem_effect.get("val", 0))
+	if not effect_stat.is_empty() and effect_val != 0:
+		var is_percent := effect_stat == "LOOT_BONUS_PERCENT" or effect_stat == "CRIT_PERCENT"
+		lines.append("%s：%s +%d%s" % [
+			I18nService.t("ui.popup.main_stat", "主属性"),
+			I18nService.stat(effect_stat),
+			effect_val,
+			"%" if is_percent else ""
+		])
 	lines.append("")
 	if trait_text.is_empty():
 		lines.append("%s：%s" % [trait_title, none_text])

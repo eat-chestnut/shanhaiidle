@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/BulkSalvagePopup.gd" id="1_bulk"]
+
+[node name="BulkSalvagePopup" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_bulk")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -210.0
+offset_right = 280.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+
+[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "一键分解"
+vertical_alignment = 1
+
+[node name="BtnClose" type="Button" parent="Panel/VBox/TopBar"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 2
+text = "关闭"
+
+[node name="OptionsBox" type="VBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CkBlueUnder" type="CheckBox" parent="Panel/VBox/OptionsBox"]
+layout_mode = 2
+button_pressed = true
+text = "蓝以下（白+蓝）"
+
+[node name="CkUnidentified" type="CheckBox" parent="Panel/VBox/OptionsBox"]
+layout_mode = 2
+text = "仅未鉴定"
+
+[node name="CkDupSet" type="CheckBox" parent="Panel/VBox/OptionsBox"]
+layout_mode = 2
+button_pressed = true
+text = "重复套装（保留更好的一件）"
+
+[node name="LblPreview" type="RichTextLabel" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 150)
+fit_content = false
+scroll_active = true
+text = "将分解：0件"
+
+[node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 56)
+theme_override_constants/separation = 10
+
+[node name="BtnCancel" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "取消"
+
+[node name="BtnConfirm" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "确认分解"

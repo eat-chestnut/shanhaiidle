@@ -94,11 +94,23 @@ func refresh_ui() -> void:
 	])
 	lines.append("%s: %d" % [I18nService.t("ui.attr_points", "属性点"), points])
 	lines.append("")
-	lines.append("HP %d  Qi %d" % [int(stats.get("HP", 10)), int(stats.get("QI", 10))])
-	lines.append("ATK %d  DEF %d" % [int(stats.get("ATK", 1)), int(stats.get("DEF", 0))])
-	lines.append("Crit%% %d  Drop%% %d" % [
+	lines.append("%s %d  %s %d" % [
+		I18nService.stat("HP"),
+		int(stats.get("HP", 10)),
+		I18nService.stat("QI"),
+		int(stats.get("QI", 10))
+	])
+	lines.append("%s %d  %s %d" % [
+		I18nService.stat("ATK"),
+		int(stats.get("ATK", 1)),
+		I18nService.stat("DEF"),
+		int(stats.get("DEF", 0))
+	])
+	lines.append("%s %d%%  %s %d%%" % [
+		I18nService.stat("CRIT_PERCENT"),
 		int(stats.get("CRIT_PERCENT", 5)),
-		int(stats.get("LOOT_BONUS_PERCENT", 0)),
+		I18nService.stat("LOOT_BONUS_PERCENT"),
+		int(stats.get("LOOT_BONUS_PERCENT", 0))
 	])
 	_stats_text.text = "\n".join(lines)
 	_refresh_badges()
