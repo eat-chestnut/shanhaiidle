@@ -1,0 +1,863 @@
+{
+    "meta": {
+        "key": "material_catalog",
+        "version": 6,
+        "exported_at": "2026-03-10 13:02:52",
+        "sha256": "e6348ac7a59971e7d3a4adcafa0dab0f0cc533b81ed787b8eb77d69fae044041"
+    },
+    "material_catalog": [
+        {
+            "id": "桂枝",
+            "name": "桂枝",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 10
+        },
+        {
+            "id": "玉屑",
+            "name": "玉屑",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 20
+        },
+        {
+            "id": "白玉碎",
+            "name": "白玉碎",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 30
+        },
+        {
+            "id": "妖核",
+            "name": "妖核",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 40
+        },
+        {
+            "id": "宗门令",
+            "name": "宗门令",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "currency",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "currency"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 50
+        },
+        {
+            "id": "打孔石",
+            "name": "打孔石",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "gem",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "gem"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 60
+        },
+        {
+            "id": "玄铁屑",
+            "name": "玄铁屑",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 61
+        },
+        {
+            "id": "灵髓",
+            "name": "灵髓",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 62
+        },
+        {
+            "id": "南山玉印",
+            "name": "南山玉印",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 63
+        },
+        {
+            "id": "forge_base_t1",
+            "name": "初阶打造精华",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 100
+        },
+        {
+            "id": "forge_base_t2",
+            "name": "中阶打造精华",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 101
+        },
+        {
+            "id": "forge_base_t3",
+            "name": "高阶打造精华",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 102
+        },
+        {
+            "id": "forge_base_t4",
+            "name": "极阶打造精华",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 103
+        },
+        {
+            "id": "forge_weapon_t1",
+            "name": "初阶兵铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 110
+        },
+        {
+            "id": "forge_armor_t1",
+            "name": "初阶甲铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 111
+        },
+        {
+            "id": "forge_cloak_t1",
+            "name": "初阶披饰片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 112
+        },
+        {
+            "id": "forge_accessory_t1",
+            "name": "初阶饰铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 113
+        },
+        {
+            "id": "forge_weapon_t2",
+            "name": "中阶兵铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 114
+        },
+        {
+            "id": "forge_armor_t2",
+            "name": "中阶甲铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 115
+        },
+        {
+            "id": "forge_cloak_t2",
+            "name": "中阶披饰片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 116
+        },
+        {
+            "id": "forge_accessory_t2",
+            "name": "中阶饰铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 117
+        },
+        {
+            "id": "forge_weapon_t3",
+            "name": "高阶兵铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 118
+        },
+        {
+            "id": "forge_armor_t3",
+            "name": "高阶甲铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 119
+        },
+        {
+            "id": "forge_cloak_t3",
+            "name": "高阶披饰片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 120
+        },
+        {
+            "id": "forge_accessory_t3",
+            "name": "高阶饰铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 121
+        },
+        {
+            "id": "forge_weapon_t4",
+            "name": "极阶兵铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 122
+        },
+        {
+            "id": "forge_armor_t4",
+            "name": "极阶甲铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 123
+        },
+        {
+            "id": "forge_cloak_t4",
+            "name": "极阶披饰片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 124
+        },
+        {
+            "id": "forge_accessory_t4",
+            "name": "极阶饰铸片",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 125
+        },
+        {
+            "id": "theme_rare_nanshan",
+            "name": "南山灵铁",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 130
+        },
+        {
+            "id": "theme_rare_qingqiu",
+            "name": "青丘灵丝",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 131
+        },
+        {
+            "id": "theme_rare_kunlun",
+            "name": "昆仑玄晶",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "craft"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 132
+        },
+        {
+            "id": "boss_mark_nanshan",
+            "name": "南山印记",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 140
+        },
+        {
+            "id": "boss_core_nanshan",
+            "name": "南山核心",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 141
+        },
+        {
+            "id": "boss_mark_qingqiu",
+            "name": "青丘印记",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 142
+        },
+        {
+            "id": "boss_core_qingqiu",
+            "name": "青丘核心",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 143
+        },
+        {
+            "id": "boss_mark_kunlun",
+            "name": "昆仑印记",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 144
+        },
+        {
+            "id": "boss_core_kunlun",
+            "name": "昆仑核心",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "rarity": "orange",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "boss"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 145
+        },
+        {
+            "id": "bp_fragment_nanshan",
+            "name": "南山图纸碎片",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "rarity": "blue",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "sort_order": 150
+        },
+        {
+            "id": "bp_fragment_qingqiu",
+            "name": "青丘图纸碎片",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "rarity": "purple",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "sort_order": 151
+        },
+        {
+            "id": "bp_fragment_kunlun",
+            "name": "昆仑图纸碎片",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "rarity": "gold",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "sort_order": 152
+        },
+        {
+            "id": "bp_weapon_nanshan_t1_01",
+            "name": "南山主武图纸·壹",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "rarity": "blue",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ],
+            "stack_limit": 999,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "sort_order": 160
+        },
+        {
+            "id": "bp_bracelet_qingqiu_t2_01",
+            "name": "青丘手镯图纸·壹",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "rarity": "purple",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ],
+            "stack_limit": 999,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "sort_order": 161
+        },
+        {
+            "id": "bp_cloak_qingqiu_t2_01",
+            "name": "青丘披饰图纸·壹",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "rarity": "purple",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ],
+            "stack_limit": 999,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "sort_order": 162
+        },
+        {
+            "id": "bp_ring_nanshan_t2_01",
+            "name": "南山戒指图纸·壹",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "rarity": "blue",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ],
+            "stack_limit": 999,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "sort_order": 163
+        },
+        {
+            "id": "bp_main_weapon_kunlun_t3_01",
+            "name": "昆仑主武图纸·壹",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "rarity": "gold",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ],
+            "stack_limit": 999,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "sort_order": 164
+        },
+        {
+            "id": "star_stone_t1_common",
+            "name": "初阶星石",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "rarity": "white",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "star"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 170
+        },
+        {
+            "id": "star_stone_t2_common",
+            "name": "中阶星石",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "star"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 171
+        },
+        {
+            "id": "star_stone_t3_common",
+            "name": "高阶星石",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "star"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 172
+        },
+        {
+            "id": "star_stone_t4_common",
+            "name": "极阶星石",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "rarity": "gold",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "star"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 173
+        },
+        {
+            "id": "refine_sand_basic",
+            "name": "洗炼砂",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "refine",
+            "rarity": "blue",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "refine"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 180
+        },
+        {
+            "id": "refine_core_advanced",
+            "name": "洗炼精核",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "refine",
+            "rarity": "purple",
+            "desc": "",
+            "source_tags": [],
+            "use_tags": [
+                "refine"
+            ],
+            "stack_limit": 9999,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "sort_order": 181
+        }
+    ]
+}

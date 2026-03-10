@@ -224,7 +224,7 @@ func _apply_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.map", "地图")
+	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
 	_btn_nav_skills.disabled = true
 	_btn_nav_dex.disabled = false
 	_btn_nav_map.disabled = false
@@ -264,7 +264,7 @@ func _on_nav_dex_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageDexHome.tscn")
 
 func _on_nav_map_pressed() -> void:
-	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
+	get_tree().change_scene_to_file("res://ui/pages/PageDungeon.tscn")
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):

@@ -7,6 +7,7 @@ const PAGE_MAP := "res://ui/pages/PageMap.tscn"
 const PAGE_DEX_HOME := "res://ui/pages/PageDexHome.tscn"
 const PAGE_ITEM_DEX := "res://ui/pages/PageItemDex.tscn"
 const PAGE_EQUIP_DEX := "res://ui/pages/PageEquipDex.tscn"
+const PAGE_DUNGEON := "res://ui/pages/PageDungeon.tscn"
 
 @onready var _title: Label = $RootVBox/Header/HeaderRow/Title
 @onready var _hint: Label = $RootVBox/Header/HeaderRow/Hint
@@ -61,7 +62,7 @@ func _apply_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.map", "地图")
+	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
 	_btn_nav_dex.disabled = true
 	_btn_nav_bag.disabled = false
 	_btn_nav_character.disabled = false
@@ -419,7 +420,7 @@ func _on_nav_bag_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_BATTLE)
 
 func _on_nav_map_pressed() -> void:
-	get_tree().change_scene_to_file(PAGE_MAP)
+	get_tree().change_scene_to_file(PAGE_DUNGEON)
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):

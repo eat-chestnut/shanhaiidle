@@ -34,16 +34,44 @@ class ExportEquipTemplatesJson extends Command
             ->get()
             ->map(function (EquipTemplate $tpl): array {
                 $effects = is_array($tpl->effects) ? array_values($tpl->effects) : [];
+                $whiteStats = $this->normalizeStatMap($tpl->white_stats);
+                if ($whiteStats === [] && filled($tpl->main_stat)) {
+                    $whiteStats = [
+                        (string) $tpl->main_stat => (int) $tpl->main_max,
+                    ];
+                }
+                $starGrowth = $this->normalizeStatMap($tpl->star_growth);
                 $row = [
                     'id' => (string) $tpl->id,
                     'name' => (string) $tpl->name,
                     'slot' => (string) $tpl->slot,
+                    'equip_type' => (string) ($tpl->equip_type ?? 'set'),
                     'rarity' => (string) $tpl->rarity,
+                    'required_level' => (int) ($tpl->required_level ?? 1),
                     'main_stat' => (string) $tpl->main_stat,
                     'main_min' => (int) $tpl->main_min,
                     'main_max' => (int) $tpl->main_max,
+                    'white_stats' => $whiteStats,
+                    'star_growth' => $starGrowth,
+                    'star_enabled' => (bool) ($tpl->star_enabled ?? true),
+                    'star_cap' => (int) ($tpl->star_cap ?? 10),
+                    'can_attach_blue_affix' => (bool) ($tpl->can_attach_blue_affix ?? false),
+                    'can_roll_purple_affix' => (bool) ($tpl->can_roll_purple_affix ?? false),
                     'unidentified_chance' => round((float) ($tpl->unidentified_chance ?? 0), 3),
                     'icon' => (string) ($tpl->icon ?? ''),
+                    'set_line_id' => (string) ($tpl->set_line_id ?? ''),
+                    'set_stage' => (int) ($tpl->set_stage ?? 0),
+                    'flow_tag' => (string) ($tpl->flow_tag ?? ''),
+                    'socket_rule_ref' => (string) ($tpl->socket_rule_ref ?? ''),
+                    'quality_tier' => (string) ($tpl->quality_tier ?? 'normal'),
+                    'forge_enabled' => (bool) ($tpl->forge_enabled ?? false),
+                    'forge_tier' => (string) ($tpl->forge_tier ?? ''),
+                    'slot_group' => (string) ($tpl->slot_group ?? ''),
+                    'theme_key' => (string) ($tpl->theme_key ?? ''),
+                    'forge_family_id' => (string) ($tpl->forge_family_id ?? ''),
+                    'upgrade_from_template_id' => (string) ($tpl->upgrade_from_template_id ?? ''),
+                    'upgrade_to_template_id' => (string) ($tpl->upgrade_to_template_id ?? ''),
+                    'blueprint_item_id' => (string) ($tpl->blueprint_item_id ?? ''),
                     'effects' => $effects,
                 ];
                 $setId = trim((string) ($tpl->set_id ?? ''));
@@ -128,5 +156,26 @@ class ExportEquipTemplatesJson extends Command
         $obj->{'4'} = (int) ($weights[4] ?? self::DEFAULT_SOCKET_WEIGHTS['4']);
 
         return $obj;
+    }
+
+    private function normalizeStatMap(mixed $raw): array
+    {
+        if (! is_array($raw)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($raw as $key => $value) {
+            $k = trim((string) $key);
+            if ($k === '') {
+                continue;
+            }
+            if (! is_numeric($value)) {
+                continue;
+            }
+            $out[$k] = (int) $value;
+        }
+
+        return $out;
     }
 }

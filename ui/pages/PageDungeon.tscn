@@ -1,0 +1,186 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/pages/PageDungeon.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://ui/components/Badge.tscn" id="2_badge"]
+
+[node name="PageDungeon" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 86)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="RootVBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 34
+text = "副本"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Hint" type="Label" parent="RootVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "选择副本挑战，获取养成材料"
+horizontal_alignment = 1
+
+[node name="TabBar" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="BtnTabElite" type="Button" parent="RootVBox/TabBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "精英副本"
+
+[node name="BtnTabNormal" type="Button" parent="RootVBox/TabBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "普通副本"
+
+[node name="BtnTabEvent" type="Button" parent="RootVBox/TabBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "活动副本"
+
+[node name="ListWrap" type="PanelContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="RootVBox/ListWrap"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+vertical_scroll_mode = 2
+
+[node name="List" type="VBoxContainer" parent="RootVBox/ListWrap/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="LblEmpty" type="Label" parent="RootVBox/ListWrap"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -24.0
+offset_right = 220.0
+offset_bottom = 24.0
+theme_override_font_sizes/font_size = 28
+text = "暂无活动副本"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomNav" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnNavCharacter" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "人物"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavCharacter" instance=ExtResource("2_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavSkills" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "技能"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavSkills" instance=ExtResource("2_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavBattle" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "战斗"
+
+[node name="BtnNavBag" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "背包"
+
+[node name="BtnNavDex" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "图鉴"
+
+[node name="Badge" parent="RootVBox/BottomNav/BtnNavDex" instance=ExtResource("2_badge")]
+layout_mode = 1
+anchors_preset = 9
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = 8.0
+offset_right = 10.0
+offset_bottom = 36.0
+
+[node name="BtnNavMap" type="Button" parent="RootVBox/BottomNav"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "副本"
+disabled = true

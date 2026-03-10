@@ -4,19 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ItemResource\Pages;
 use App\Models\Item;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Filament\Forms\Get;
 
 class ItemResource extends Resource
 {
@@ -29,6 +31,8 @@ class ItemResource extends Resource
     protected static ?string $pluralModelLabel = '物品';
 
     protected static ?string $modelLabel = '物品';
+
+    protected static ?string $navigationGroup = '装备成长配置';
 
     public static function form(Form $form): Form
     {
@@ -53,7 +57,15 @@ class ItemResource extends Resource
                                     ->label('类型')
                                     ->options(static::typeOptions())
                                     ->required()
-                                    ->default('item'),
+                                    ->default('material'),
+                                TextInput::make('sub_type')
+                                    ->label('子类型')
+                                    ->maxLength(64)
+                                    ->helperText('例如：forge_base / equipment_blueprint / skill_gem 等'),
+                                TextInput::make('material_type')
+                                    ->label('材料大类')
+                                    ->maxLength(64)
+                                    ->helperText('craft / blueprint / boss / star / refine / gem / currency'),
                                 Select::make('rarity')
                                     ->label('稀有度')
                                     ->options(static::rarityOptions())
@@ -62,6 +74,76 @@ class ItemResource extends Resource
                                 TextInput::make('icon')
                                     ->label('图标路径')
                                     ->maxLength(255),
+                                TextInput::make('stack_limit')
+                                    ->label('堆叠上限')
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(9999)
+                                    ->required(),
+                                TextInput::make('drop_unlock_level')
+                                    ->label('掉落开放等级')
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+                                TagsInput::make('source_tags')
+                                    ->label('来源标签')
+                                    ->placeholder('输入后回车'),
+                                TagsInput::make('use_tags')
+                                    ->label('用途标签')
+                                    ->placeholder('输入后回车'),
+                                Textarea::make('desc')
+                                    ->label('描述')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
+                                Textarea::make('trait')
+                                    ->label('特性备注')
+                                    ->rows(2)
+                                    ->columnSpanFull(),
+                            ])->columns(2),
+                        Tab::make('效果与规则')
+                            ->schema([
+                                Select::make('gem_effect.stat')
+                                    ->label('宝石属性')
+                                    ->options(static::statOptions())
+                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
+                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
+                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
+                                TextInput::make('gem_effect.val')
+                                    ->label('宝石数值')
+                                    ->integer()
+                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
+                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
+                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
+                                Select::make('effect_type')
+                                    ->label('效果类型')
+                                    ->options([
+                                        'stat' => '属性',
+                                        'skill_modifier' => '技能修饰',
+                                    ])
+                                    ->nullable(),
+                                TextInput::make('target_scope')
+                                    ->label('目标范围')
+                                    ->maxLength(64)
+                                    ->helperText('global / sect / flow / skill_id'),
+                                KeyValue::make('effect_payload')
+                                    ->label('效果负载(JSON)')
+                                    ->keyLabel('键')
+                                    ->valueLabel('值')
+                                    ->columnSpanFull(),
+                                TagsInput::make('socket_limit')
+                                    ->label('可镶嵌孔位限制')
+                                    ->placeholder('例如 1,2 或 attr,skill')
+                                    ->helperText('用于宝石：第1/2孔属性，第3/4孔技能'),
+                                Toggle::make('can_compose')
+                                    ->label('可合成')
+                                    ->default(false),
+                                Toggle::make('can_reforge')
+                                    ->label('可洗炼')
+                                    ->default(false),
+                            ])->columns(2),
+                        Tab::make('状态')
+                            ->schema([
                                 Toggle::make('is_enabled')
                                     ->label('启用')
                                     ->default(true),
@@ -71,26 +153,6 @@ class ItemResource extends Resource
                                     ->minValue(0)
                                     ->required()
                                     ->default(0),
-                            ])->columns(2),
-                        Tab::make('宝石效果')
-                            ->schema([
-                                Select::make('gem_effect.stat')
-                                    ->label('效果属性')
-                                    ->options(static::statOptions())
-                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
-                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
-                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
-                                TextInput::make('gem_effect.val')
-                                    ->label('效果数值')
-                                    ->integer()
-                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
-                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
-                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
-                                Textarea::make('trait')
-                                    ->label('特性描述')
-                                    ->rows(3)
-                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
-                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
                             ])->columns(2),
                     ]),
             ]);
@@ -112,6 +174,9 @@ class ItemResource extends Resource
                     ->label('类型')
                     ->formatStateUsing(fn (string $state): string => static::typeOptions()[$state] ?? $state)
                     ->sortable(),
+                TextColumn::make('sub_type')
+                    ->label('子类型')
+                    ->toggleable(),
                 TextColumn::make('rarity')
                     ->label('稀有度')
                     ->formatStateUsing(fn (string $state): string => static::rarityOptions()[$state] ?? $state)
@@ -128,6 +193,9 @@ class ItemResource extends Resource
                 Tables\Filters\SelectFilter::make('type')
                     ->label('类型')
                     ->options(static::typeOptions()),
+                Tables\Filters\SelectFilter::make('rarity')
+                    ->label('稀有度')
+                    ->options(static::rarityOptions()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -142,9 +210,7 @@ class ItemResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -156,24 +222,30 @@ class ItemResource extends Resource
         ];
     }
 
-    protected static function typeOptions(): array
+    public static function typeOptions(): array
     {
         return [
-            'item' => '物品',
+            'material' => '材料',
+            'item' => '道具',
             'gem' => '宝石',
+            'blueprint' => '图纸',
+            'blueprint_fragment' => '图纸碎片',
+            'currency' => '货币',
         ];
     }
 
-    protected static function rarityOptions(): array
+    public static function rarityOptions(): array
     {
         return [
             'white' => '白',
             'blue' => '蓝',
+            'purple' => '紫',
             'gold' => '金',
+            'orange' => '橙',
         ];
     }
 
-    protected static function statOptions(): array
+    public static function statOptions(): array
     {
         return [
             'HP' => '生命',
@@ -182,6 +254,8 @@ class ItemResource extends Resource
             'QI' => '气',
             'CRIT_PERCENT' => '暴击',
             'LOOT_BONUS_PERCENT' => '掉落',
+            'WD' => '物伤',
+            'SP' => '术伤',
         ];
     }
 }

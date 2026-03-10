@@ -519,7 +519,7 @@ class StageResource extends Resource
     {
         return Item::query()
             ->where('is_enabled', true)
-            ->where('type', 'item')
+            ->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])
             ->orderBy('sort_order')
             ->get(['id', 'name', 'rarity'])
             ->mapWithKeys(fn (Item $item): array => [

@@ -20,7 +20,13 @@ class EditEquipmentSet extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $data['thresholds'] = EquipmentSetResource::normalizeThresholdsInput($data['thresholds'] ?? []);
-        EquipmentSetResource::validateThresholdsOrFail($data['thresholds'], (int) ($data['max_pieces'] ?? 0));
+        $maxPieces = (int) ($data['piece_count'] ?? $data['max_pieces'] ?? 0);
+        $data['max_pieces'] = $maxPieces;
+        EquipmentSetResource::validateThresholdsOrFail(
+            $data['thresholds'],
+            $maxPieces,
+            isset($data['stage']) ? (int) $data['stage'] : null,
+        );
 
         return $data;
     }
@@ -32,4 +38,3 @@ class EditEquipmentSet extends EditRecord
         ];
     }
 }
-

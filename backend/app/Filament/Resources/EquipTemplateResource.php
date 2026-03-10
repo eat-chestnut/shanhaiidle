@@ -6,6 +6,7 @@ use App\Filament\Resources\EquipTemplateResource\Pages;
 use App\Models\EquipmentSet;
 use App\Models\EquipTemplate;
 use App\Models\SkillCatalog;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -32,6 +33,8 @@ class EquipTemplateResource extends Resource
 
     protected static ?string $modelLabel = '装备模板';
 
+    protected static ?string $navigationGroup = '装备成长配置';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -52,19 +55,43 @@ class EquipTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                                 Select::make('slot')
-                                    ->label('槽位')
+                                    ->label('装备类型')
                                     ->required()
                                     ->options(static::slotOptions()),
+                                Select::make('equip_type')
+                                    ->label('装备归类')
+                                    ->required()
+                                    ->default('set')
+                                    ->options(static::equipTypeOptions()),
                                 Select::make('rarity')
                                     ->label('稀有度')
                                     ->required()
                                     ->options(static::rarityOptions()),
+                                TextInput::make('required_level')
+                                    ->label('需求等级')
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+                                TextInput::make('flow_tag')
+                                    ->label('流派标签')
+                                    ->maxLength(64),
                                 Select::make('set_id')
-                                    ->label('所属套装')
+                                    ->label('所属套装配置')
                                     ->options(fn (): array => static::equipmentSetOptions())
                                     ->searchable()
-                                    ->nullable()
-                                    ->rule('nullable|exists:equipment_sets,id'),
+                                    ->nullable(),
+                                TextInput::make('set_line_id')
+                                    ->label('套装线ID')
+                                    ->maxLength(64),
+                                Select::make('set_stage')
+                                    ->label('套装阶段')
+                                    ->options([
+                                        20 => '20级',
+                                        40 => '40级',
+                                        60 => '60级',
+                                    ])
+                                    ->nullable(),
                                 TextInput::make('icon')
                                     ->label('图标路径')
                                     ->maxLength(255)
@@ -79,24 +106,107 @@ class EquipTemplateResource extends Resource
                                     ->required()
                                     ->default(0),
                             ])->columns(2),
-                        Tab::make('主属性区间')
+                        Tab::make('白色属性与成长')
                             ->schema([
-                                Select::make('main_stat')
-                                    ->label('主属性')
-                                    ->required()
-                                    ->options(static::statOptions()),
-                                TextInput::make('main_min')
-                                    ->label('最小值')
+                                KeyValue::make('white_stats')
+                                    ->label('白色基础属性')
+                                    ->keyLabel('属性Key')
+                                    ->valueLabel('数值')
+                                    ->helperText('示例：ATK=20, DEF=5, HP=60'),
+                                KeyValue::make('star_growth')
+                                    ->label('每星成长')
+                                    ->keyLabel('属性Key')
+                                    ->valueLabel('每星增量')
+                                    ->helperText('示例：ATK=4, DEF=1, HP=10'),
+                                Toggle::make('star_enabled')
+                                    ->label('可升星')
+                                    ->default(true),
+                                TextInput::make('star_cap')
+                                    ->label('升星上限')
                                     ->integer()
                                     ->minValue(0)
-                                    ->required()
+                                    ->maxValue(10)
+                                    ->default(10)
+                                    ->required(),
+                                TextInput::make('socket_rule_ref')
+                                    ->label('孔位规则引用')
+                                    ->maxLength(64)
+                                    ->helperText('例如 auto_star_3_6_8_10'),
+                                Toggle::make('can_attach_blue_affix')
+                                    ->label('可附加蓝词条')
+                                    ->default(false),
+                                Toggle::make('can_roll_purple_affix')
+                                    ->label('可洗炼紫词条')
+                                    ->default(false),
+                            ])->columns(2),
+                        Tab::make('打造与升品')
+                            ->schema([
+                                Toggle::make('forge_enabled')
+                                    ->label('可打造')
+                                    ->default(false),
+                                Select::make('quality_tier')
+                                    ->label('品质层级')
+                                    ->options([
+                                        'normal' => '普通',
+                                        'high' => '高品质',
+                                        'blue_drop' => '蓝装掉落',
+                                    ])
+                                    ->default('normal')
+                                    ->required(),
+                                Select::make('forge_tier')
+                                    ->label('打造段位')
+                                    ->options([
+                                        'T1' => 'T1(1-19)',
+                                        'T2' => 'T2(20-39)',
+                                        'T3' => 'T3(40-59)',
+                                        'T4' => 'T4(60-79)',
+                                    ])
+                                    ->nullable(),
+                                Select::make('slot_group')
+                                    ->label('部位组')
+                                    ->options([
+                                        'weapon' => '武器组',
+                                        'armor' => '防具组',
+                                        'cloak' => '披风组',
+                                        'accessory' => '饰品组',
+                                    ])
+                                    ->nullable(),
+                                Select::make('theme_key')
+                                    ->label('主题')
+                                    ->options([
+                                        'nanshan' => '南山',
+                                        'qingqiu' => '青丘',
+                                        'kunlun' => '昆仑',
+                                    ])
+                                    ->nullable(),
+                                TextInput::make('forge_family_id')
+                                    ->label('打造家族ID')
+                                    ->maxLength(64),
+                                TextInput::make('upgrade_from_template_id')
+                                    ->label('升品来源模板ID')
+                                    ->maxLength(64),
+                                TextInput::make('upgrade_to_template_id')
+                                    ->label('可升到模板ID')
+                                    ->maxLength(64),
+                                TextInput::make('blueprint_item_id')
+                                    ->label('图纸物品ID')
+                                    ->maxLength(64),
+                            ])->columns(2),
+                        Tab::make('兼容字段')
+                            ->schema([
+                                Select::make('main_stat')
+                                    ->label('旧主属性')
+                                    ->options(static::statOptions())
+                                    ->nullable(),
+                                TextInput::make('main_min')
+                                    ->label('旧最小值')
+                                    ->integer()
+                                    ->minValue(0)
                                     ->default(0),
                                 TextInput::make('main_max')
-                                    ->label('最大值')
+                                    ->label('旧最大值')
                                     ->integer()
-                                    ->required()
-                                    ->minValue(fn (Get $get): int => (int) ($get('main_min') ?? 0))
-                                    ->rule('gte:main_min')
+                                    ->minValue(0)
                                     ->default(0),
                                 TextInput::make('unidentified_chance')
                                     ->label('未鉴定概率')
@@ -104,13 +214,9 @@ class EquipTemplateResource extends Resource
                                     ->required()
                                     ->default(0)
                                     ->minValue(0)
-                                    ->maxValue(1)
-                                    ->rule('between:0,1'),
-                            ])->columns(3),
-                        Tab::make('特效 effects')
-                            ->schema([
+                                    ->maxValue(1),
                                 Repeater::make('effects')
-                                    ->label('特效列表')
+                                    ->label('旧特效 effects')
                                     ->default([])
                                     ->schema([
                                         Select::make('type')
@@ -134,13 +240,12 @@ class EquipTemplateResource extends Resource
                                             ->options(fn (): array => static::skillOptions())
                                             ->searchable()
                                             ->required(fn (Get $get): bool => $get('type') === 'skill_level')
-                                            ->rule('exists:skills_catalog,id')
                                             ->hidden(fn (Get $get): bool => $get('type') !== 'skill_level')
                                             ->dehydrated(fn (Get $get): bool => $get('type') === 'skill_level'),
                                     ])
                                     ->columns(2)
                                     ->collapsible(),
-                            ]),
+                            ])->columns(2),
                     ]),
             ]);
     }
@@ -152,28 +257,33 @@ class EquipTemplateResource extends Resource
                 TextColumn::make('id')->label('模板ID')->searchable()->sortable(),
                 TextColumn::make('name')->label('名称')->searchable()->sortable(),
                 TextColumn::make('slot')
-                    ->label('槽位')
+                    ->label('装备类型')
                     ->formatStateUsing(fn (string $state): string => static::slotOptions()[$state] ?? $state)
+                    ->sortable(),
+                TextColumn::make('quality_tier')
+                    ->label('品质层级')
+                    ->formatStateUsing(fn (string $state): string => static::qualityTierOptions()[$state] ?? $state)
                     ->sortable(),
                 TextColumn::make('rarity')
                     ->label('稀有度')
                     ->formatStateUsing(fn (string $state): string => static::rarityOptions()[$state] ?? $state)
                     ->sortable(),
-                TextColumn::make('main_stat')
-                    ->label('主属性')
-                    ->formatStateUsing(fn (string $state): string => static::statOptions()[$state] ?? $state)
-                    ->sortable(),
-                TextColumn::make('main_range')
-                    ->label('主属性区间')
-                    ->state(fn (EquipTemplate $record): string => sprintf('%d~%d', (int) $record->main_min, (int) $record->main_max)),
-                TextColumn::make('unidentified_chance')
-                    ->label('未鉴定概率')
-                    ->formatStateUsing(fn (mixed $state): string => sprintf('%.3f', (float) $state)),
-                TextColumn::make('set_id')
-                    ->label('套装')
-                    ->formatStateUsing(fn (mixed $state): string => static::equipmentSetOptions()[(string) $state] ?? '—'),
+                TextColumn::make('required_level')->label('等级')->numeric()->sortable(),
+                TextColumn::make('forge_tier')->label('打造段位')->toggleable(),
+                TextColumn::make('forge_family_id')->label('家族ID')->toggleable(isToggledHiddenByDefault: true),
+                ToggleColumn::make('forge_enabled')->label('可打造')->sortable(),
                 ToggleColumn::make('is_enabled')->label('启用')->sortable(),
                 TextColumn::make('sort_order')->label('排序')->numeric()->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('slot')->label('装备类型')->options(static::slotOptions()),
+                Tables\Filters\SelectFilter::make('quality_tier')->label('品质层级')->options(static::qualityTierOptions()),
+                Tables\Filters\SelectFilter::make('forge_tier')->label('打造段位')->options([
+                    'T1' => 'T1',
+                    'T2' => 'T2',
+                    'T3' => 'T3',
+                    'T4' => 'T4',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -188,9 +298,7 @@ class EquipTemplateResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -202,24 +310,48 @@ class EquipTemplateResource extends Resource
         ];
     }
 
+    protected static function qualityTierOptions(): array
+    {
+        return [
+            'normal' => '普通',
+            'high' => '高品质',
+            'blue_drop' => '蓝装掉落',
+        ];
+    }
+
+    protected static function equipTypeOptions(): array
+    {
+        return [
+            'set' => '套装位',
+            'ring' => '戒指',
+            'bracelet' => '手镯',
+            'talisman' => '护身符',
+        ];
+    }
+
     protected static function rarityOptions(): array
     {
         return [
             'white' => '白',
             'blue' => '蓝',
+            'purple' => '紫',
             'gold' => '金',
+            'orange' => '橙',
         ];
     }
 
     protected static function slotOptions(): array
     {
         return [
-            'weapon' => '武器',
-            'helm' => '头盔',
+            'main_weapon' => '主武器',
+            'off_weapon' => '副武器',
             'armor' => '盔甲',
-            'pants' => '护腿',
+            'belt' => '腰带',
             'shoes' => '鞋子',
-            'cloak' => '披风',
+            'gloves' => '护手',
+            'helm' => '头盔',
+            'necklace' => '项链',
+            'talisman' => '护身符',
             'ring' => '戒指',
             'bracelet' => '手镯',
         ];
@@ -234,6 +366,8 @@ class EquipTemplateResource extends Resource
             'QI' => '气',
             'CRIT_PERCENT' => '暴击',
             'LOOT_BONUS_PERCENT' => '掉落',
+            'WD' => '物伤',
+            'SP' => '术伤',
         ];
     }
 

@@ -16,18 +16,27 @@ class EquipmentSet extends Model
 
     protected $fillable = [
         'id',
+        'set_line_id',
         'name',
+        'sect',
+        'flow_tag',
+        'stage',
+        'piece_count',
+        'slot_ids',
         'max_pieces',
         'thresholds',
+        'description',
         'is_enabled',
         'sort_order',
     ];
 
     protected $casts = [
+        'stage' => 'integer',
+        'piece_count' => 'integer',
+        'slot_ids' => 'array',
         'max_pieces' => 'integer',
         'thresholds' => 'array',
         'is_enabled' => 'boolean',
         'sort_order' => 'integer',
     ];
 }
-

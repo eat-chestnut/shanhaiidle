@@ -9,7 +9,9 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -32,6 +34,8 @@ class EquipmentSetResource extends Resource
 
     protected static ?string $modelLabel = '套装';
 
+    protected static ?string $navigationGroup = '装备成长配置';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -47,17 +51,52 @@ class EquipmentSetResource extends Resource
                                     ->maxLength(64)
                                     ->unique(ignoreRecord: true)
                                     ->disabled(fn (?EquipmentSet $record): bool => $record !== null),
+                                TextInput::make('set_line_id')
+                                    ->label('套装线ID')
+                                    ->required()
+                                    ->maxLength(64),
                                 TextInput::make('name')
                                     ->label('名称')
                                     ->required()
                                     ->maxLength(255),
-                                TextInput::make('max_pieces')
-                                    ->label('总件数')
+                                TextInput::make('sect')
+                                    ->label('宗门')
+                                    ->maxLength(64),
+                                TextInput::make('flow_tag')
+                                    ->label('流派标签')
+                                    ->maxLength(64),
+                                Select::make('stage')
+                                    ->label('阶段')
                                     ->required()
+                                    ->options([
+                                        20 => '20级套装',
+                                        40 => '40级套装',
+                                        60 => '60级套装',
+                                    ])
+                                    ->live(),
+                                TextInput::make('piece_count')
+                                    ->label('套装总件数')
                                     ->integer()
+                                    ->required()
+                                    ->default(4)
+                                    ->minValue(2)
+                                    ->maxValue(8),
+                                TextInput::make('max_pieces')
+                                    ->label('兼容总件数')
+                                    ->integer()
+                                    ->required()
+                                    ->default(4)
                                     ->minValue(2)
                                     ->maxValue(10)
-                                    ->default(4),
+                                    ->helperText('旧字段兼容，建议与套装总件数保持一致'),
+                                TagsInput::make('slot_ids')
+                                    ->label('套装位')
+                                    ->placeholder('输入后回车')
+                                    ->helperText('建议固定 8 个：main_weapon/off_weapon/armor/belt/shoes/gloves/helm/necklace'),
+                                Textarea::make('description')
+                                    ->label('说明')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
                                 Toggle::make('is_enabled')
                                     ->label('启用')
                                     ->default(true),
@@ -81,7 +120,7 @@ class EquipmentSetResource extends Resource
                                             ->required()
                                             ->integer()
                                             ->minValue(1)
-                                            ->maxValue(fn (Get $get): int => max(1, (int) $get('../../../max_pieces'))),
+                                            ->maxValue(fn (Get $get): int => max(1, (int) $get('../../../piece_count'))),
                                         Repeater::make('bonuses')
                                             ->label('加成')
                                             ->default([])
@@ -127,10 +166,22 @@ class EquipmentSetResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->label('套装ID')->searchable()->sortable(),
+                TextColumn::make('set_line_id')->label('套装线')->searchable()->sortable(),
                 TextColumn::make('name')->label('名称')->searchable()->sortable(),
-                TextColumn::make('max_pieces')->label('总件数')->numeric()->sortable(),
+                TextColumn::make('stage')->label('阶段')->numeric()->sortable(),
+                TextColumn::make('piece_count')->label('件数')->numeric()->sortable(),
+                TextColumn::make('max_pieces')->label('兼容件数')->numeric()->sortable(),
                 ToggleColumn::make('is_enabled')->label('启用')->sortable(),
                 TextColumn::make('sort_order')->label('排序')->numeric()->sortable(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('stage')
+                    ->label('阶段')
+                    ->options([
+                        20 => '20级',
+                        40 => '40级',
+                        60 => '60级',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -211,7 +262,7 @@ class EquipmentSetResource extends Resource
         return array_values($rows);
     }
 
-    public static function validateThresholdsOrFail(array $thresholds, int $maxPieces): void
+    public static function validateThresholdsOrFail(array $thresholds, int $maxPieces, ?int $stage = null): void
     {
         if ($thresholds === []) {
             throw ValidationException::withMessages([
@@ -219,15 +270,31 @@ class EquipmentSetResource extends Resource
             ]);
         }
 
+        if ($stage !== null) {
+            $expectedPieces = match ($stage) {
+                20 => 4,
+                40 => 6,
+                60 => 8,
+                default => 0,
+            };
+            if ($expectedPieces > 0 && $maxPieces !== $expectedPieces) {
+                throw ValidationException::withMessages([
+                    'piece_count' => sprintf('%d级套装总件数必须为 %d。', $stage, $expectedPieces),
+                ]);
+            }
+        }
+
         $statOptions = static::statOptions();
         $seenCounts = [];
         $lastCount = 0;
+
         foreach ($thresholds as $idx => $row) {
             if (! is_array($row)) {
                 throw ValidationException::withMessages([
                     "thresholds.{$idx}" => '阈值行格式错误。',
                 ]);
             }
+
             $count = (int) ($row['count'] ?? 0);
             if ($count < 1 || $count > $maxPieces) {
                 throw ValidationException::withMessages([
@@ -272,6 +339,7 @@ class EquipmentSetResource extends Resource
                         "thresholds.{$idx}.bonuses.{$bIdx}.val" => '数值不能为负数。',
                     ]);
                 }
+
                 if ($type === 'stat') {
                     $stat = (string) ($bonus['stat'] ?? '');
                     if ($stat === '' || ! array_key_exists($stat, $statOptions)) {
@@ -281,14 +349,28 @@ class EquipmentSetResource extends Resource
                     }
                 } else {
                     $skillId = trim((string) ($bonus['skill_id'] ?? ''));
-                    if ($skillId === '') {
-                        throw ValidationException::withMessages([
-                            "thresholds.{$idx}.bonuses.{$bIdx}.skill_id" => '技能ID不能为空。',
-                        ]);
-                    }
-                    if (! SkillCatalog::query()->where('id', $skillId)->exists()) {
+                    if ($skillId === '' || ! SkillCatalog::query()->where('id', $skillId)->exists()) {
                         throw ValidationException::withMessages([
                             "thresholds.{$idx}.bonuses.{$bIdx}.skill_id" => '技能ID不存在。',
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if ($stage !== null) {
+            $required = match ($stage) {
+                20 => [2, 4],
+                40 => [2, 4, 6],
+                60 => [2, 4, 6, 8],
+                default => [],
+            };
+
+            if ($required !== []) {
+                foreach ($required as $must) {
+                    if (! in_array($must, $seenCounts, true)) {
+                        throw ValidationException::withMessages([
+                            'thresholds' => sprintf('%d级套装必须包含 %s 件阈值。', $stage, implode('/', $required)),
                         ]);
                     }
                 }
@@ -313,6 +395,8 @@ class EquipmentSetResource extends Resource
             'CRIT_PERCENT' => '暴击',
             'QI' => '气',
             'LOOT_BONUS_PERCENT' => '掉落',
+            'WD' => '物伤',
+            'SP' => '术伤',
         ];
     }
 
@@ -325,4 +409,3 @@ class EquipmentSetResource extends Resource
             ->all();
     }
 }
-

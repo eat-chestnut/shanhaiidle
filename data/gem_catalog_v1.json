@@ -1,0 +1,117 @@
+{
+    "meta": {
+        "key": "gem_catalog",
+        "version": 6,
+        "exported_at": "2026-03-10 13:02:52",
+        "sha256": "7571ec329dd4d12b282ed91537f76dbb8c138f7ad4d7694f3460bff7a3fb12c4"
+    },
+    "gem_catalog": [
+        {
+            "id": "赤晶石",
+            "name": "赤晶石",
+            "gem_type": "attr",
+            "rarity": "blue",
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "ATK",
+                "val": 1
+            },
+            "drop_unlock_level": 1,
+            "socket_limit": [
+                1,
+                2
+            ],
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "sort_order": 70
+        },
+        {
+            "id": "沧澜石",
+            "name": "沧澜石",
+            "gem_type": "attr",
+            "rarity": "blue",
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "DEF",
+                "val": 1
+            },
+            "drop_unlock_level": 1,
+            "socket_limit": [
+                1,
+                2
+            ],
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "sort_order": 80
+        },
+        {
+            "id": "青木石",
+            "name": "青木石",
+            "gem_type": "attr",
+            "rarity": "blue",
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "HP",
+                "val": 2
+            },
+            "drop_unlock_level": 1,
+            "socket_limit": [
+                1,
+                2
+            ],
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "sort_order": 90
+        },
+        {
+            "id": "妖王核心",
+            "name": "妖王核心",
+            "gem_type": "skill",
+            "rarity": "gold",
+            "effect_type": "skill_modifier",
+            "target_scope": "BING_01",
+            "effect_payload": {
+                "skill_id": "BING_01",
+                "modifier": "damage_coef",
+                "val": 0.08
+            },
+            "drop_unlock_level": 40,
+            "socket_limit": [
+                3,
+                4
+            ],
+            "can_compose": true,
+            "can_reforge": true,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "sort_order": 100
+        },
+        {
+            "id": "裂石符玉",
+            "name": "裂石符玉",
+            "gem_type": "skill",
+            "rarity": "purple",
+            "effect_type": "skill_modifier",
+            "target_scope": "BING_01",
+            "effect_payload": {
+                "skill_id": "BING_01",
+                "modifier": "range",
+                "val": 0.12
+            },
+            "drop_unlock_level": 40,
+            "socket_limit": [
+                3,
+                4
+            ],
+            "can_compose": true,
+            "can_reforge": true,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "sort_order": 101
+        }
+    ]
+}

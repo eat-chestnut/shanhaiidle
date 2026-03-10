@@ -13,7 +13,7 @@ class ExportConfigBundle extends Command
 {
     protected $signature = 'game:export-bundle';
 
-    protected $description = 'Export config bundle (manifest + 6 json files) to storage/app/exports/bundles/{bundle_id}';
+    protected $description = 'Export config bundle (manifest + all config json files) to storage/app/exports/bundles/{bundle_id}';
 
     /**
      * @var array<int, array{key:string, command:string, source:string, filename:string}>
@@ -23,6 +23,15 @@ class ExportConfigBundle extends Command
         ['key' => 'items', 'command' => 'game:export-items', 'source' => 'items.json', 'filename' => 'items.json'],
         ['key' => 'equip_templates', 'command' => 'game:export-equip-templates', 'source' => 'equip_templates.json', 'filename' => 'equip_templates.json'],
         ['key' => 'equipment_sets', 'command' => 'game:export-equipment-sets', 'source' => 'equipment_sets.json', 'filename' => 'equipment_sets.json'],
+        ['key' => 'equip_slots', 'command' => 'game:export-equip-slots', 'source' => 'equip_slots_v1.json', 'filename' => 'equip_slots_v1.json'],
+        ['key' => 'equipment_growth_rules', 'command' => 'game:export-equipment-growth-rules', 'source' => 'equipment_growth_rules_v1.json', 'filename' => 'equipment_growth_rules_v1.json'],
+        ['key' => 'blue_gear_templates', 'command' => 'game:export-blue-gear-templates', 'source' => 'blue_gear_templates_v1.json', 'filename' => 'blue_gear_templates_v1.json'],
+        ['key' => 'blue_affix_pool', 'command' => 'game:export-blue-affix-pool', 'source' => 'blue_affix_pool_v1.json', 'filename' => 'blue_affix_pool_v1.json'],
+        ['key' => 'purple_affix_pool', 'command' => 'game:export-purple-affix-pool', 'source' => 'purple_affix_pool_v1.json', 'filename' => 'purple_affix_pool_v1.json'],
+        ['key' => 'gem_catalog', 'command' => 'game:export-gem-catalog', 'source' => 'gem_catalog_v1.json', 'filename' => 'gem_catalog_v1.json'],
+        ['key' => 'material_catalog', 'command' => 'game:export-material-catalog', 'source' => 'material_catalog_v1.json', 'filename' => 'material_catalog_v1.json'],
+        ['key' => 'material_dungeons', 'command' => 'game:export-material-dungeons', 'source' => 'material_dungeons_v1.json', 'filename' => 'material_dungeons_v1.json'],
+        ['key' => 'crafting_recipes', 'command' => 'game:export-crafting-recipes', 'source' => 'crafting_recipes_v1.json', 'filename' => 'crafting_recipes_v1.json'],
         ['key' => 'monsters', 'command' => 'game:export-monsters', 'source' => 'monsters.json', 'filename' => 'monsters.json'],
         ['key' => 'skills_catalog', 'command' => 'game:export-skills-catalog', 'source' => 'skills_catalog.json', 'filename' => 'skills_catalog.json'],
         ['key' => 'battle_defaults', 'command' => 'game:export-battle-defaults', 'source' => 'battle_defaults.json', 'filename' => 'battle_defaults.json'],

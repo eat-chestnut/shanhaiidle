@@ -222,11 +222,38 @@ func _on_update_cfg_pressed() -> void:
 			"stages": "地图",
 			"items": "物品",
 			"equip_templates": "装备",
+			"equipment_sets": "套装",
+			"equip_slots": "槽位",
+			"equipment_growth_rules": "成长",
+			"blue_gear_templates": "蓝装",
+			"blue_affix_pool": "蓝词条",
+			"purple_affix_pool": "紫词条",
+			"gem_catalog": "宝石",
+			"material_catalog": "材料",
+			"material_dungeons": "副本",
+			"crafting_recipes": "配方",
 			"monsters": "怪物",
 			"skills_catalog": "技能",
 			"battle_defaults": "战斗",
 		}
-		for key in ["stages", "items", "equip_templates", "monsters", "skills_catalog", "battle_defaults"]:
+		for key in [
+			"stages",
+			"items",
+			"equip_templates",
+			"equipment_sets",
+			"equip_slots",
+			"equipment_growth_rules",
+			"blue_gear_templates",
+			"blue_affix_pool",
+			"purple_affix_pool",
+			"gem_catalog",
+			"material_catalog",
+			"material_dungeons",
+			"crafting_recipes",
+			"monsters",
+			"skills_catalog",
+			"battle_defaults",
+		]:
 			var b := int(ver_before.get(key, 0))
 			var a := int(ver_after.get(key, 0))
 			if a != b:
@@ -298,11 +325,16 @@ func _refresh_current_stage_text() -> void:
 
 func _refresh_cfg_version() -> void:
 	var versions := _read_cfg_versions()
-
-	_lbl_cfg_ver.text = "配置：地图v%d 物品v%d 装备v%d 怪物v%d 技能v%d 战斗v%d" % [
+	_lbl_cfg_ver.text = "配置：地图v%d 物品v%d 装备v%d 套装v%d 槽位v%d 蓝装v%d 宝石v%d 材料v%d 配方v%d 怪物v%d 技能v%d 战斗v%d" % [
 		int(versions.get("stages", 0)),
 		int(versions.get("items", 0)),
 		int(versions.get("equip_templates", 0)),
+		int(versions.get("equipment_sets", 0)),
+		int(versions.get("equip_slots", 0)),
+		int(versions.get("blue_gear_templates", 0)),
+		int(versions.get("gem_catalog", 0)),
+		int(versions.get("material_catalog", 0)),
+		int(versions.get("crafting_recipes", 0)),
 		int(versions.get("monsters", 0)),
 		int(versions.get("skills_catalog", 0)),
 		int(versions.get("battle_defaults", 0)),
@@ -319,6 +351,16 @@ func _read_cfg_versions() -> Dictionary:
 		"stages": int(versions.get("stages", 0)),
 		"items": int(versions.get("items", 0)),
 		"equip_templates": int(versions.get("equip_templates", 0)),
+		"equipment_sets": int(versions.get("equipment_sets", 0)),
+		"equip_slots": int(versions.get("equip_slots", 0)),
+		"equipment_growth_rules": int(versions.get("equipment_growth_rules", 0)),
+		"blue_gear_templates": int(versions.get("blue_gear_templates", 0)),
+		"blue_affix_pool": int(versions.get("blue_affix_pool", 0)),
+		"purple_affix_pool": int(versions.get("purple_affix_pool", 0)),
+		"gem_catalog": int(versions.get("gem_catalog", 0)),
+		"material_catalog": int(versions.get("material_catalog", 0)),
+		"material_dungeons": int(versions.get("material_dungeons", 0)),
+		"crafting_recipes": int(versions.get("crafting_recipes", 0)),
 		"monsters": int(versions.get("monsters", 0)),
 		"skills_catalog": int(versions.get("skills_catalog", 0)),
 		"battle_defaults": int(versions.get("battle_defaults", 0)),

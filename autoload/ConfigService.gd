@@ -18,7 +18,16 @@ func load_all() -> void:
 	cfg["balance"] = balance_cfg
 
 	_load_items_cfg()
+	_load_material_catalog_cfg()
+	_load_gem_catalog_cfg()
 	_load_equip_cfg()
+	_load_equip_slots_cfg()
+	_load_equipment_growth_rules_cfg()
+	_load_blue_gear_templates_cfg()
+	_load_blue_affix_pool_cfg()
+	_load_purple_affix_pool_cfg()
+	_load_material_dungeons_cfg()
+	_load_crafting_recipes_cfg()
 	_load_star_rules_cfg()
 	_load_forge_rules_cfg()
 	_load_equipment_sets_cfg()
@@ -142,6 +151,58 @@ func _load_items_cfg() -> void:
 	push_warning("ConfigService: local items invalid: %s" % str(local_check.get("reason", "unknown")))
 	cfg["items_db"] = fallback
 
+func _load_material_catalog_cfg() -> void:
+	var fallback: Dictionary = {
+		"material_catalog": [],
+	}
+	cfg["material_catalog_db"] = fallback
+	var source_text := RemoteConfigService.get_material_catalog_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_material_catalog_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["material_catalog_db"] = parsed
+			return
+	push_warning("ConfigService: remote material catalog invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/material_catalog_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_material_catalog_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["material_catalog_db"] = local_parsed
+			return
+	push_warning("ConfigService: local material catalog invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_gem_catalog_cfg() -> void:
+	var fallback: Dictionary = {
+		"gem_catalog": [],
+	}
+	cfg["gem_catalog_db"] = fallback
+	var source_text := RemoteConfigService.get_gem_catalog_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_gem_catalog_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["gem_catalog_db"] = parsed
+			return
+	push_warning("ConfigService: remote gem catalog invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/gem_catalog_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_gem_catalog_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["gem_catalog_db"] = local_parsed
+			return
+	push_warning("ConfigService: local gem catalog invalid: %s" % str(local_check.get("reason", "unknown")))
+
 func _load_equip_cfg() -> void:
 	var fallback: Dictionary = {
 		"slots": [],
@@ -166,6 +227,188 @@ func _load_equip_cfg() -> void:
 
 	push_warning("ConfigService: local equip templates invalid: %s" % str(local_check.get("reason", "unknown")))
 	cfg["equip_db"] = fallback
+
+func _load_equip_slots_cfg() -> void:
+	var fallback: Dictionary = {
+		"equip_slots": [],
+	}
+	cfg["equip_slots_db"] = fallback
+	var source_text := RemoteConfigService.get_equip_slots_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_equip_slots_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["equip_slots_db"] = parsed
+			return
+	push_warning("ConfigService: remote equip slots invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/equip_slots_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_equip_slots_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["equip_slots_db"] = local_parsed
+			return
+	push_warning("ConfigService: local equip slots invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_equipment_growth_rules_cfg() -> void:
+	var fallback: Dictionary = {
+		"equipment_growth_rules": {},
+	}
+	cfg["equipment_growth_rules_db"] = fallback
+	var source_text := RemoteConfigService.get_equipment_growth_rules_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_equipment_growth_rules_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["equipment_growth_rules_db"] = parsed
+			return
+	push_warning("ConfigService: remote equipment growth rules invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/equipment_growth_rules_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_equipment_growth_rules_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["equipment_growth_rules_db"] = local_parsed
+			return
+	push_warning("ConfigService: local equipment growth rules invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_blue_gear_templates_cfg() -> void:
+	var fallback: Dictionary = {
+		"blue_gear_templates": [],
+	}
+	cfg["blue_gear_templates_db"] = fallback
+	var source_text := RemoteConfigService.get_blue_gear_templates_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_blue_gear_templates_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["blue_gear_templates_db"] = parsed
+			return
+	push_warning("ConfigService: remote blue gear templates invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/blue_gear_templates_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_blue_gear_templates_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["blue_gear_templates_db"] = local_parsed
+			return
+	push_warning("ConfigService: local blue gear templates invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_blue_affix_pool_cfg() -> void:
+	var fallback: Dictionary = {
+		"blue_affix_pool": [],
+	}
+	cfg["blue_affix_pool_db"] = fallback
+	var source_text := RemoteConfigService.get_blue_affix_pool_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_blue_affix_pool_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["blue_affix_pool_db"] = parsed
+			return
+	push_warning("ConfigService: remote blue affix pool invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/blue_affix_pool_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_blue_affix_pool_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["blue_affix_pool_db"] = local_parsed
+			return
+	push_warning("ConfigService: local blue affix pool invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_purple_affix_pool_cfg() -> void:
+	var fallback: Dictionary = {
+		"purple_affix_pool": [],
+	}
+	cfg["purple_affix_pool_db"] = fallback
+	var source_text := RemoteConfigService.get_purple_affix_pool_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_purple_affix_pool_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["purple_affix_pool_db"] = parsed
+			return
+	push_warning("ConfigService: remote purple affix pool invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/purple_affix_pool_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_purple_affix_pool_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["purple_affix_pool_db"] = local_parsed
+			return
+	push_warning("ConfigService: local purple affix pool invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_material_dungeons_cfg() -> void:
+	var fallback: Dictionary = {
+		"material_dungeons": [],
+	}
+	cfg["material_dungeons_db"] = fallback
+	var source_text := RemoteConfigService.get_material_dungeons_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_material_dungeons_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["material_dungeons_db"] = parsed
+			return
+	push_warning("ConfigService: remote material dungeons invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/material_dungeons_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_material_dungeons_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["material_dungeons_db"] = local_parsed
+			return
+	push_warning("ConfigService: local material dungeons invalid: %s" % str(local_check.get("reason", "unknown")))
+
+func _load_crafting_recipes_cfg() -> void:
+	var fallback: Dictionary = {
+		"crafting_recipes": [],
+	}
+	cfg["crafting_recipes_db"] = fallback
+	var source_text := RemoteConfigService.get_crafting_recipes_text()
+	if source_text.strip_edges().is_empty():
+		return
+	var check := RemoteConfigService.validate_crafting_recipes_json(source_text)
+	if bool(check.get("ok", false)):
+		var parsed: Variant = JSON.parse_string(source_text)
+		if parsed is Dictionary:
+			cfg["crafting_recipes_db"] = parsed
+			return
+	push_warning("ConfigService: remote crafting recipes invalid: %s" % str(check.get("reason", "unknown")))
+	var local_text := _read_text_file("res://data/crafting_recipes_v1.json")
+	if local_text.strip_edges().is_empty():
+		return
+	var local_check := RemoteConfigService.validate_crafting_recipes_json(local_text)
+	if bool(local_check.get("ok", false)):
+		var local_parsed: Variant = JSON.parse_string(local_text)
+		if local_parsed is Dictionary:
+			cfg["crafting_recipes_db"] = local_parsed
+			return
+	push_warning("ConfigService: local crafting recipes invalid: %s" % str(local_check.get("reason", "unknown")))
 
 func _load_equipment_sets_cfg() -> void:
 	var fallback: Dictionary = {

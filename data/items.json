@@ -1,539 +1,1080 @@
 {
-  "items": [
-    {
-      "id": "桂枝",
-      "name": "桂枝",
-      "rarity": "white",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_01.png"
+    "meta": {
+        "key": "items",
+        "version": 13,
+        "exported_at": "2026-03-10 13:02:52",
+        "sha256": "5e720d7e807b1791199a716e9a1de661df3f1fefb3d9afe77c3c10327c0a8197"
     },
-    {
-      "id": "玉屑",
-      "name": "玉屑",
-      "rarity": "white",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_02.png"
-    },
-    {
-      "id": "白玉碎",
-      "name": "白玉碎",
-      "rarity": "blue",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_03.png"
-    },
-    {
-      "id": "妖核",
-      "name": "妖核",
-      "rarity": "gold",
-      "type": "item",
-      "icon": "res://assets/icons/icon_killskill.png"
-    },
-    {
-      "id": "宗门令",
-      "name": "宗门令",
-      "rarity": "white",
-      "type": "item",
-      "icon": "res://assets/icons/icon_key_01.png"
-    },
-    {
-      "id": "打孔石",
-      "name": "打孔石",
-      "rarity": "blue",
-      "type": "item",
-      "icon": "res://assets/icons/icon_key_02.png"
-    },
-    {
-      "id": "star_stone_t1_common",
-      "name": "初阶星石",
-      "rarity": "white",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_01.png"
-    },
-    {
-      "id": "star_stone_t2_common",
-      "name": "中阶星石",
-      "rarity": "blue",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_02.png"
-    },
-    {
-      "id": "star_stone_t3_common",
-      "name": "高阶星石",
-      "rarity": "gold",
-      "type": "item",
-      "icon": "res://assets/icons/icon_ld_03.png"
-    },
-    {
-      "id": "star_stone_t4_common",
-      "name": "宗师星石",
-      "rarity": "gold",
-      "type": "item",
-      "icon": "res://assets/icons/icon_killskill.png"
-    },
-    {
-      "id": "妖王核心",
-      "name": "妖王核心",
-      "rarity": "gold",
-      "type": "gem",
-      "trait": "妖王之力：战斗中可灌注武器（未启用），后续可解锁特殊效果。",
-      "gem_effect": {
-        "stat": "LOOT_BONUS_PERCENT",
-        "val": 3
-      },
-      "icon": "res://assets/icons/icon_killskill.png"
-    },
-    {
-      "id": "赤晶石",
-      "name": "赤晶石",
-      "rarity": "blue",
-      "type": "gem",
-      "gem_effect": {
-        "stat": "ATK",
-        "val": 1
-      },
-      "icon": "res://assets/icons/icon_ld_01.png"
-    },
-    {
-      "id": "沧澜石",
-      "name": "沧澜石",
-      "rarity": "blue",
-      "type": "gem",
-      "gem_effect": {
-        "stat": "DEF",
-        "val": 1
-      },
-      "icon": "res://assets/icons/icon_ld_02.png"
-    },
-    {
-      "id": "青木石",
-      "name": "青木石",
-      "rarity": "blue",
-      "type": "gem",
-      "gem_effect": {
-        "stat": "HP",
-        "val": 2
-      },
-      "icon": "res://assets/icons/icon_ld_03.png"
-    },
-    {
-      "id": "forge_base_t1",
-      "name": "锻造基材·初阶",
-      "rarity": "white",
-      "type": "item",
-      "sub_type": "forge_base",
-      "icon": "res://assets/icons/icon_ld_01.png",
-      "desc": "普通打造通用基材。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_base_t2",
-      "name": "锻造基材·中阶",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_base",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "中阶打造通用基材。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_base_t3",
-      "name": "锻造基材·高阶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_base",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "高阶打造通用基材。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_base_t4",
-      "name": "锻造基材·宗师",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_base",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "宗师打造通用基材。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_weapon_t1",
-      "name": "兵刃锻材·初阶",
-      "rarity": "white",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_01.png",
-      "desc": "武器普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_armor_t1",
-      "name": "甲胄锻材·初阶",
-      "rarity": "white",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_01.png",
-      "desc": "防具普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_cloak_t1",
-      "name": "披风锻材·初阶",
-      "rarity": "white",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_01.png",
-      "desc": "披风普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_accessory_t1",
-      "name": "饰品锻材·初阶",
-      "rarity": "white",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_01.png",
-      "desc": "饰品普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_weapon_t2",
-      "name": "兵刃锻材·中阶",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "武器普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_armor_t2",
-      "name": "甲胄锻材·中阶",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "防具普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_cloak_t2",
-      "name": "披风锻材·中阶",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "披风普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_accessory_t2",
-      "name": "饰品锻材·中阶",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "饰品普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_weapon_t3",
-      "name": "兵刃锻材·高阶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "武器普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_armor_t3",
-      "name": "甲胄锻材·高阶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "防具普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_cloak_t3",
-      "name": "披风锻材·高阶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "披风普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_accessory_t3",
-      "name": "饰品锻材·高阶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "饰品普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_weapon_t4",
-      "name": "兵刃锻材·宗师",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "武器普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_armor_t4",
-      "name": "甲胄锻材·宗师",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "防具普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_cloak_t4",
-      "name": "披风锻材·宗师",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "披风普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "forge_accessory_t4",
-      "name": "饰品锻材·宗师",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_part",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "饰品普通打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "theme_rare_nanshan",
-      "name": "南山玄铁",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_theme",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "南山主题稀有打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "theme_rare_qingqiu",
-      "name": "青丘灵髓",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "forge_theme",
-      "icon": "res://assets/icons/icon_ld_02.png",
-      "desc": "青丘主题稀有打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "theme_rare_kunlun",
-      "name": "昆仑玄晶",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "forge_theme",
-      "icon": "res://assets/icons/icon_ld_03.png",
-      "desc": "昆仑主题稀有打造材料。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_mark_nanshan",
-      "name": "南山印记",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "boss_mark",
-      "icon": "res://assets/icons/icon_key_02.png",
-      "desc": "击败南山Boss获得。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_core_nanshan",
-      "name": "南山核心",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "boss_core",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "南山Boss低概率掉落。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_mark_qingqiu",
-      "name": "青丘印记",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "boss_mark",
-      "icon": "res://assets/icons/icon_key_02.png",
-      "desc": "击败青丘Boss获得。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_core_qingqiu",
-      "name": "青丘核心",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "boss_core",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "青丘Boss低概率掉落。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_mark_kunlun",
-      "name": "昆仑印记",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "boss_mark",
-      "icon": "res://assets/icons/icon_key_02.png",
-      "desc": "击败昆仑Boss获得。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "boss_core_kunlun",
-      "name": "昆仑核心",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "boss_core",
-      "icon": "res://assets/icons/icon_killskill.png",
-      "desc": "昆仑Boss低概率掉落。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_fragment_nanshan",
-      "name": "南山图纸碎片",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "theme_blueprint_fragment",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "20个可合成一张南山装备图纸。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_fragment_qingqiu",
-      "name": "青丘图纸碎片",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "theme_blueprint_fragment",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "20个可合成一张青丘装备图纸。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_fragment_kunlun",
-      "name": "昆仑图纸碎片",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "theme_blueprint_fragment",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "20个可合成一张昆仑装备图纸。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_weapon_nanshan_t1_01",
-      "name": "南山兵刃图纸",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于南山兵刃高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_armor_nanshan_t1_01",
-      "name": "南山甲胄图纸",
-      "rarity": "blue",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于南山甲胄高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_cloak_nanshan_t2_01",
-      "name": "南山披风图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于南山披风高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_ring_nanshan_t2_01",
-      "name": "南山戒指图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于南山戒指高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_bracelet_nanshan_t2_01",
-      "name": "南山手镯图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于南山手镯高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_bracelet_qingqiu_t2_01",
-      "name": "青丘手镯图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于青丘手镯高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_cloak_qingqiu_t2_01",
-      "name": "青丘披风图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于青丘披风高升品打造。",
-      "stack_limit": 9999
-    },
-    {
-      "id": "bp_ring_qingqiu_t2_01",
-      "name": "青丘戒指图纸",
-      "rarity": "gold",
-      "type": "item",
-      "sub_type": "equipment_blueprint",
-      "icon": "res://assets/icons/icon_key_01.png",
-      "desc": "用于青丘戒指高升品打造。",
-      "stack_limit": 9999
+    "items": [
+        {
+            "id": "桂枝",
+            "name": "桂枝",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "玉屑",
+            "name": "玉屑",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "白玉碎",
+            "name": "白玉碎",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "妖核",
+            "name": "妖核",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "宗门令",
+            "name": "宗门令",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "currency",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "currency"
+            ]
+        },
+        {
+            "id": "打孔石",
+            "name": "打孔石",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "gem",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "gem"
+            ]
+        },
+        {
+            "id": "玄铁屑",
+            "name": "玄铁屑",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "灵髓",
+            "name": "灵髓",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "南山玉印",
+            "name": "南山玉印",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "赤晶石",
+            "name": "赤晶石",
+            "rarity": "blue",
+            "type": "gem",
+            "sub_type": "attr",
+            "material_type": "gem",
+            "stack_limit": 999,
+            "drop_unlock_level": 1,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "desc": "属性强化宝石",
+            "gem_effect": {
+                "stat": "ATK",
+                "val": 1
+            },
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "ATK",
+                "val": 1
+            },
+            "socket_limit": [
+                1,
+                2
+            ],
+            "source_tags": [
+                "boss_drop",
+                "dungeon_drop"
+            ],
+            "use_tags": [
+                "socket"
+            ]
+        },
+        {
+            "id": "沧澜石",
+            "name": "沧澜石",
+            "rarity": "blue",
+            "type": "gem",
+            "sub_type": "attr",
+            "material_type": "gem",
+            "stack_limit": 999,
+            "drop_unlock_level": 1,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "desc": "属性强化宝石",
+            "gem_effect": {
+                "stat": "DEF",
+                "val": 1
+            },
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "DEF",
+                "val": 1
+            },
+            "socket_limit": [
+                1,
+                2
+            ],
+            "source_tags": [
+                "boss_drop",
+                "dungeon_drop"
+            ],
+            "use_tags": [
+                "socket"
+            ]
+        },
+        {
+            "id": "青木石",
+            "name": "青木石",
+            "rarity": "blue",
+            "type": "gem",
+            "sub_type": "attr",
+            "material_type": "gem",
+            "stack_limit": 999,
+            "drop_unlock_level": 1,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "desc": "属性强化宝石",
+            "gem_effect": {
+                "stat": "HP",
+                "val": 2
+            },
+            "effect_type": "stat",
+            "target_scope": "global",
+            "effect_payload": {
+                "stat": "HP",
+                "val": 2
+            },
+            "socket_limit": [
+                1,
+                2
+            ],
+            "source_tags": [
+                "boss_drop",
+                "dungeon_drop"
+            ],
+            "use_tags": [
+                "socket"
+            ]
+        },
+        {
+            "id": "forge_base_t1",
+            "name": "初阶打造精华",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "妖王核心",
+            "name": "妖王核心",
+            "rarity": "gold",
+            "type": "gem",
+            "sub_type": "skill",
+            "material_type": "gem",
+            "stack_limit": 999,
+            "drop_unlock_level": 40,
+            "can_compose": true,
+            "can_reforge": true,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "desc": "技能强化宝石",
+            "effect_type": "skill_modifier",
+            "target_scope": "BING_01",
+            "effect_payload": {
+                "skill_id": "BING_01",
+                "modifier": "damage_coef",
+                "val": 0.08
+            },
+            "socket_limit": [
+                3,
+                4
+            ],
+            "source_tags": [
+                "boss_drop",
+                "dungeon_drop"
+            ],
+            "use_tags": [
+                "socket"
+            ]
+        },
+        {
+            "id": "forge_base_t2",
+            "name": "中阶打造精华",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "裂石符玉",
+            "name": "裂石符玉",
+            "rarity": "purple",
+            "type": "gem",
+            "sub_type": "skill",
+            "material_type": "gem",
+            "stack_limit": 999,
+            "drop_unlock_level": 40,
+            "can_compose": true,
+            "can_reforge": true,
+            "icon": "res://assets/icons/icon_ld_02.png",
+            "desc": "技能强化宝石",
+            "effect_type": "skill_modifier",
+            "target_scope": "BING_01",
+            "effect_payload": {
+                "skill_id": "BING_01",
+                "modifier": "range",
+                "val": 0.12
+            },
+            "socket_limit": [
+                3,
+                4
+            ],
+            "source_tags": [
+                "boss_drop",
+                "dungeon_drop"
+            ],
+            "use_tags": [
+                "socket"
+            ]
+        },
+        {
+            "id": "forge_base_t3",
+            "name": "高阶打造精华",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_base_t4",
+            "name": "极阶打造精华",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_weapon_t1",
+            "name": "初阶兵铸片",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_armor_t1",
+            "name": "初阶甲铸片",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_cloak_t1",
+            "name": "初阶披饰片",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_accessory_t1",
+            "name": "初阶饰铸片",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_weapon_t2",
+            "name": "中阶兵铸片",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_armor_t2",
+            "name": "中阶甲铸片",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_cloak_t2",
+            "name": "中阶披饰片",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_accessory_t2",
+            "name": "中阶饰铸片",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_weapon_t3",
+            "name": "高阶兵铸片",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_armor_t3",
+            "name": "高阶甲铸片",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_cloak_t3",
+            "name": "高阶披饰片",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_accessory_t3",
+            "name": "高阶饰铸片",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_weapon_t4",
+            "name": "极阶兵铸片",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_armor_t4",
+            "name": "极阶甲铸片",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_cloak_t4",
+            "name": "极阶披饰片",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "forge_accessory_t4",
+            "name": "极阶饰铸片",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "theme_rare_nanshan",
+            "name": "南山灵铁",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "theme_rare_qingqiu",
+            "name": "青丘灵丝",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "theme_rare_kunlun",
+            "name": "昆仑玄晶",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "craft",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "craft"
+            ]
+        },
+        {
+            "id": "boss_mark_nanshan",
+            "name": "南山印记",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "boss_core_nanshan",
+            "name": "南山核心",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "boss_mark_qingqiu",
+            "name": "青丘印记",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "boss_core_qingqiu",
+            "name": "青丘核心",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "boss_mark_kunlun",
+            "name": "昆仑印记",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "boss_core_kunlun",
+            "name": "昆仑核心",
+            "rarity": "orange",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "boss",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "boss"
+            ]
+        },
+        {
+            "id": "bp_fragment_nanshan",
+            "name": "南山图纸碎片",
+            "rarity": "blue",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "stack_limit": 9999,
+            "drop_unlock_level": 20,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ]
+        },
+        {
+            "id": "bp_fragment_qingqiu",
+            "name": "青丘图纸碎片",
+            "rarity": "purple",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "stack_limit": 9999,
+            "drop_unlock_level": 20,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ]
+        },
+        {
+            "id": "bp_fragment_kunlun",
+            "name": "昆仑图纸碎片",
+            "rarity": "gold",
+            "type": "blueprint_fragment",
+            "sub_type": "theme_blueprint_fragment",
+            "material_type": "blueprint",
+            "stack_limit": 9999,
+            "drop_unlock_level": 20,
+            "can_compose": true,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_01.png",
+            "desc": "20个可合成主题图纸",
+            "source_tags": [
+                "boss_drop"
+            ],
+            "use_tags": [
+                "blueprint_compose"
+            ]
+        },
+        {
+            "id": "bp_weapon_nanshan_t1_01",
+            "name": "南山主武图纸·壹",
+            "rarity": "blue",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "stack_limit": 999,
+            "drop_unlock_level": 20,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ]
+        },
+        {
+            "id": "bp_bracelet_qingqiu_t2_01",
+            "name": "青丘手镯图纸·壹",
+            "rarity": "purple",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "stack_limit": 999,
+            "drop_unlock_level": 20,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ]
+        },
+        {
+            "id": "bp_cloak_qingqiu_t2_01",
+            "name": "青丘披饰图纸·壹",
+            "rarity": "purple",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "stack_limit": 999,
+            "drop_unlock_level": 20,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ]
+        },
+        {
+            "id": "bp_ring_nanshan_t2_01",
+            "name": "南山戒指图纸·壹",
+            "rarity": "blue",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "stack_limit": 999,
+            "drop_unlock_level": 20,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ]
+        },
+        {
+            "id": "bp_main_weapon_kunlun_t3_01",
+            "name": "昆仑主武图纸·壹",
+            "rarity": "gold",
+            "type": "blueprint",
+            "sub_type": "equipment_blueprint",
+            "material_type": "blueprint",
+            "stack_limit": 999,
+            "drop_unlock_level": 20,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_key_02.png",
+            "desc": "用于高品质升品打造",
+            "source_tags": [
+                "boss_drop",
+                "compose"
+            ],
+            "use_tags": [
+                "high_forge"
+            ]
+        },
+        {
+            "id": "star_stone_t1_common",
+            "name": "初阶星石",
+            "rarity": "white",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "star"
+            ]
+        },
+        {
+            "id": "star_stone_t2_common",
+            "name": "中阶星石",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "star"
+            ]
+        },
+        {
+            "id": "star_stone_t3_common",
+            "name": "高阶星石",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "star"
+            ]
+        },
+        {
+            "id": "star_stone_t4_common",
+            "name": "极阶星石",
+            "rarity": "gold",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "star",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "star"
+            ]
+        },
+        {
+            "id": "refine_sand_basic",
+            "name": "洗炼砂",
+            "rarity": "blue",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "refine",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "refine"
+            ]
+        },
+        {
+            "id": "refine_core_advanced",
+            "name": "洗炼精核",
+            "rarity": "purple",
+            "type": "material",
+            "sub_type": "material",
+            "material_type": "refine",
+            "stack_limit": 9999,
+            "drop_unlock_level": 1,
+            "can_compose": false,
+            "can_reforge": false,
+            "icon": "res://assets/icons/icon_ld_01.png",
+            "use_tags": [
+                "refine"
+            ]
+        }
+    ],
+    "rarity_colors": {
+        "white": {
+            "r": 1,
+            "g": 1,
+            "b": 1,
+            "a": 1
+        },
+        "blue": {
+            "r": 0.35,
+            "g": 0.65,
+            "b": 1,
+            "a": 1
+        },
+        "purple": {
+            "r": 0.72,
+            "g": 0.45,
+            "b": 0.95,
+            "a": 1
+        },
+        "gold": {
+            "r": 1,
+            "g": 0.82,
+            "b": 0.35,
+            "a": 1
+        },
+        "orange": {
+            "r": 1,
+            "g": 0.56,
+            "b": 0.18,
+            "a": 1
+        }
     }
-  ],
-  "rarity_colors": {
-    "white": {
-      "r": 1.0,
-      "g": 1.0,
-      "b": 1.0,
-      "a": 1.0
-    },
-    "blue": {
-      "r": 0.35,
-      "g": 0.65,
-      "b": 1.0,
-      "a": 1.0
-    },
-    "gold": {
-      "r": 1.0,
-      "g": 0.82,
-      "b": 0.35,
-      "a": 1.0
-    }
-  }
 }

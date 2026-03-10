@@ -23,12 +23,25 @@ class ExportEquipmentSetsJson extends Command
             ->get()
             ->map(function (EquipmentSet $set): array {
                 $thresholds = $this->normalizeThresholds($set->thresholds);
+                $slotIds = is_array($set->slot_ids) ? array_values($set->slot_ids) : [];
+                $pieceCount = (int) ($set->piece_count ?? 0);
+                $maxPieces = (int) $set->max_pieces;
+                if ($pieceCount <= 0) {
+                    $pieceCount = $maxPieces;
+                }
 
                 return [
                     'id' => (string) $set->id,
+                    'set_line_id' => (string) ($set->set_line_id ?? ''),
                     'name' => (string) $set->name,
-                    'max_pieces' => (int) $set->max_pieces,
+                    'sect' => (string) ($set->sect ?? ''),
+                    'flow_tag' => (string) ($set->flow_tag ?? ''),
+                    'stage' => (int) ($set->stage ?? 0),
+                    'piece_count' => $pieceCount,
+                    'slot_ids' => $slotIds,
+                    'max_pieces' => $maxPieces,
                     'thresholds' => $thresholds,
+                    'description' => (string) ($set->description ?? ''),
                     'sort_order' => (int) $set->sort_order,
                 ];
             })
@@ -114,4 +127,3 @@ class ExportEquipmentSetsJson extends Command
         return array_values($rows);
     }
 }
-

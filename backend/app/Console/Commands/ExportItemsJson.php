@@ -27,6 +27,12 @@ class ExportItemsJson extends Command
                     'name' => (string) $item->name,
                     'rarity' => (string) $item->rarity,
                     'type' => (string) $item->type,
+                    'sub_type' => (string) ($item->sub_type ?? ''),
+                    'material_type' => (string) ($item->material_type ?? ''),
+                    'stack_limit' => (int) ($item->stack_limit ?? 9999),
+                    'drop_unlock_level' => (int) ($item->drop_unlock_level ?? 1),
+                    'can_compose' => (bool) ($item->can_compose ?? false),
+                    'can_reforge' => (bool) ($item->can_reforge ?? false),
                 ];
 
                 if (filled($item->icon)) {
@@ -37,8 +43,31 @@ class ExportItemsJson extends Command
                     $row['trait'] = (string) $item->trait;
                 }
 
+                if (filled($item->desc)) {
+                    $row['desc'] = (string) $item->desc;
+                }
+
                 if (is_array($item->gem_effect) && $item->gem_effect !== []) {
                     $row['gem_effect'] = $item->gem_effect;
+                }
+
+                if (filled($item->effect_type)) {
+                    $row['effect_type'] = (string) $item->effect_type;
+                }
+                if (filled($item->target_scope)) {
+                    $row['target_scope'] = (string) $item->target_scope;
+                }
+                if (is_array($item->effect_payload) && $item->effect_payload !== []) {
+                    $row['effect_payload'] = $item->effect_payload;
+                }
+                if (is_array($item->socket_limit) && $item->socket_limit !== []) {
+                    $row['socket_limit'] = array_values($item->socket_limit);
+                }
+                if (is_array($item->source_tags) && $item->source_tags !== []) {
+                    $row['source_tags'] = array_values($item->source_tags);
+                }
+                if (is_array($item->use_tags) && $item->use_tags !== []) {
+                    $row['use_tags'] = array_values($item->use_tags);
                 }
 
                 return $row;
@@ -51,7 +80,9 @@ class ExportItemsJson extends Command
             'rarity_colors' => [
                 'white' => ['r' => 1.0, 'g' => 1.0, 'b' => 1.0, 'a' => 1.0],
                 'blue' => ['r' => 0.35, 'g' => 0.65, 'b' => 1.0, 'a' => 1.0],
+                'purple' => ['r' => 0.72, 'g' => 0.45, 'b' => 0.95, 'a' => 1.0],
                 'gold' => ['r' => 1.0, 'g' => 0.82, 'b' => 0.35, 'a' => 1.0],
+                'orange' => ['r' => 1.0, 'g' => 0.56, 'b' => 0.18, 'a' => 1.0],
             ],
         ];
         $version = ExportMetaService::getNextVersion('items');

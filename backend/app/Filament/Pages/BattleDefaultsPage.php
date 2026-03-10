@@ -588,7 +588,7 @@ class BattleDefaultsPage extends Page implements HasForms
                         $errors["economy.refine_cost_by_rarity.{$rarity}.items_rows"] = '进阶材料数量不能为负数。';
                         break;
                     }
-                    if (! Item::query()->where('id', $id)->where('type', 'item')->exists()) {
+                    if (! Item::query()->where('id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
                         $errors["economy.refine_cost_by_rarity.{$rarity}.items_rows"] = "进阶材料 {$id} 必须是有效的普通物品。";
                         break;
                     }
@@ -614,7 +614,7 @@ class BattleDefaultsPage extends Page implements HasForms
                     $errors["economy.salvage_reward_by_rarity.{$rarity}.items_rows"] = '分解材料数量不能为负数。';
                     break;
                 }
-                if (! Item::query()->where('id', $id)->where('type', 'item')->exists()) {
+                if (! Item::query()->where('id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
                     $errors["economy.salvage_reward_by_rarity.{$rarity}.items_rows"] = "分解材料 {$id} 必须是有效的普通物品。";
                     break;
                 }
@@ -801,7 +801,7 @@ class BattleDefaultsPage extends Page implements HasForms
     {
         return Item::query()
             ->where('is_enabled', true)
-            ->where('type', 'item')
+            ->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])
             ->orderBy('sort_order')
             ->pluck('name', 'id')
             ->all();

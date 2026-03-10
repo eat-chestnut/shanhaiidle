@@ -1,0 +1,67 @@
+{
+    "meta": {
+        "key": "equipment_growth_rules",
+        "version": 6,
+        "exported_at": "2026-03-10 13:02:52",
+        "sha256": "7808e5d3e044f2df8e12b01f3ed9395ebf6e96eb4c39f8017a177e0ef4d36e8e"
+    },
+    "equipment_growth_rules": {
+        "set_stage_piece_count": {
+            "20": 4,
+            "40": 6,
+            "60": 8
+        },
+        "star_caps": {
+            "20": 3,
+            "40": 6,
+            "50": 8,
+            "60": 10
+        },
+        "star_material_stage": {
+            "1_3": "初阶星材",
+            "4_6": "中阶星材",
+            "7_8": "高阶星材",
+            "9_10": "极阶星材"
+        },
+        "socket_unlocks": {
+            "3": 1,
+            "6": 2,
+            "8": 3,
+            "10": 4
+        },
+        "blue_affix_unlock_level": 30,
+        "purple_affix_unlock_level": 50,
+        "resonance_thresholds": [
+            3,
+            6,
+            8,
+            10
+        ],
+        "blue_gear_rules": {
+            "drop_from_boss_only": true,
+            "allowed_slots": [
+                "main_weapon",
+                "off_weapon",
+                "armor",
+                "belt",
+                "shoes",
+                "gloves",
+                "helm",
+                "necklace"
+            ],
+            "forbidden_slots": [
+                "ring",
+                "bracelet",
+                "talisman"
+            ],
+            "can_star_up": false,
+            "can_rank_up": false,
+            "can_socket": false,
+            "can_reforge": false
+        },
+        "main_equipment_limits": {
+            "ring": 2,
+            "bracelet": 2
+        }
+    }
+}

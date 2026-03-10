@@ -37,6 +37,7 @@ func rebuild_indexes() -> void:
 	_collect_item_rarity_map(cfg)
 	_collect_equip_templates_by_rarity(cfg)
 	_collect_blueprints_by_theme_from_items(cfg)
+	_append_material_dungeon_item_sources(cfg)
 	var equip_drop_cfg := _resolve_equip_drop_cfg(cfg)
 
 	var stages_db_any = cfg.get("stages_db", {})
@@ -253,6 +254,38 @@ func _append_item_pool_sources(stage_id: String, stage_name: String, diff_index:
 				"sort_stage_index": _stage_index(stage_id),
 			}
 			_add_item_source(item_id, source)
+
+func _append_material_dungeon_item_sources(cfg: Dictionary) -> void:
+	var db_any = cfg.get("material_dungeons_db", {})
+	if not (db_any is Dictionary):
+		return
+	var rows_any = (db_any as Dictionary).get("material_dungeons", [])
+	if not (rows_any is Array):
+		return
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var dungeon_id := str(row.get("dungeon_id", row.get("id", ""))).strip_edges()
+		if dungeon_id.is_empty():
+			continue
+		var dungeon_name := str(row.get("name", dungeon_id)).strip_edges()
+		var unlock_level := maxi(0, int(row.get("unlock_level", 0)))
+		var dungeon_type := str(row.get("dungeon_type", "")).strip_edges().to_lower()
+		var pool_ids := _as_clean_string_array(row.get("drop_pools", []))
+		for item_id in pool_ids:
+			_add_item_source(item_id, {
+				"stage_id": "dungeon:%s" % dungeon_id,
+				"stage_name": dungeon_name,
+				"difficulty_index": 0,
+				"difficulty_name": "材料副本",
+				"rarity": _item_rarity(item_id, "white"),
+				"source_type": "material_dungeon",
+				"dungeon_id": dungeon_id,
+				"dungeon_type": dungeon_type,
+				"unlock_level": unlock_level,
+				"sort_stage_index": 900000 + unlock_level,
+			})
 
 func _append_boss_resource_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, stage_cfg: Dictionary) -> void:
 	var theme_key := _resolve_stage_theme_key(stage_cfg)
@@ -695,6 +728,11 @@ func _format_item_source_line(source: Dictionary) -> String:
 		diff_name = DEFAULT_DIFF_NAME
 	var prefix := "%s（%s）" % [stage_name, diff_name]
 	match source_type:
+		"material_dungeon":
+			var unlock_level := maxi(0, int(source.get("unlock_level", 0)))
+			if unlock_level > 0:
+				return "%s - 材料副本（Lv%d解锁）" % [stage_name, unlock_level]
+			return "%s - 材料副本" % stage_name
 		"boss_mark":
 			return "%s - %sBoss稳定掉落印记" % [prefix, _theme_name(theme_key)]
 		"boss_fragment":

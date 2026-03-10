@@ -11,6 +11,15 @@ const FILE_KEY_ORDER := [
 	"items",
 	"equip_templates",
 	"equipment_sets",
+	"equip_slots",
+	"equipment_growth_rules",
+	"blue_gear_templates",
+	"blue_affix_pool",
+	"purple_affix_pool",
+	"gem_catalog",
+	"material_catalog",
+	"material_dungeons",
+	"crafting_recipes",
 	"monsters",
 	"skills_catalog",
 	"battle_defaults",
@@ -26,6 +35,15 @@ const FILE_KEY_TO_NAME := {
 	"items": "items.json",
 	"equip_templates": "equip_templates.json",
 	"equipment_sets": "equipment_sets.json",
+	"equip_slots": "equip_slots_v1.json",
+	"equipment_growth_rules": "equipment_growth_rules_v1.json",
+	"blue_gear_templates": "blue_gear_templates_v1.json",
+	"blue_affix_pool": "blue_affix_pool_v1.json",
+	"purple_affix_pool": "purple_affix_pool_v1.json",
+	"gem_catalog": "gem_catalog_v1.json",
+	"material_catalog": "material_catalog_v1.json",
+	"material_dungeons": "material_dungeons_v1.json",
+	"crafting_recipes": "crafting_recipes_v1.json",
 	"monsters": "monsters.json",
 	"skills_catalog": "skills_catalog.json",
 	"battle_defaults": "battle_defaults.json",
@@ -44,6 +62,33 @@ func get_equip_templates_text() -> String:
 
 func get_equipment_sets_text() -> String:
 	return get_active_text("equipment_sets.json", "res://data/equipment_sets.json")
+
+func get_equip_slots_text() -> String:
+	return get_active_text("equip_slots_v1.json", "res://data/equip_slots_v1.json")
+
+func get_equipment_growth_rules_text() -> String:
+	return get_active_text("equipment_growth_rules_v1.json", "res://data/equipment_growth_rules_v1.json")
+
+func get_blue_gear_templates_text() -> String:
+	return get_active_text("blue_gear_templates_v1.json", "res://data/blue_gear_templates_v1.json")
+
+func get_blue_affix_pool_text() -> String:
+	return get_active_text("blue_affix_pool_v1.json", "res://data/blue_affix_pool_v1.json")
+
+func get_purple_affix_pool_text() -> String:
+	return get_active_text("purple_affix_pool_v1.json", "res://data/purple_affix_pool_v1.json")
+
+func get_gem_catalog_text() -> String:
+	return get_active_text("gem_catalog_v1.json", "res://data/gem_catalog_v1.json")
+
+func get_material_catalog_text() -> String:
+	return get_active_text("material_catalog_v1.json", "res://data/material_catalog_v1.json")
+
+func get_material_dungeons_text() -> String:
+	return get_active_text("material_dungeons_v1.json", "res://data/material_dungeons_v1.json")
+
+func get_crafting_recipes_text() -> String:
+	return get_active_text("crafting_recipes_v1.json", "res://data/crafting_recipes_v1.json")
 
 func get_monsters_json_text() -> String:
 	return get_active_text("monsters.json", "res://data/monsters.json")
@@ -74,6 +119,15 @@ func get_active_versions() -> Dictionary:
 		"items": 0,
 		"equip_templates": 0,
 		"equipment_sets": 0,
+		"equip_slots": 0,
+		"equipment_growth_rules": 0,
+		"blue_gear_templates": 0,
+		"blue_affix_pool": 0,
+		"purple_affix_pool": 0,
+		"gem_catalog": 0,
+		"material_catalog": 0,
+		"material_dungeons": 0,
+		"crafting_recipes": 0,
 		"monsters": 0,
 		"skills_catalog": 0,
 		"battle_defaults": 0,
@@ -557,10 +611,10 @@ func validate_items_json(text: String) -> Dictionary:
 		var row: Dictionary = row_any
 		var item_id := str(row.get("id", "")).strip_edges()
 		var item_name := str(row.get("name", "")).strip_edges()
-		var rarity := str(row.get("rarity", "")).strip_edges()
+		var rarity := str(row.get("rarity", "")).strip_edges().to_lower()
 		if item_id.is_empty() or item_name.is_empty():
 			return {"ok": false, "reason": "items[%d] id/name 不能为空" % i}
-		if rarity != "white" and rarity != "blue" and rarity != "gold":
+		if rarity != "white" and rarity != "blue" and rarity != "gold" and rarity != "purple" and rarity != "orange":
 			return {"ok": false, "reason": "items[%d].rarity 非法" % i}
 
 	return {"ok": true}
@@ -1000,6 +1054,174 @@ func validate_forge_rules_json(text: String) -> Dictionary:
 
 	return {"ok": true}
 
+func validate_equip_slots_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "equip_slots", "equip_slots")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "equip_slots 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "equip_slots[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		var slot_id := str(row.get("slot_id", row.get("id", ""))).strip_edges()
+		if slot_id.is_empty():
+			return {"ok": false, "reason": "equip_slots[%d].slot_id 不能为空" % i}
+		if int(row.get("equip_limit", 1)) < 1:
+			return {"ok": false, "reason": "equip_slots[%d].equip_limit 必须 >= 1" % i}
+		if int(row.get("unlock_level", 0)) < 0:
+			return {"ok": false, "reason": "equip_slots[%d].unlock_level 不能为负数" % i}
+	return {"ok": true}
+
+func validate_equipment_growth_rules_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "equipment_growth_rules 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "equipment_growth_rules 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "equipment_growth_rules")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rules_any = root.get("equipment_growth_rules", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 equipment_growth_rules 对象"}
+	return {"ok": true}
+
+func validate_blue_gear_templates_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "blue_gear_templates", "blue_gear_templates")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "blue_gear_templates 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "blue_gear_templates[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "blue_gear_templates[%d].id 不能为空" % i}
+		if str(row.get("slot_id", row.get("slot", ""))).strip_edges().is_empty():
+			return {"ok": false, "reason": "blue_gear_templates[%d].slot_id 不能为空" % i}
+	return {"ok": true}
+
+func validate_blue_affix_pool_json(text: String) -> Dictionary:
+	return _validate_affix_pool_json(text, "blue_affix_pool", "blue_affix_pool")
+
+func validate_purple_affix_pool_json(text: String) -> Dictionary:
+	return _validate_affix_pool_json(text, "purple_affix_pool", "purple_affix_pool")
+
+func validate_gem_catalog_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "gem_catalog", "gem_catalog")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "gem_catalog 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "gem_catalog[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "gem_catalog[%d].id 不能为空" % i}
+		if str(row.get("gem_type", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "gem_catalog[%d].gem_type 不能为空" % i}
+	return {"ok": true}
+
+func validate_material_catalog_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "material_catalog", "material_catalog")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "material_catalog 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "material_catalog[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "material_catalog[%d].id 不能为空" % i}
+	return {"ok": true}
+
+func validate_material_dungeons_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "material_dungeons", "material_dungeons")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "material_dungeons 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "material_dungeons[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("dungeon_id", row.get("id", ""))).strip_edges().is_empty():
+			return {"ok": false, "reason": "material_dungeons[%d].dungeon_id 不能为空" % i}
+	return {"ok": true}
+
+func validate_crafting_recipes_json(text: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, "crafting_recipes", "crafting_recipes")
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "crafting_recipes 结构错误"}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "crafting_recipes[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("recipe_id", row.get("id", ""))).strip_edges().is_empty():
+			return {"ok": false, "reason": "crafting_recipes[%d].recipe_id 不能为空" % i}
+	return {"ok": true}
+
+func _validate_affix_pool_json(text: String, root_key: String, expected_meta_key: String) -> Dictionary:
+	var check := _validate_catalog_array_json(text, root_key, expected_meta_key)
+	if not bool(check.get("ok", false)):
+		return check
+	var rows_any = check.get("rows", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "%s 结构错误" % root_key}
+	var rows: Array = rows_any
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "%s[%d] 必须是对象" % [root_key, i]}
+		var row: Dictionary = row_any
+		if str(row.get("affix_id", row.get("id", ""))).strip_edges().is_empty():
+			return {"ok": false, "reason": "%s[%d].affix_id 不能为空" % [root_key, i]}
+		var min_v := float(row.get("min_value", 0.0))
+		var max_v := float(row.get("max_value", 0.0))
+		if max_v < min_v:
+			return {"ok": false, "reason": "%s[%d] min_value/max_value 非法" % [root_key, i]}
+	return {"ok": true}
+
+func _validate_catalog_array_json(text: String, root_key: String, expected_meta_key: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "%s 内容为空" % root_key}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "%s 根节点必须是对象" % root_key}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, expected_meta_key)
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rows_any = root.get(root_key, null)
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "缺少 %s 数组" % root_key}
+	return {"ok": true, "rows": rows_any}
+
 func is_valid_refine_effect_pool(pool_any: Variant) -> bool:
 	var ret := _validate_refine_effect_pool(pool_any)
 	return bool(ret.get("ok", false))
@@ -1215,6 +1437,24 @@ func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 			return validate_equip_templates_json(text)
 		"equipment_sets":
 			return validate_equipment_sets_json(text)
+		"equip_slots":
+			return validate_equip_slots_json(text)
+		"equipment_growth_rules":
+			return validate_equipment_growth_rules_json(text)
+		"blue_gear_templates":
+			return validate_blue_gear_templates_json(text)
+		"blue_affix_pool":
+			return validate_blue_affix_pool_json(text)
+		"purple_affix_pool":
+			return validate_purple_affix_pool_json(text)
+		"gem_catalog":
+			return validate_gem_catalog_json(text)
+		"material_catalog":
+			return validate_material_catalog_json(text)
+		"material_dungeons":
+			return validate_material_dungeons_json(text)
+		"crafting_recipes":
+			return validate_crafting_recipes_json(text)
 		"monsters":
 			return validate_monsters_json(text)
 		"skills_catalog":

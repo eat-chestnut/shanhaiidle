@@ -9,12 +9,15 @@ const STAR_MAX_DEFAULT := 10
 var next_uid: int = 1
 var bag: Array = []
 var equipped: Dictionary = {
-	"weapon": 0,
+	"main_weapon": 0,
+	"off_weapon": 0,
 	"helm": 0,
 	"armor": 0,
-	"pants": 0,
+	"belt": 0,
 	"shoes": 0,
-	"cloak": 0,
+	"gloves": 0,
+	"necklace": 0,
+	"talisman": 0,
 	"ring1": 0,
 	"ring2": 0,
 	"bracelet1": 0,
@@ -335,16 +338,17 @@ func salvage(uid: int) -> Dictionary:
 	return result
 
 func unequip(slot_key: String) -> void:
-	if not equipped.has(slot_key):
+	var normalized_slot := _normalize_equipped_slot_key(slot_key)
+	if not equipped.has(normalized_slot):
 		return
-	var uid := int(equipped.get(slot_key, 0))
+	var uid := int(equipped.get(normalized_slot, 0))
 	if uid == 0:
 		return
 	var inst_any = equipped_store.get(uid, {})
 	if inst_any is Dictionary:
 		bag.append(inst_any)
 	equipped_store.erase(uid)
-	equipped[slot_key] = 0
+	equipped[normalized_slot] = 0
 	EventBus.notify_inventory_updated()
 	_request_save()
 
@@ -361,7 +365,7 @@ func get_total_stats_with_override(override_equipped: Dictionary) -> Dictionary:
 
 func get_total_stats_simulate_replace(slot_key: String, candidate_inst: Dictionary) -> Dictionary:
 	var override_equipped: Dictionary = {}
-	var normalized_slot := slot_key.strip_edges()
+	var normalized_slot := _normalize_equipped_slot_key(slot_key.strip_edges())
 	if not normalized_slot.is_empty():
 		override_equipped[normalized_slot] = candidate_inst if not candidate_inst.is_empty() else {}
 	return get_total_stats_with_override(override_equipped)
@@ -479,7 +483,7 @@ func get_set_counts_with_override(override_equipped: Dictionary) -> Dictionary:
 
 func get_set_counts_simulate_replace(target_slot: String, candidate_inst: Dictionary) -> Dictionary:
 	var override_equipped: Dictionary = {}
-	var slot_key := target_slot.strip_edges()
+	var slot_key := _normalize_equipped_slot_key(target_slot.strip_edges())
 	if not slot_key.is_empty():
 		override_equipped[slot_key] = candidate_inst if not candidate_inst.is_empty() else {}
 	return get_set_counts_with_override(override_equipped)
@@ -618,7 +622,7 @@ func _set_counts_from_store(store: Dictionary) -> Dictionary:
 
 func _build_simulated_equipped_state(slot_key: String, candidate_inst: Dictionary) -> Dictionary:
 	var override_equipped: Dictionary = {}
-	var normalized_slot := slot_key.strip_edges()
+	var normalized_slot := _normalize_equipped_slot_key(slot_key.strip_edges())
 	if not normalized_slot.is_empty() and equipped.has(normalized_slot):
 		override_equipped[normalized_slot] = candidate_inst if not candidate_inst.is_empty() else {}
 	return _build_override_equipped_state(override_equipped)
@@ -1378,9 +1382,10 @@ func remove_from_bag(uid: int) -> bool:
 	return true
 
 func get_equipped_instance(slot_key: String) -> Dictionary:
-	if not equipped.has(slot_key):
+	var normalized_slot := _normalize_equipped_slot_key(slot_key)
+	if not equipped.has(normalized_slot):
 		return {}
-	var uid := int(equipped.get(slot_key, 0))
+	var uid := int(equipped.get(normalized_slot, 0))
 	if uid == 0:
 		return {}
 	var inst_any = equipped_store.get(uid, {})
@@ -1389,16 +1394,20 @@ func get_equipped_instance(slot_key: String) -> Dictionary:
 	return {}
 
 func get_equipped_uid(slot_key: String) -> int:
-	return int(equipped.get(slot_key, 0))
+	var normalized_slot := _normalize_equipped_slot_key(slot_key)
+	return int(equipped.get(normalized_slot, 0))
 
 func _default_equipped() -> Dictionary:
 	return {
-		"weapon": 0,
+		"main_weapon": 0,
+		"off_weapon": 0,
 		"helm": 0,
 		"armor": 0,
-		"pants": 0,
+		"belt": 0,
 		"shoes": 0,
-		"cloak": 0,
+		"gloves": 0,
+		"necklace": 0,
+		"talisman": 0,
 		"ring1": 0,
 		"ring2": 0,
 		"bracelet1": 0,
@@ -1441,7 +1450,7 @@ func _load_save() -> void:
 			var eq_any: Variant = (parsed as Dictionary).get("equipped_items", {})
 			if eq_any is Dictionary:
 				for slot_key_any in (eq_any as Dictionary).keys():
-					var slot_key := str(slot_key_any)
+					var slot_key := _normalize_equipped_slot_key(str(slot_key_any))
 					if not equipped.has(slot_key):
 						continue
 					var inst_any = (eq_any as Dictionary).get(slot_key_any, {})
@@ -1582,7 +1591,7 @@ func _sync_legacy_main_fields(inst: Dictionary) -> Dictionary:
 
 	if not template.is_empty():
 		out["name"] = str(template.get("name", out.get("name", template_id)))
-		out["slot"] = str(template.get("slot", out.get("slot", "")))
+		out["slot"] = _normalize_template_slot(str(template.get("slot", out.get("slot", ""))))
 		out["rarity"] = str(template.get("rarity", out.get("rarity", "white")))
 		out["icon"] = str(template.get("icon", out.get("icon", "")))
 		if str(out.get("set_id", "")).strip_edges().is_empty():
@@ -1743,12 +1752,12 @@ func _pick_affordable_material_option(options: Array[Dictionary], owned: Diction
 	return {}
 
 func _slot_group_from_slot(slot: String) -> String:
-	var key := slot.strip_edges().to_lower()
-	if key == "weapon":
+	var key := _normalize_template_slot(slot).strip_edges().to_lower()
+	if key == "main_weapon" or key == "off_weapon" or key == "weapon":
 		return "weapon"
-	if key == "armor" or key == "pants" or key == "helm" or key == "shoes":
+	if key == "armor" or key == "belt" or key == "pants" or key == "helm" or key == "shoes" or key == "gloves":
 		return "armor"
-	if key == "cloak":
+	if key == "cloak" or key == "necklace":
 		return "cloak"
 	return "accessory"
 
@@ -1962,7 +1971,8 @@ func _set_instance_by_uid(uid: int, inst: Dictionary) -> bool:
 	return false
 
 func _resolve_slot_key_for_equip(slot: String) -> String:
-	match slot:
+	var normalized_slot := _normalize_template_slot(slot)
+	match normalized_slot:
 		"ring":
 			if int(equipped.get("ring1", 0)) == 0:
 				return "ring1"
@@ -1976,7 +1986,7 @@ func _resolve_slot_key_for_equip(slot: String) -> String:
 				return "bracelet2"
 			return "bracelet1"
 		_:
-			return slot if equipped.has(slot) else ""
+			return normalized_slot if equipped.has(normalized_slot) else ""
 
 func _normalize_stat_key(stat: String) -> String:
 	match stat:
@@ -2193,6 +2203,7 @@ func _pop_bag_instance(uid: int) -> Dictionary:
 
 func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
 	var out := _ensure_socket_fields(inst)
+	out["slot"] = _normalize_template_slot(str(out.get("slot", "")))
 	var template_id := str(out.get("template_id", "")).strip_edges()
 	var tpl := _find_template(template_id)
 	var current_set := str(out.get("set_id", "")).strip_edges()
@@ -2208,6 +2219,32 @@ func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
 		out["icon"] = str(tpl.get("icon", ""))
 	out = _sync_legacy_main_fields(out)
 	return out
+
+func _normalize_template_slot(slot: String) -> String:
+	var key := slot.strip_edges().to_lower()
+	match key:
+		"weapon":
+			return "main_weapon"
+		"pants":
+			return "belt"
+		"cloak":
+			return "off_weapon"
+		"main_weapon", "off_weapon", "armor", "belt", "shoes", "gloves", "helm", "necklace", "talisman", "ring", "bracelet", "ring1", "ring2", "bracelet1", "bracelet2":
+			return key
+		_:
+			return key
+
+func _normalize_equipped_slot_key(slot_key: String) -> String:
+	var key := slot_key.strip_edges().to_lower()
+	match key:
+		"weapon":
+			return "main_weapon"
+		"pants":
+			return "belt"
+		"cloak":
+			return "off_weapon"
+		_:
+			return key
 
 func _add_one_extra_effect(inst: Dictionary) -> Dictionary:
 	var existing: Dictionary = {}

@@ -73,14 +73,17 @@ const DEBUG_TOPUP_TARGETS := {
 }
 
 const DEBUG_EQUIP_PLAN := [
-	{"id": "eq_weapon_002", "count": 1},
-	{"id": "eq_helm_001", "count": 1},
-	{"id": "eq_armor_002", "count": 1},
-	{"id": "eq_pants_001", "count": 1},
-	{"id": "eq_shoes_001", "count": 1},
-	{"id": "eq_cloak_001", "count": 1},
-	{"id": "eq_ring_001", "count": 2},
-	{"id": "eq_bracelet_001", "count": 2},
+	{"id": "main_weapon_nanshan_t1_normal_01", "count": 1},
+	{"id": "off_weapon_nanshan_t1_normal_01", "count": 1},
+	{"id": "helm_nanshan_t1_normal_01", "count": 1},
+	{"id": "armor_nanshan_t1_normal_01", "count": 1},
+	{"id": "belt_nanshan_t1_normal_01", "count": 1},
+	{"id": "shoes_nanshan_t1_normal_01", "count": 1},
+	{"id": "gloves_nanshan_t1_normal_01", "count": 1},
+	{"id": "necklace_nanshan_t1_normal_01", "count": 1},
+	{"id": "ring_nanshan_t2_normal_01", "count": 2},
+	{"id": "bracelet_qingqiu_t2_normal_01", "count": 2},
+	{"id": "talisman_shop_40_01", "count": 1},
 ]
 
 func _ready() -> void:
@@ -265,21 +268,27 @@ func _sort_seed_inst_for_equip(a_any: Variant, b_any: Variant) -> bool:
 
 func _slot_sort_value(slot: String) -> int:
 	match slot.to_lower():
-		"weapon":
+		"main_weapon", "weapon":
 			return 0
-		"helm":
+		"off_weapon", "cloak":
 			return 1
-		"armor":
+		"helm":
 			return 2
-		"pants":
+		"armor":
 			return 3
-		"shoes":
+		"belt", "pants":
 			return 4
-		"cloak":
+		"shoes":
 			return 5
-		"ring":
+		"gloves":
 			return 6
-		"bracelet":
+		"necklace":
 			return 7
+		"talisman":
+			return 8
+		"ring":
+			return 9
+		"bracelet":
+			return 10
 		_:
 			return 99
