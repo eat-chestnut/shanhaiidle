@@ -18,6 +18,7 @@ const FILE_KEY_ORDER := [
 
 const OPTIONAL_FILE_KEYS := [
 	"star_rules",
+	"forge_rules",
 ]
 
 const FILE_KEY_TO_NAME := {
@@ -29,6 +30,7 @@ const FILE_KEY_TO_NAME := {
 	"skills_catalog": "skills_catalog.json",
 	"battle_defaults": "battle_defaults.json",
 	"star_rules": "star_rules_v1.json",
+	"forge_rules": "forge_rules_v1.json",
 }
 
 func get_stages_json_text() -> String:
@@ -55,6 +57,9 @@ func get_battle_defaults_text() -> String:
 func get_star_rules_text() -> String:
 	return get_active_text("star_rules_v1.json", "res://data/star_rules_v1.json")
 
+func get_forge_rules_text() -> String:
+	return get_active_text("forge_rules_v1.json", "res://data/forge_rules_v1.json")
+
 func get_active_text(filename: String, fallback_res_path: String) -> String:
 	var active_path := "%s/%s" % [ACTIVE_DIR, filename]
 	if FileAccess.file_exists(active_path):
@@ -73,6 +78,7 @@ func get_active_versions() -> Dictionary:
 		"skills_catalog": 0,
 		"battle_defaults": 0,
 		"star_rules": 0,
+		"forge_rules": 0,
 	}
 	if not FileAccess.file_exists(ACTIVE_MANIFEST):
 		return out
@@ -849,6 +855,151 @@ func validate_star_rules_json(text: String) -> Dictionary:
 
 	return {"ok": true}
 
+func validate_forge_rules_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "打造规则内容为空"}
+
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "打造规则JSON根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "forge_rules")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+
+	var rules_any: Variant = root.get("forge_rules", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 forge_rules 对象"}
+	var rules: Dictionary = rules_any
+
+	var tiers_any: Variant = rules.get("tiers", {})
+	if not (tiers_any is Dictionary):
+		return {"ok": false, "reason": "forge_rules.tiers 必须是对象"}
+	var tiers: Dictionary = tiers_any
+	if tiers.is_empty():
+		return {"ok": false, "reason": "forge_rules.tiers 不能为空"}
+	for tier_key_any in tiers.keys():
+		var tier_key := str(tier_key_any).strip_edges()
+		if tier_key.is_empty():
+			return {"ok": false, "reason": "forge_rules.tiers 存在空tier键名"}
+		var row_any: Variant = tiers.get(tier_key_any, {})
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "forge_rules.tiers.%s 必须是对象" % tier_key}
+		var row: Dictionary = row_any
+		var lv_any: Variant = row.get("level_range", [])
+		if not (lv_any is Array):
+			return {"ok": false, "reason": "forge_rules.tiers.%s.level_range 必须是数组" % tier_key}
+		var lv: Array = lv_any
+		if lv.size() < 2:
+			return {"ok": false, "reason": "forge_rules.tiers.%s.level_range 至少2项" % tier_key}
+		var min_lv := int(lv[0])
+		var max_lv := int(lv[1])
+		if min_lv < 1 or max_lv < min_lv:
+			return {"ok": false, "reason": "forge_rules.tiers.%s.level_range 非法" % tier_key}
+
+	var normal_any: Variant = rules.get("normal_forge_rules", [])
+	if not (normal_any is Array):
+		return {"ok": false, "reason": "forge_rules.normal_forge_rules 必须是数组"}
+	var normal_rows: Array = normal_any
+	if normal_rows.is_empty():
+		return {"ok": false, "reason": "forge_rules.normal_forge_rules 不能为空"}
+	for i in range(normal_rows.size()):
+		var row_any: Variant = normal_rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "normal_forge_rules[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("forge_tier", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "normal_forge_rules[%d].forge_tier 不能为空" % i}
+		if str(row.get("slot_group", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "normal_forge_rules[%d].slot_group 不能为空" % i}
+		if int(row.get("gold_cost", -1)) < 0:
+			return {"ok": false, "reason": "normal_forge_rules[%d].gold_cost 不能为负数" % i}
+		var mats_any: Variant = row.get("materials", [])
+		if not (mats_any is Array):
+			return {"ok": false, "reason": "normal_forge_rules[%d].materials 必须是数组" % i}
+		var mats: Array = mats_any
+		if mats.is_empty():
+			return {"ok": false, "reason": "normal_forge_rules[%d].materials 不能为空" % i}
+		for j in range(mats.size()):
+			var mat_any: Variant = mats[j]
+			if not (mat_any is Dictionary):
+				return {"ok": false, "reason": "normal_forge_rules[%d].materials[%d] 必须是对象" % [i, j]}
+			var mat: Dictionary = mat_any
+			if str(mat.get("item_id", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "normal_forge_rules[%d].materials[%d].item_id 不能为空" % [i, j]}
+			if int(mat.get("count", 0)) <= 0:
+				return {"ok": false, "reason": "normal_forge_rules[%d].materials[%d].count 必须 > 0" % [i, j]}
+
+	var high_any: Variant = rules.get("high_forge_rules", [])
+	if not (high_any is Array):
+		return {"ok": false, "reason": "forge_rules.high_forge_rules 必须是数组"}
+	var high_rows: Array = high_any
+	if high_rows.is_empty():
+		return {"ok": false, "reason": "forge_rules.high_forge_rules 不能为空"}
+	for i in range(high_rows.size()):
+		var row_any: Variant = high_rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "high_forge_rules[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("forge_tier", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "high_forge_rules[%d].forge_tier 不能为空" % i}
+		if str(row.get("slot_group", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "high_forge_rules[%d].slot_group 不能为空" % i}
+		if str(row.get("theme_key", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "high_forge_rules[%d].theme_key 不能为空" % i}
+		if int(row.get("gold_cost", -1)) < 0:
+			return {"ok": false, "reason": "high_forge_rules[%d].gold_cost 不能为负数" % i}
+		var mats_any: Variant = row.get("materials", [])
+		if not (mats_any is Array):
+			return {"ok": false, "reason": "high_forge_rules[%d].materials 必须是数组" % i}
+		var mats: Array = mats_any
+		if mats.is_empty():
+			return {"ok": false, "reason": "high_forge_rules[%d].materials 不能为空" % i}
+		for j in range(mats.size()):
+			var mat_any: Variant = mats[j]
+			if not (mat_any is Dictionary):
+				return {"ok": false, "reason": "high_forge_rules[%d].materials[%d] 必须是对象" % [i, j]}
+			var mat: Dictionary = mat_any
+			if str(mat.get("item_id", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "high_forge_rules[%d].materials[%d].item_id 不能为空" % [i, j]}
+			if int(mat.get("count", 0)) <= 0:
+				return {"ok": false, "reason": "high_forge_rules[%d].materials[%d].count 必须 > 0" % [i, j]}
+		if row.has("extra_materials"):
+			var extra_any: Variant = row.get("extra_materials", [])
+			if not (extra_any is Array):
+				return {"ok": false, "reason": "high_forge_rules[%d].extra_materials 必须是数组" % i}
+			for j in range((extra_any as Array).size()):
+				var mat_any: Variant = (extra_any as Array)[j]
+				if not (mat_any is Dictionary):
+					return {"ok": false, "reason": "high_forge_rules[%d].extra_materials[%d] 必须是对象" % [i, j]}
+				var mat: Dictionary = mat_any
+				if str(mat.get("item_id", "")).strip_edges().is_empty():
+					return {"ok": false, "reason": "high_forge_rules[%d].extra_materials[%d].item_id 不能为空" % [i, j]}
+				if int(mat.get("count", 0)) <= 0:
+					return {"ok": false, "reason": "high_forge_rules[%d].extra_materials[%d].count 必须 > 0" % [i, j]}
+
+	var compose_any: Variant = rules.get("blueprint_compose_rules", [])
+	if not (compose_any is Array):
+		return {"ok": false, "reason": "forge_rules.blueprint_compose_rules 必须是数组"}
+	var compose_rows: Array = compose_any
+	if compose_rows.is_empty():
+		return {"ok": false, "reason": "forge_rules.blueprint_compose_rules 不能为空"}
+	for i in range(compose_rows.size()):
+		var row_any: Variant = compose_rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "blueprint_compose_rules[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("theme_key", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "blueprint_compose_rules[%d].theme_key 不能为空" % i}
+		if str(row.get("fragment_item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "blueprint_compose_rules[%d].fragment_item_id 不能为空" % i}
+		if int(row.get("fragment_count", 0)) <= 0:
+			return {"ok": false, "reason": "blueprint_compose_rules[%d].fragment_count 必须 > 0" % i}
+		if int(row.get("gold_cost", -1)) < 0:
+			return {"ok": false, "reason": "blueprint_compose_rules[%d].gold_cost 不能为负数" % i}
+
+	return {"ok": true}
+
 func is_valid_refine_effect_pool(pool_any: Variant) -> bool:
 	var ret := _validate_refine_effect_pool(pool_any)
 	return bool(ret.get("ok", false))
@@ -1072,6 +1223,8 @@ func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 			return validate_battle_defaults(text)
 		"star_rules":
 			return validate_star_rules_json(text)
+		"forge_rules":
+			return validate_forge_rules_json(text)
 		_:
 			return {"ok": false, "reason": "未知配置 key：%s" % key}
 

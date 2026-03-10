@@ -30,6 +30,7 @@ const SLOT_KEYS := [
 @onready var _btn_tab_equip: BaseButton = $Panel/VBox/Tabs/TabEquip/BtnTabEquip
 @onready var _btn_tab_gem: BaseButton = $Panel/VBox/Tabs/TabGem/BtnTabGem
 @onready var _btn_bulk_salvage: Button = $Panel/VBox/Tabs/BtnBulkSalvage
+@onready var _btn_forge: Button = $Panel/VBox/Tabs/BtnForge
 @onready var _lbl_tab_items: Label = $Panel/VBox/Tabs/TabItems/LblTabItems
 @onready var _lbl_tab_equip: Label = $Panel/VBox/Tabs/TabEquip/LblTabEquip
 @onready var _lbl_tab_gem: Label = $Panel/VBox/Tabs/TabGem/LblTabGem
@@ -45,6 +46,8 @@ const SLOT_KEYS := [
 @onready var _equip_gem_popup: Node = $EquipGemPopup
 @onready var _star_up_popup: Node = $StarUpPopup
 @onready var _bulk_popup: Node = $BulkSalvagePopup
+@onready var _forge_popup: Node = $ForgePopup
+@onready var _forge_base_popup: Node = $ForgeBaseEquipSelectPopup
 
 var _slots: Array[Control] = []
 var _slot_rows: Array = []
@@ -68,6 +71,8 @@ func _ready() -> void:
 		_btn_tab_gem.pressed.connect(_on_tab_gem_pressed)
 	if not _btn_bulk_salvage.pressed.is_connected(_on_bulk_salvage_pressed):
 		_btn_bulk_salvage.pressed.connect(_on_bulk_salvage_pressed)
+	if not _btn_forge.pressed.is_connected(_on_forge_pressed):
+		_btn_forge.pressed.connect(_on_forge_pressed)
 	if not _dim_bg.gui_input.is_connected(_on_dim_bg_gui_input):
 		_dim_bg.gui_input.connect(_on_dim_bg_gui_input)
 	if not EventBus.inventory_updated.is_connected(_on_inventory_updated):
@@ -108,6 +113,10 @@ func close() -> void:
 		_star_up_popup.call("close")
 	if _bulk_popup != null and _bulk_popup.has_method("close"):
 		_bulk_popup.call("close")
+	if _forge_popup != null and _forge_popup.has_method("close"):
+		_forge_popup.call("close")
+	if _forge_base_popup != null and _forge_base_popup.has_method("close"):
+		_forge_base_popup.call("close")
 	closed.emit()
 
 func refresh() -> void:
@@ -287,6 +296,7 @@ func _apply_i18n() -> void:
 	_lbl_tab_equip.text = I18nService.t("ui.tab.equip")
 	_lbl_tab_gem.text = I18nService.t("ui.tab.gem", "宝石")
 	_btn_bulk_salvage.text = I18nService.t("ui.btn.bulk_salvage", "一键分解")
+	_btn_forge.text = I18nService.t("ui.btn.forge", "打造")
 	_equip_title.text = I18nService.t("ui.panel.equip_slots", "装备栏")
 	_stats_title.text = I18nService.t("ui.panel.stats", "属性")
 
@@ -297,6 +307,7 @@ func _refresh_tab_visual() -> void:
 	_lbl_tab_equip.modulate = active if _tab == "equip" else inactive
 	_lbl_tab_gem.modulate = active if _tab == "gem" else inactive
 	_btn_bulk_salvage.visible = _tab == "equip"
+	_btn_forge.visible = _tab == "equip"
 
 func _refresh_stats_panel() -> void:
 	var stats: Dictionary = EquipmentModel.get_total_stats()
@@ -441,6 +452,12 @@ func _on_bulk_salvage_pressed() -> void:
 		return
 	if _bulk_popup != null and _bulk_popup.has_method("open"):
 		_bulk_popup.call("open")
+
+func _on_forge_pressed() -> void:
+	if _tab != "equip":
+		return
+	if _forge_popup != null and _forge_popup.has_method("open"):
+		_forge_popup.call("open")
 
 func _on_slot_gui_input(event: InputEvent, index: int) -> void:
 	if event is InputEventMouseButton:

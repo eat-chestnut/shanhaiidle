@@ -41,13 +41,21 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t1",
+            "forge_weapon_t1",
+            "forge_armor_t1",
+            "forge_cloak_t1",
+            "forge_accessory_t1"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_weapon_nanshan_t1_01"
           ]
         },
         "special": {
@@ -237,13 +245,26 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t1",
+            "forge_weapon_t1",
+            "forge_armor_t1",
+            "forge_cloak_t1",
+            "forge_accessory_t1"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "forge_base_t2",
+            "forge_weapon_t2",
+            "forge_armor_t2",
+            "forge_cloak_t2",
+            "forge_accessory_t2",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_armor_nanshan_t1_01"
           ]
         },
         "special": {
@@ -433,13 +454,26 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t2",
+            "forge_weapon_t2",
+            "forge_armor_t2",
+            "forge_cloak_t2",
+            "forge_accessory_t2"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "forge_base_t3",
+            "forge_weapon_t3",
+            "forge_armor_t3",
+            "forge_cloak_t3",
+            "forge_accessory_t3",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_cloak_nanshan_t2_01"
           ]
         },
         "special": {
@@ -629,13 +663,26 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t2",
+            "forge_weapon_t2",
+            "forge_armor_t2",
+            "forge_cloak_t2",
+            "forge_accessory_t2"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "forge_base_t3",
+            "forge_weapon_t3",
+            "forge_armor_t3",
+            "forge_cloak_t3",
+            "forge_accessory_t3",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_ring_nanshan_t2_01"
           ]
         },
         "special": {
@@ -825,13 +872,26 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t3",
+            "forge_weapon_t3",
+            "forge_armor_t3",
+            "forge_cloak_t3",
+            "forge_accessory_t3"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "forge_base_t4",
+            "forge_weapon_t4",
+            "forge_armor_t4",
+            "forge_cloak_t4",
+            "forge_accessory_t4",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_bracelet_nanshan_t2_01"
           ]
         },
         "special": {
@@ -1021,13 +1081,24 @@
         "items_by_rarity": {
           "white": [
             "桂枝",
-            "玉屑"
+            "玉屑",
+            "forge_base_t4",
+            "forge_weapon_t4",
+            "forge_armor_t4",
+            "forge_cloak_t4",
+            "forge_accessory_t4"
           ],
           "blue": [
-            "白玉碎"
+            "白玉碎",
+            "theme_rare_nanshan",
+            "bp_fragment_nanshan"
           ],
           "gold": [
-            "妖核"
+            "妖核",
+            "bp_weapon_nanshan_t1_01",
+            "bp_cloak_nanshan_t2_01",
+            "bp_ring_nanshan_t2_01",
+            "bp_bracelet_nanshan_t2_01"
           ]
         },
         "special": {

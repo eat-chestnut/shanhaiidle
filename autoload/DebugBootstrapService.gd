@@ -3,7 +3,7 @@ extends Node
 const SAVE_SECTION := "debug_bootstrap"
 const DONE_KEY := "phase3_star_seed_done"
 const SECT_TOKEN_ID := "宗门令"
-const DEBUG_GOLD_TARGET := 80000
+const DEBUG_GOLD_TARGET := 500000
 
 const DEBUG_ITEM_REWARDS := {
 	"宗门令": 10,
@@ -20,19 +20,56 @@ const DEBUG_ITEM_REWARDS := {
 # DEBUG 下每次启动都会把关键材料补到该库存下限，避免旧存档因一次性标记导致材料不足。
 const DEBUG_TOPUP_TARGETS := {
 	"宗门令": 30,
-	"打孔石": 120,
-	"玉屑": 1200,
-	"桂枝": 1200,
-	"白玉碎": 900,
-	"妖核": 400,
-	"妖王核心": 100,
-	"赤晶石": 320,
-	"沧澜石": 320,
-	"青木石": 320,
-	"star_stone_t1_common": 1200,
-	"star_stone_t2_common": 900,
-	"star_stone_t3_common": 700,
-	"star_stone_t4_common": 500,
+	"打孔石": 360,
+	"玉屑": 3000,
+	"桂枝": 3000,
+	"白玉碎": 2000,
+	"妖核": 1200,
+	"妖王核心": 400,
+	"赤晶石": 800,
+	"沧澜石": 800,
+	"青木石": 800,
+	"star_stone_t1_common": 3000,
+	"star_stone_t2_common": 2200,
+	"star_stone_t3_common": 1500,
+	"star_stone_t4_common": 1000,
+	# Forge V1 材料：仅当 items 配置存在对应条目时才会发放。
+	"forge_base_t1": 2000,
+	"forge_base_t2": 1500,
+	"forge_base_t3": 1000,
+	"forge_base_t4": 600,
+	"forge_weapon_t1": 1200,
+	"forge_weapon_t2": 900,
+	"forge_weapon_t3": 600,
+	"forge_weapon_t4": 400,
+	"forge_armor_t1": 1200,
+	"forge_armor_t2": 900,
+	"forge_armor_t3": 600,
+	"forge_armor_t4": 400,
+	"forge_cloak_t1": 1200,
+	"forge_cloak_t2": 900,
+	"forge_cloak_t3": 600,
+	"forge_cloak_t4": 400,
+	"forge_accessory_t1": 1200,
+	"forge_accessory_t2": 900,
+	"forge_accessory_t3": 600,
+	"forge_accessory_t4": 400,
+	"theme_rare_nanshan": 800,
+	"theme_rare_qingqiu": 800,
+	"theme_rare_kunlun": 800,
+	"boss_mark_nanshan": 500,
+	"boss_mark_qingqiu": 500,
+	"boss_mark_kunlun": 500,
+	"boss_core_nanshan": 120,
+	"boss_core_qingqiu": 120,
+	"boss_core_kunlun": 120,
+	"bp_fragment_nanshan": 900,
+	"bp_fragment_qingqiu": 900,
+	"bp_fragment_kunlun": 900,
+	"bp_weapon_nanshan_t1_01": 20,
+	"bp_ring_nanshan_t2_01": 20,
+	"bp_bracelet_qingqiu_t2_01": 20,
+	"bp_cloak_qingqiu_t2_01": 20,
 }
 
 const DEBUG_EQUIP_PLAN := [
@@ -60,7 +97,7 @@ func _run_bootstrap_once() -> void:
 	if bool(section.get(DONE_KEY, false)):
 		return
 
-	InventoryModel.add_items_bulk(DEBUG_ITEM_REWARDS, "system", false)
+	InventoryModel.add_items_bulk(_filter_existing_items(DEBUG_ITEM_REWARDS), "system", false)
 	PlayerModel.add_gold(5000, false)
 
 	var new_uids: Array[int] = []
@@ -89,6 +126,8 @@ func _top_up_debug_resources() -> void:
 	var add_items: Dictionary = {}
 	for item_id_any in DEBUG_TOPUP_TARGETS.keys():
 		var item_id := str(item_id_any).strip_edges()
+		if not _item_exists(item_id):
+			continue
 		var target := maxi(0, int(DEBUG_TOPUP_TARGETS.get(item_id_any, 0)))
 		if item_id.is_empty() or target <= 0:
 			continue
@@ -109,6 +148,35 @@ func _top_up_debug_resources() -> void:
 	if touched:
 		EventBus.notify_inventory_updated()
 		EventBus.add_log("DEBUG补给：已补充大量材料（含升星材料）")
+
+func _filter_existing_items(source: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key_any in source.keys():
+		var item_id := str(key_any).strip_edges()
+		if item_id.is_empty() or not _item_exists(item_id):
+			continue
+		var count := maxi(0, int(source.get(key_any, 0)))
+		if count <= 0:
+			continue
+		out[item_id] = count
+	return out
+
+func _item_exists(item_id: String) -> bool:
+	if item_id.is_empty():
+		return false
+	var cfg := ConfigService.get_cfg()
+	var db_any: Variant = cfg.get("items_db", {})
+	if not (db_any is Dictionary):
+		return false
+	var items_any: Variant = (db_any as Dictionary).get("items", [])
+	if not (items_any is Array):
+		return false
+	for row_any in (items_any as Array):
+		if not (row_any is Dictionary):
+			continue
+		if str((row_any as Dictionary).get("id", "")).strip_edges() == item_id:
+			return true
+	return false
 
 func _grant_template_ids(template_id: String, count: int) -> Array[int]:
 	var before := _collect_bag_uids()

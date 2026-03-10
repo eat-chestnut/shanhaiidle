@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://btpnvleu3n2k1"]
+[gd_scene load_steps=12 format=3 uid="uid://btpnvleu3n2k1"]
 
 [ext_resource type="Script" uid="uid://cf13dvrwog3r2" path="res://ui/components/InventoryOverlay.gd" id="1_0xg2o"]
 [ext_resource type="Texture2D" uid="uid://bbedsxmsk4wlk" path="res://icon.svg" id="2_6f2ki"]
@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" path="res://ui/components/BulkSalvagePopup.tscn" id="7_gm4h2"]
 [ext_resource type="PackedScene" path="res://ui/components/EquipGemPopup.tscn" id="8_1n7m0"]
 [ext_resource type="PackedScene" path="res://ui/components/StarUpPopup.tscn" id="9_starup"]
+[ext_resource type="PackedScene" path="res://ui/components/ForgePopup.tscn" id="10_forge"]
+[ext_resource type="PackedScene" path="res://ui/components/ForgeBaseEquipSelectPopup.tscn" id="11_forgebase"]
 
 [node name="InventoryOverlay" type="Control"]
 layout_mode = 3
@@ -400,6 +402,11 @@ custom_minimum_size = Vector2(140, 48)
 layout_mode = 2
 text = "一键分解"
 
+[node name="BtnForge" type="Button" parent="Panel/VBox/Tabs"]
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+text = "打造"
+
 [node name="BottomScroll" type="ScrollContainer" parent="Panel/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -426,3 +433,7 @@ columns = 5
 [node name="StarUpPopup" parent="." instance=ExtResource("9_starup")]
 
 [node name="BulkSalvagePopup" parent="." instance=ExtResource("7_gm4h2")]
+
+[node name="ForgePopup" parent="." instance=ExtResource("10_forge")]
+
+[node name="ForgeBaseEquipSelectPopup" parent="." instance=ExtResource("11_forgebase")]

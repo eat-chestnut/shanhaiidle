@@ -1,0 +1,153 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/ForgePopup.gd" id="1_forge"]
+
+[node name="ForgePopup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+script = ExtResource("1_forge")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.62)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -430.0
+offset_right = 340.0
+offset_bottom = 430.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "打造"
+vertical_alignment = 1
+
+[node name="BtnTabNormal" type="Button" parent="Panel/VBox/TopBar"]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+text = "普通打造"
+
+[node name="BtnTabHigh" type="Button" parent="Panel/VBox/TopBar"]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+text = "高升品打造"
+
+[node name="Spacer" type="Control" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnClose" type="Button" parent="Panel/VBox/TopBar"]
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+text = "关闭"
+
+[node name="Body" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="LeftBox" type="VBoxContainer" parent="Panel/VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+theme_override_constants/separation = 6
+
+[node name="CandidateList" type="ItemList" parent="Panel/VBox/Body/LeftBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+allow_reselect = true
+
+[node name="RightBox" type="VBoxContainer" parent="Panel/VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.4
+theme_override_constants/separation = 8
+
+[node name="DetailTitle" type="Label" parent="Panel/VBox/Body/RightBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "详情"
+
+[node name="DetailText" type="RichTextLabel" parent="Panel/VBox/Body/RightBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = true
+
+[node name="BlockReason" type="Label" parent="Panel/VBox/Body/RightBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.45, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = ""
+autowrap_mode = 3
+
+[node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 10
+
+[node name="BtnCompose" type="Button" parent="Panel/VBox/ActionBar"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "合成图纸"
+
+[node name="BtnSelectBase" type="Button" parent="Panel/VBox/ActionBar"]
+custom_minimum_size = Vector2(140, 44)
+layout_mode = 2
+text = "选择基础装备"
+
+[node name="BtnClearBase" type="Button" parent="Panel/VBox/ActionBar"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "清空选择"
+
+[node name="BtnForge" type="Button" parent="Panel/VBox/ActionBar"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "打造"
+
+[node name="BtnCancel" type="Button" parent="Panel/VBox/ActionBar"]
+custom_minimum_size = Vector2(100, 44)
+layout_mode = 2
+text = "取消"

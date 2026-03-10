@@ -1001,7 +1001,8 @@ func upgrade_quality_from_base(base_uid: int, target_template_id: String) -> Dic
 		inherited_gems[i] = base_gems[i]
 	new_inst["socket_gems"] = inherited_gems
 	new_inst["locked"] = bool(base_inst.get("locked", false))
-	new_inst["identified"] = bool(base_inst.get("identified", true))
+	# 升品继承只保留成长状态；鉴定状态不再沿用旧随机链路，目标装备默认已鉴定。
+	new_inst["identified"] = true
 	new_inst = _sync_legacy_main_fields(new_inst)
 
 	if from_bag and bag_idx >= 0 and bag_idx < bag.size():

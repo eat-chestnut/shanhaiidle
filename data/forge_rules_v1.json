@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "key": "forge_rules",
+    "version": 1,
+    "exported_at": "2026-03-10 00:00:00",
+    "sha256": ""
+  },
+  "forge_rules": {
+    "tiers": {
+      "T1": {
+        "level_range": [1, 19]
+      },
+      "T2": {
+        "level_range": [20, 39]
+      },
+      "T3": {
+        "level_range": [40, 59]
+      },
+      "T4": {
+        "level_range": [60, 79]
+      }
+    },
+    "normal_forge_rules": [
+      { "forge_tier": "T1", "slot_group": "weapon", "materials": [{ "item_id": "forge_base_t1", "count": 12 }, { "item_id": "forge_weapon_t1", "count": 6 }], "gold_cost": 300 },
+      { "forge_tier": "T1", "slot_group": "armor", "materials": [{ "item_id": "forge_base_t1", "count": 12 }, { "item_id": "forge_armor_t1", "count": 6 }], "gold_cost": 300 },
+      { "forge_tier": "T1", "slot_group": "cloak", "materials": [{ "item_id": "forge_base_t1", "count": 12 }, { "item_id": "forge_cloak_t1", "count": 6 }], "gold_cost": 300 },
+      { "forge_tier": "T1", "slot_group": "accessory", "materials": [{ "item_id": "forge_base_t1", "count": 12 }, { "item_id": "forge_accessory_t1", "count": 6 }], "gold_cost": 300 },
+
+      { "forge_tier": "T2", "slot_group": "weapon", "materials": [{ "item_id": "forge_base_t2", "count": 14 }, { "item_id": "forge_weapon_t2", "count": 7 }], "gold_cost": 700 },
+      { "forge_tier": "T2", "slot_group": "armor", "materials": [{ "item_id": "forge_base_t2", "count": 14 }, { "item_id": "forge_armor_t2", "count": 7 }], "gold_cost": 700 },
+      { "forge_tier": "T2", "slot_group": "cloak", "materials": [{ "item_id": "forge_base_t2", "count": 14 }, { "item_id": "forge_cloak_t2", "count": 7 }], "gold_cost": 700 },
+      { "forge_tier": "T2", "slot_group": "accessory", "materials": [{ "item_id": "forge_base_t2", "count": 14 }, { "item_id": "forge_accessory_t2", "count": 7 }], "gold_cost": 700 },
+
+      { "forge_tier": "T3", "slot_group": "weapon", "materials": [{ "item_id": "forge_base_t3", "count": 16 }, { "item_id": "forge_weapon_t3", "count": 8 }], "gold_cost": 1400 },
+      { "forge_tier": "T3", "slot_group": "armor", "materials": [{ "item_id": "forge_base_t3", "count": 16 }, { "item_id": "forge_armor_t3", "count": 8 }], "gold_cost": 1400 },
+      { "forge_tier": "T3", "slot_group": "cloak", "materials": [{ "item_id": "forge_base_t3", "count": 16 }, { "item_id": "forge_cloak_t3", "count": 8 }], "gold_cost": 1400 },
+      { "forge_tier": "T3", "slot_group": "accessory", "materials": [{ "item_id": "forge_base_t3", "count": 16 }, { "item_id": "forge_accessory_t3", "count": 8 }], "gold_cost": 1400 },
+
+      { "forge_tier": "T4", "slot_group": "weapon", "materials": [{ "item_id": "forge_base_t4", "count": 18 }, { "item_id": "forge_weapon_t4", "count": 9 }], "gold_cost": 2600 },
+      { "forge_tier": "T4", "slot_group": "armor", "materials": [{ "item_id": "forge_base_t4", "count": 18 }, { "item_id": "forge_armor_t4", "count": 9 }], "gold_cost": 2600 },
+      { "forge_tier": "T4", "slot_group": "cloak", "materials": [{ "item_id": "forge_base_t4", "count": 18 }, { "item_id": "forge_cloak_t4", "count": 9 }], "gold_cost": 2600 },
+      { "forge_tier": "T4", "slot_group": "accessory", "materials": [{ "item_id": "forge_base_t4", "count": 18 }, { "item_id": "forge_accessory_t4", "count": 9 }], "gold_cost": 2600 }
+    ],
+    "high_forge_rules": [
+      { "forge_tier": "T1", "slot_group": "weapon", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 6 }, { "item_id": "boss_mark_nanshan", "count": 3 }], "extra_materials": [], "gold_cost": 900, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T1", "slot_group": "armor", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 6 }, { "item_id": "boss_mark_nanshan", "count": 3 }], "extra_materials": [], "gold_cost": 900, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T1", "slot_group": "cloak", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 6 }, { "item_id": "boss_mark_nanshan", "count": 3 }], "extra_materials": [], "gold_cost": 900, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T1", "slot_group": "accessory", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 6 }, { "item_id": "boss_mark_nanshan", "count": 3 }], "extra_materials": [], "gold_cost": 900, "require_blueprint": true, "require_base_equip": true },
+
+      { "forge_tier": "T2", "slot_group": "weapon", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 8 }, { "item_id": "boss_mark_nanshan", "count": 5 }], "extra_materials": [], "gold_cost": 1200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T2", "slot_group": "armor", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 8 }, { "item_id": "boss_mark_nanshan", "count": 5 }], "extra_materials": [], "gold_cost": 1200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T2", "slot_group": "cloak", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 8 }, { "item_id": "boss_mark_nanshan", "count": 5 }], "extra_materials": [], "gold_cost": 1200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T2", "slot_group": "accessory", "theme_key": "nanshan", "materials": [{ "item_id": "theme_rare_nanshan", "count": 8 }, { "item_id": "boss_mark_nanshan", "count": 5 }], "extra_materials": [{ "item_id": "boss_core_nanshan", "count": 1 }], "gold_cost": 1200, "require_blueprint": true, "require_base_equip": true },
+
+      { "forge_tier": "T3", "slot_group": "weapon", "theme_key": "qingqiu", "materials": [{ "item_id": "theme_rare_qingqiu", "count": 10 }, { "item_id": "boss_mark_qingqiu", "count": 7 }], "extra_materials": [{ "item_id": "boss_core_qingqiu", "count": 1 }], "gold_cost": 2400, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T3", "slot_group": "armor", "theme_key": "qingqiu", "materials": [{ "item_id": "theme_rare_qingqiu", "count": 10 }, { "item_id": "boss_mark_qingqiu", "count": 7 }], "extra_materials": [{ "item_id": "boss_core_qingqiu", "count": 1 }], "gold_cost": 2400, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T3", "slot_group": "cloak", "theme_key": "qingqiu", "materials": [{ "item_id": "theme_rare_qingqiu", "count": 10 }, { "item_id": "boss_mark_qingqiu", "count": 7 }], "extra_materials": [{ "item_id": "boss_core_qingqiu", "count": 1 }], "gold_cost": 2400, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T3", "slot_group": "accessory", "theme_key": "qingqiu", "materials": [{ "item_id": "theme_rare_qingqiu", "count": 10 }, { "item_id": "boss_mark_qingqiu", "count": 7 }], "extra_materials": [{ "item_id": "boss_core_qingqiu", "count": 1 }], "gold_cost": 2400, "require_blueprint": true, "require_base_equip": true },
+
+      { "forge_tier": "T4", "slot_group": "weapon", "theme_key": "kunlun", "materials": [{ "item_id": "theme_rare_kunlun", "count": 12 }, { "item_id": "boss_mark_kunlun", "count": 9 }], "extra_materials": [{ "item_id": "boss_core_kunlun", "count": 1 }], "gold_cost": 4200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T4", "slot_group": "armor", "theme_key": "kunlun", "materials": [{ "item_id": "theme_rare_kunlun", "count": 12 }, { "item_id": "boss_mark_kunlun", "count": 9 }], "extra_materials": [{ "item_id": "boss_core_kunlun", "count": 1 }], "gold_cost": 4200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T4", "slot_group": "cloak", "theme_key": "kunlun", "materials": [{ "item_id": "theme_rare_kunlun", "count": 12 }, { "item_id": "boss_mark_kunlun", "count": 9 }], "extra_materials": [{ "item_id": "boss_core_kunlun", "count": 1 }], "gold_cost": 4200, "require_blueprint": true, "require_base_equip": true },
+      { "forge_tier": "T4", "slot_group": "accessory", "theme_key": "kunlun", "materials": [{ "item_id": "theme_rare_kunlun", "count": 12 }, { "item_id": "boss_mark_kunlun", "count": 9 }], "extra_materials": [{ "item_id": "boss_core_kunlun", "count": 1 }], "gold_cost": 4200, "require_blueprint": true, "require_base_equip": true }
+    ],
+    "blueprint_compose_rules": [
+      { "theme_key": "nanshan", "fragment_item_id": "bp_fragment_nanshan", "fragment_count": 20, "gold_cost": 500 },
+      { "theme_key": "qingqiu", "fragment_item_id": "bp_fragment_qingqiu", "fragment_count": 20, "gold_cost": 700 },
+      { "theme_key": "kunlun", "fragment_item_id": "bp_fragment_kunlun", "fragment_count": 20, "gold_cost": 900 }
+    ]
+  }
+}

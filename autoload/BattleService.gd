@@ -1799,6 +1799,7 @@ func _apply_special_drops(kind: String) -> void:
 	var drop_def: Dictionary = def_any
 
 	if kind_key == "boss":
+		_grant_boss_forge_resources()
 		var core_id := str(drop_def.get("core_guarantee", ""))
 		if not core_id.is_empty():
 			_grant_item_drop(core_id, "gold")
@@ -1820,6 +1821,131 @@ func _apply_special_drops(kind: String) -> void:
 	if gem_id.is_empty():
 		return
 	_grant_item_drop(gem_id, "blue")
+
+func _grant_boss_forge_resources() -> void:
+	var stage := _find_stage_cfg(current_stage_id)
+	var theme_key := _resolve_stage_theme_key(stage)
+	if theme_key.is_empty():
+		return
+
+	var mark_id := "boss_mark_%s" % theme_key
+	_grant_item_drop(mark_id, "blue")
+
+	var frag_chance := clampf(0.40 + float(maxi(0, current_diff_index)) * 0.08, 0.05, 0.85)
+	if randf() < frag_chance:
+		_grant_item_drop("bp_fragment_%s" % theme_key, "blue")
+
+	var blueprint_id := _pick_blueprint_drop_for_theme(theme_key)
+	var blueprint_chance := clampf(0.06 + float(maxi(0, current_diff_index)) * 0.02, 0.01, 0.25)
+	if not blueprint_id.is_empty() and randf() < blueprint_chance:
+		_grant_item_drop(blueprint_id, "gold")
+
+	if _theme_has_core_requirement(theme_key) and current_diff_index >= 1:
+		var core_id := "boss_core_%s" % theme_key
+		var core_chance := clampf(0.08 + float(maxi(0, current_diff_index)) * 0.04, 0.02, 0.35)
+		if randf() < core_chance:
+			_grant_item_drop(core_id, "gold")
+
+func _resolve_stage_theme_key(stage_cfg: Dictionary) -> String:
+	if not stage_cfg.is_empty():
+		var direct := str(stage_cfg.get("theme_key", "")).strip_edges().to_lower()
+		if not direct.is_empty():
+			return direct
+	var stage_id := current_stage_id.strip_edges().to_lower()
+	if stage_id.begins_with("nan"):
+		return "nanshan"
+	if stage_id.begins_with("qing") or stage_id.begins_with("qiu"):
+		return "qingqiu"
+	if stage_id.begins_with("kun"):
+		return "kunlun"
+	var stage_name := str(stage_cfg.get("name", "")).strip_edges()
+	if stage_name.find("南山") != -1:
+		return "nanshan"
+	if stage_name.find("青丘") != -1:
+		return "qingqiu"
+	if stage_name.find("昆仑") != -1:
+		return "kunlun"
+	return ""
+
+func _pick_blueprint_drop_for_theme(theme_key: String) -> String:
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var equip_db_any = cfg.get("equip_db", {})
+	if not (equip_db_any is Dictionary):
+		return ""
+	var templates_any = (equip_db_any as Dictionary).get("equip_templates", [])
+	if not (templates_any is Array):
+		return ""
+	var ids: Array[String] = []
+	var seen: Dictionary = {}
+	for tpl_any in templates_any:
+		if not (tpl_any is Dictionary):
+			continue
+		var tpl: Dictionary = tpl_any
+		if str(tpl.get("quality_tier", "")).strip_edges().to_lower() != "high":
+			continue
+		if str(tpl.get("theme_key", "")).strip_edges().to_lower() != theme_key:
+			continue
+		var blueprint_id := str(tpl.get("blueprint_item_id", "")).strip_edges()
+		if blueprint_id.is_empty() or seen.has(blueprint_id):
+			continue
+		seen[blueprint_id] = true
+		ids.append(blueprint_id)
+	if ids.is_empty():
+		var items_db_any = cfg.get("items_db", {})
+		if items_db_any is Dictionary:
+			var items_any = (items_db_any as Dictionary).get("items", [])
+			if items_any is Array:
+				for row_any in (items_any as Array):
+					if not (row_any is Dictionary):
+						continue
+					var row: Dictionary = row_any
+					var item_id := str(row.get("id", "")).strip_edges()
+					if item_id.is_empty():
+						continue
+					var sub_type := str(row.get("sub_type", "")).strip_edges().to_lower()
+					var is_blueprint := sub_type == "equipment_blueprint" or item_id.begins_with("bp_")
+					if not is_blueprint:
+						continue
+					if item_id.find(theme_key) == -1:
+						continue
+					if seen.has(item_id):
+						continue
+					seen[item_id] = true
+					ids.append(item_id)
+	if ids.is_empty():
+		return ""
+	return ids[randi() % ids.size()]
+
+func _theme_has_core_requirement(theme_key: String) -> bool:
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var rules_db_any = cfg.get("forge_rules_db", {})
+	if not (rules_db_any is Dictionary):
+		return false
+	var root_any = (rules_db_any as Dictionary).get("forge_rules", {})
+	if not (root_any is Dictionary):
+		return false
+	var high_any = (root_any as Dictionary).get("high_forge_rules", [])
+	if not (high_any is Array):
+		return false
+	var expected_core_id := "boss_core_%s" % theme_key
+	for row_any in (high_any as Array):
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("theme_key", "")).strip_edges().to_lower() != theme_key:
+			continue
+		var extra_any = row.get("extra_materials", [])
+		if not (extra_any is Array):
+			continue
+		for mat_any in (extra_any as Array):
+			if not (mat_any is Dictionary):
+				continue
+			var mat: Dictionary = mat_any
+			if str(mat.get("item_id", "")).strip_edges() != expected_core_id:
+				continue
+			if int(mat.get("count", 0)) > 0:
+				return true
+	return false
 
 func _find_enemy_index_by_uid(enemy_uid: int) -> int:
 	if enemy_uid <= 0:

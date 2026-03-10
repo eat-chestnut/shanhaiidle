@@ -1,23 +1,539 @@
 {
   "items": [
-    { "id": "桂枝", "name": "桂枝", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_ld_01.png" },
-    { "id": "玉屑", "name": "玉屑", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_ld_02.png" },
-    { "id": "白玉碎", "name": "白玉碎", "rarity": "blue", "type": "item", "icon": "res://assets/icons/icon_ld_03.png" },
-    { "id": "妖核", "name": "妖核", "rarity": "gold", "type": "item", "icon": "res://assets/icons/icon_killskill.png" },
-    { "id": "宗门令", "name": "宗门令", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_key_01.png" },
-    { "id": "打孔石", "name": "打孔石", "rarity": "blue", "type": "item", "icon": "res://assets/icons/icon_key_02.png" },
-    { "id": "star_stone_t1_common", "name": "初阶星石", "rarity": "white", "type": "item", "icon": "res://assets/icons/icon_ld_01.png" },
-    { "id": "star_stone_t2_common", "name": "中阶星石", "rarity": "blue", "type": "item", "icon": "res://assets/icons/icon_ld_02.png" },
-    { "id": "star_stone_t3_common", "name": "高阶星石", "rarity": "gold", "type": "item", "icon": "res://assets/icons/icon_ld_03.png" },
-    { "id": "star_stone_t4_common", "name": "宗师星石", "rarity": "gold", "type": "item", "icon": "res://assets/icons/icon_killskill.png" },
-    { "id": "妖王核心", "name": "妖王核心", "rarity": "gold", "type": "gem", "trait": "妖王之力：战斗中可灌注武器（未启用），后续可解锁特殊效果。", "gem_effect": { "stat": "LOOT_BONUS_PERCENT", "val": 3 }, "icon": "res://assets/icons/icon_killskill.png" },
-    { "id": "赤晶石", "name": "赤晶石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "ATK", "val": 1 }, "icon": "res://assets/icons/icon_ld_01.png" },
-    { "id": "沧澜石", "name": "沧澜石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "DEF", "val": 1 }, "icon": "res://assets/icons/icon_ld_02.png" },
-    { "id": "青木石", "name": "青木石", "rarity": "blue", "type": "gem", "gem_effect": { "stat": "HP", "val": 2 }, "icon": "res://assets/icons/icon_ld_03.png" }
+    {
+      "id": "桂枝",
+      "name": "桂枝",
+      "rarity": "white",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_01.png"
+    },
+    {
+      "id": "玉屑",
+      "name": "玉屑",
+      "rarity": "white",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_02.png"
+    },
+    {
+      "id": "白玉碎",
+      "name": "白玉碎",
+      "rarity": "blue",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_03.png"
+    },
+    {
+      "id": "妖核",
+      "name": "妖核",
+      "rarity": "gold",
+      "type": "item",
+      "icon": "res://assets/icons/icon_killskill.png"
+    },
+    {
+      "id": "宗门令",
+      "name": "宗门令",
+      "rarity": "white",
+      "type": "item",
+      "icon": "res://assets/icons/icon_key_01.png"
+    },
+    {
+      "id": "打孔石",
+      "name": "打孔石",
+      "rarity": "blue",
+      "type": "item",
+      "icon": "res://assets/icons/icon_key_02.png"
+    },
+    {
+      "id": "star_stone_t1_common",
+      "name": "初阶星石",
+      "rarity": "white",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_01.png"
+    },
+    {
+      "id": "star_stone_t2_common",
+      "name": "中阶星石",
+      "rarity": "blue",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_02.png"
+    },
+    {
+      "id": "star_stone_t3_common",
+      "name": "高阶星石",
+      "rarity": "gold",
+      "type": "item",
+      "icon": "res://assets/icons/icon_ld_03.png"
+    },
+    {
+      "id": "star_stone_t4_common",
+      "name": "宗师星石",
+      "rarity": "gold",
+      "type": "item",
+      "icon": "res://assets/icons/icon_killskill.png"
+    },
+    {
+      "id": "妖王核心",
+      "name": "妖王核心",
+      "rarity": "gold",
+      "type": "gem",
+      "trait": "妖王之力：战斗中可灌注武器（未启用），后续可解锁特殊效果。",
+      "gem_effect": {
+        "stat": "LOOT_BONUS_PERCENT",
+        "val": 3
+      },
+      "icon": "res://assets/icons/icon_killskill.png"
+    },
+    {
+      "id": "赤晶石",
+      "name": "赤晶石",
+      "rarity": "blue",
+      "type": "gem",
+      "gem_effect": {
+        "stat": "ATK",
+        "val": 1
+      },
+      "icon": "res://assets/icons/icon_ld_01.png"
+    },
+    {
+      "id": "沧澜石",
+      "name": "沧澜石",
+      "rarity": "blue",
+      "type": "gem",
+      "gem_effect": {
+        "stat": "DEF",
+        "val": 1
+      },
+      "icon": "res://assets/icons/icon_ld_02.png"
+    },
+    {
+      "id": "青木石",
+      "name": "青木石",
+      "rarity": "blue",
+      "type": "gem",
+      "gem_effect": {
+        "stat": "HP",
+        "val": 2
+      },
+      "icon": "res://assets/icons/icon_ld_03.png"
+    },
+    {
+      "id": "forge_base_t1",
+      "name": "锻造基材·初阶",
+      "rarity": "white",
+      "type": "item",
+      "sub_type": "forge_base",
+      "icon": "res://assets/icons/icon_ld_01.png",
+      "desc": "普通打造通用基材。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_base_t2",
+      "name": "锻造基材·中阶",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_base",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "中阶打造通用基材。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_base_t3",
+      "name": "锻造基材·高阶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_base",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "高阶打造通用基材。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_base_t4",
+      "name": "锻造基材·宗师",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_base",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "宗师打造通用基材。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_weapon_t1",
+      "name": "兵刃锻材·初阶",
+      "rarity": "white",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_01.png",
+      "desc": "武器普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_armor_t1",
+      "name": "甲胄锻材·初阶",
+      "rarity": "white",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_01.png",
+      "desc": "防具普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_cloak_t1",
+      "name": "披风锻材·初阶",
+      "rarity": "white",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_01.png",
+      "desc": "披风普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_accessory_t1",
+      "name": "饰品锻材·初阶",
+      "rarity": "white",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_01.png",
+      "desc": "饰品普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_weapon_t2",
+      "name": "兵刃锻材·中阶",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "武器普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_armor_t2",
+      "name": "甲胄锻材·中阶",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "防具普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_cloak_t2",
+      "name": "披风锻材·中阶",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "披风普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_accessory_t2",
+      "name": "饰品锻材·中阶",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "饰品普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_weapon_t3",
+      "name": "兵刃锻材·高阶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "武器普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_armor_t3",
+      "name": "甲胄锻材·高阶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "防具普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_cloak_t3",
+      "name": "披风锻材·高阶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "披风普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_accessory_t3",
+      "name": "饰品锻材·高阶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "饰品普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_weapon_t4",
+      "name": "兵刃锻材·宗师",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "武器普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_armor_t4",
+      "name": "甲胄锻材·宗师",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "防具普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_cloak_t4",
+      "name": "披风锻材·宗师",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "披风普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "forge_accessory_t4",
+      "name": "饰品锻材·宗师",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_part",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "饰品普通打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "theme_rare_nanshan",
+      "name": "南山玄铁",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_theme",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "南山主题稀有打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "theme_rare_qingqiu",
+      "name": "青丘灵髓",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "forge_theme",
+      "icon": "res://assets/icons/icon_ld_02.png",
+      "desc": "青丘主题稀有打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "theme_rare_kunlun",
+      "name": "昆仑玄晶",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "forge_theme",
+      "icon": "res://assets/icons/icon_ld_03.png",
+      "desc": "昆仑主题稀有打造材料。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_mark_nanshan",
+      "name": "南山印记",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "boss_mark",
+      "icon": "res://assets/icons/icon_key_02.png",
+      "desc": "击败南山Boss获得。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_core_nanshan",
+      "name": "南山核心",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "boss_core",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "南山Boss低概率掉落。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_mark_qingqiu",
+      "name": "青丘印记",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "boss_mark",
+      "icon": "res://assets/icons/icon_key_02.png",
+      "desc": "击败青丘Boss获得。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_core_qingqiu",
+      "name": "青丘核心",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "boss_core",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "青丘Boss低概率掉落。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_mark_kunlun",
+      "name": "昆仑印记",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "boss_mark",
+      "icon": "res://assets/icons/icon_key_02.png",
+      "desc": "击败昆仑Boss获得。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "boss_core_kunlun",
+      "name": "昆仑核心",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "boss_core",
+      "icon": "res://assets/icons/icon_killskill.png",
+      "desc": "昆仑Boss低概率掉落。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_fragment_nanshan",
+      "name": "南山图纸碎片",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "theme_blueprint_fragment",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "20个可合成一张南山装备图纸。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_fragment_qingqiu",
+      "name": "青丘图纸碎片",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "theme_blueprint_fragment",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "20个可合成一张青丘装备图纸。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_fragment_kunlun",
+      "name": "昆仑图纸碎片",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "theme_blueprint_fragment",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "20个可合成一张昆仑装备图纸。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_weapon_nanshan_t1_01",
+      "name": "南山兵刃图纸",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于南山兵刃高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_armor_nanshan_t1_01",
+      "name": "南山甲胄图纸",
+      "rarity": "blue",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于南山甲胄高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_cloak_nanshan_t2_01",
+      "name": "南山披风图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于南山披风高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_ring_nanshan_t2_01",
+      "name": "南山戒指图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于南山戒指高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_bracelet_nanshan_t2_01",
+      "name": "南山手镯图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于南山手镯高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_bracelet_qingqiu_t2_01",
+      "name": "青丘手镯图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于青丘手镯高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_cloak_qingqiu_t2_01",
+      "name": "青丘披风图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于青丘披风高升品打造。",
+      "stack_limit": 9999
+    },
+    {
+      "id": "bp_ring_qingqiu_t2_01",
+      "name": "青丘戒指图纸",
+      "rarity": "gold",
+      "type": "item",
+      "sub_type": "equipment_blueprint",
+      "icon": "res://assets/icons/icon_key_01.png",
+      "desc": "用于青丘戒指高升品打造。",
+      "stack_limit": 9999
+    }
   ],
   "rarity_colors": {
-    "white": { "r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0 },
-    "blue":  { "r": 0.35, "g": 0.65, "b": 1.0, "a": 1.0 },
-    "gold":  { "r": 1.0, "g": 0.82, "b": 0.35, "a": 1.0 }
+    "white": {
+      "r": 1.0,
+      "g": 1.0,
+      "b": 1.0,
+      "a": 1.0
+    },
+    "blue": {
+      "r": 0.35,
+      "g": 0.65,
+      "b": 1.0,
+      "a": 1.0
+    },
+    "gold": {
+      "r": 1.0,
+      "g": 0.82,
+      "b": 0.35,
+      "a": 1.0
+    }
   }
 }

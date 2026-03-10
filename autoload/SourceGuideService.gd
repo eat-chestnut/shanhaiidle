@@ -10,6 +10,8 @@ var _item_source_keys: Dictionary = {} # item_id -> Dictionary
 var _equip_template_sources: Dictionary = {} # template_id -> Array[Dictionary]
 var _equip_template_source_keys: Dictionary = {} # template_id -> Dictionary
 var _equip_templates_by_rarity: Dictionary = {} # rarity -> Array[String]
+var _blueprints_by_theme: Dictionary = {} # theme_key -> Array[String]
+var _item_rarity_by_id: Dictionary = {} # item_id -> rarity
 var _stage_order: Dictionary = {} # stage_id -> int
 var _stage_unlock_level: Dictionary = {} # stage_id -> unlock_min_level
 var _indexes_ready := false
@@ -25,12 +27,16 @@ func rebuild_indexes() -> void:
 	_equip_template_sources.clear()
 	_equip_template_source_keys.clear()
 	_equip_templates_by_rarity.clear()
+	_blueprints_by_theme.clear()
+	_item_rarity_by_id.clear()
 	_stage_order.clear()
 	_stage_unlock_level.clear()
 	_indexes_ready = false
 
 	var cfg: Dictionary = ConfigService.get_cfg()
+	_collect_item_rarity_map(cfg)
 	_collect_equip_templates_by_rarity(cfg)
+	_collect_blueprints_by_theme_from_items(cfg)
 	var equip_drop_cfg := _resolve_equip_drop_cfg(cfg)
 
 	var stages_db_any = cfg.get("stages_db", {})
@@ -65,6 +71,7 @@ func rebuild_indexes() -> void:
 			var monsters_cfg := _resolve_monsters_for_difficulty(stage, diff)
 			_collect_stage_monster_sources(stage_id, stage_name, diff_idx, diff_name, monsters_cfg)
 			_append_item_pool_sources(stage_id, stage_name, diff_idx, diff_name, stage, diff)
+			_append_boss_resource_sources(stage_id, stage_name, diff_idx, diff_name, stage)
 			_append_equip_template_sources(stage_id, stage_name, diff_idx, diff_name, equip_drop_cfg)
 
 	_sort_all_indexes()
@@ -247,6 +254,85 @@ func _append_item_pool_sources(stage_id: String, stage_name: String, diff_index:
 			}
 			_add_item_source(item_id, source)
 
+func _append_boss_resource_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, stage_cfg: Dictionary) -> void:
+	var theme_key := _resolve_stage_theme_key(stage_cfg)
+	if theme_key.is_empty():
+		return
+
+	var mark_id := "boss_mark_%s" % theme_key
+	_add_item_source(mark_id, {
+		"stage_id": stage_id,
+		"stage_name": stage_name,
+		"difficulty_index": diff_index,
+		"difficulty_name": diff_name,
+		"rarity": _item_rarity(mark_id, "blue"),
+		"theme_key": theme_key,
+		"source_type": "boss_mark",
+		"sort_stage_index": _stage_index(stage_id),
+	})
+
+	var fragment_id := "bp_fragment_%s" % theme_key
+	_add_item_source(fragment_id, {
+		"stage_id": stage_id,
+		"stage_name": stage_name,
+		"difficulty_index": diff_index,
+		"difficulty_name": diff_name,
+		"rarity": _item_rarity(fragment_id, "blue"),
+		"theme_key": theme_key,
+		"source_type": "boss_fragment",
+		"sort_stage_index": _stage_index(stage_id),
+	})
+
+	if _theme_has_core_requirement(theme_key) and diff_index >= 1:
+		var core_id := "boss_core_%s" % theme_key
+		_add_item_source(core_id, {
+			"stage_id": stage_id,
+			"stage_name": stage_name,
+			"difficulty_index": diff_index,
+			"difficulty_name": diff_name,
+			"rarity": _item_rarity(core_id, "gold"),
+			"theme_key": theme_key,
+			"source_type": "boss_core",
+			"sort_stage_index": _stage_index(stage_id),
+		})
+
+	var blueprint_any = _blueprints_by_theme.get(theme_key, [])
+	if blueprint_any is Array:
+		for bp_any in (blueprint_any as Array):
+			var bp_id := str(bp_any).strip_edges()
+			if bp_id.is_empty():
+				continue
+			_add_item_source(bp_id, {
+				"stage_id": stage_id,
+				"stage_name": stage_name,
+				"difficulty_index": diff_index,
+				"difficulty_name": diff_name,
+				"rarity": _item_rarity(bp_id, "gold"),
+				"theme_key": theme_key,
+				"source_type": "boss_blueprint",
+				"sort_stage_index": _stage_index(stage_id),
+			})
+
+func _collect_item_rarity_map(cfg: Dictionary) -> void:
+	_item_rarity_by_id.clear()
+	var items_db_any = cfg.get("items_db", {})
+	if not (items_db_any is Dictionary):
+		return
+	var rows_any = (items_db_any as Dictionary).get("items", [])
+	if not (rows_any is Array):
+		return
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var item_id := str(row.get("id", "")).strip_edges()
+		if item_id.is_empty():
+			continue
+		var rarity := str(row.get("rarity", "white")).strip_edges().to_lower()
+		if rarity.is_empty():
+			rarity = "white"
+		_item_rarity_by_id[item_id] = rarity
+
 func _collect_equip_templates_by_rarity(cfg: Dictionary) -> void:
 	var equip_db_any = cfg.get("equip_db", {})
 	if not (equip_db_any is Dictionary):
@@ -269,6 +355,42 @@ func _collect_equip_templates_by_rarity(cfg: Dictionary) -> void:
 		if list.find(tpl_id) == -1:
 			list.append(tpl_id)
 		_equip_templates_by_rarity[rarity] = list
+
+		var theme_key := str(tpl.get("theme_key", "")).strip_edges().to_lower()
+		var blueprint_id := str(tpl.get("blueprint_item_id", "")).strip_edges()
+		if not theme_key.is_empty() and not blueprint_id.is_empty():
+			var bp_any = _blueprints_by_theme.get(theme_key, [])
+			var bp_rows: Array = bp_any if bp_any is Array else []
+			if bp_rows.find(blueprint_id) == -1:
+				bp_rows.append(blueprint_id)
+			_blueprints_by_theme[theme_key] = bp_rows
+
+func _collect_blueprints_by_theme_from_items(cfg: Dictionary) -> void:
+	var items_db_any = cfg.get("items_db", {})
+	if not (items_db_any is Dictionary):
+		return
+	var rows_any = (items_db_any as Dictionary).get("items", [])
+	if not (rows_any is Array):
+		return
+	for row_any in (rows_any as Array):
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var item_id := str(row.get("id", "")).strip_edges()
+		if item_id.is_empty():
+			continue
+		var sub_type := str(row.get("sub_type", "")).strip_edges().to_lower()
+		var is_blueprint := sub_type == "equipment_blueprint" or item_id.begins_with("bp_")
+		if not is_blueprint:
+			continue
+		for theme_key in ["nanshan", "qingqiu", "kunlun"]:
+			if item_id.find(theme_key) == -1:
+				continue
+			var bp_any = _blueprints_by_theme.get(theme_key, [])
+			var bp_rows: Array = bp_any if bp_any is Array else []
+			if bp_rows.find(item_id) == -1:
+				bp_rows.append(item_id)
+			_blueprints_by_theme[theme_key] = bp_rows
 
 func _resolve_equip_drop_cfg(cfg: Dictionary) -> Dictionary:
 	var out := {
@@ -565,10 +687,22 @@ func _format_item_source_line(source: Dictionary) -> String:
 	var stage_name := str(source.get("stage_name", source.get("stage_id", ""))).strip_edges()
 	var diff_name := str(source.get("difficulty_name", DEFAULT_DIFF_NAME)).strip_edges()
 	var rarity := str(source.get("rarity", "white")).strip_edges().to_lower()
+	var source_type := str(source.get("source_type", "items_by_rarity")).strip_edges()
+	var theme_key := str(source.get("theme_key", "")).strip_edges().to_lower()
 	if stage_name.is_empty():
 		stage_name = str(source.get("stage_id", "未知地图"))
 	if diff_name.is_empty():
 		diff_name = DEFAULT_DIFF_NAME
+	var prefix := "%s（%s）" % [stage_name, diff_name]
+	match source_type:
+		"boss_mark":
+			return "%s - %sBoss稳定掉落印记" % [prefix, _theme_name(theme_key)]
+		"boss_fragment":
+			return "%s - %sBoss掉落图纸碎片" % [prefix, _theme_name(theme_key)]
+		"boss_core":
+			return "%s - %sBoss低概率掉落核心" % [prefix, _theme_name(theme_key)]
+		"boss_blueprint":
+			return "%s - %sBoss低概率掉落完整图纸" % [prefix, _theme_name(theme_key)]
 	return "%s（%s）- %s掉落池" % [stage_name, diff_name, _rarity_name(rarity)]
 
 func _format_equip_source_line(source: Dictionary) -> String:
@@ -737,6 +871,77 @@ func _collect_rarity_keys(primary_any: Variant, fallback_any: Variant = null) ->
 			seen[key] = true
 			out.append(key)
 	return out
+
+func _resolve_stage_theme_key(stage_cfg: Dictionary) -> String:
+	var direct := str(stage_cfg.get("theme_key", "")).strip_edges().to_lower()
+	if not direct.is_empty():
+		return direct
+	var stage_id := str(stage_cfg.get("id", "")).strip_edges().to_lower()
+	if stage_id.begins_with("nan"):
+		return "nanshan"
+	if stage_id.begins_with("qing") or stage_id.begins_with("qiu"):
+		return "qingqiu"
+	if stage_id.begins_with("kun"):
+		return "kunlun"
+	var stage_name := str(stage_cfg.get("name", "")).strip_edges()
+	if stage_name.find("南山") != -1:
+		return "nanshan"
+	if stage_name.find("青丘") != -1:
+		return "qingqiu"
+	if stage_name.find("昆仑") != -1:
+		return "kunlun"
+	return ""
+
+func _theme_has_core_requirement(theme_key: String) -> bool:
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var rules_db_any = cfg.get("forge_rules_db", {})
+	if not (rules_db_any is Dictionary):
+		return false
+	var root_any = (rules_db_any as Dictionary).get("forge_rules", {})
+	if not (root_any is Dictionary):
+		return false
+	var rows_any = (root_any as Dictionary).get("high_forge_rules", [])
+	if not (rows_any is Array):
+		return false
+	var expected_core := "boss_core_%s" % theme_key
+	for row_any in (rows_any as Array):
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("theme_key", "")).strip_edges().to_lower() != theme_key:
+			continue
+		var extra_any = row.get("extra_materials", [])
+		if not (extra_any is Array):
+			continue
+		for mat_any in (extra_any as Array):
+			if not (mat_any is Dictionary):
+				continue
+			var mat: Dictionary = mat_any
+			if str(mat.get("item_id", "")).strip_edges() != expected_core:
+				continue
+			if int(mat.get("count", 0)) > 0:
+				return true
+	return false
+
+func _item_rarity(item_id: String, fallback: String = "white") -> String:
+	var id := item_id.strip_edges()
+	if id.is_empty():
+		return fallback
+	var rarity := str(_item_rarity_by_id.get(id, fallback)).strip_edges().to_lower()
+	if rarity.is_empty():
+		return fallback
+	return rarity
+
+func _theme_name(theme_key: String) -> String:
+	match theme_key:
+		"nanshan":
+			return "南山"
+		"qingqiu":
+			return "青丘"
+		"kunlun":
+			return "昆仑"
+		_:
+			return ""
 
 func _ensure_indexes() -> void:
 	if _indexes_ready:
