@@ -1,33 +1,11 @@
 {
     "meta": {
         "key": "crafting_recipes",
-        "version": 6,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "c7a5a93cc41cfa823b7f528316435f48bb32d696a6003e64b625889788a6b50c"
+        "version": 7,
+        "exported_at": "2026-03-10 23:24:05",
+        "sha256": "dcb4661cbd02fcb8fc080d38296b96d132bb5e87a1d688f7263d1095de4c4a71"
     },
     "crafting_recipes": [
-        {
-            "recipe_id": "rcp_craft_main_weapon_t1",
-            "recipe_type": "craft",
-            "output_type": "equip",
-            "output_id": "main_weapon_nanshan_t1_normal_01",
-            "output_count": 1,
-            "unlock_level": 20,
-            "cost_items": [
-                {
-                    "item_id": "forge_base_t1",
-                    "count": 12
-                },
-                {
-                    "item_id": "forge_weapon_t1",
-                    "count": 6
-                }
-            ],
-            "cost_gold": 300,
-            "cost_currency": "",
-            "notes": "普通打造示例",
-            "sort_order": 10
-        },
         {
             "recipe_id": "rcp_compose_bp_qingqiu",
             "recipe_type": "compose",
@@ -45,24 +23,6 @@
             "cost_currency": "",
             "notes": "20碎片合成图纸",
             "sort_order": 20
-        },
-        {
-            "recipe_id": "rcp_exchange_talisman_40",
-            "recipe_type": "exchange",
-            "output_type": "equip",
-            "output_id": "talisman_shop_40_01",
-            "output_count": 1,
-            "unlock_level": 40,
-            "cost_items": [
-                {
-                    "item_id": "宗门令",
-                    "count": 20
-                }
-            ],
-            "cost_gold": 1000,
-            "cost_currency": "",
-            "notes": "护身符商店兑换",
-            "sort_order": 30
         },
         {
             "recipe_id": "rcp_gem_compose_blue_attr",
@@ -89,6 +49,1094 @@
             "cost_currency": "",
             "notes": "宝石合成示例（同大类同阶）",
             "sort_order": 40
+        },
+        {
+            "recipe_id": "rcp_craft_main_weapon_t1",
+            "recipe_type": "craft",
+            "output_type": "equip",
+            "output_id": "main_weapon_nanshan_t1_normal_01",
+            "output_count": 1,
+            "unlock_level": 20,
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t1",
+                    "count": 12
+                },
+                {
+                    "item_id": "forge_weapon_t1",
+                    "count": 6
+                }
+            ],
+            "cost_gold": 300,
+            "cost_currency": "",
+            "notes": "普通打造示例",
+            "sort_order": 10
+        },
+        {
+            "recipe_id": "rcp_exchange_talisman_40",
+            "recipe_type": "exchange",
+            "output_type": "equip",
+            "output_id": "talisman_shop_40_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "cost_items": [
+                {
+                    "item_id": "宗门令",
+                    "count": 20
+                }
+            ],
+            "cost_gold": 1000,
+            "cost_currency": "",
+            "notes": "护身符商店兑换",
+            "sort_order": 30
+        },
+        {
+            "recipe_id": "rcp_rank_up_armor_nanshan_t1_normal_01_to_armor_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "armor_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "armor_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_armor_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_armor_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_belt_nanshan_t1_normal_01_to_belt_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "belt_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "belt_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_belt_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_armor_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_gloves_nanshan_t1_normal_01_to_gloves_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "gloves_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "gloves_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_gloves_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_armor_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_helm_nanshan_t1_normal_01_to_helm_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "helm_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "helm_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_helm_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_armor_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_main_weapon_nanshan_t1_normal_01_to_main_weapon_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "main_weapon_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "main_weapon_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_main_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_weapon_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_necklace_nanshan_t1_normal_01_to_necklace_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "necklace_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "necklace_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_necklace_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_accessory_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_off_weapon_nanshan_t1_normal_01_to_off_weapon_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "off_weapon_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "off_weapon_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_off_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_weapon_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_shoes_nanshan_t1_normal_01_to_shoes_nanshan_t2_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "shoes_nanshan_t2_normal_01",
+            "output_count": 1,
+            "unlock_level": 40,
+            "input_template_id": "shoes_nanshan_t1_normal_01",
+            "input_rank_series_id": "rank_shoes_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t2",
+                    "count": 20
+                },
+                {
+                    "item_id": "forge_armor_t2",
+                    "count": 10
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 3
+                }
+            ],
+            "cost_gold": 1800,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 140
+        },
+        {
+            "recipe_id": "rcp_rank_up_armor_nanshan_t2_normal_01_to_armor_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "armor_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "armor_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_armor_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_armor_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_belt_nanshan_t2_normal_01_to_belt_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "belt_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "belt_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_belt_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_armor_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_bracelet_qingqiu_t2_normal_01_to_bracelet_qingqiu_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "bracelet_qingqiu_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "bracelet_qingqiu_t2_normal_01",
+            "input_rank_series_id": "rank_bracelet_frost_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_accessory_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_qingqiu",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_qingqiu",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_qingqiu",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_gloves_nanshan_t2_normal_01_to_gloves_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "gloves_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "gloves_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_gloves_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_armor_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_helm_nanshan_t2_normal_01_to_helm_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "helm_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "helm_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_helm_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_armor_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_main_weapon_nanshan_t2_normal_01_to_main_weapon_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "main_weapon_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "main_weapon_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_main_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_weapon_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_necklace_nanshan_t2_normal_01_to_necklace_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "necklace_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "necklace_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_necklace_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_accessory_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_off_weapon_nanshan_t2_normal_01_to_off_weapon_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "off_weapon_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "off_weapon_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_off_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_weapon_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_ring_nanshan_t2_normal_01_to_ring_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "ring_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "ring_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_ring_berserk_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_accessory_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_shoes_nanshan_t2_normal_01_to_shoes_nanshan_t3_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "shoes_nanshan_t3_normal_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "shoes_nanshan_t2_normal_01",
+            "input_rank_series_id": "rank_shoes_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_armor_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_talisman_shop_40_01_to_talisman_shop_50_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "talisman_shop_50_01",
+            "output_count": 1,
+            "unlock_level": 50,
+            "input_template_id": "talisman_shop_40_01",
+            "input_rank_series_id": "rank_talisman_shop_universal_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t3",
+                    "count": 30
+                },
+                {
+                    "item_id": "forge_accessory_t3",
+                    "count": 14
+                },
+                {
+                    "item_id": "theme_rare_qingqiu",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_mark_qingqiu",
+                    "count": 6
+                },
+                {
+                    "item_id": "boss_core_qingqiu",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 4200,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 150
+        },
+        {
+            "recipe_id": "rcp_rank_up_armor_nanshan_t3_normal_01_to_armor_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "armor_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "armor_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_armor_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_armor_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_belt_nanshan_t3_normal_01_to_belt_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "belt_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "belt_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_belt_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_armor_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_bracelet_qingqiu_t3_normal_01_to_bracelet_qingqiu_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "bracelet_qingqiu_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "bracelet_qingqiu_t3_normal_01",
+            "input_rank_series_id": "rank_bracelet_frost_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_accessory_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_qingqiu",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_qingqiu",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_qingqiu",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_gloves_nanshan_t3_normal_01_to_gloves_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "gloves_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "gloves_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_gloves_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_armor_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_helm_nanshan_t3_normal_01_to_helm_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "helm_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "helm_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_helm_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_armor_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_main_weapon_nanshan_t3_normal_01_to_main_weapon_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "main_weapon_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "main_weapon_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_main_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_weapon_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_necklace_nanshan_t3_normal_01_to_necklace_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "necklace_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "necklace_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_necklace_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_accessory_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_off_weapon_nanshan_t3_normal_01_to_off_weapon_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "off_weapon_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "off_weapon_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_off_weapon_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_weapon_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_ring_nanshan_t3_normal_01_to_ring_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "ring_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "ring_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_ring_berserk_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_accessory_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_shoes_nanshan_t3_normal_01_to_shoes_nanshan_t4_normal_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "shoes_nanshan_t4_normal_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "shoes_nanshan_t3_normal_01",
+            "input_rank_series_id": "rank_shoes_setline_kuangzhan_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_armor_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_nanshan",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_nanshan",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_nanshan",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
+        },
+        {
+            "recipe_id": "rcp_rank_up_talisman_shop_50_01_to_talisman_shop_60_01",
+            "recipe_type": "rank_up",
+            "output_type": "equip",
+            "output_id": "talisman_shop_60_01",
+            "output_count": 1,
+            "unlock_level": 60,
+            "input_template_id": "talisman_shop_50_01",
+            "input_rank_series_id": "rank_talisman_shop_universal_normal",
+            "cost_items": [
+                {
+                    "item_id": "forge_base_t4",
+                    "count": 42
+                },
+                {
+                    "item_id": "forge_accessory_t4",
+                    "count": 18
+                },
+                {
+                    "item_id": "theme_rare_qingqiu",
+                    "count": 14
+                },
+                {
+                    "item_id": "boss_mark_qingqiu",
+                    "count": 10
+                },
+                {
+                    "item_id": "boss_core_qingqiu",
+                    "count": 1
+                }
+            ],
+            "cost_gold": 8600,
+            "cost_currency": "",
+            "notes": "装备升阶配方",
+            "sort_order": 160
         }
     ]
 }

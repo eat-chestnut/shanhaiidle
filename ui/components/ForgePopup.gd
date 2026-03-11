@@ -149,17 +149,20 @@ func _refresh_detail_normal(row: Dictionary) -> void:
 	lines.append("部位：%s" % I18nService.t("slot.%s" % str(row.get("slot", "")), str(row.get("slot", ""))))
 	lines.append("稀有度：%s" % _rarity_name(str(row.get("rarity", "white"))) )
 	lines.append("阶段：%s" % str(recipe.get("forge_tier", "T1")))
-	var base_stats_any = row.get("base_stats", {})
-	if base_stats_any is Dictionary and not (base_stats_any as Dictionary).is_empty():
-		lines.append("基础属性：")
-		for stat_line in _format_stats_dict(base_stats_any):
+	var base_stats_any = row.get("white_stats", [])
+	var base_stat_lines := _format_stats_dict(base_stats_any)
+	if not base_stat_lines.is_empty():
+		lines.append("白色基础属性：")
+		for stat_line in base_stat_lines:
 			lines.append("- %s" % stat_line)
-	var growth_any = row.get("star_growth", {})
-	if growth_any is Dictionary and not (growth_any as Dictionary).is_empty():
+	var growth_any = row.get("star_growth", [])
+	var growth_lines := _format_stats_dict(growth_any)
+	if not growth_lines.is_empty():
 		lines.append("每星成长：")
-		for stat_line in _format_stats_dict(growth_any):
+		for stat_line in growth_lines:
 			lines.append("- %s" % stat_line)
-	lines.append("最大孔位：%d" % int(row.get("max_sockets", 0)))
+	lines.append("孔位规则：%s" % _socket_rule_name(str(row.get("socket_rule_ref", ""))))
+	lines.append("最大孔位：%d" % EquipmentModel._template_socket_count_for_star(row, int(row.get("star_cap", 10))))
 	lines.append("可升星：%s" % ("是" if bool(row.get("star_enabled", true)) else "否"))
 	lines.append("")
 	lines.append("配方需求：")
@@ -204,11 +207,13 @@ func _refresh_detail_high(row: Dictionary) -> void:
 	lines.append("品质：高品质")
 	lines.append("主题：%s" % str(recipe.get("theme_key", str(row.get("theme_key", "")))) )
 	lines.append("阶段：%s" % str(recipe.get("forge_tier", "T1")))
-	lines.append("最大孔位：%d" % int(row.get("max_sockets", 0)))
-	var growth_any = row.get("star_growth", {})
-	if growth_any is Dictionary and not (growth_any as Dictionary).is_empty():
+	lines.append("孔位规则：%s" % _socket_rule_name(str(row.get("socket_rule_ref", ""))))
+	lines.append("最大孔位：%d" % EquipmentModel._template_socket_count_for_star(row, int(row.get("star_cap", 10))))
+	var growth_any = row.get("star_growth", [])
+	var growth_lines := _format_stats_dict(growth_any)
+	if not growth_lines.is_empty():
 		lines.append("每星成长：")
-		for stat_line in _format_stats_dict(growth_any):
+		for stat_line in growth_lines:
 			lines.append("- %s" % stat_line)
 
 	lines.append("")
@@ -552,10 +557,18 @@ func _rarity_name(rarity: String) -> String:
 
 func _format_stats_dict(stats_any: Variant) -> Array[String]:
 	var out: Array[String] = []
-	if not (stats_any is Dictionary):
+	if not (stats_any is Array):
 		return out
-	var stats: Dictionary = stats_any
-	var ordered := ["HP", "ATK", "DEF", "CRIT_PERCENT", "LOOT_BONUS_PERCENT", "QI"]
+	var stats: Dictionary = {}
+	for row_any in stats_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var stat := str(row.get("stat", "")).strip_edges()
+		if stat.is_empty():
+			continue
+		stats[stat] = int(row.get("value", 0))
+	var ordered := ["HP", "ATK", "DEF", "CRIT_RATE", "CRIT_DMG", "QI"]
 	for key in ordered:
 		if not stats.has(key):
 			continue
@@ -574,5 +587,12 @@ func _format_stats_dict(stats_any: Variant) -> Array[String]:
 	return out
 
 func _format_stat_line(stat: String, val: int) -> String:
-	var is_percent := stat == "CRIT_PERCENT" or stat == "LOOT_BONUS_PERCENT"
+	var is_percent := stat == "CRIT_RATE"
 	return "%s +%d%s" % [I18nService.stat(stat), val, "%" if is_percent else ""]
+
+func _socket_rule_name(rule_ref: String) -> String:
+	match rule_ref.strip_edges():
+		"fixed_star_3_6_8_10", "":
+			return "固定开孔（3/6/8/10星）"
+		_:
+			return rule_ref

@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://ui/components/StarUpPopup.tscn" id="9_starup"]
 [ext_resource type="PackedScene" path="res://ui/components/ForgePopup.tscn" id="10_forge"]
 [ext_resource type="PackedScene" path="res://ui/components/ForgeBaseEquipSelectPopup.tscn" id="11_forgebase"]
+[ext_resource type="PackedScene" path="res://ui/components/EquipRankUpPopup.tscn" id="12_rankup"]
 
 [node name="InventoryOverlay" type="Control"]
 layout_mode = 3
@@ -431,6 +432,8 @@ columns = 5
 [node name="GemSelectPopup" parent="." instance=ExtResource("6_07j2d")]
 
 [node name="StarUpPopup" parent="." instance=ExtResource("9_starup")]
+
+[node name="EquipRankUpPopup" parent="." instance=ExtResource("12_rankup")]
 
 [node name="BulkSalvagePopup" parent="." instance=ExtResource("7_gm4h2")]
 

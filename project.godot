@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="放置-肉鸽-山海经"
+config/name="山海巡厄录"
 run/main_scene="res://ui/pages/PageBattle.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
@@ -44,6 +44,7 @@ SourceGuideService="*res://autoload/SourceGuideService.gd"
 DexHubService="*res://autoload/DexHubService.gd"
 MapNavTargetModel="*res://autoload/MapNavTargetModel.gd"
 DungeonDisplayService="*res://autoload/DungeonDisplayService.gd"
+EquipmentRankUpService="*res://autoload/EquipmentRankUpService.gd"
 DebugBootstrapService="*res://autoload/DebugBootstrapService.gd"
 
 [display]

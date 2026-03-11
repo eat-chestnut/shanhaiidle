@@ -419,38 +419,26 @@ func _refresh_detail() -> void:
 
 	var lines: Array[String] = []
 	lines.append("%s（%s）" % [str(row.get("name", template_id)), "已解锁" if unlocked else "未解锁"])
-	lines.append("ID：%s" % template_id)
+	lines.append("模板ID：%s" % template_id)
 	lines.append("稀有度：%s" % _rarity_name(str(row.get("rarity", "white"))))
-	lines.append("槽位：%s" % _slot_name(str(row.get("slot", ""))))
-	var base_stats_any = row.get("base_stats", {})
-	var growth_any = row.get("star_growth", {})
-	var base_stats: Dictionary = base_stats_any if base_stats_any is Dictionary else {}
-	var star_growth: Dictionary = growth_any if growth_any is Dictionary else {}
+	lines.append("部位：%s" % _slot_name(str(row.get("slot", ""))))
+	var white_stats_any = row.get("white_stats", [])
+	var growth_any = row.get("star_growth", [])
 	var star_enabled := bool(row.get("star_enabled", true))
-	var star_max := maxi(0, int(row.get("star_max", 10)))
-	lines.append("星级：%s（上限 +%d）" % ["可升星" if star_enabled else "不可升星", star_max])
-	if not base_stats.is_empty():
-		lines.append("模板属性：")
-		for line in _format_stats_dict(base_stats):
+	var star_cap := maxi(0, int(row.get("star_cap", 10)))
+	lines.append("星级：%s（上限 +%d）" % ["可升星" if star_enabled else "不可升星", star_cap])
+	lines.append("孔位规则：%s" % _socket_rule_name(str(row.get("socket_rule_ref", ""))))
+	var white_stat_lines := _format_stat_rows(white_stats_any)
+	if not white_stat_lines.is_empty():
+		lines.append("白色基础属性：")
+		for line in white_stat_lines:
 			lines.append("- %s" % line)
-	else:
-		lines.append("主属性：%s %d~%d" % [
-			I18nService.stat(str(row.get("main_stat", ""))),
-			int(row.get("main_min", 0)),
-			int(row.get("main_max", 0)),
-		])
-	if not star_growth.is_empty():
+	var growth_lines := _format_stat_rows(growth_any)
+	if not growth_lines.is_empty():
 		lines.append("每星成长：")
-		for line in _format_stats_dict(star_growth):
+		for line in growth_lines:
 			lines.append("- %s" % line)
 	lines.append("套装：%s" % ("无" if set_id.is_empty() else _set_name(set_id)))
-	var effects := _format_effects(row.get("effects", []))
-	if effects.is_empty():
-		lines.append("特效：无")
-	else:
-		lines.append("特效：")
-		for e in effects:
-			lines.append("- %s" % e)
 	lines.append("奖励：金币%d（%s）" % [reward_gold, "已领取" if claimed else "未领取（点击领取）"])
 	lines.append("")
 	lines.append("推荐刷取")
@@ -504,35 +492,27 @@ func _on_farm_pressed() -> void:
 		MapNavTargetModel.set_target(stage_id, diff_index, "equip_dex")
 	get_tree().change_scene_to_file(PAGE_MAP)
 
-func _format_effects(effects_any: Variant) -> Array[String]:
+func _format_stat_rows(rows_any: Variant) -> Array[String]:
 	var out: Array[String] = []
-	if not (effects_any is Array):
+	if not (rows_any is Array):
 		return out
-	for e_any in effects_any:
-		if not (e_any is Dictionary):
+	var stats: Dictionary = {}
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
 			continue
-		var e: Dictionary = e_any
-		var effect_type := str(e.get("type", ""))
-		var val := int(e.get("val", 0))
-		if effect_type == "stat":
-			var stat := str(e.get("stat", ""))
-			var suffix := "%" if stat == "CRIT_PERCENT" or stat == "LOOT_BONUS_PERCENT" else ""
-			out.append("%s +%d%s" % [I18nService.stat(stat), val, suffix])
-		elif effect_type == "skill_level":
-			var skill_id := str(e.get("skill_id", ""))
-			out.append("%s +%d级" % [SkillNameService.name(skill_id), val])
-	return out
-
-func _format_stats_dict(stats: Dictionary) -> Array[String]:
-	var out: Array[String] = []
-	var ordered := ["HP", "ATK", "DEF", "CRIT_PERCENT", "LOOT_BONUS_PERCENT", "QI"]
+		var row: Dictionary = row_any
+		var stat := str(row.get("stat", "")).strip_edges()
+		if stat.is_empty():
+			continue
+		stats[stat] = int(row.get("value", 0))
+	var ordered := ["HP", "ATK", "DEF", "CRIT_RATE", "CRIT_DMG", "QI"]
 	for stat in ordered:
 		if not stats.has(stat):
 			continue
 		var val := int(stats.get(stat, 0))
 		if val == 0:
 			continue
-		var suffix := "%" if stat == "CRIT_PERCENT" or stat == "LOOT_BONUS_PERCENT" else ""
+		var suffix := "%" if stat == "CRIT_RATE" else ""
 		out.append("%s +%d%s" % [I18nService.stat(stat), val, suffix])
 	for key_any in stats.keys():
 		var stat := str(key_any)
@@ -541,9 +521,16 @@ func _format_stats_dict(stats: Dictionary) -> Array[String]:
 		var val := int(stats.get(key_any, 0))
 		if val == 0:
 			continue
-		var suffix := "%" if stat == "CRIT_PERCENT" or stat == "LOOT_BONUS_PERCENT" else ""
+		var suffix := "%" if stat == "CRIT_RATE" else ""
 		out.append("%s +%d%s" % [I18nService.stat(stat), val, suffix])
 	return out
+
+func _socket_rule_name(rule_ref: String) -> String:
+	match rule_ref.strip_edges():
+		"fixed_star_3_6_8_10", "":
+			return "固定开孔（3/6/8/10星）"
+		_:
+			return rule_ref
 
 func _find_view_index(template_id: String) -> int:
 	for i in range(_view_rows.size()):

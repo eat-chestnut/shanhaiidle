@@ -647,36 +647,47 @@ func validate_equip_templates_json(text: String) -> Dictionary:
 		var name := str(row.get("name", "")).strip_edges()
 		var slot := str(row.get("slot", "")).strip_edges()
 		var rarity := str(row.get("rarity", "")).strip_edges()
-		var main_stat := str(row.get("main_stat", "")).strip_edges()
 		if template_id.is_empty() or name.is_empty():
 			return {"ok": false, "reason": "equip_templates[%d] id/name 不能为空" % i}
-		if slot.is_empty() or rarity.is_empty() or main_stat.is_empty():
+		if slot.is_empty() or rarity.is_empty():
 			return {"ok": false, "reason": "equip_templates[%d] 缺少核心字段" % i}
-		if int(row.get("main_min", -1)) < 0 or int(row.get("main_max", -1)) < 0:
-			return {"ok": false, "reason": "equip_templates[%d] main_min/main_max 非法" % i}
-		if row.has("base_stats"):
-			var base_stats_any = row.get("base_stats", {})
-			if not (base_stats_any is Dictionary):
-				return {"ok": false, "reason": "equip_templates[%d].base_stats 必须是对象" % i}
-			var base_stats: Dictionary = base_stats_any
-			for stat_any in base_stats.keys():
-				if int(base_stats.get(stat_any, 0)) < 0:
-					return {"ok": false, "reason": "equip_templates[%d].base_stats.%s 不能为负数" % [i, str(stat_any)]}
-		if row.has("star_growth"):
-			var growth_any = row.get("star_growth", {})
-			if not (growth_any is Dictionary):
-				return {"ok": false, "reason": "equip_templates[%d].star_growth 必须是对象" % i}
-			var growth: Dictionary = growth_any
-			for stat_any in growth.keys():
-				if int(growth.get(stat_any, 0)) < 0:
-					return {"ok": false, "reason": "equip_templates[%d].star_growth.%s 不能为负数" % [i, str(stat_any)]}
-		if row.has("star_max") and int(row.get("star_max", 0)) < 0:
-			return {"ok": false, "reason": "equip_templates[%d].star_max 不能为负数" % i}
-		if row.has("max_sockets") and int(row.get("max_sockets", 0)) < 0:
-			return {"ok": false, "reason": "equip_templates[%d].max_sockets 不能为负数" % i}
-		if row.has("default_socket_count") and int(row.get("default_socket_count", 0)) < 0:
-			return {"ok": false, "reason": "equip_templates[%d].default_socket_count 不能为负数" % i}
+		for legacy_key in ["main_stat", "main_min", "main_max", "unidentified_chance", "effects", "base_stats", "star_max", "max_sockets", "default_socket_count"]:
+			if row.has(legacy_key):
+				return {"ok": false, "reason": "equip_templates[%d] 不允许出现旧字段 %s" % [i, legacy_key]}
+		var white_stats_check := _validate_template_stat_rows(row.get("white_stats", null), "white_stats", i)
+		if not bool(white_stats_check.get("ok", false)):
+			return white_stats_check
+		var growth_check := _validate_template_stat_rows(row.get("star_growth", []), "star_growth", i, false)
+		if not bool(growth_check.get("ok", false)):
+			return growth_check
+		if row.has("star_cap") and int(row.get("star_cap", 0)) < 0:
+			return {"ok": false, "reason": "equip_templates[%d].star_cap 不能为负数" % i}
+		var socket_rule := str(row.get("socket_rule_ref", "")).strip_edges()
+		if socket_rule != "fixed_star_3_6_8_10":
+			return {"ok": false, "reason": "equip_templates[%d].socket_rule_ref 仅支持固定开孔规则" % i}
 
+	return {"ok": true}
+
+func _validate_template_stat_rows(rows_any: Variant, field_name: String, row_index: int, required: bool = true) -> Dictionary:
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "equip_templates[%d].%s 必须是数组" % [row_index, field_name]}
+	var rows: Array = rows_any
+	if required and rows.is_empty():
+		return {"ok": false, "reason": "equip_templates[%d].%s 不能为空" % [row_index, field_name]}
+	var seen: Dictionary = {}
+	for stat_idx in range(rows.size()):
+		var stat_row_any = rows[stat_idx]
+		if not (stat_row_any is Dictionary):
+			return {"ok": false, "reason": "equip_templates[%d].%s[%d] 必须是对象" % [row_index, field_name, stat_idx]}
+		var stat_row: Dictionary = stat_row_any
+		var stat := str(stat_row.get("stat", "")).strip_edges()
+		if stat.is_empty():
+			return {"ok": false, "reason": "equip_templates[%d].%s[%d].stat 不能为空" % [row_index, field_name, stat_idx]}
+		if seen.has(stat):
+			return {"ok": false, "reason": "equip_templates[%d].%s 中属性 %s 重复" % [row_index, field_name, stat]}
+		if int(stat_row.get("value", -1)) < 0:
+			return {"ok": false, "reason": "equip_templates[%d].%s[%d].value 不能为负数" % [row_index, field_name, stat_idx]}
+		seen[stat] = true
 	return {"ok": true}
 
 func validate_equipment_sets_json(text: String) -> Dictionary:

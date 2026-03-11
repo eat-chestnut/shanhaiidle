@@ -9,6 +9,7 @@ use App\Models\Stage;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -34,6 +35,8 @@ class StageResource extends Resource
 
     protected static ?string $modelLabel = '关卡';
 
+    protected static ?string $navigationGroup = '掉落与副本';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -43,56 +46,68 @@ class StageResource extends Resource
                     ->tabs([
                         Tab::make('基础')
                             ->schema([
-                                TextInput::make('id')
-                                    ->label('关卡ID')
-                                    ->required()
-                                    ->maxLength(64)
-                                    ->unique(ignoreRecord: true)
-                                    ->disabled(fn (?Stage $record): bool => $record !== null),
-                                TextInput::make('name')
-                                    ->label('关卡名')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('unlock_min_level')
-                                    ->label('解锁等级')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(1),
-                                TextInput::make('sort_order')
-                                    ->label('排序')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0)
-                                    ->default(0),
-                                Toggle::make('is_enabled')
-                                    ->label('启用')
-                                    ->default(true),
-                            ])->columns(2),
+                                Section::make('基础信息')
+                                    ->description('维护关卡名称、解锁等级和显示顺序。')
+                                    ->schema([
+                                        TextInput::make('id')
+                                            ->label('关卡 ID')
+                                            ->required()
+                                            ->maxLength(64)
+                                            ->unique(ignoreRecord: true)
+                                            ->disabled(fn (?Stage $record): bool => $record !== null),
+                                        TextInput::make('name')
+                                            ->label('关卡名称')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('unlock_min_level')
+                                            ->label('解锁等级')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->default(1)
+                                            ->helperText('玩家达到该等级后可进入此关卡。'),
+                                        TextInput::make('sort_order')
+                                            ->label('排序')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0)
+                                            ->default(0)
+                                            ->helperText('数值越小越靠前显示。'),
+                                        Toggle::make('is_enabled')
+                                            ->label('启用')
+                                            ->default(true),
+                                    ])
+                                    ->columns(2),
+                            ]),
                         Tab::make('刷怪参数')
                             ->schema([
-                                TextInput::make('spawn_patch.respawn_s')
-                                    ->label('刷新间隔（秒）')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0.5)
-                                    ->maxValue(10)
-                                    ->default(1.6),
-                                TextInput::make('spawn_patch.max_alive')
-                                    ->label('同屏上限')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->maxValue(50)
-                                    ->default(10),
-                                TextInput::make('spawn_patch.spawn_radius')
-                                    ->label('刷怪半径')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(50)
-                                    ->maxValue(800)
-                                    ->default(220),
-                            ])->columns(3),
+                                Section::make('刷怪参数')
+                                    ->description('控制关卡的刷新节奏、同屏怪物数量与刷怪范围。')
+                                    ->schema([
+                                        TextInput::make('spawn_patch.respawn_s')
+                                            ->label('刷新间隔（秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0.5)
+                                            ->maxValue(10)
+                                            ->default(1.6),
+                                        TextInput::make('spawn_patch.max_alive')
+                                            ->label('同屏上限')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->maxValue(50)
+                                            ->default(10),
+                                        TextInput::make('spawn_patch.spawn_radius')
+                                            ->label('刷怪半径')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(50)
+                                            ->maxValue(800)
+                                            ->default(220),
+                                    ])
+                                    ->columns(3),
+                            ]),
                         Tab::make('怪物配置')
                             ->schema([
                                 static::monsterPoolRepeater('normal', '普通怪池', fn (): array => static::normalMonsterOptions()),
@@ -343,102 +358,138 @@ class StageResource extends Resource
                             ]),
                         Tab::make('普通掉落')
                             ->schema([
-                                TextInput::make('drops_patch.drop_chance')
-                                    ->label('基础掉落概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.28),
-                                TextInput::make('drops_patch.rarity_weights.white')
-                                    ->label('白色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(85),
-                                TextInput::make('drops_patch.rarity_weights.blue')
-                                    ->label('蓝色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(13),
-                                TextInput::make('drops_patch.rarity_weights.gold')
-                                    ->label('金色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(2),
-                                MultiSelect::make('drops_patch.items_by_rarity.white')
-                                    ->label('白色掉落池')
-                                    ->options(fn (): array => static::itemOptions())
-                                    ->required()
-                                    ->minItems(1),
-                                MultiSelect::make('drops_patch.items_by_rarity.blue')
-                                    ->label('蓝色掉落池')
-                                    ->options(fn (): array => static::itemOptions())
-                                    ->default([]),
-                                MultiSelect::make('drops_patch.items_by_rarity.gold')
-                                    ->label('金色掉落池')
-                                    ->options(fn (): array => static::itemOptions())
-                                    ->default([]),
-                            ])->columns(2),
+                                Section::make('基础概率')
+                                    ->description('设置普通掉落的基础概率与稀有度权重。')
+                                    ->schema([
+                                        TextInput::make('drops_patch.drop_chance')
+                                            ->label('基础掉落概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.28),
+                                        TextInput::make('drops_patch.rarity_weights.white')
+                                            ->label('白色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->default(85),
+                                        TextInput::make('drops_patch.rarity_weights.blue')
+                                            ->label('蓝色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->default(13),
+                                        TextInput::make('drops_patch.rarity_weights.gold')
+                                            ->label('金色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->default(2),
+                                    ])
+                                    ->columns(4),
+                                Section::make('按稀有度掉落池')
+                                    ->description('每个稀有度单独维护掉落池，方便策划查找和覆盖。')
+                                    ->schema([
+                                        MultiSelect::make('drops_patch.items_by_rarity.white')
+                                            ->label('白色掉落池')
+                                            ->options(fn (): array => static::itemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->minItems(1),
+                                        MultiSelect::make('drops_patch.items_by_rarity.blue')
+                                            ->label('蓝色掉落池')
+                                            ->options(fn (): array => static::itemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default([]),
+                                        MultiSelect::make('drops_patch.items_by_rarity.gold')
+                                            ->label('金色掉落池')
+                                            ->options(fn (): array => static::itemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default([]),
+                                    ])
+                                    ->columns(1),
+                            ]),
                         Tab::make('特殊掉落')
                             ->schema([
-                                TextInput::make('drops_patch.special.normal.extra_gem_chance')
-                                    ->label('普通怪额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.02),
-                                MultiSelect::make('drops_patch.special.normal.extra_gems')
-                                    ->label('普通怪额外宝石池')
-                                    ->options(fn (): array => static::gemOptions())
-                                    ->default([]),
-
-                                TextInput::make('drops_patch.special.elite.punch_stone_chance')
-                                    ->label('精英打孔石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.18),
-                                TextInput::make('drops_patch.special.elite.extra_gem_chance')
-                                    ->label('精英额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.10),
-                                MultiSelect::make('drops_patch.special.elite.extra_gems')
-                                    ->label('精英额外宝石池')
-                                    ->options(fn (): array => static::gemOptions())
-                                    ->default([]),
-
-                                TextInput::make('drops_patch.special.boss.punch_stone_chance')
-                                    ->label('Boss打孔石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.45),
-                                TextInput::make('drops_patch.special.boss.extra_gem_chance')
-                                    ->label('Boss额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->default(0.25),
-                                MultiSelect::make('drops_patch.special.boss.extra_gems')
-                                    ->label('Boss额外宝石池')
-                                    ->options(fn (): array => static::gemOptions())
-                                    ->default([]),
-                                Select::make('drops_patch.special.boss.core_guarantee')
-                                    ->label('Boss保底核心')
-                                    ->required()
-                                    ->options(fn (): array => static::gemOptions())
-                                    ->default('妖王核心'),
-                            ])->columns(2),
+                                Section::make('普通怪额外掉落')
+                                    ->schema([
+                                        TextInput::make('drops_patch.special.normal.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.02),
+                                        MultiSelect::make('drops_patch.special.normal.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => static::gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default([]),
+                                    ])
+                                    ->columns(2),
+                                Section::make('精英额外掉落')
+                                    ->schema([
+                                        TextInput::make('drops_patch.special.elite.punch_stone_chance')
+                                            ->label('打孔石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.18),
+                                        TextInput::make('drops_patch.special.elite.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.10),
+                                        MultiSelect::make('drops_patch.special.elite.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => static::gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default([])
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+                                Section::make('Boss 额外掉落')
+                                    ->schema([
+                                        Select::make('drops_patch.special.boss.core_guarantee')
+                                            ->label('保底核心')
+                                            ->required()
+                                            ->options(fn (): array => static::gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default('妖王核心'),
+                                        TextInput::make('drops_patch.special.boss.punch_stone_chance')
+                                            ->label('打孔石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.45),
+                                        TextInput::make('drops_patch.special.boss.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->default(0.25),
+                                        MultiSelect::make('drops_patch.special.boss.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => static::gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->default([])
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+                            ]),
                     ]),
             ]);
     }

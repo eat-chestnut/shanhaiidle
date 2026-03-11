@@ -26,13 +26,12 @@ class ExportBlueAffixPoolJson extends Command
                 'affix_name' => (string) $row->affix_name,
                 'stat' => (string) $row->stat,
                 'slot_tags' => is_array($row->slot_tags) ? array_values($row->slot_tags) : [],
-                'flow_tags' => is_array($row->flow_tags) ? array_values($row->flow_tags) : [],
                 'min_value' => (int) $row->min_value,
                 'max_value' => (int) $row->max_value,
                 'value_mode' => (string) $row->value_mode,
-                'weight' => (int) $row->weight,
                 'unlock_level' => (int) $row->unlock_level,
                 'sort_order' => (int) $row->sort_order,
+                'notes' => (string) ($row->notes ?? ''),
             ])
             ->values()
             ->all();

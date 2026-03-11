@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Support\Facades\FilamentView;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,6 +11,8 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -28,8 +31,45 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('山海巡厄录配置后台')
+            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->sidebarCollapsibleOnDesktop()
             ->bootUsing(function (): void {
                 App::setLocale('zh_CN');
+
+                FilamentView::registerRenderHook(
+                    PanelsRenderHook::STYLES_AFTER,
+                    fn (): string => <<<'HTML'
+                        <style>
+                            .compact-cost-items.fi-fo-repeater {
+                                gap: .5rem;
+                            }
+
+                            .compact-cost-items .fi-fo-repeater-item {
+                                border-radius: .75rem;
+                                box-shadow: none;
+                            }
+
+                            .compact-cost-items .fi-fo-repeater-item-header {
+                                padding: .375rem .625rem;
+                                min-height: 2rem;
+                            }
+
+                            .compact-cost-items .fi-fo-repeater-item-content {
+                                padding: .5rem .625rem;
+                            }
+
+                            .compact-cost-items .fi-fo-repeater-item-content .grid {
+                                row-gap: .375rem;
+                                column-gap: .5rem;
+                            }
+
+                            .compact-cost-items .fi-fo-field-wrp-helper-text {
+                                display: none;
+                            }
+                        </style>
+                    HTML,
+                );
             })
             ->colors([
                 'primary' => Color::Amber,
@@ -42,7 +82,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

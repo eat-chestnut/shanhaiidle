@@ -20,10 +20,6 @@ class EquipTemplate extends Model
         'slot',
         'equip_type',
         'rarity',
-        'main_stat',
-        'main_min',
-        'main_max',
-        'unidentified_chance',
         'icon',
         'set_id',
         'set_line_id',
@@ -46,13 +42,11 @@ class EquipTemplate extends Model
         'upgrade_from_template_id',
         'upgrade_to_template_id',
         'blueprint_item_id',
-        'effects',
         'is_enabled',
         'sort_order',
     ];
 
     protected $casts = [
-        'unidentified_chance' => 'float',
         'set_stage' => 'integer',
         'required_level' => 'integer',
         'white_stats' => 'array',
@@ -62,7 +56,6 @@ class EquipTemplate extends Model
         'can_attach_blue_affix' => 'boolean',
         'can_roll_purple_affix' => 'boolean',
         'forge_enabled' => 'boolean',
-        'effects' => 'array',
         'is_enabled' => 'boolean',
         'sort_order' => 'integer',
     ];

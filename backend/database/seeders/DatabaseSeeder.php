@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
             BlueGearTemplatesSeeder::class,
             MaterialDungeonsSeeder::class,
             CraftingRecipesSeeder::class,
-            EquipSettingsSeeder::class,
             BattleDefaultsSettingSeeder::class,
             EquipmentGrowthRulesSettingSeeder::class,
             SkillsCatalogSeeder::class,
             MonstersSeeder::class,
             StagesSeeder::class,
+            NanshanYijingWorldSeeder::class,
         ]);
     }
 }

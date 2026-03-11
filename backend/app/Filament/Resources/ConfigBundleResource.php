@@ -15,14 +15,11 @@ use Filament\Tables\Table;
 class ConfigBundleResource extends Resource
 {
     protected static ?string $model = ConfigBundle::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-archive-box-arrow-down';
-
     protected static ?string $navigationLabel = '配置包管理';
-
     protected static ?string $pluralModelLabel = '配置包';
-
     protected static ?string $modelLabel = '配置包';
+    protected static ?string $navigationGroup = '系统配置';
 
     public static function form(Form $form): Form
     {
@@ -33,23 +30,22 @@ class ConfigBundleResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('bundle_id')
-                    ->label('包ID')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label('时间')
-                    ->dateTime('Y-m-d H:i:s')
-                    ->sortable(),
-                TextColumn::make('sha256')
-                    ->label('SHA256')
-                    ->copyable()
-                    ->searchable(),
+                TextColumn::make('bundle_id')->label('包 ID')->searchable()->sortable(),
+                TextColumn::make('created_at')->label('创建时间')->dateTime('Y-m-d H:i:s')->sortable(),
+                TextColumn::make('sha256')->label('SHA256')->copyable()->searchable()->limit(24)->tooltip(fn (ConfigBundle $record): string => (string) $record->sha256),
                 IconColumn::make('is_latest')
-                    ->label('最新')
+                    ->label('当前最新')
                     ->boolean()
-                    ->getStateUsing(
-                        fn (ConfigBundle $record): bool => $record->bundle_id === trim((string) AppSetting::getValue('latest_bundle_id', ''))
+                    ->getStateUsing(fn (ConfigBundle $record): bool => $record->bundle_id === trim((string) AppSetting::getValue('latest_bundle_id', ''))),
+                TextColumn::make('updated_at')->label('更新时间')->since()->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_latest')
+                    ->label('仅看最新')
+                    ->queries(
+                        true: fn ($query) => $query->where('bundle_id', trim((string) AppSetting::getValue('latest_bundle_id', ''))),
+                        false: fn ($query) => $query->where('bundle_id', '!=', trim((string) AppSetting::getValue('latest_bundle_id', ''))),
+                        blank: fn ($query) => $query,
                     ),
             ])
             ->actions([
@@ -75,11 +71,6 @@ class ConfigBundleResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [
@@ -87,4 +78,3 @@ class ConfigBundleResource extends Resource
         ];
     }
 }
-

@@ -1,7 +1,6 @@
 extends Control
 
 const MAX_SOCKET_BTNS := 4
-const PUNCH_ITEM_ID := "打孔石"
 
 @onready var _dim_bg: ColorRect = $DimBG
 @onready var _lbl_title: Label = $Panel/VBox/TopBar/LblTitle
@@ -17,14 +16,15 @@ const PUNCH_ITEM_ID := "打孔石"
 @onready var _btn_equip: Button = $Panel/VBox/ActionBar/BtnEquip
 @onready var _btn_unequip: Button = $Panel/VBox/ActionBar/BtnUnequip
 @onready var _btn_upgrade: Button = $Panel/VBox/ActionBar/BtnUpgrade
+@onready var _btn_rank_up: Button = $Panel/VBox/ActionBar/BtnRankUp
 @onready var _btn_gem: Button = $Panel/VBox/ActionBar/BtnGem
-@onready var _btn_punch: Button = $Panel/VBox/ActionBar/BtnPunch
 @onready var _btn_cancel: Button = $Panel/VBox/ActionBar/BtnCancel
 @onready var _lbl_upgrade_hint: Label = $Panel/VBox/LblUpgradeHint
 @onready var _dlg_salvage: ConfirmationDialog = $ConfirmSalvage
 @onready var _gem_select_popup: Node = $"../GemSelectPopup"
 @onready var _equip_gem_popup: Node = $"../EquipGemPopup"
 @onready var _star_popup: Node = $"../StarUpPopup"
+@onready var _rank_popup: Node = $"../EquipRankUpPopup"
 
 var _mode := ""
 var _uid := 0
@@ -32,7 +32,6 @@ var _target_slot := ""
 var _candidate: Dictionary = {}
 var _current: Dictionary = {}
 var _last_new_effect: Dictionary = {}
-var _punch_ready_style: StyleBoxFlat
 
 func _ready() -> void:
 	visible = false
@@ -48,10 +47,9 @@ func _ready() -> void:
 	_btn_equip.text = I18nService.t("ui.btn.equip")
 	_btn_unequip.text = I18nService.t("ui.btn.unequip")
 	_btn_upgrade.text = "升星"
+	_btn_rank_up.text = "升阶"
 	_btn_gem.text = I18nService.t("ui.tab.gem", "宝石")
-	_btn_punch.text = I18nService.t("ui.btn.punch", "打孔")
 	_btn_cancel.text = I18nService.t("ui.btn.cancel")
-	_build_punch_style()
 
 	if not _btn_close.pressed.is_connected(close):
 		_btn_close.pressed.connect(close)
@@ -69,10 +67,10 @@ func _ready() -> void:
 		_btn_unequip.pressed.connect(_on_btn_unequip_pressed)
 	if not _btn_upgrade.pressed.is_connected(_on_btn_upgrade_pressed):
 		_btn_upgrade.pressed.connect(_on_btn_upgrade_pressed)
+	if not _btn_rank_up.pressed.is_connected(_on_btn_rank_up_pressed):
+		_btn_rank_up.pressed.connect(_on_btn_rank_up_pressed)
 	if not _btn_gem.pressed.is_connected(_on_btn_gem_pressed):
 		_btn_gem.pressed.connect(_on_btn_gem_pressed)
-	if not _btn_punch.pressed.is_connected(_on_btn_punch_pressed):
-		_btn_punch.pressed.connect(_on_btn_punch_pressed)
 	if not _dim_bg.gui_input.is_connected(_on_dim_bg_gui_input):
 		_dim_bg.gui_input.connect(_on_dim_bg_gui_input)
 	if not _dlg_salvage.confirmed.is_connected(_on_salvage_confirmed):
@@ -121,6 +119,8 @@ func close() -> void:
 		_equip_gem_popup.call("close")
 	if _star_popup != null and _star_popup.has_method("close"):
 		_star_popup.call("close")
+	if _rank_popup != null and _rank_popup.has_method("close"):
+		_rank_popup.call("close")
 
 func _refresh_ui() -> void:
 	if _mode == "bag":
@@ -192,7 +192,8 @@ func _refresh_ui() -> void:
 
 	_refresh_lock_button()
 	_refresh_upgrade_button()
-	_refresh_gem_and_punch_buttons()
+	_refresh_rank_up_button()
+	_refresh_gem_button()
 
 func _refresh_lock_button() -> void:
 	var uid := _active_uid()
@@ -206,21 +207,17 @@ func _refresh_lock_button() -> void:
 	_btn_lock.disabled = false
 	_btn_lock.text = I18nService.t("ui.btn.unlock", "解锁") if locked else I18nService.t("ui.btn.lock", "锁定")
 
-func _refresh_gem_and_punch_buttons() -> void:
+func _refresh_gem_button() -> void:
 	var inst := _active_inst()
 	if inst.is_empty():
 		_btn_gem.disabled = true
 		_btn_gem.visible = false
-		_refresh_punch_button(0, 0)
 		return
 	_btn_gem.visible = true
 	_btn_gem.disabled = false
 	if _mode == "bag" and not EquipmentModel.is_identified(inst):
 		_btn_gem.disabled = true
-		_refresh_punch_button(0, 0)
 		return
-	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKET_BTNS)
-	_refresh_punch_button(sockets, int(inst.get("uid", 0)))
 
 func _refresh_upgrade_button() -> void:
 	var uid := _active_uid()
@@ -271,49 +268,38 @@ func _refresh_upgrade_button() -> void:
 		_:
 			_set_upgrade_hint("当前不可升星", Color(1.0, 0.55, 0.55, 1.0))
 
-func _refresh_punch_button(sockets: int, active_uid: int) -> void:
-	var stone_count: int = InventoryModel.get_count(PUNCH_ITEM_ID)
-	_btn_punch.remove_theme_stylebox_override("normal")
-
-	if active_uid <= 0:
-		_btn_punch.disabled = true
-		_btn_punch.text = I18nService.t("ui.btn.punch", "打孔")
-		_btn_punch.remove_theme_color_override("font_color")
+func _refresh_rank_up_button() -> void:
+	var uid := _active_uid()
+	if uid <= 0:
+		_btn_rank_up.visible = false
+		_btn_rank_up.disabled = true
+		_btn_rank_up.tooltip_text = ""
 		return
-
-	if sockets >= MAX_SOCKET_BTNS:
-		_btn_punch.disabled = true
-		_btn_punch.text = I18nService.t("ui.btn.punch_full", "孔已满（4/4）")
-		_btn_punch.remove_theme_color_override("font_color")
+	var info := EquipmentRankUpService.can_rank_up(uid)
+	var inst := _active_inst()
+	var is_blue := str(info.get("reason", "")) == "blue_gear"
+	_btn_rank_up.visible = not is_blue and not inst.is_empty()
+	if not _btn_rank_up.visible:
 		return
-
-	if stone_count <= 0:
-		_btn_punch.disabled = true
-		_btn_punch.text = I18nService.t("ui.btn.punch_lack", "打孔（缺打孔石）")
-		_btn_punch.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 1.0))
-		return
-
-	_btn_punch.disabled = false
-	_btn_punch.text = "%s（%s x%d）" % [
-		I18nService.t("ui.btn.punch", "打孔"),
-		PUNCH_ITEM_ID,
-		stone_count
-	]
-	_btn_punch.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
-	_btn_punch.add_theme_stylebox_override("normal", _punch_ready_style)
-
-func _build_punch_style() -> void:
-	_punch_ready_style = StyleBoxFlat.new()
-	_punch_ready_style.bg_color = Color(0.15, 0.15, 0.15, 1.0)
-	_punch_ready_style.border_color = Color(1.0, 0.82, 0.35, 1.0)
-	_punch_ready_style.border_width_left = 2
-	_punch_ready_style.border_width_top = 2
-	_punch_ready_style.border_width_right = 2
-	_punch_ready_style.border_width_bottom = 2
-	_punch_ready_style.corner_radius_top_left = 10
-	_punch_ready_style.corner_radius_top_right = 10
-	_punch_ready_style.corner_radius_bottom_left = 10
-	_punch_ready_style.corner_radius_bottom_right = 10
+	_btn_rank_up.disabled = not bool(info.get("ok", false))
+	_btn_rank_up.text = "升阶"
+	_btn_rank_up.tooltip_text = ""
+	match str(info.get("reason", "")).strip_edges():
+		"":
+			_btn_rank_up.tooltip_text = "升至下一阶模板"
+		"no_target":
+			_btn_rank_up.text = "已满阶"
+			_btn_rank_up.tooltip_text = "当前装备已满阶或未配置下一阶模板"
+		"no_recipe":
+			_btn_rank_up.tooltip_text = "缺少升阶配置"
+		"level_low":
+			_btn_rank_up.tooltip_text = "等级不足：需Lv%d" % int(info.get("required_level", 0))
+		"no_gold":
+			_btn_rank_up.tooltip_text = "金币不足"
+		"no_material":
+			_btn_rank_up.tooltip_text = "升阶材料不足"
+		_:
+			_btn_rank_up.tooltip_text = "当前不可升阶"
 
 func _format_inst_detail(inst: Dictionary, slot_key: String) -> String:
 	if inst.is_empty():
@@ -755,16 +741,6 @@ func _on_btn_unequip_pressed() -> void:
 	EquipmentModel.unequip(_target_slot)
 	close()
 
-func _on_btn_punch_pressed() -> void:
-	var inst := _active_inst()
-	if inst.is_empty():
-		return
-	var uid := int(inst.get("uid", 0))
-	if uid <= 0:
-		return
-	if EquipmentModel.add_socket(uid):
-		_reload_instance_and_refresh()
-
 func _on_btn_gem_pressed() -> void:
 	var inst := _active_inst()
 	if inst.is_empty():
@@ -784,6 +760,31 @@ func _on_btn_upgrade_pressed() -> void:
 		return
 	if _star_popup != null and _star_popup.has_method("open_for_equip"):
 		_star_popup.call("open_for_equip", uid)
+
+func _on_btn_rank_up_pressed() -> void:
+	var uid := _active_uid()
+	if uid <= 0:
+		return
+	var info := EquipmentRankUpService.can_rank_up(uid)
+	if not bool(info.get("ok", false)):
+		match str(info.get("reason", "")).strip_edges():
+			"blue_gear":
+				EventBus.add_log("蓝装不可升阶")
+			"no_target":
+				EventBus.add_log("已满阶或未配置下一阶模板")
+			"no_recipe":
+				EventBus.add_log("缺少升阶配置")
+			"level_low":
+				EventBus.add_log("等级不足：需Lv%d" % int(info.get("required_level", 0)))
+			"no_gold":
+				EventBus.add_log("金币不足")
+			"no_material":
+				EventBus.add_log("升阶材料不足")
+			_:
+				EventBus.add_log("当前不可升阶")
+		return
+	if _rank_popup != null and _rank_popup.has_method("open_for_equip"):
+		_rank_popup.call("open_for_equip", uid)
 
 func _on_inventory_updated() -> void:
 	if visible:

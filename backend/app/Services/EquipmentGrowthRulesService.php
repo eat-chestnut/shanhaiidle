@@ -28,12 +28,7 @@ class EquipmentGrowthRulesService
                 '7_8' => '高阶星材',
                 '9_10' => '极阶星材',
             ],
-            'socket_unlocks' => [
-                '3' => 1,
-                '6' => 2,
-                '8' => 3,
-                '10' => 4,
-            ],
+            'socket_unlocks' => self::fixedSocketUnlocks(),
             'blue_affix_unlock_level' => 30,
             'purple_affix_unlock_level' => 50,
             'resonance_thresholds' => [3, 6, 8, 10],
@@ -77,15 +72,30 @@ class EquipmentGrowthRulesService
             return self::defaultConfig();
         }
 
-        return self::mergeRecursive(self::defaultConfig(), $decoded);
+        $config = self::mergeRecursive(self::defaultConfig(), $decoded);
+        $config['socket_unlocks'] = self::fixedSocketUnlocks();
+
+        return $config;
     }
 
     public static function saveConfig(array $config): void
     {
+        $config['socket_unlocks'] = self::fixedSocketUnlocks();
+
         AppSetting::setValue(
             self::SETTING_KEY,
             json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         );
+    }
+
+    public static function fixedSocketUnlocks(): array
+    {
+        return [
+            '3' => 1,
+            '6' => 2,
+            '8' => 3,
+            '10' => 4,
+        ];
     }
 
     private static function mergeRecursive(array $base, array $override): array

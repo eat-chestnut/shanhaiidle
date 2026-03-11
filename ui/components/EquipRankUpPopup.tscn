@@ -1,0 +1,241 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/EquipRankUpPopup.gd" id="1_script"]
+
+[node name="EquipRankUpPopup" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="DimBG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.58)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -290.0
+offset_top = -450.0
+offset_right = 290.0
+offset_bottom = 450.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 52)
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "装备升阶"
+vertical_alignment = 1
+
+[node name="BtnClose" type="Button" parent="Panel/VBox/TopBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 42)
+text = "关闭"
+
+[node name="ContentScroll" type="ScrollContainer" parent="Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="Panel/VBox/ContentScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="EquipRow" type="HBoxContainer" parent="Panel/VBox/ContentScroll/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="CurrentCard" type="PanelContainer" parent="Panel/VBox/ContentScroll/Content/EquipRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CurrentVBox" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content/EquipRow/CurrentCard"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CurrentHead" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/CurrentCard/CurrentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "当前装备"
+horizontal_alignment = 1
+
+[node name="CurrentIcon" type="TextureRect" parent="Panel/VBox/ContentScroll/Content/EquipRow/CurrentCard/CurrentVBox"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CurrentName" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/CurrentCard/CurrentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+text = "当前装备"
+
+[node name="CurrentMeta" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/CurrentCard/CurrentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+horizontal_alignment = 1
+text = "—"
+
+[node name="ArrowBox" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content/EquipRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 0)
+alignment = 1
+
+[node name="Arrow" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/ArrowBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 46
+text = "⇒"
+horizontal_alignment = 1
+
+[node name="TargetCard" type="PanelContainer" parent="Panel/VBox/ContentScroll/Content/EquipRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TargetVBox" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content/EquipRow/TargetCard"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="TargetHead" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/TargetCard/TargetVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "升阶后装备"
+horizontal_alignment = 1
+
+[node name="TargetIcon" type="TextureRect" parent="Panel/VBox/ContentScroll/Content/EquipRow/TargetCard/TargetVBox"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TargetName" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/TargetCard/TargetVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+text = "目标装备"
+
+[node name="TargetMeta" type="Label" parent="Panel/VBox/ContentScroll/Content/EquipRow/TargetCard/TargetVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+horizontal_alignment = 1
+text = "—"
+
+[node name="StatsRow" type="HBoxContainer" parent="Panel/VBox/ContentScroll/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="NowBox" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content/StatsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NowTitle" type="Label" parent="Panel/VBox/ContentScroll/Content/StatsRow/NowBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "当前属性"
+
+[node name="NowText" type="RichTextLabel" parent="Panel/VBox/ContentScroll/Content/StatsRow/NowBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_horizontal = 3
+fit_content = true
+scroll_active = false
+text = "—"
+
+[node name="NextBox" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content/StatsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NextTitle" type="Label" parent="Panel/VBox/ContentScroll/Content/StatsRow/NextBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "升阶后属性"
+
+[node name="NextText" type="RichTextLabel" parent="Panel/VBox/ContentScroll/Content/StatsRow/NextBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_horizontal = 3
+fit_content = true
+scroll_active = false
+text = "—"
+
+[node name="InheritNote" type="Label" parent="Panel/VBox/ContentScroll/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+text = "升阶将继承：星级、宝石、蓝词条、洗练、锁定与穿戴状态"
+
+[node name="MaterialSection" type="VBoxContainer" parent="Panel/VBox/ContentScroll/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="MaterialTitle" type="Label" parent="Panel/VBox/ContentScroll/Content/MaterialSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "升阶所需材料"
+
+[node name="MaterialFlow" type="HFlowContainer" parent="Panel/VBox/ContentScroll/Content/MaterialSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="StatusLabel" type="Label" parent="Panel/VBox/ContentScroll/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+text = "—"
+
+[node name="ActionBar" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 58)
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="BtnBack" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "返回"
+
+[node name="BtnRankUp" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "开始升阶"

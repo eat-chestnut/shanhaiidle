@@ -45,6 +45,7 @@ const SLOT_KEYS := [
 @onready var _gem_select_popup: Node = $GemSelectPopup
 @onready var _equip_gem_popup: Node = $EquipGemPopup
 @onready var _star_up_popup: Node = $StarUpPopup
+@onready var _rank_up_popup: Node = $EquipRankUpPopup
 @onready var _bulk_popup: Node = $BulkSalvagePopup
 @onready var _forge_popup: Node = $ForgePopup
 @onready var _forge_base_popup: Node = $ForgeBaseEquipSelectPopup
@@ -111,6 +112,8 @@ func close() -> void:
 		_equip_gem_popup.call("close")
 	if _star_up_popup != null and _star_up_popup.has_method("close"):
 		_star_up_popup.call("close")
+	if _rank_up_popup != null and _rank_up_popup.has_method("close"):
+		_rank_up_popup.call("close")
 	if _bulk_popup != null and _bulk_popup.has_method("close"):
 		_bulk_popup.call("close")
 	if _forge_popup != null and _forge_popup.has_method("close"):

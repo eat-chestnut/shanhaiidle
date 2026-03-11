@@ -40,13 +40,10 @@ func create_instance(template_id: String) -> Dictionary:
 	if template.is_empty():
 		return {}
 
-	var main_stat := str(template.get("main_stat", "")).strip_edges()
+	var main_stat := _template_primary_stat(template)
 	var star_level := 0
 	var main_val := _template_main_value_for_star(template, main_stat, star_level)
-	var sockets := _template_default_socket_count(template)
-	var effects := _normalize_effects(template.get("effects", []))
-	var unidentified_chance := clampf(float(template.get("unidentified_chance", 0.0)), 0.0, 1.0)
-	var identified := randf() >= unidentified_chance
+	var sockets := _template_socket_count_for_star(template, star_level)
 	var socket_gems: Array[String] = []
 	socket_gems.resize(sockets)
 	for i in range(sockets):
@@ -64,17 +61,17 @@ func create_instance(template_id: String) -> Dictionary:
 		"main_val": main_val,
 		"tier": 0,
 		"set_id": str(template.get("set_id", "")),
-		"effects": effects,
+		"effects": [],
 		"extra_effects": [],
 		"sockets": sockets,
 		"socket_gems": socket_gems,
 		"icon": str(template.get("icon", "")),
-		"identified": identified,
+		"identified": true,
 		"locked": false,
 		"star_level": star_level,
 		"refine_lv": 0,
 	}
-	instance = _sync_legacy_main_fields(instance)
+	instance = _sync_instance_summary_fields(instance)
 	next_uid += 1
 	return instance
 
@@ -763,17 +760,14 @@ func get_instance_template_stats(inst: Dictionary) -> Dictionary:
 	var template := _find_template(template_id)
 	var star_level := get_star_level(inst)
 	if not template.is_empty():
-		var base_stats_any = template.get("base_stats", {})
-		if base_stats_any is Dictionary:
-			var base_stats: Dictionary = base_stats_any
-			for stat_any in base_stats.keys():
-				var stat := _normalize_stat_key(str(stat_any))
-				if stat.is_empty():
-					continue
-				out[stat] = int(base_stats.get(stat_any, 0))
-		var growth_any = template.get("star_growth", {})
-		if growth_any is Dictionary and star_level > 0:
-			var growth: Dictionary = growth_any
+		var base_stats := _template_stat_map(template, "white_stats")
+		for stat_any in base_stats.keys():
+			var stat := _normalize_stat_key(str(stat_any))
+			if stat.is_empty():
+				continue
+			out[stat] = int(base_stats.get(stat_any, 0))
+		if star_level > 0:
+			var growth := _template_stat_map(template, "star_growth")
 			for stat_any in growth.keys():
 				var stat := _normalize_stat_key(str(stat_any))
 				if stat.is_empty():
@@ -782,13 +776,6 @@ func get_instance_template_stats(inst: Dictionary) -> Dictionary:
 				if add == 0:
 					continue
 				out[stat] = int(out.get(stat, 0)) + add
-
-	if out.is_empty():
-		# 兼容旧实例：没有模板基础字段时退回旧主属性字段。
-		var main_stat := _normalize_stat_key(str(inst.get("main_stat", "")).strip_edges())
-		var legacy_main := int(inst.get("main_val", 0))
-		if not main_stat.is_empty() and legacy_main != 0:
-			out[main_stat] = legacy_main
 
 	return out
 
@@ -950,7 +937,7 @@ func do_star_up(uid: int) -> Dictionary:
 		result["reason"] = "not_found"
 		return result
 	inst["star_level"] = clampi(int(inst.get("star_level", 0)) + 1, 0, get_instance_star_max(inst))
-	inst = _sync_legacy_main_fields(inst)
+	inst = _sync_instance_summary_fields(inst)
 	if not _set_instance_by_uid(uid, inst):
 		InventoryModel.add_item(item_id, need_count, "system")
 		if gold_cost > 0:
@@ -1007,7 +994,7 @@ func upgrade_quality_from_base(base_uid: int, target_template_id: String) -> Dic
 	new_inst["locked"] = bool(base_inst.get("locked", false))
 	# 升品继承只保留成长状态；鉴定状态不再沿用旧随机链路，目标装备默认已鉴定。
 	new_inst["identified"] = true
-	new_inst = _sync_legacy_main_fields(new_inst)
+	new_inst = _sync_instance_summary_fields(new_inst)
 
 	if from_bag and bag_idx >= 0 and bag_idx < bag.size():
 		bag.remove_at(bag_idx)
@@ -1187,29 +1174,7 @@ func refine(uid: int) -> Dictionary:
 	return result
 
 func add_socket(uid: int) -> bool:
-	if uid <= 0:
-		return false
-	var inst := _get_instance_by_uid(uid)
-	if inst.is_empty():
-		return false
-	inst = _ensure_socket_fields(inst)
-	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKETS)
-	if sockets >= MAX_SOCKETS:
-		return false
-	if InventoryModel.get_count("打孔石") < 1:
-		return false
-	if not InventoryModel.spend_item("打孔石", 1, "system"):
-		return false
-	var socket_gems := _normalize_socket_gems(inst.get("socket_gems", []), sockets)
-	sockets += 1
-	socket_gems.append("")
-	inst["sockets"] = sockets
-	inst["socket_gems"] = socket_gems
-	if not _set_instance_by_uid(uid, inst):
-		return false
-	EventBus.notify_inventory_updated()
-	_request_save()
-	return true
+	return false
 
 func set_socket_gem(uid: int, socket_idx: int, gem_id: String) -> bool:
 	if uid <= 0 or gem_id.is_empty():
@@ -1538,6 +1503,41 @@ func _find_template(template_id: String) -> Dictionary:
 func get_template(template_id: String) -> Dictionary:
 	return _find_template(template_id)
 
+func _template_stat_map(template: Dictionary, field_name: String) -> Dictionary:
+	var out: Dictionary = {}
+	if template.is_empty():
+		return out
+	var rows_any = template.get(field_name, [])
+	if not (rows_any is Array):
+		return out
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var stat := _normalize_stat_key(str(row.get("stat", "")))
+		if stat.is_empty():
+			continue
+		out[stat] = maxi(0, int(row.get("value", 0)))
+	return out
+
+func _template_primary_stat(template: Dictionary) -> String:
+	var stats := _template_stat_map(template, "white_stats")
+	var best_stat := ""
+	var best_value := -1
+	for stat_any in stats.keys():
+		var stat := str(stat_any)
+		var value := int(stats.get(stat_any, 0))
+		if value > best_value:
+			best_stat = stat
+			best_value = value
+	return best_stat
+
+func _template_socket_rule(template: Dictionary) -> String:
+	var rule := str(template.get("socket_rule_ref", "")).strip_edges()
+	if rule.is_empty():
+		return "fixed_star_3_6_8_10"
+	return rule
+
 func _template_star_enabled(template: Dictionary) -> bool:
 	if template.is_empty():
 		return false
@@ -1548,43 +1548,76 @@ func _template_star_enabled(template: Dictionary) -> bool:
 func _template_star_max(template: Dictionary) -> int:
 	if template.is_empty():
 		return STAR_MAX_DEFAULT
-	var max_star := int(template.get("star_max", STAR_MAX_DEFAULT))
+	var max_star := int(template.get("star_cap", STAR_MAX_DEFAULT))
 	return clampi(max_star, 0, STAR_MAX_DEFAULT)
 
 func _template_max_sockets(template: Dictionary) -> int:
 	if template.is_empty():
-		return MAX_SOCKETS
-	return clampi(int(template.get("max_sockets", MAX_SOCKETS)), 0, MAX_SOCKETS)
+		return 0
+	if _template_socket_rule(template) != "fixed_star_3_6_8_10":
+		return 0
+	return 4
 
 func _template_default_socket_count(template: Dictionary) -> int:
+	return _template_socket_count_for_star(template, 0)
+
+func _fixed_socket_unlocks_cfg() -> Dictionary:
+	var out := {
+		3: 1,
+		6: 2,
+		8: 3,
+		10: 4,
+	}
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var db_any = cfg.get("equipment_growth_rules_db", {})
+	if not (db_any is Dictionary):
+		return out
+	var rules_any = (db_any as Dictionary).get("equipment_growth_rules", {})
+	if not (rules_any is Dictionary):
+		return out
+	var unlocks_any = (rules_any as Dictionary).get("socket_unlocks", {})
+	if not (unlocks_any is Dictionary):
+		return out
+	var unlocks: Dictionary = unlocks_any
+	for key_any in unlocks.keys():
+		var milestone := int(str(key_any))
+		if milestone <= 0:
+			continue
+		out[milestone] = maxi(0, int(unlocks.get(key_any, out.get(milestone, 0))))
+	return out
+
+func _template_socket_count_for_star(template: Dictionary, star_level: int) -> int:
 	if template.is_empty():
 		return 0
-	var default_count := int(template.get("default_socket_count", 0))
-	return clampi(default_count, 0, _template_max_sockets(template))
+	if _template_socket_rule(template) != "fixed_star_3_6_8_10":
+		return 0
+	var max_sockets := _template_max_sockets(template)
+	var sockets := 0
+	var unlocks := _fixed_socket_unlocks_cfg()
+	for milestone in [3, 6, 8, 10]:
+		if star_level >= milestone:
+			sockets = maxi(sockets, int(unlocks.get(milestone, sockets)))
+	return clampi(sockets, 0, max_sockets)
 
 func _template_main_value_for_star(template: Dictionary, main_stat: String, star_level: int) -> int:
 	var stat := _normalize_stat_key(main_stat)
 	if template.is_empty() or stat.is_empty():
 		return 0
 	var base := 0
-	var base_stats_any = template.get("base_stats", {})
-	if base_stats_any is Dictionary:
-		base = int((base_stats_any as Dictionary).get(stat, 0))
-	if base == 0:
-		base = int(template.get("main_min", 0))
+	var base_stats := _template_stat_map(template, "white_stats")
+	base = int(base_stats.get(stat, 0))
 	var growth := 0
-	var growth_any = template.get("star_growth", {})
-	if growth_any is Dictionary:
-		growth = int((growth_any as Dictionary).get(stat, 0))
+	var growth_stats := _template_stat_map(template, "star_growth")
+	growth = int(growth_stats.get(stat, 0))
 	return base + maxi(0, star_level) * growth
 
-func _sync_legacy_main_fields(inst: Dictionary) -> Dictionary:
+func _sync_instance_summary_fields(inst: Dictionary) -> Dictionary:
 	var out := inst.duplicate(true)
 	var template_id := str(out.get("template_id", "")).strip_edges()
 	var template := _find_template(template_id)
 	var main_stat := str(out.get("main_stat", "")).strip_edges()
 	if main_stat.is_empty():
-		main_stat = str(template.get("main_stat", "")).strip_edges()
+		main_stat = _template_primary_stat(template)
 	out["main_stat"] = main_stat
 	var star_level := clampi(int(out.get("star_level", 0)), 0, _template_star_max(template))
 	out["star_level"] = star_level
@@ -1596,8 +1629,6 @@ func _sync_legacy_main_fields(inst: Dictionary) -> Dictionary:
 		out["icon"] = str(template.get("icon", out.get("icon", "")))
 		if str(out.get("set_id", "")).strip_edges().is_empty():
 			out["set_id"] = str(template.get("set_id", ""))
-		if not out.has("effects") or _normalize_effects(out.get("effects", [])).is_empty():
-			out["effects"] = _normalize_effects(template.get("effects", []))
 
 	var legacy_main := _template_main_value_for_star(template, main_stat, star_level)
 	if legacy_main == 0:
@@ -1997,49 +2028,17 @@ func _normalize_stat_key(stat: String) -> String:
 		_:
 			return stat
 
-func _roll_socket_count() -> int:
-	var weights := _socket_weights_cfg()
-	var total := 0
-	for i in range(MAX_SOCKETS + 1):
-		total += maxi(0, int(weights.get(i, 0)))
-	if total <= 0:
-		return 0
-	var roll := randi() % total
-	var acc := 0
-	for i in range(MAX_SOCKETS + 1):
-		acc += maxi(0, int(weights.get(i, 0)))
-		if roll < acc:
-			return i
-	return 0
-
-func _socket_weights_cfg() -> Dictionary:
-	var out := {
-		0: 60,
-		1: 25,
-		2: 10,
-		3: 4,
-		4: 1,
-	}
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var equip_db_any = cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return out
-	var socket_weights_any = (equip_db_any as Dictionary).get("socket_weights", {})
-	if not (socket_weights_any is Dictionary):
-		return out
-	var socket_weights: Dictionary = socket_weights_any
-	for key_any in socket_weights.keys():
-		var k_str := str(key_any)
-		var k := int(k_str)
-		if k < 0 or k > MAX_SOCKETS:
-			continue
-		out[k] = maxi(0, int(socket_weights.get(key_any, out.get(k, 0))))
-	return out
-
 func _ensure_socket_fields(inst: Dictionary) -> Dictionary:
 	var out := inst.duplicate(true)
+	var template_id := str(out.get("template_id", "")).strip_edges()
+	var template := _find_template(template_id)
+	var star_level := maxi(0, int(out.get("star_level", 0)))
 	var sockets := clampi(int(out.get("sockets", 0)), 0, MAX_SOCKETS)
+	if not template.is_empty():
+		sockets = _template_socket_count_for_star(template, star_level)
 	out["sockets"] = sockets
+	if out.has("socket_count"):
+		out["socket_count"] = sockets
 	out["socket_gems"] = _normalize_socket_gems(out.get("socket_gems", []), sockets)
 	return out
 
@@ -2213,11 +2212,11 @@ func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
 	out["locked"] = bool(out.get("locked", false))
 	out["star_level"] = clampi(int(out.get("star_level", 0)), 0, _template_star_max(tpl))
 	out["refine_lv"] = clampi(int(out.get("refine_lv", 0)), 0, REFINE_MAX)
-	out["effects"] = _normalize_effects(out.get("effects", []))
+	out["effects"] = []
 	out["extra_effects"] = _normalize_effects(out.get("extra_effects", []))
 	if str(out.get("icon", "")).is_empty():
 		out["icon"] = str(tpl.get("icon", ""))
-	out = _sync_legacy_main_fields(out)
+	out = _sync_instance_summary_fields(out)
 	return out
 
 func _normalize_template_slot(slot: String) -> String:

@@ -31,4 +31,37 @@ class CraftingRecipe extends Model
         'sort_order' => 'integer',
         'is_enabled' => 'boolean',
     ];
+
+    public function setCostItemsAttribute($value): void
+    {
+        $rows = [];
+
+        foreach ((array) $value as $index => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $itemId = trim((string) ($row['item_id'] ?? ''));
+            if ($itemId === '') {
+                continue;
+            }
+
+            $itemName = trim((string) ($row['item_name'] ?? ''));
+            if ($itemName === '') {
+                $itemName = (string) Item::query()->where('id', $itemId)->value('name');
+            }
+
+            $rows[] = [
+                'item_id' => $itemId,
+                'item_name' => $itemName,
+                'count' => max(1, (int) ($row['count'] ?? 1)),
+                'material_type' => trim((string) ($row['material_type'] ?? 'sub')) ?: 'sub',
+                'sort_order' => max(0, (int) ($row['sort_order'] ?? (($index + 1) * 10))),
+            ];
+        }
+
+        usort($rows, fn (array $a, array $b): int => ($a['sort_order'] <=> $b['sort_order']) ?: strcmp($a['item_id'], $b['item_id']));
+
+        $this->attributes['cost_items'] = json_encode(array_values($rows), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
 }

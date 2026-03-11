@@ -4,9 +4,11 @@ namespace App\Filament\Pages;
 
 use App\Models\Item;
 use App\Services\BattleDefaultsService;
+use App\Support\AdminOptions;
 use Filament\Actions\Action;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -33,7 +35,7 @@ class BattleDefaultsPage extends Page implements HasForms
 
     protected static ?int $navigationSort = 99;
 
-    protected static ?string $navigationGroup = '配置管理';
+    protected static ?string $navigationGroup = '系统配置';
 
     protected static string $view = 'filament.pages.battle-defaults-page';
 
@@ -54,352 +56,318 @@ class BattleDefaultsPage extends Page implements HasForms
                     ->tabs([
                         Tab::make('阈值')
                             ->schema([
-                                TextInput::make('spawn_rules.elite_every_kills')
-                                    ->label('精英触发击杀数')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1),
-                                TextInput::make('spawn_rules.boss_every_kills')
-                                    ->label('Boss触发击杀数')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(1),
-                            ])->columns(2),
+                                Section::make('刷怪阈值')
+                                    ->description('控制普通击杀累计到多少后刷出精英和 Boss。')
+                                    ->schema([
+                                        TextInput::make('spawn_rules.elite_every_kills')
+                                            ->label('精英触发击杀数')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->helperText('建议保持中等频率，避免战斗节奏过慢。'),
+                                        TextInput::make('spawn_rules.boss_every_kills')
+                                            ->label('Boss触发击杀数')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->helperText('数值越高，Boss 出现越晚。'),
+                                    ])
+                                    ->columns(2),
+                            ]),
 
                         Tab::make('普通掉落')
                             ->schema([
-                                TextInput::make('drops.drop_chance')
-                                    ->label('基础掉落概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                TextInput::make('drops.rarity_weights.white')
-                                    ->label('白色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('drops.rarity_weights.blue')
-                                    ->label('蓝色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('drops.rarity_weights.gold')
-                                    ->label('金色权重')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                MultiSelect::make('drops.items_by_rarity.white')
-                                    ->label('白色掉落池')
-                                    ->options(fn (): array => $this->itemOptions())
-                                    ->required()
-                                    ->minItems(1),
-                                MultiSelect::make('drops.items_by_rarity.blue')
-                                    ->label('蓝色掉落池')
-                                    ->options(fn (): array => $this->itemOptions()),
-                                MultiSelect::make('drops.items_by_rarity.gold')
-                                    ->label('金色掉落池')
-                                    ->options(fn (): array => $this->itemOptions()),
-                            ])->columns(2),
+                                Section::make('基础概率')
+                                    ->description('统一配置普通掉落的基础概率和稀有度权重。')
+                                    ->schema([
+                                        TextInput::make('drops.drop_chance')
+                                            ->label('基础掉落概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1)
+                                            ->helperText('填写 0~1 之间的小数。'),
+                                        TextInput::make('drops.rarity_weights.white')
+                                            ->label('白色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                        TextInput::make('drops.rarity_weights.blue')
+                                            ->label('蓝色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                        TextInput::make('drops.rarity_weights.gold')
+                                            ->label('金色权重')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                    ])
+                                    ->columns(4),
+                                Section::make('按稀有度掉落池')
+                                    ->description('掉落池统一用可搜索多选录入，不允许手输物品 ID。')
+                                    ->schema([
+                                        MultiSelect::make('drops.items_by_rarity.white')
+                                            ->label('白色掉落池')
+                                            ->options(fn (): array => $this->itemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->minItems(1),
+                                        MultiSelect::make('drops.items_by_rarity.blue')
+                                            ->label('蓝色掉落池')
+                                            ->options(fn (): array => $this->itemOptions())
+                                            ->searchable()
+                                            ->preload(),
+                                        MultiSelect::make('drops.items_by_rarity.gold')
+                                            ->label('金色掉落池')
+                                            ->options(fn (): array => $this->itemOptions())
+                                            ->searchable()
+                                            ->preload(),
+                                    ])
+                                    ->columns(1),
+                            ]),
 
                         Tab::make('特殊掉落')
                             ->schema([
-                                TextInput::make('special_drops.normal.extra_gem_chance')
-                                    ->label('普通怪额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                MultiSelect::make('special_drops.normal.extra_gems')
-                                    ->label('普通怪额外宝石池')
-                                    ->options(fn (): array => $this->gemOptions()),
-
-                                TextInput::make('special_drops.elite.punch_stone_chance')
-                                    ->label('精英打孔石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                TextInput::make('special_drops.elite.extra_gem_chance')
-                                    ->label('精英额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                MultiSelect::make('special_drops.elite.extra_gems')
-                                    ->label('精英额外宝石池')
-                                    ->options(fn (): array => $this->gemOptions()),
-
-                                TextInput::make('special_drops.boss.punch_stone_chance')
-                                    ->label('Boss打孔石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                TextInput::make('special_drops.boss.extra_gem_chance')
-                                    ->label('Boss额外宝石概率')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                MultiSelect::make('special_drops.boss.extra_gems')
-                                    ->label('Boss额外宝石池')
-                                    ->options(fn (): array => $this->gemOptions()),
-                                Select::make('special_drops.boss.core_guarantee')
-                                    ->label('Boss保底核心')
-                                    ->options(fn (): array => $this->gemOptions())
-                                    ->required()
-                                    ->default('妖王核心'),
-                            ])->columns(2),
+                                Section::make('普通怪特殊掉落')
+                                    ->schema([
+                                        TextInput::make('special_drops.normal.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                        MultiSelect::make('special_drops.normal.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => $this->gemOptions())
+                                            ->searchable()
+                                            ->preload(),
+                                    ])
+                                    ->columns(2),
+                                Section::make('精英怪特殊掉落')
+                                    ->schema([
+                                        TextInput::make('special_drops.elite.punch_stone_chance')
+                                            ->label('打孔石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                        TextInput::make('special_drops.elite.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                        MultiSelect::make('special_drops.elite.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => $this->gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+                                Section::make('Boss 特殊掉落')
+                                    ->schema([
+                                        Select::make('special_drops.boss.core_guarantee')
+                                            ->label('Boss 保底核心')
+                                            ->options(fn (): array => $this->gemOptions())
+                                            ->searchable()
+                                            ->required()
+                                            ->default('妖王核心'),
+                                        TextInput::make('special_drops.boss.punch_stone_chance')
+                                            ->label('打孔石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                        TextInput::make('special_drops.boss.extra_gem_chance')
+                                            ->label('额外宝石概率')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                        MultiSelect::make('special_drops.boss.extra_gems')
+                                            ->label('宝石池')
+                                            ->options(fn (): array => $this->gemOptions())
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(3),
+                            ]),
 
                         Tab::make('回血')
                             ->schema([
-                                TextInput::make('player_regen.regen_delay')
-                                    ->label('受击后回血延迟（秒）')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(10),
-                                TextInput::make('player_regen.regen_base')
-                                    ->label('基础回血速率（每秒）')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(10),
-                                TextInput::make('player_regen.regen_per_physique')
-                                    ->label('每体魄加成回血')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->maxValue(1),
-                                TextInput::make('player_regen.heal_on_kill.normal')
-                                    ->label('击杀普通回血')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('player_regen.heal_on_kill.elite')
-                                    ->label('击杀精英回血')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('player_regen.heal_on_kill.boss')
-                                    ->label('击杀Boss回血')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                            ])->columns(2),
+                                Section::make('基础回血规则')
+                                    ->schema([
+                                        TextInput::make('player_regen.regen_delay')
+                                            ->label('受击后回血延迟（秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(10),
+                                        TextInput::make('player_regen.regen_base')
+                                            ->label('基础回血速率（每秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(10),
+                                        TextInput::make('player_regen.regen_per_physique')
+                                            ->label('每体魄加成回血')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                    ])
+                                    ->columns(3),
+                                Section::make('击杀回血')
+                                    ->schema([
+                                        TextInput::make('player_regen.heal_on_kill.normal')
+                                            ->label('击杀普通怪回血')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                        TextInput::make('player_regen.heal_on_kill.elite')
+                                            ->label('击杀精英回血')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                        TextInput::make('player_regen.heal_on_kill.boss')
+                                            ->label('击杀 Boss 回血')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0),
+                                    ])
+                                    ->columns(3),
+                            ]),
 
                         Tab::make('经济')
                             ->schema([
-                                TextInput::make('economy.identify_cost_by_rarity.white')
-                                    ->label('白装鉴定金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('economy.identify_cost_by_rarity.blue')
-                                    ->label('蓝装鉴定金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                TextInput::make('economy.identify_cost_by_rarity.gold')
-                                    ->label('金装鉴定金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-
-                                TextInput::make('economy.refine_cost_by_rarity.white.gold')
-                                    ->label('白装进阶金币（每级）')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.refine_cost_by_rarity.white.items_rows')
-                                    ->label('白装进阶材料（每级）')
+                                Section::make('鉴定消耗')
+                                    ->description('不同品质装备的鉴定金币消耗。')
                                     ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
+                                        TextInput::make('economy.identify_cost_by_rarity.white')
+                                            ->label('白装鉴定金币')
                                             ->required()
                                             ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
-                                    ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-
-                                TextInput::make('economy.refine_cost_by_rarity.blue.gold')
-                                    ->label('蓝装进阶金币（每级）')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.refine_cost_by_rarity.blue.items_rows')
-                                    ->label('蓝装进阶材料（每级）')
-                                    ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
+                                            ->minValue(0),
+                                        TextInput::make('economy.identify_cost_by_rarity.blue')
+                                            ->label('蓝装鉴定金币')
                                             ->required()
                                             ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
-                                    ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-
-                                TextInput::make('economy.refine_cost_by_rarity.gold.gold')
-                                    ->label('金装进阶金币（每级）')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.refine_cost_by_rarity.gold.items_rows')
-                                    ->label('金装进阶材料（每级）')
-                                    ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
+                                            ->minValue(0),
+                                        TextInput::make('economy.identify_cost_by_rarity.gold')
+                                            ->label('金装鉴定金币')
                                             ->required()
                                             ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
+                                            ->minValue(0),
                                     ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-
-                                TextInput::make('economy.salvage_reward_by_rarity.white.gold')
-                                    ->label('白装分解金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.salvage_reward_by_rarity.white.items_rows')
-                                    ->label('白装分解材料')
+                                    ->columns(3),
+                                Section::make('进阶消耗（每级）')
+                                    ->description('金币放在同一行展示，各品质材料独占整行，便于策划长期维护。')
                                     ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
-                                            ->required()
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
+                                        TextInput::make('economy.refine_cost_by_rarity.white.gold')->label('白装进阶金币')->required()->integer()->minValue(0),
+                                        TextInput::make('economy.refine_cost_by_rarity.blue.gold')->label('蓝装进阶金币')->required()->integer()->minValue(0),
+                                        TextInput::make('economy.refine_cost_by_rarity.gold.gold')->label('金装进阶金币')->required()->integer()->minValue(0),
+                                        $this->compactItemRepeater('economy.refine_cost_by_rarity.white.items_rows', '白装进阶材料'),
+                                        $this->compactItemRepeater('economy.refine_cost_by_rarity.blue.items_rows', '蓝装进阶材料'),
+                                        $this->compactItemRepeater('economy.refine_cost_by_rarity.gold.items_rows', '金装进阶材料'),
                                     ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-
-                                TextInput::make('economy.salvage_reward_by_rarity.blue.gold')
-                                    ->label('蓝装分解金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.salvage_reward_by_rarity.blue.items_rows')
-                                    ->label('蓝装分解材料')
+                                    ->columns(3),
+                                Section::make('分解奖励')
+                                    ->description('分解金币按品质横向显示，材料使用紧凑 Repeater。')
                                     ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
-                                            ->required()
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
+                                        TextInput::make('economy.salvage_reward_by_rarity.white.gold')->label('白装分解金币')->required()->integer()->minValue(0),
+                                        TextInput::make('economy.salvage_reward_by_rarity.blue.gold')->label('蓝装分解金币')->required()->integer()->minValue(0),
+                                        TextInput::make('economy.salvage_reward_by_rarity.gold.gold')->label('金装分解金币')->required()->integer()->minValue(0),
+                                        $this->compactItemRepeater('economy.salvage_reward_by_rarity.white.items_rows', '白装分解材料'),
+                                        $this->compactItemRepeater('economy.salvage_reward_by_rarity.blue.items_rows', '蓝装分解材料'),
+                                        $this->compactItemRepeater('economy.salvage_reward_by_rarity.gold.items_rows', '金装分解材料'),
                                     ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-
-                                TextInput::make('economy.salvage_reward_by_rarity.gold.gold')
-                                    ->label('金装分解金币')
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Repeater::make('economy.salvage_reward_by_rarity.gold.items_rows')
-                                    ->label('金装分解材料')
-                                    ->schema([
-                                        Select::make('item_id')
-                                            ->label('物品')
-                                            ->options(fn (): array => $this->itemOptions())
-                                            ->searchable()
-                                            ->required(),
-                                        TextInput::make('count')
-                                            ->label('数量')
-                                            ->required()
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
-                                    ])
-                                    ->columns(2)
-                                    ->defaultItems(0)
-                                    ->collapsible(),
-                            ])->columns(3),
+                                    ->columns(3),
+                            ]),
 
                         Tab::make('词条池（进阶）')
                             ->schema([
-                                Repeater::make('refine_effect_pool')
-                                    ->label('进阶新增词条池')
-                                    ->required()
-                                    ->minItems(1)
-                                    ->defaultItems(1)
+                                Section::make('进阶新增词条池')
+                                    ->description('统一维护每次进阶可能新增的词条，不允许自由输入属性键。')
                                     ->schema([
-                                        TextInput::make('w')
-                                            ->label('权重')
+                                        Repeater::make('refine_effect_pool')
+                                            ->label('词条池')
                                             ->required()
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->default(0),
-                                        Select::make('type')
-                                            ->label('类型')
-                                            ->required()
-                                            ->options([
-                                                'stat' => '属性',
-                                                'skill_level' => '技能等级',
+                                            ->minItems(1)
+                                            ->defaultItems(1)
+                                            ->schema([
+                                                TextInput::make('w')
+                                                    ->label('权重')
+                                                    ->required()
+                                                    ->integer()
+                                                    ->minValue(0)
+                                                    ->default(0),
+                                                Select::make('type')
+                                                    ->label('类型')
+                                                    ->required()
+                                                    ->options([
+                                                        'stat' => '属性',
+                                                        'skill_level' => '技能等级',
+                                                    ])
+                                                    ->default('stat'),
+                                                Select::make('stat')
+                                                    ->label('属性')
+                                                    ->options(fn (): array => $this->statOptions())
+                                                    ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat')
+                                                    ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'stat')
+                                                    ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat'),
+                                                Select::make('skill_id')
+                                                    ->label('技能')
+                                                    ->options(fn (): array => $this->skillOptions())
+                                                    ->searchable()
+                                                    ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level')
+                                                    ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'skill_level')
+                                                    ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level'),
+                                                TextInput::make('val')
+                                                    ->label('数值')
+                                                    ->required()
+                                                    ->integer()
+                                                    ->minValue(0)
+                                                    ->default(1),
                                             ])
-                                            ->default('stat'),
-                                        Select::make('stat')
-                                            ->label('属性')
-                                            ->options(fn (): array => $this->statOptions())
-                                            ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat')
-                                            ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'stat')
-                                            ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat'),
-                                        Select::make('skill_id')
-                                            ->label('技能')
-                                            ->options(fn (): array => $this->skillOptions())
-                                            ->searchable()
-                                            ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level')
-                                            ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'skill_level')
-                                            ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level'),
-                                        TextInput::make('val')
-                                            ->label('数值')
-                                            ->required()
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->default(1),
-                                    ])
-                                    ->columns(3)
-                                    ->collapsible(),
+                                            ->columns(4)
+                                            ->collapsible()
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
                     ]),
             ])
             ->statePath('data');
+    }
+
+    private function compactItemRepeater(string $path, string $label): Repeater
+    {
+        return Repeater::make($path)
+            ->label($label)
+            ->defaultItems(0)
+            ->addActionLabel('添加材料')
+            ->collapsible()
+            ->columnSpanFull()
+            ->schema([
+                Select::make('item_id')
+                    ->label('物品')
+                    ->options(fn (): array => $this->itemOptions())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpan(4),
+                TextInput::make('count')
+                    ->label('数量')
+                    ->required()
+                    ->integer()
+                    ->minValue(0)
+                    ->default(1)
+                    ->columnSpan(2),
+            ])
+            ->columns(6);
     }
 
     protected function getHeaderActions(): array

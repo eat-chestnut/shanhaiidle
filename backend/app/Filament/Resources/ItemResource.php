@@ -4,11 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ItemResource\Pages;
 use App\Models\Item;
+use App\Support\AdminOptions;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\MultiSelect;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -32,170 +35,88 @@ class ItemResource extends Resource
 
     protected static ?string $modelLabel = '物品';
 
-    protected static ?string $navigationGroup = '装备成长配置';
+    protected static ?string $navigationGroup = '基础配置';
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Tabs::make('ItemTabs')
-                    ->persistTabInQueryString()
-                    ->tabs([
-                        Tab::make('基础')
-                            ->schema([
-                                TextInput::make('id')
-                                    ->label('物品ID')
-                                    ->required()
-                                    ->maxLength(64)
-                                    ->unique(ignoreRecord: true)
-                                    ->disabled(fn (?Item $record): bool => $record !== null),
-                                TextInput::make('name')
-                                    ->label('名称')
-                                    ->required()
-                                    ->maxLength(255),
-                                Select::make('type')
-                                    ->label('类型')
-                                    ->options(static::typeOptions())
-                                    ->required()
-                                    ->default('material'),
-                                TextInput::make('sub_type')
-                                    ->label('子类型')
-                                    ->maxLength(64)
-                                    ->helperText('例如：forge_base / equipment_blueprint / skill_gem 等'),
-                                TextInput::make('material_type')
-                                    ->label('材料大类')
-                                    ->maxLength(64)
-                                    ->helperText('craft / blueprint / boss / star / refine / gem / currency'),
-                                Select::make('rarity')
-                                    ->label('稀有度')
-                                    ->options(static::rarityOptions())
-                                    ->required()
-                                    ->default('white'),
-                                TextInput::make('icon')
-                                    ->label('图标路径')
-                                    ->maxLength(255),
-                                TextInput::make('stack_limit')
-                                    ->label('堆叠上限')
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(9999)
-                                    ->required(),
-                                TextInput::make('drop_unlock_level')
-                                    ->label('掉落开放等级')
-                                    ->integer()
-                                    ->minValue(1)
-                                    ->default(1)
-                                    ->required(),
-                                TagsInput::make('source_tags')
-                                    ->label('来源标签')
-                                    ->placeholder('输入后回车'),
-                                TagsInput::make('use_tags')
-                                    ->label('用途标签')
-                                    ->placeholder('输入后回车'),
-                                Textarea::make('desc')
-                                    ->label('描述')
-                                    ->rows(3)
-                                    ->columnSpanFull(),
-                                Textarea::make('trait')
-                                    ->label('特性备注')
-                                    ->rows(2)
-                                    ->columnSpanFull(),
-                            ])->columns(2),
-                        Tab::make('效果与规则')
-                            ->schema([
-                                Select::make('gem_effect.stat')
-                                    ->label('宝石属性')
-                                    ->options(static::statOptions())
-                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
-                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
-                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
-                                TextInput::make('gem_effect.val')
-                                    ->label('宝石数值')
-                                    ->integer()
-                                    ->required(fn (Get $get): bool => $get('type') === 'gem')
-                                    ->hidden(fn (Get $get): bool => $get('type') !== 'gem')
-                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
-                                Select::make('effect_type')
-                                    ->label('效果类型')
-                                    ->options([
-                                        'stat' => '属性',
-                                        'skill_modifier' => '技能修饰',
-                                    ])
-                                    ->nullable(),
-                                TextInput::make('target_scope')
-                                    ->label('目标范围')
-                                    ->maxLength(64)
-                                    ->helperText('global / sect / flow / skill_id'),
-                                KeyValue::make('effect_payload')
-                                    ->label('效果负载(JSON)')
-                                    ->keyLabel('键')
-                                    ->valueLabel('值')
-                                    ->columnSpanFull(),
-                                TagsInput::make('socket_limit')
-                                    ->label('可镶嵌孔位限制')
-                                    ->placeholder('例如 1,2 或 attr,skill')
-                                    ->helperText('用于宝石：第1/2孔属性，第3/4孔技能'),
-                                Toggle::make('can_compose')
-                                    ->label('可合成')
-                                    ->default(false),
-                                Toggle::make('can_reforge')
-                                    ->label('可洗炼')
-                                    ->default(false),
-                            ])->columns(2),
-                        Tab::make('状态')
-                            ->schema([
-                                Toggle::make('is_enabled')
-                                    ->label('启用')
-                                    ->default(true),
-                                TextInput::make('sort_order')
-                                    ->label('排序')
-                                    ->integer()
-                                    ->minValue(0)
-                                    ->required()
-                                    ->default(0),
-                            ])->columns(2),
-                    ]),
-            ]);
+        return $form->schema([
+            Tabs::make('ItemTabs')
+                ->persistTabInQueryString()
+                ->tabs([
+                    Tab::make('基础信息')
+                        ->schema([
+                            Section::make('基础字段')
+                                ->schema([
+                                    TextInput::make('id')->label('物品 ID')->required()->maxLength(64)->unique(ignoreRecord: true)->disabled(fn (?Item $record): bool => $record !== null),
+                                    TextInput::make('name')->label('名称')->required()->maxLength(255),
+                                    Select::make('type')->label('类型')->options(AdminOptions::itemTypeOptions())->required()->default('material'),
+                                    Select::make('material_type')->label('材料大类')->options(AdminOptions::materialTypeOptions())->searchable()->nullable()->helperText('仅材料类物品需要填写。'),
+                                    TextInput::make('sub_type')->label('子类型')->maxLength(64)->helperText('如 forge_base / equipment_blueprint / skill_gem。'),
+                                    Select::make('rarity')->label('稀有度')->options(AdminOptions::rarityOptions())->required()->default('white'),
+                                    FileUpload::make('icon')->label('图标')->disk('public')->directory('config/item-icons')->image()->imagePreviewHeight('120'),
+                                    TextInput::make('stack_limit')->label('堆叠上限')->integer()->minValue(1)->default(9999)->required(),
+                                    TextInput::make('drop_unlock_level')->label('掉落开放等级')->integer()->minValue(1)->default(1)->required(),
+                                    MultiSelect::make('source_tags')->label('来源标签')->options(AdminOptions::materialTypeOptions())->searchable()->preload()->helperText('用于运维快速标记来源大类。'),
+                                    MultiSelect::make('use_tags')->label('用途标签')->options(AdminOptions::materialTypeOptions())->searchable()->preload(),
+                                    Textarea::make('desc')->label('描述')->rows(3)->columnSpanFull(),
+                                    Textarea::make('trait')->label('特性备注')->rows(2)->columnSpanFull(),
+                                ])
+                                ->columns(3),
+                        ]),
+                    Tab::make('效果与规则')
+                        ->schema([
+                            Section::make('宝石/效果字段')
+                                ->description('仅宝石或特殊道具使用，下方字段没有需求时可留空。')
+                                ->schema([
+                                    Select::make('gem_effect.stat')->label('宝石属性')->options(AdminOptions::statOptions())->required(fn (Get $get): bool => $get('type') === 'gem')->hidden(fn (Get $get): bool => $get('type') !== 'gem')->dehydrated(fn (Get $get): bool => $get('type') === 'gem')->searchable(),
+                                    TextInput::make('gem_effect.val')->label('宝石数值')->integer()->required(fn (Get $get): bool => $get('type') === 'gem')->hidden(fn (Get $get): bool => $get('type') !== 'gem')->dehydrated(fn (Get $get): bool => $get('type') === 'gem'),
+                                    Select::make('effect_type')->label('效果类型')->options(AdminOptions::gemEffectTypeOptions())->nullable(),
+                                    Select::make('target_scope')->label('目标范围')->options(AdminOptions::gemTargetScopeOptions())->nullable(),
+                                    KeyValue::make('effect_payload')->label('效果负载')->keyLabel('键')->valueLabel('值')->columnSpanFull(),
+                                    MultiSelect::make('socket_limit')->label('孔位限制')->options([
+                                        '1' => '第1孔',
+                                        '2' => '第2孔',
+                                        '3' => '第3孔',
+                                        '4' => '第4孔',
+                                        'attr' => '属性孔',
+                                        'skill' => '技能孔',
+                                    ])->searchable()->preload()->columnSpanFull(),
+                                    Toggle::make('can_compose')->label('可合成')->default(false),
+                                    Toggle::make('can_reforge')->label('可洗炼')->default(false),
+                                ])
+                                ->columns(3),
+                        ]),
+                    Tab::make('状态')
+                        ->schema([
+                            Section::make('启用与排序')
+                                ->schema([
+                                    Toggle::make('is_enabled')->label('启用')->default(true),
+                                    TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
+                                ])
+                                ->columns(2),
+                        ]),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('物品ID')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('name')
-                    ->label('名称')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('type')
-                    ->label('类型')
-                    ->formatStateUsing(fn (string $state): string => static::typeOptions()[$state] ?? $state)
-                    ->sortable(),
-                TextColumn::make('sub_type')
-                    ->label('子类型')
-                    ->toggleable(),
-                TextColumn::make('rarity')
-                    ->label('稀有度')
-                    ->formatStateUsing(fn (string $state): string => static::rarityOptions()[$state] ?? $state)
-                    ->sortable(),
-                ToggleColumn::make('is_enabled')
-                    ->label('启用')
-                    ->sortable(),
-                TextColumn::make('sort_order')
-                    ->label('排序')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('id')->label('物品 ID')->searchable()->sortable(),
+                TextColumn::make('name')->label('名称')->searchable()->sortable(),
+                TextColumn::make('type')->label('类型')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::itemTypeOptions(), $state))->sortable(),
+                TextColumn::make('material_type')->label('材料大类')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::materialTypeOptions(), $state))->toggleable(),
+                TextColumn::make('sub_type')->label('子类型')->toggleable(),
+                TextColumn::make('rarity')->label('稀有度')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::rarityOptions(), $state))->sortable(),
+                ToggleColumn::make('is_enabled')->label('启用')->sortable(),
+                TextColumn::make('sort_order')->label('排序')->numeric()->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->label('类型')
-                    ->options(static::typeOptions()),
-                Tables\Filters\SelectFilter::make('rarity')
-                    ->label('稀有度')
-                    ->options(static::rarityOptions()),
+                Tables\Filters\SelectFilter::make('type')->label('类型')->options(AdminOptions::itemTypeOptions()),
+                Tables\Filters\SelectFilter::make('material_type')->label('材料大类')->options(AdminOptions::materialTypeOptions()),
+                Tables\Filters\SelectFilter::make('rarity')->label('稀有度')->options(AdminOptions::rarityOptions()),
+                Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -219,43 +140,6 @@ class ItemResource extends Resource
             'index' => Pages\ListItems::route('/'),
             'create' => Pages\CreateItem::route('/create'),
             'edit' => Pages\EditItem::route('/{record}/edit'),
-        ];
-    }
-
-    public static function typeOptions(): array
-    {
-        return [
-            'material' => '材料',
-            'item' => '道具',
-            'gem' => '宝石',
-            'blueprint' => '图纸',
-            'blueprint_fragment' => '图纸碎片',
-            'currency' => '货币',
-        ];
-    }
-
-    public static function rarityOptions(): array
-    {
-        return [
-            'white' => '白',
-            'blue' => '蓝',
-            'purple' => '紫',
-            'gold' => '金',
-            'orange' => '橙',
-        ];
-    }
-
-    public static function statOptions(): array
-    {
-        return [
-            'HP' => '生命',
-            'ATK' => '攻击',
-            'DEF' => '防御',
-            'QI' => '气',
-            'CRIT_PERCENT' => '暴击',
-            'LOOT_BONUS_PERCENT' => '掉落',
-            'WD' => '物伤',
-            'SP' => '术伤',
         ];
     }
 }

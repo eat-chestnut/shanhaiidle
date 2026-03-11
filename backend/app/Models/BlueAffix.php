@@ -20,6 +20,7 @@ class BlueAffix extends Model
         'weight',
         'unlock_level',
         'sort_order',
+        'notes',
         'is_enabled',
     ];
 

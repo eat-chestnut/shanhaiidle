@@ -158,15 +158,15 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "升星"
 
+[node name="BtnRankUp" type="Button" parent="Panel/VBox/ActionBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "升阶"
+
 [node name="BtnGem" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "宝石"
-
-[node name="BtnPunch" type="Button" parent="Panel/VBox/ActionBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "打孔"
 
 [node name="BtnCancel" type="Button" parent="Panel/VBox/ActionBar"]
 layout_mode = 2
