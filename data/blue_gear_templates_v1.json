@@ -1,67 +1,1770 @@
 {
     "meta": {
         "key": "blue_gear_templates",
-        "version": 6,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "2c75fc38cf408648716ce653f3e834687784c926b3964b447af7d8fca4e251a3"
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:41",
+        "sha256": "d9df9aeac6b73fc2dd5e2335dda407ab430d3e5cb08994d9eecc1c5ec01c8612"
     },
     "blue_gear_templates": [
         {
-            "id": "blue_main_weapon_nanshan_01",
-            "name": "南山试炼主武",
-            "blue_pool_id": "pool_nanshan_t1",
+            "id": "blue_main_weapon_1",
+            "name": "1级蓝装主武器",
+            "blue_pool_id": "pool_blue_1",
             "slot_id": "main_weapon",
-            "flow_tag": "berserk",
-            "required_level": 20,
+            "required_level": 1,
             "white_stats": {
-                "ATK": 18,
-                "HP": 22
+                "ATK": 6,
+                "HP": 6
             },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
             "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv1",
+                    "weight": 30
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv1",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv1",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv1",
+                    "weight": 26
+                }
+            ],
             "affix_pool_tags": [
-                "atk",
-                "crit"
+                "stage_1",
+                "slot_main_weapon"
             ],
             "icon": "",
             "sort_order": 10
         },
         {
-            "id": "blue_armor_nanshan_01",
-            "name": "南山试炼盔甲",
-            "blue_pool_id": "pool_nanshan_t1",
-            "slot_id": "armor",
-            "flow_tag": "guard",
-            "required_level": 20,
+            "id": "blue_off_weapon_1",
+            "name": "1级蓝装副武器",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "off_weapon",
+            "required_level": 1,
             "white_stats": {
-                "DEF": 11,
-                "HP": 52
+                "ATK": 4,
+                "DEF": 1
             },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
             "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv1",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv1",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_cdr_lv1",
+                    "weight": 18
+                }
+            ],
             "affix_pool_tags": [
-                "def",
-                "hp"
+                "stage_1",
+                "slot_off_weapon"
             ],
             "icon": "",
             "sort_order": 20
         },
         {
-            "id": "blue_necklace_qingqiu_01",
-            "name": "青丘试炼项链",
-            "blue_pool_id": "pool_qingqiu_t2",
-            "slot_id": "necklace",
-            "flow_tag": "frost",
-            "required_level": 40,
+            "id": "blue_armor_1",
+            "name": "1级蓝装盔甲",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "armor",
+            "required_level": 1,
             "white_stats": {
-                "HP": 66,
-                "ATK": 6
+                "DEF": 4,
+                "HP": 24
             },
-            "affix_count": 2,
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv1",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_def_flat_lv1",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_pdef_lv1",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_mdef_lv1",
+                    "weight": 20
+                }
+            ],
             "affix_pool_tags": [
-                "hp",
-                "loot"
+                "stage_1",
+                "slot_armor"
             ],
             "icon": "",
             "sort_order": 30
+        },
+        {
+            "id": "blue_belt_1",
+            "name": "1级蓝装腰带",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "belt",
+            "required_level": 1,
+            "white_stats": {
+                "HP": 20,
+                "DEF": 2
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv1",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_dodge_lv1",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_pdef_lv1",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv1",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_1",
+                "slot_belt"
+            ],
+            "icon": "",
+            "sort_order": 40
+        },
+        {
+            "id": "blue_shoes_1",
+            "name": "1级蓝装鞋子",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "shoes",
+            "required_level": 1,
+            "white_stats": {
+                "DEF": 3,
+                "DODGE": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv1",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_def_flat_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv1",
+                    "weight": 26
+                },
+                {
+                    "affix_id": "blue_pdef_lv1",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_1",
+                "slot_shoes"
+            ],
+            "icon": "",
+            "sort_order": 50
+        },
+        {
+            "id": "blue_gloves_1",
+            "name": "1级蓝装护手",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "gloves",
+            "required_level": 1,
+            "white_stats": {
+                "ATK": 3,
+                "CRIT_PERCENT": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv1",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv1",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_1",
+                "slot_gloves"
+            ],
+            "icon": "",
+            "sort_order": 60
+        },
+        {
+            "id": "blue_helm_1",
+            "name": "1级蓝装头盔",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "helm",
+            "required_level": 1,
+            "white_stats": {
+                "DEF": 4,
+                "HP": 18
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv1",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_def_flat_lv1",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_pdef_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_mdef_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_cdr_lv1",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_1",
+                "slot_helm"
+            ],
+            "icon": "",
+            "sort_order": 70
+        },
+        {
+            "id": "blue_necklace_1",
+            "name": "1级蓝装项链",
+            "blue_pool_id": "pool_blue_1",
+            "slot_id": "necklace",
+            "required_level": 1,
+            "white_stats": {
+                "HP": 12,
+                "ATK": 2
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv1",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_hp_flat_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv1",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv1",
+                    "weight": 16
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv1",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv1",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv1",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_cdr_lv1",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_1",
+                "slot_necklace"
+            ],
+            "icon": "",
+            "sort_order": 80
+        },
+        {
+            "id": "blue_main_weapon_5",
+            "name": "5级蓝装主武器",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "main_weapon",
+            "required_level": 5,
+            "white_stats": {
+                "ATK": 10,
+                "HP": 10
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv5",
+                    "weight": 30
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv5",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv5",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv5",
+                    "weight": 26
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_main_weapon"
+            ],
+            "icon": "",
+            "sort_order": 90
+        },
+        {
+            "id": "blue_off_weapon_5",
+            "name": "5级蓝装副武器",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "off_weapon",
+            "required_level": 5,
+            "white_stats": {
+                "ATK": 7,
+                "DEF": 2
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv5",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv5",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_cdr_lv5",
+                    "weight": 18
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_off_weapon"
+            ],
+            "icon": "",
+            "sort_order": 100
+        },
+        {
+            "id": "blue_armor_5",
+            "name": "5级蓝装盔甲",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "armor",
+            "required_level": 5,
+            "white_stats": {
+                "DEF": 7,
+                "HP": 40
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv5",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_def_flat_lv5",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_pdef_lv5",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_mdef_lv5",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_armor"
+            ],
+            "icon": "",
+            "sort_order": 110
+        },
+        {
+            "id": "blue_belt_5",
+            "name": "5级蓝装腰带",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "belt",
+            "required_level": 5,
+            "white_stats": {
+                "HP": 32,
+                "DEF": 3
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv5",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_dodge_lv5",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_pdef_lv5",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv5",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_belt"
+            ],
+            "icon": "",
+            "sort_order": 120
+        },
+        {
+            "id": "blue_shoes_5",
+            "name": "5级蓝装鞋子",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "shoes",
+            "required_level": 5,
+            "white_stats": {
+                "DEF": 6,
+                "DODGE": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv5",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_def_flat_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv5",
+                    "weight": 26
+                },
+                {
+                    "affix_id": "blue_pdef_lv5",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_shoes"
+            ],
+            "icon": "",
+            "sort_order": 130
+        },
+        {
+            "id": "blue_gloves_5",
+            "name": "5级蓝装护手",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "gloves",
+            "required_level": 5,
+            "white_stats": {
+                "ATK": 5,
+                "CRIT_PERCENT": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv5",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv5",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_gloves"
+            ],
+            "icon": "",
+            "sort_order": 140
+        },
+        {
+            "id": "blue_helm_5",
+            "name": "5级蓝装头盔",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "helm",
+            "required_level": 5,
+            "white_stats": {
+                "DEF": 7,
+                "HP": 30
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv5",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_def_flat_lv5",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_pdef_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_mdef_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_cdr_lv5",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_helm"
+            ],
+            "icon": "",
+            "sort_order": 150
+        },
+        {
+            "id": "blue_necklace_5",
+            "name": "5级蓝装项链",
+            "blue_pool_id": "pool_blue_5",
+            "slot_id": "necklace",
+            "required_level": 5,
+            "white_stats": {
+                "HP": 22,
+                "ATK": 3
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv5",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_hp_flat_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv5",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv5",
+                    "weight": 16
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv5",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv5",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv5",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_cdr_lv5",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_5",
+                "slot_necklace"
+            ],
+            "icon": "",
+            "sort_order": 160
+        },
+        {
+            "id": "blue_main_weapon_10",
+            "name": "10级蓝装主武器",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "main_weapon",
+            "required_level": 10,
+            "white_stats": {
+                "ATK": 16,
+                "HP": 14
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv10",
+                    "weight": 30
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv10",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv10",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv10",
+                    "weight": 26
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_main_weapon"
+            ],
+            "icon": "",
+            "sort_order": 170
+        },
+        {
+            "id": "blue_off_weapon_10",
+            "name": "10级蓝装副武器",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "off_weapon",
+            "required_level": 10,
+            "white_stats": {
+                "ATK": 11,
+                "DEF": 3
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv10",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv10",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_cdr_lv10",
+                    "weight": 18
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_off_weapon"
+            ],
+            "icon": "",
+            "sort_order": 180
+        },
+        {
+            "id": "blue_armor_10",
+            "name": "10级蓝装盔甲",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "armor",
+            "required_level": 10,
+            "white_stats": {
+                "DEF": 10,
+                "HP": 58
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv10",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_def_flat_lv10",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_pdef_lv10",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_mdef_lv10",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_armor"
+            ],
+            "icon": "",
+            "sort_order": 190
+        },
+        {
+            "id": "blue_belt_10",
+            "name": "10级蓝装腰带",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "belt",
+            "required_level": 10,
+            "white_stats": {
+                "HP": 46,
+                "DEF": 5
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv10",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_dodge_lv10",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_pdef_lv10",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv10",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_belt"
+            ],
+            "icon": "",
+            "sort_order": 200
+        },
+        {
+            "id": "blue_shoes_10",
+            "name": "10级蓝装鞋子",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "shoes",
+            "required_level": 10,
+            "white_stats": {
+                "DEF": 9,
+                "DODGE": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv10",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_def_flat_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv10",
+                    "weight": 26
+                },
+                {
+                    "affix_id": "blue_pdef_lv10",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_shoes"
+            ],
+            "icon": "",
+            "sort_order": 210
+        },
+        {
+            "id": "blue_gloves_10",
+            "name": "10级蓝装护手",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "gloves",
+            "required_level": 10,
+            "white_stats": {
+                "ATK": 8,
+                "CRIT_PERCENT": 1
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv10",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv10",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_gloves"
+            ],
+            "icon": "",
+            "sort_order": 220
+        },
+        {
+            "id": "blue_helm_10",
+            "name": "10级蓝装头盔",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "helm",
+            "required_level": 10,
+            "white_stats": {
+                "DEF": 10,
+                "HP": 42
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv10",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_def_flat_lv10",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_pdef_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_mdef_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_cdr_lv10",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_helm"
+            ],
+            "icon": "",
+            "sort_order": 230
+        },
+        {
+            "id": "blue_necklace_10",
+            "name": "10级蓝装项链",
+            "blue_pool_id": "pool_blue_10",
+            "slot_id": "necklace",
+            "required_level": 10,
+            "white_stats": {
+                "HP": 34,
+                "ATK": 4
+            },
+            "min_affix_count": 1,
+            "max_affix_count": 1,
+            "affix_count": 1,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv10",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_hp_flat_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv10",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv10",
+                    "weight": 16
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv10",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv10",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv10",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_cdr_lv10",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_10",
+                "slot_necklace"
+            ],
+            "icon": "",
+            "sort_order": 240
+        },
+        {
+            "id": "blue_main_weapon_15",
+            "name": "15级蓝装主武器",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "main_weapon",
+            "required_level": 15,
+            "white_stats": {
+                "ATK": 22,
+                "HP": 18
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv15",
+                    "weight": 30
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv15",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv15",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv15",
+                    "weight": 26
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_main_weapon"
+            ],
+            "icon": "",
+            "sort_order": 250
+        },
+        {
+            "id": "blue_off_weapon_15",
+            "name": "15级蓝装副武器",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "off_weapon",
+            "required_level": 15,
+            "white_stats": {
+                "ATK": 15,
+                "DEF": 5
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv15",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv15",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_cdr_lv15",
+                    "weight": 18
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_off_weapon"
+            ],
+            "icon": "",
+            "sort_order": 260
+        },
+        {
+            "id": "blue_armor_15",
+            "name": "15级蓝装盔甲",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "armor",
+            "required_level": 15,
+            "white_stats": {
+                "DEF": 14,
+                "HP": 74
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv15",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_def_flat_lv15",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_pdef_lv15",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_mdef_lv15",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_armor"
+            ],
+            "icon": "",
+            "sort_order": 270
+        },
+        {
+            "id": "blue_belt_15",
+            "name": "15级蓝装腰带",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "belt",
+            "required_level": 15,
+            "white_stats": {
+                "HP": 60,
+                "DEF": 6
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv15",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_dodge_lv15",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_pdef_lv15",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv15",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_belt"
+            ],
+            "icon": "",
+            "sort_order": 280
+        },
+        {
+            "id": "blue_shoes_15",
+            "name": "15级蓝装鞋子",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "shoes",
+            "required_level": 15,
+            "white_stats": {
+                "DEF": 12,
+                "DODGE": 2
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv15",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_def_flat_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv15",
+                    "weight": 26
+                },
+                {
+                    "affix_id": "blue_pdef_lv15",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_shoes"
+            ],
+            "icon": "",
+            "sort_order": 290
+        },
+        {
+            "id": "blue_gloves_15",
+            "name": "15级蓝装护手",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "gloves",
+            "required_level": 15,
+            "white_stats": {
+                "ATK": 11,
+                "CRIT_PERCENT": 2
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv15",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv15",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_gloves"
+            ],
+            "icon": "",
+            "sort_order": 300
+        },
+        {
+            "id": "blue_helm_15",
+            "name": "15级蓝装头盔",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "helm",
+            "required_level": 15,
+            "white_stats": {
+                "DEF": 13,
+                "HP": 50
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv15",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_def_flat_lv15",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_pdef_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_mdef_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_cdr_lv15",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_helm"
+            ],
+            "icon": "",
+            "sort_order": 310
+        },
+        {
+            "id": "blue_necklace_15",
+            "name": "15级蓝装项链",
+            "blue_pool_id": "pool_blue_15",
+            "slot_id": "necklace",
+            "required_level": 15,
+            "white_stats": {
+                "HP": 44,
+                "ATK": 5
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv15",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_hp_flat_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv15",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv15",
+                    "weight": 16
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv15",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv15",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv15",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_cdr_lv15",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_15",
+                "slot_necklace"
+            ],
+            "icon": "",
+            "sort_order": 320
+        },
+        {
+            "id": "blue_main_weapon_20",
+            "name": "20级蓝装主武器",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "main_weapon",
+            "required_level": 20,
+            "white_stats": {
+                "ATK": 28,
+                "HP": 24
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv20",
+                    "weight": 30
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv20",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv20",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv20",
+                    "weight": 26
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_main_weapon"
+            ],
+            "icon": "",
+            "sort_order": 330
+        },
+        {
+            "id": "blue_off_weapon_20",
+            "name": "20级蓝装副武器",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "off_weapon",
+            "required_level": 20,
+            "white_stats": {
+                "ATK": 20,
+                "DEF": 6
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv20",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv20",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_cdr_lv20",
+                    "weight": 18
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_off_weapon"
+            ],
+            "icon": "",
+            "sort_order": 340
+        },
+        {
+            "id": "blue_armor_20",
+            "name": "20级蓝装盔甲",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "armor",
+            "required_level": 20,
+            "white_stats": {
+                "DEF": 18,
+                "HP": 90
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv20",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_def_flat_lv20",
+                    "weight": 28
+                },
+                {
+                    "affix_id": "blue_pdef_lv20",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_mdef_lv20",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_armor"
+            ],
+            "icon": "",
+            "sort_order": 350
+        },
+        {
+            "id": "blue_belt_20",
+            "name": "20级蓝装腰带",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "belt",
+            "required_level": 20,
+            "white_stats": {
+                "HP": 72,
+                "DEF": 8
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv20",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_def_flat_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_dodge_lv20",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_pdef_lv20",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv20",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_belt"
+            ],
+            "icon": "",
+            "sort_order": 360
+        },
+        {
+            "id": "blue_shoes_20",
+            "name": "20级蓝装鞋子",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "shoes",
+            "required_level": 20,
+            "white_stats": {
+                "DEF": 14,
+                "DODGE": 2
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv20",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_def_flat_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv20",
+                    "weight": 26
+                },
+                {
+                    "affix_id": "blue_pdef_lv20",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_shoes"
+            ],
+            "icon": "",
+            "sort_order": 370
+        },
+        {
+            "id": "blue_gloves_20",
+            "name": "20级蓝装护手",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "gloves",
+            "required_level": 20,
+            "white_stats": {
+                "ATK": 14,
+                "CRIT_PERCENT": 2
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv20",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_melee_atk_lv20",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_gloves"
+            ],
+            "icon": "",
+            "sort_order": 380
+        },
+        {
+            "id": "blue_helm_20",
+            "name": "20级蓝装头盔",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "helm",
+            "required_level": 20,
+            "white_stats": {
+                "DEF": 16,
+                "HP": 56
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_hp_flat_lv20",
+                    "weight": 22
+                },
+                {
+                    "affix_id": "blue_def_flat_lv20",
+                    "weight": 24
+                },
+                {
+                    "affix_id": "blue_pdef_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_mdef_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_cdr_lv20",
+                    "weight": 10
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_helm"
+            ],
+            "icon": "",
+            "sort_order": 390
+        },
+        {
+            "id": "blue_necklace_20",
+            "name": "20级蓝装项链",
+            "blue_pool_id": "pool_blue_20",
+            "slot_id": "necklace",
+            "required_level": 20,
+            "white_stats": {
+                "HP": 54,
+                "ATK": 6
+            },
+            "min_affix_count": 2,
+            "max_affix_count": 2,
+            "affix_count": 2,
+            "blue_affixes": [
+                {
+                    "affix_id": "blue_atk_flat_lv20",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_hp_flat_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_pct_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_crit_dmg_lv20",
+                    "weight": 20
+                },
+                {
+                    "affix_id": "blue_dodge_lv20",
+                    "weight": 16
+                },
+                {
+                    "affix_id": "blue_atk_speed_lv20",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_spell_atk_lv20",
+                    "weight": 18
+                },
+                {
+                    "affix_id": "blue_mdef_lv20",
+                    "weight": 10
+                },
+                {
+                    "affix_id": "blue_cdr_lv20",
+                    "weight": 20
+                }
+            ],
+            "affix_pool_tags": [
+                "stage_20",
+                "slot_necklace"
+            ],
+            "icon": "",
+            "sort_order": 400
         }
     ]
 }

@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="山海巡厄录"
-run/main_scene="res://ui/pages/PageBattle.tscn"
+config/client_api_header_name="X-Client-Token"
+config/client_api_token="dev-client-token"
+run/main_scene="res://ui/pages/PageMap.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
@@ -35,6 +37,7 @@ ForgeService="*res://autoload/ForgeService.gd"
 SkillModel="*res://autoload/SkillModel.gd"
 SkillNameService="*res://autoload/SkillNameService.gd"
 TaskService="*res://autoload/TaskService.gd"
+MountainGodService="*res://autoload/MountainGodService.gd"
 PerfTracker="*res://autoload/PerfTracker.gd"
 OfflineService="*res://autoload/OfflineService.gd"
 GrindModel="*res://autoload/GrindModel.gd"
@@ -45,6 +48,8 @@ DexHubService="*res://autoload/DexHubService.gd"
 MapNavTargetModel="*res://autoload/MapNavTargetModel.gd"
 DungeonDisplayService="*res://autoload/DungeonDisplayService.gd"
 EquipmentRankUpService="*res://autoload/EquipmentRankUpService.gd"
+ShopService="*res://autoload/ShopService.gd"
+PlayerProfileSyncService="*res://autoload/PlayerProfileSyncService.gd"
 DebugBootstrapService="*res://autoload/DebugBootstrapService.gd"
 
 [display]

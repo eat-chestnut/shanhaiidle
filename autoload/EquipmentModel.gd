@@ -5,6 +5,18 @@ const SAVE_PATH := "user://equipment.json"
 const MAX_SOCKETS := 4
 const REFINE_MAX := 5
 const STAR_MAX_DEFAULT := 10
+const BLUE_GEAR_STAGE_LEVELS := [1, 5, 10, 15, 20]
+const GEM_SKILL_TEMPLATE_DEFS := {
+	"damage_up": {"label": "技能伤害提升", "params": [{"key": "damage_multiplier", "label": "伤害倍率"}]},
+	"range_up": {"label": "技能范围提升", "params": [{"key": "range_multiplier", "label": "范围倍率"}]},
+	"crit_up": {"label": "技能暴击提升", "params": [{"key": "crit_rate_bonus", "label": "暴击加成"}]},
+	"shield_up": {"label": "护盾效果提升", "params": [{"key": "shield_multiplier", "label": "护盾倍率"}]},
+	"cooldown_down": {"label": "技能冷却缩减", "params": [{"key": "cooldown_reduction", "label": "冷却缩减"}]},
+	"duration_up": {"label": "技能持续时间提升", "params": [{"key": "duration_multiplier", "label": "持续时间倍率"}]},
+	"burn_up": {"label": "灼烧效果提升", "params": [{"key": "burn_multiplier", "label": "灼烧倍率"}]},
+	"slow_up": {"label": "减速效果提升", "params": [{"key": "slow_multiplier", "label": "减速倍率"}]},
+	"mana_cost_down": {"label": "技能消耗降低", "params": [{"key": "mana_cost_reduction", "label": "消耗降低"}]},
+}
 
 var next_uid: int = 1
 var bag: Array = []
@@ -61,7 +73,7 @@ func create_instance(template_id: String) -> Dictionary:
 		"main_val": main_val,
 		"tier": 0,
 		"set_id": str(template.get("set_id", "")),
-		"effects": [],
+		"effects": _roll_blue_effects_for_template(template) if _is_blue_template(template) else [],
 		"extra_effects": [],
 		"sockets": sockets,
 		"socket_gems": socket_gems,
@@ -86,6 +98,62 @@ func add_equip(template_id: String, source: String = "online") -> void:
 		PerfTracker.record_equip_gain(template_id, 1)
 	EventBus.notify_inventory_updated()
 	_request_save()
+
+func get_blue_stage_for_level(level: int) -> int:
+	var stage := 1
+	var current_level := maxi(1, level)
+	for stage_level in BLUE_GEAR_STAGE_LEVELS:
+		if current_level >= stage_level:
+			stage = stage_level
+	return stage
+
+func find_blue_template_for_slot(slot_id: String, level: int) -> Dictionary:
+	var wanted_slot := _normalize_template_slot(slot_id)
+	if wanted_slot.is_empty():
+		return {}
+	var stage_level := get_blue_stage_for_level(level)
+	for row_any in _blue_gear_templates_array():
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var row_slot := _normalize_template_slot(str(row.get("slot_id", row.get("slot", ""))))
+		if row_slot != wanted_slot:
+			continue
+		if int(row.get("required_level", 0)) != stage_level:
+			continue
+		return _normalize_blue_template(row)
+	return {}
+
+func add_blue_equip_for_slot(slot_id: String, level: int, source: String = "system") -> bool:
+	var template := find_blue_template_for_slot(slot_id, level)
+	if template.is_empty():
+		return false
+	var template_id := str(template.get("id", "")).strip_edges()
+	if template_id.is_empty():
+		return false
+	add_equip(template_id, source)
+	return true
+
+func get_template_catalog_rows(include_blue: bool = true) -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	var order := 0
+	for row_any in _equip_templates_array():
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = (row_any as Dictionary).duplicate(true)
+		row["_order"] = order
+		row["_is_blue_gear"] = false
+		rows.append(row)
+		order += 1
+	if include_blue:
+		for row_any in _blue_gear_templates_array():
+			if not (row_any is Dictionary):
+				continue
+			var row := _normalize_blue_template(row_any as Dictionary)
+			row["_order"] = order
+			rows.append(row)
+			order += 1
+	return rows
 
 func get_instance(uid: int) -> Dictionary:
 	return _get_instance_by_uid(uid)
@@ -412,6 +480,14 @@ func _calc_totals_from_equipped(equipped_map: Dictionary, equipped_store_map: Di
 		"DEF": int(base_stats.get("DEF", 0)),
 		"QI": int(base_stats.get("QI", 10)),
 		"CRIT_PERCENT": int(base_stats.get("CRIT_PERCENT", 5)),
+		"CRIT_DMG": int(base_stats.get("CRIT_DMG", 0)),
+		"DODGE": int(base_stats.get("DODGE", 0)),
+		"ATK_SPEED": int(base_stats.get("ATK_SPEED", 0)),
+		"MELEE_ATK": int(base_stats.get("MELEE_ATK", 0)),
+		"SPELL_ATK": int(base_stats.get("SPELL_ATK", 0)),
+		"PDEF": int(base_stats.get("PDEF", 0)),
+		"MDEF": int(base_stats.get("MDEF", 0)),
+		"CDR": int(base_stats.get("CDR", 0)),
 		"LOOT_BONUS_PERCENT": int(base_stats.get("LOOT_BONUS_PERCENT", 0)),
 		"PHYS_MUL_PERMILLE": int(base_stats.get("PHYS_MUL_PERMILLE", 1000)),
 		"SPELL_MUL_PERMILLE": int(base_stats.get("SPELL_MUL_PERMILLE", 1000)),
@@ -1482,22 +1558,71 @@ func _notification(what: int) -> void:
 	or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		_flush_save()
 
-func _find_template(template_id: String) -> Dictionary:
+func _equip_templates_array() -> Array:
 	var cfg: Dictionary = ConfigService.get_cfg()
 	var equip_db_any = cfg.get("equip_db", {})
 	if not (equip_db_any is Dictionary):
-		return {}
-	var equip_db: Dictionary = equip_db_any
-	var templates_any = equip_db.get("equip_templates", [])
-	if not (templates_any is Array):
-		return {}
+		return []
+	var templates_any = (equip_db_any as Dictionary).get("equip_templates", [])
+	return templates_any if templates_any is Array else []
 
-	for t_any in templates_any:
+func _blue_gear_templates_array() -> Array:
+	var db := ConfigService.get_blue_gear_templates_db()
+	var rows_any = db.get("blue_gear_templates", [])
+	return rows_any if rows_any is Array else []
+
+func _blue_affix_pool_array() -> Array:
+	var db := ConfigService.get_blue_affix_pool_db()
+	var rows_any = db.get("blue_affix_pool", [])
+	return rows_any if rows_any is Array else []
+
+func _is_blue_template(template: Dictionary) -> bool:
+	return bool(template.get("_is_blue_gear", false))
+
+func _normalize_blue_template(raw: Dictionary) -> Dictionary:
+	var out := raw.duplicate(true)
+	var template_id := str(out.get("id", "")).strip_edges()
+	out["id"] = template_id
+	out["name"] = str(out.get("name", template_id))
+	out["slot"] = _normalize_template_slot(str(out.get("slot_id", out.get("slot", ""))))
+	out["slot_id"] = str(out.get("slot", out.get("slot_id", "")))
+	out["rarity"] = "blue"
+	out["required_level"] = maxi(1, int(out.get("required_level", 1)))
+	out["set_id"] = ""
+	out["equip_type"] = str(out.get("equip_type", "blue")).strip_edges()
+	out["star_enabled"] = false
+	out["star_cap"] = 0
+	out["socket_rule_ref"] = "none"
+	out["_is_blue_gear"] = true
+	return out
+
+func _find_blue_template(template_id: String) -> Dictionary:
+	var wanted := template_id.strip_edges()
+	if wanted.is_empty():
+		return {}
+	for row_any in _blue_gear_templates_array():
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("id", "")).strip_edges() == wanted:
+			return _normalize_blue_template(row)
+	return {}
+
+func _find_template(template_id: String) -> Dictionary:
+	var wanted := template_id.strip_edges()
+	if wanted.is_empty():
+		return {}
+	for t_any in _equip_templates_array():
 		if not (t_any is Dictionary):
 			continue
 		var tpl: Dictionary = t_any
-		if str(tpl.get("id", "")) == template_id:
-			return tpl
+		if str(tpl.get("id", "")).strip_edges() == wanted:
+			var out := tpl.duplicate(true)
+			out["_is_blue_gear"] = false
+			return out
+	var blue_tpl := _find_blue_template(wanted)
+	if not blue_tpl.is_empty():
+		return blue_tpl
 	return {}
 
 func get_template(template_id: String) -> Dictionary:
@@ -1508,6 +1633,13 @@ func _template_stat_map(template: Dictionary, field_name: String) -> Dictionary:
 	if template.is_empty():
 		return out
 	var rows_any = template.get(field_name, [])
+	if rows_any is Dictionary:
+		for stat_any in (rows_any as Dictionary).keys():
+			var stat := _normalize_stat_key(str(stat_any))
+			if stat.is_empty():
+				continue
+			out[stat] = maxi(0, int((rows_any as Dictionary).get(stat_any, 0)))
+		return out
 	if not (rows_any is Array):
 		return out
 	for row_any in rows_any:
@@ -1519,6 +1651,141 @@ func _template_stat_map(template: Dictionary, field_name: String) -> Dictionary:
 			continue
 		out[stat] = maxi(0, int(row.get("value", 0)))
 	return out
+
+func _find_blue_affix_def(affix_id: String) -> Dictionary:
+	var wanted := affix_id.strip_edges()
+	if wanted.is_empty():
+		return {}
+	for row_any in _blue_affix_pool_array():
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("affix_id", "")).strip_edges() == wanted:
+			return row.duplicate(true)
+	return {}
+
+func _resolve_blue_affix_candidates(template: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not _is_blue_template(template):
+		return out
+	var wanted_slot := _normalize_template_slot(str(template.get("slot", template.get("slot_id", ""))))
+	var stage_level := maxi(1, int(template.get("required_level", 1)))
+	var weighted_any = template.get("blue_affixes", template.get("affix_entries", []))
+	if weighted_any is Array:
+		for row_any in (weighted_any as Array):
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var affix_id := str(row.get("affix_id", row.get("id", ""))).strip_edges()
+			if affix_id.is_empty():
+				continue
+			var affix_def := _find_blue_affix_def(affix_id)
+			if affix_def.is_empty():
+				continue
+			var unlock_level := maxi(0, int(affix_def.get("unlock_level", 0)))
+			if unlock_level > 0 and unlock_level != stage_level:
+				continue
+			out.append({
+				"affix_id": affix_id,
+				"weight": maxi(1, int(row.get("weight", 1))),
+				"affix": affix_def,
+			})
+	if not out.is_empty():
+		return out
+	for row_any in _blue_affix_pool_array():
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if maxi(0, int(row.get("unlock_level", 0))) != stage_level:
+			continue
+		var slot_tags_any = row.get("slot_tags", [])
+		if slot_tags_any is Array and not (slot_tags_any as Array).is_empty():
+			var slot_ok := false
+			for tag_any in (slot_tags_any as Array):
+				if _normalize_template_slot(str(tag_any)) == wanted_slot:
+					slot_ok = true
+					break
+			if not slot_ok:
+				continue
+		var affix_id := str(row.get("affix_id", "")).strip_edges()
+		if affix_id.is_empty():
+			continue
+		out.append({
+			"affix_id": affix_id,
+			"weight": 1,
+			"affix": row.duplicate(true),
+		})
+	return out
+
+func _roll_blue_effects_for_template(template: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if not _is_blue_template(template):
+		return out
+	var candidates := _resolve_blue_affix_candidates(template)
+	if candidates.is_empty():
+		return out
+	var affix_count := maxi(0, int(template.get("affix_count", 0)))
+	if affix_count <= 0:
+		affix_count = maxi(int(template.get("min_affix_count", 0)), int(template.get("max_affix_count", 0)))
+	if affix_count <= 0:
+		affix_count = 1
+	var remaining: Array[Dictionary] = []
+	for row in candidates:
+		remaining.append((row as Dictionary).duplicate(true))
+	while out.size() < affix_count and not remaining.is_empty():
+		var picked := _pick_weighted_blue_affix(remaining)
+		if picked.is_empty():
+			break
+		var affix_any = picked.get("affix", {})
+		if not (affix_any is Dictionary):
+			break
+		var affix: Dictionary = affix_any
+		var stat := _normalize_stat_key(str(affix.get("stat", "")))
+		if stat.is_empty():
+			continue
+		var min_value := int(affix.get("min_value", 0))
+		var max_value := int(affix.get("max_value", min_value))
+		if max_value < min_value:
+			var temp := min_value
+			min_value = max_value
+			max_value = temp
+		var rolled := min_value if max_value <= min_value else randi_range(min_value, max_value)
+		out.append({
+			"type": "stat",
+			"stat": stat,
+			"val": rolled,
+			"value_mode": str(affix.get("value_mode", "flat")).strip_edges(),
+			"affix_id": str(affix.get("affix_id", "")),
+			"name": str(affix.get("affix_name", stat)),
+		})
+		var picked_id := str(picked.get("affix_id", "")).strip_edges()
+		var next_remaining: Array[Dictionary] = []
+		for row_any in remaining:
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			if str(row.get("affix_id", "")).strip_edges() == picked_id:
+				continue
+			next_remaining.append(row)
+		remaining = next_remaining
+	return out
+
+func _pick_weighted_blue_affix(candidates: Array[Dictionary]) -> Dictionary:
+	var total_weight := 0
+	for row in candidates:
+		total_weight += maxi(0, int((row as Dictionary).get("weight", 0)))
+	if total_weight <= 0:
+		return {}
+	var roll := randi_range(1, total_weight)
+	var acc := 0
+	for row in candidates:
+		var weight := maxi(0, int((row as Dictionary).get("weight", 0)))
+		if weight <= 0:
+			continue
+		acc += weight
+		if roll <= acc:
+			return (row as Dictionary).duplicate(true)
+	return {}
 
 func _template_primary_stat(template: Dictionary) -> String:
 	var stats := _template_stat_map(template, "white_stats")
@@ -2054,6 +2321,95 @@ func _normalize_socket_gems(gems_any: Variant, sockets: int) -> Array[String]:
 		arr.resize(sockets)
 	return arr
 
+func get_gem_effect_view(item_def: Dictionary) -> Dictionary:
+	if item_def.is_empty():
+		return {}
+	var payload_any: Variant = item_def.get("effect_payload", {})
+	if not (payload_any is Dictionary):
+		return {}
+	var payload: Dictionary = payload_any
+	var effect_code := str(payload.get("effect_code", "")).strip_edges()
+	var params_any: Variant = payload.get("params", {})
+	if not (params_any is Dictionary):
+		return {}
+	var params: Dictionary = params_any
+	if effect_code == "add_attr":
+		var stat := _normalize_stat_key(str(params.get("stat", "")))
+		var value := float(params.get("value", 0.0))
+		if stat.is_empty() or is_zero_approx(value):
+			return {}
+		var value_type := str(params.get("value_type", _infer_gem_value_type(stat))).strip_edges()
+		return {
+			"kind": "attr",
+			"stat": stat,
+			"value": value,
+			"value_type": value_type,
+			"summary": _gem_attr_summary(stat, value, value_type),
+		}
+	var template_any: Variant = GEM_SKILL_TEMPLATE_DEFS.get(effect_code, {})
+	if not (template_any is Dictionary):
+		return {}
+	var template: Dictionary = template_any
+	var target_scope := str(item_def.get("target_scope", "")).strip_edges()
+	var parts: Array[String] = []
+	var param_defs_any: Variant = template.get("params", [])
+	if param_defs_any is Array:
+		for param_def_any in (param_defs_any as Array):
+			if not (param_def_any is Dictionary):
+				continue
+			var param_def: Dictionary = param_def_any
+			var param_key := str(param_def.get("key", "")).strip_edges()
+			if param_key.is_empty():
+				continue
+			var param_value: Variant = params.get(param_key, null)
+			if not (param_value is int or param_value is float):
+				continue
+			parts.append("%s %s" % [str(param_def.get("label", param_key)), _format_gem_number(float(param_value))])
+	var summary := str(template.get("label", effect_code))
+	if not target_scope.is_empty():
+		summary += "·%s" % _skill_display_name(target_scope)
+	if not parts.is_empty():
+		summary += "（%s）" % "，".join(parts)
+	return {
+		"kind": "skill",
+		"effect_code": effect_code,
+		"target_scope": target_scope,
+		"params": params.duplicate(true),
+		"summary": summary,
+	}
+
+func get_gem_stat_bonus(item_def: Dictionary) -> Dictionary:
+	var effect := get_gem_effect_view(item_def)
+	if str(effect.get("kind", "")) != "attr":
+		return {}
+	return {
+		"stat": str(effect.get("stat", "")),
+		"value": float(effect.get("value", 0.0)),
+		"value_type": str(effect.get("value_type", "flat")),
+	}
+
+func describe_gem_effect(item_def: Dictionary) -> String:
+	var effect := get_gem_effect_view(item_def)
+	return str(effect.get("summary", ""))
+
+func _gem_attr_summary(stat: String, value: float, value_type: String) -> String:
+	return "%s+%s%s" % [I18nService.stat(stat), _format_gem_number(value), "%" if value_type == "percent" else ""]
+
+func _infer_gem_value_type(stat: String) -> String:
+	if stat == "CRIT_RATE" or stat == "CRIT_DMG" or stat == "CRIT_PERCENT" or stat == "FINAL_DAMAGE" or stat == "FINAL_REDUCTION" or stat == "CDR" or stat == "LOOT_BONUS_PERCENT":
+		return "percent"
+	return "flat"
+
+func _format_gem_number(value: float) -> String:
+	if is_zero_approx(value - floor(value)):
+		return str(int(round(value)))
+	var text := "%.4f" % snappedf(value, 0.0001)
+	while text.ends_with("0"):
+		text = text.left(text.length() - 1)
+	if text.ends_with("."):
+		text = text.left(text.length() - 1)
+	return text
+
 func _apply_socket_gem_bonus_from_instance(totals: Dictionary, inst: Dictionary) -> void:
 	var sockets := clampi(int(inst.get("sockets", 0)), 0, MAX_SOCKETS)
 	if sockets <= 0:
@@ -2065,13 +2421,12 @@ func _apply_socket_gem_bonus_from_instance(totals: Dictionary, inst: Dictionary)
 		var item_def := _find_item_def(gem_id)
 		if item_def.is_empty():
 			continue
-		var effect_any: Variant = item_def.get("gem_effect", {})
-		if not (effect_any is Dictionary):
+		var stat_bonus := get_gem_stat_bonus(item_def)
+		if stat_bonus.is_empty():
 			continue
-		var effect: Dictionary = effect_any
-		var stat := _normalize_stat_key(str(effect.get("stat", "")))
-		var val := int(effect.get("val", 0))
-		if val == 0:
+		var stat := _normalize_stat_key(str(stat_bonus.get("stat", "")))
+		var val := int(round(float(stat_bonus.get("value", 0.0))))
+		if stat.is_empty() or val == 0:
 			continue
 		if stat != "HP" and stat != "ATK" and stat != "DEF" and stat != "LOOT_BONUS_PERCENT":
 			continue
@@ -2089,7 +2444,7 @@ func _apply_effect_stat_bonus(totals: Dictionary, inst: Dictionary) -> void:
 		var val := int(row.get("val", 0))
 		if val == 0:
 			continue
-		if stat != "HP" and stat != "ATK" and stat != "DEF" and stat != "QI" and stat != "CRIT_PERCENT" and stat != "LOOT_BONUS_PERCENT":
+		if stat != "HP" and stat != "ATK" and stat != "DEF" and stat != "QI" and stat != "CRIT_PERCENT" and stat != "CRIT_DMG" and stat != "DODGE" and stat != "ATK_SPEED" and stat != "MELEE_ATK" and stat != "SPELL_ATK" and stat != "PDEF" and stat != "MDEF" and stat != "CDR" and stat != "LOOT_BONUS_PERCENT":
 			continue
 		totals[stat] = int(totals.get(stat, 0)) + val
 
@@ -2212,7 +2567,10 @@ func _normalize_loaded_instance(inst: Dictionary) -> Dictionary:
 	out["locked"] = bool(out.get("locked", false))
 	out["star_level"] = clampi(int(out.get("star_level", 0)), 0, _template_star_max(tpl))
 	out["refine_lv"] = clampi(int(out.get("refine_lv", 0)), 0, REFINE_MAX)
-	out["effects"] = []
+	var normalized_effects: Array[Dictionary] = _normalize_effects(out.get("effects", []))
+	out["effects"] = normalized_effects if _is_blue_template(tpl) else []
+	if _is_blue_template(tpl) and normalized_effects.is_empty():
+		out["effects"] = _roll_blue_effects_for_template(tpl)
 	out["extra_effects"] = _normalize_effects(out.get("extra_effects", []))
 	if str(out.get("icon", "")).is_empty():
 		out["icon"] = str(tpl.get("icon", ""))

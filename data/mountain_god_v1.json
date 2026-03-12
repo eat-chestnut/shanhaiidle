@@ -1,0 +1,101 @@
+{
+    "meta": {
+        "key": "mountain_god",
+        "schema_version": 1,
+        "exported_at": "2026-03-11 15:04:18",
+        "sha256": "b7d2abffea7be1afda4d0d3df3ae1453b524a2c0ab73f90429df35015f3c589f"
+    },
+    "mountain_god": {
+        "god_id": "nanshan_guardian",
+        "name": "南山山神",
+        "unlock_stage_id": "nan_05",
+        "description": "通关南山终段后，可在山神殿进行轻量供奉，换取每日额外收益。",
+        "offerings": [
+            {
+                "offering_id": "offering_rumi",
+                "name": "稌米供",
+                "offering_item_id": "稌米供",
+                "exchange_cost": {
+                    "gold": 120,
+                    "sect_contribution": 0
+                },
+                "rewards": {
+                    "gold": 80,
+                    "spirit_stone": 0,
+                    "sect_contribution": 12,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "daily_limit": 1,
+                "sort_order": 10,
+                "is_enabled": true
+            },
+            {
+                "offering_id": "offering_baijian",
+                "name": "白菅席",
+                "offering_item_id": "白菅席",
+                "exchange_cost": {
+                    "gold": 160,
+                    "sect_contribution": 10
+                },
+                "rewards": {
+                    "gold": 0,
+                    "spirit_stone": 8,
+                    "sect_contribution": 16,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "daily_limit": 1,
+                "sort_order": 20,
+                "is_enabled": true
+            },
+            {
+                "offering_id": "offering_zhangyu",
+                "name": "璋玉符",
+                "offering_item_id": "璋玉符",
+                "exchange_cost": {
+                    "gold": 220,
+                    "sect_contribution": 20
+                },
+                "rewards": {
+                    "gold": 0,
+                    "spirit_stone": 10,
+                    "sect_contribution": 18,
+                    "skill_points": 1,
+                    "items": []
+                },
+                "daily_limit": 1,
+                "sort_order": 30,
+                "is_enabled": true
+            },
+            {
+                "offering_id": "offering_beast_ticket",
+                "name": "山牲券",
+                "offering_item_id": "山牲券",
+                "exchange_cost": {
+                    "gold": 260,
+                    "sect_contribution": 24
+                },
+                "rewards": {
+                    "gold": 0,
+                    "spirit_stone": 0,
+                    "sect_contribution": 20,
+                    "skill_points": 0,
+                    "items": [
+                        {
+                            "item_id": "鹿蜀纹角碎片",
+                            "count": 2
+                        },
+                        {
+                            "item_id": "白玉髓",
+                            "count": 2
+                        }
+                    ]
+                },
+                "daily_limit": 1,
+                "sort_order": 40,
+                "is_enabled": true
+            }
+        ]
+    }
+}

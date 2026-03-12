@@ -36,7 +36,7 @@ class CraftingRecipe extends Model
     {
         $rows = [];
 
-        foreach ((array) $value as $index => $row) {
+        foreach ((array) $value as $row) {
             if (! is_array($row)) {
                 continue;
             }
@@ -56,11 +56,8 @@ class CraftingRecipe extends Model
                 'item_name' => $itemName,
                 'count' => max(1, (int) ($row['count'] ?? 1)),
                 'material_type' => trim((string) ($row['material_type'] ?? 'sub')) ?: 'sub',
-                'sort_order' => max(0, (int) ($row['sort_order'] ?? (($index + 1) * 10))),
             ];
         }
-
-        usort($rows, fn (array $a, array $b): int => ($a['sort_order'] <=> $b['sort_order']) ?: strcmp($a['item_id'], $b['item_id']));
 
         $this->attributes['cost_items'] = json_encode(array_values($rows), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }

@@ -13,7 +13,6 @@ class BlueGearTemplate extends Model
         'name',
         'blue_pool_id',
         'slot_id',
-        'flow_tag',
         'required_level',
         'white_stats',
         'affix_count',
@@ -114,7 +113,7 @@ class BlueGearTemplate extends Model
 
     public function resolvedAffixEntries(): array
     {
-        $entries = collect(is_array($this->affix_entries) ? $this->affix_entries : [])
+        return collect(is_array($this->affix_entries) ? $this->affix_entries : [])
             ->map(function (mixed $row): ?array {
                 if (! is_array($row)) {
                     return null;
@@ -131,13 +130,8 @@ class BlueGearTemplate extends Model
                 ];
             })
             ->filter()
-            ->values();
-
-        if ($entries->isNotEmpty()) {
-            return $entries->all();
-        }
-
-        return $this->legacyAffixEntries();
+            ->values()
+            ->all();
     }
 
     public function resolvedMinAffixCount(): int
@@ -148,26 +142,5 @@ class BlueGearTemplate extends Model
     public function resolvedMaxAffixCount(): int
     {
         return max($this->resolvedMinAffixCount(), (int) ($this->max_affix_count ?? $this->affix_count ?? 0));
-    }
-
-    private function legacyAffixEntries(): array
-    {
-        $slotId = (string) ($this->slot_id ?? '');
-        if ($slotId === '') {
-            return [];
-        }
-
-        return BlueAffix::query()
-            ->where('is_enabled', true)
-            ->whereJsonContains('slot_tags', $slotId)
-            ->orderBy('sort_order')
-            ->orderBy('affix_id')
-            ->get()
-            ->map(fn (BlueAffix $affix): array => [
-                'affix_id' => (string) $affix->affix_id,
-                'weight' => max(1, (int) ($affix->weight ?? 1)),
-            ])
-            ->values()
-            ->all();
     }
 }

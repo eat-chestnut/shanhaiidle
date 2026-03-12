@@ -13,7 +13,6 @@ class PurpleAffix extends Model
         'affix_name',
         'stat',
         'slot_tags',
-        'flow_tags',
         'rarity_tier',
         'min_value',
         'max_value',
@@ -26,7 +25,6 @@ class PurpleAffix extends Model
 
     protected $casts = [
         'slot_tags' => 'array',
-        'flow_tags' => 'array',
         'min_value' => 'integer',
         'max_value' => 'integer',
         'weight' => 'integer',

@@ -7,12 +7,12 @@ use App\Models\WorldName;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,15 +22,15 @@ use Filament\Tables\Table;
 class WorldNameResource extends Resource
 {
     protected static ?string $model = WorldName::class;
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
     protected static ?string $navigationLabel = '世界观命名';
     protected static ?string $modelLabel = '世界观命名';
     protected static ?string $pluralModelLabel = '世界观命名';
-    protected static ?string $navigationGroup = '世界观与主线';
+    protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->schema([
                     TextInput::make('name_id')->label('命名 ID')->required()->maxLength(120)->unique(ignoreRecord: true),
@@ -44,12 +44,12 @@ class WorldNameResource extends Resource
             Section::make('命名说明')
                 ->schema([
                     Textarea::make('naming_note')->label('命名备注')->rows(4)->columnSpanFull(),
-                    MultiSelect::make('visual_tags')->label('视觉关键词')->options([
+                    Select::make('visual_tags')->label('视觉关键词')->options([
                         'forest' => '森林', 'stone' => '岩石', 'fire' => '火焰', 'ice' => '寒霜', 'beast' => '异兽', 'ritual' => '祭祀', 'seal' => '封印',
-                    ])->searchable()->preload(),
-                    MultiSelect::make('system_usage')->label('系统用途')->options([
+                    ])->multiple()->searchable()->preload(),
+                    Select::make('system_usage')->label('系统用途')->options([
                         'map' => '地图显示', 'boss' => 'Boss 显示', 'item' => '物品命名', 'set' => '套装命名', 'dungeon' => '副本命名',
-                    ])->searchable()->preload(),
+                    ])->multiple()->searchable()->preload(),
                 ])
                 ->columns(2),
             Section::make('图片资源与状态')
@@ -79,10 +79,10 @@ class WorldNameResource extends Resource
                 Tables\Filters\SelectFilter::make('category')->label('分类')->options(AdminOptions::worldNameCategoryOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->recordActions([\Filament\Actions\EditAction::make()])
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

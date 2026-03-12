@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Item;
+use App\Support\GemEffectRegistry;
 use Illuminate\Database\Seeder;
 
 class ItemsSeeder extends Seeder
@@ -16,7 +17,6 @@ class ItemsSeeder extends Seeder
             $row['icon'] = $row['icon'] ?? '';
             $row['trait'] = $row['trait'] ?? '';
             $row['desc'] = $row['desc'] ?? '';
-            $row['gem_effect'] = $row['gem_effect'] ?? null;
             $row['effect_type'] = $row['effect_type'] ?? null;
             $row['target_scope'] = $row['target_scope'] ?? null;
             $row['effect_payload'] = $row['effect_payload'] ?? null;
@@ -147,9 +147,34 @@ class ItemsSeeder extends Seeder
             ];
         };
 
+        $attrGemPayload = fn (string $stat, int|float $value, string $valueType = 'flat'): array => [
+            'effect_code' => GemEffectRegistry::ATTR_EFFECT_CODE,
+            'params' => [
+                'stat' => $stat,
+                'value' => $value,
+                'value_type' => $valueType,
+            ],
+        ];
+
+        $skillGemPayload = fn (string $effectCode, array $params): array => [
+            'effect_code' => $effectCode,
+            'params' => $params,
+        ];
+
         // 货币与兼容基础资源
         $add($currency('金币', '金币', '基础流通货币，用于打造、升星、升阶、洗练与商店消耗。', ['打造', '升星', '升阶', '洗练', '商店']));
+        $add($currency('灵石', '灵石', '1-20 阶段的通用灵性货币，主要用于山神供奉与轻量兑换。', ['供奉', '兑换']));
+        $add($currency('角色经验', '角色经验', '用于经验副本的直接成长奖励，不进入背包展示。', ['成长']));
         $add($item('宗门令', '宗门令', 'token', 'blue', '用于宗门商店兑换护身符与部分稀有道具。', ['宗门', '活动'], ['兑换']));
+        $add($item('milestone_pack_lv1', '祝余行囊', 'pack', 'white', '1级成长里程碑礼包，用于新手阶段的基础补给。', ['成长里程碑'], ['领取奖励']));
+        $add($item('milestone_pack_lv5', '迷榖指途匣', 'pack', 'blue', '5级成长里程碑礼包，用于前期主线路线与金币副本过渡。', ['成长里程碑'], ['领取奖励']));
+        $add($item('milestone_pack_lv10', '堂庭采玉礼', 'pack', 'blue', '10级成长里程碑礼包，用于稳定推进期的资源补充。', ['成长里程碑'], ['领取奖励']));
+        $add($item('milestone_pack_lv15', '蓝装进阶礼', 'pack', 'blue', '15级成长里程碑礼包，用于双词条蓝装阶段的资源补充。', ['成长里程碑'], ['领取奖励']));
+        $add($item('milestone_pack_lv20', '招摇铸兵礼', 'pack', 'purple', '20级成长里程碑礼包，用于完成20级蓝装成型与过渡准备。', ['成长里程碑'], ['领取奖励']));
+        $add($item('稌米供', '稌米供', 'pack', 'white', '南山山神常用的基础祭品，可在山神殿换取后供奉。', ['山神殿'], ['供奉', '兑换']));
+        $add($item('白菅席', '白菅席', 'pack', 'blue', '以白菅编制的祭席，用于中阶供奉。', ['山神殿'], ['供奉', '兑换']));
+        $add($item('璋玉符', '璋玉符', 'exchange_ticket', 'purple', '以璋玉为形制的祭符，是南山山神高阶供奉券。', ['山神殿'], ['供奉', '兑换']));
+        $add($item('山牲券', '山牲券', 'exchange_ticket', 'purple', '以山牲为意象的供奉券，用于换取额外山神回报。', ['山神殿'], ['供奉', '兑换']));
         $add($material('桂枝', '桂枝', 'forge_base', 'craft', 'white', '旧版打造与掉落兼容材料，仍保留给基础配置与调试逻辑使用。', ['旧版掉落'], ['打造']));
         $add($material('玉屑', '玉屑', 'forge_base', 'craft', 'white', '旧版白装回收与升星兼容材料。', ['分解', '旧版掉落'], ['升星', '打造']));
         $add($material('白玉碎', '白玉碎', 'forge_base', 'craft', 'blue', '中阶打造与升星兼容材料。', ['分解', '副本'], ['升星', '打造']));
@@ -358,10 +383,10 @@ class ItemsSeeder extends Seeder
         }
 
         // 兼容旧宝石ID
-        $add($gem('赤晶石', '赤晶石', 'attr', 'white', 'stat', 'global', ['stat' => 'ATK', 'value' => 2], 1, [1, 2], '兼容旧版的攻击属性宝石。'));
-        $add($gem('沧澜石', '沧澜石', 'attr', 'white', 'stat', 'global', ['stat' => 'HP', 'value' => 12], 1, [1, 2], '兼容旧版的生命属性宝石。'));
-        $add($gem('青木石', '青木石', 'attr', 'white', 'stat', 'global', ['stat' => 'DEF', 'value' => 2], 1, [1, 2], '兼容旧版的防御属性宝石。'));
-        $add($gem('裂石符玉', '裂石符玉', 'skill', 'blue', 'skill_modifier', 'skill_id', ['skill_id' => 'BING_01', 'modifier' => 'damage_up', 'value' => 0.08], 40, [3, 4], '兼容旧版的技能宝石。', true, false, ['Boss掉落', '宝石副本']));
+        $add($gem('赤晶石', '赤晶石', 'attr', 'white', 'stat', 'global', $attrGemPayload('ATK', 2), 1, [1, 2], '兼容旧版的攻击属性宝石。'));
+        $add($gem('沧澜石', '沧澜石', 'attr', 'white', 'stat', 'global', $attrGemPayload('HP', 12), 1, [1, 2], '兼容旧版的生命属性宝石。'));
+        $add($gem('青木石', '青木石', 'attr', 'white', 'stat', 'global', $attrGemPayload('DEF', 2), 1, [1, 2], '兼容旧版的防御属性宝石。'));
+        $add($gem('裂石符玉', '裂石符玉', 'skill', 'blue', 'skill_modifier', 'BING_01', $skillGemPayload('damage_up', ['damage_multiplier' => 0.08]), 40, [3, 4], '兼容旧版的技能宝石。', true, false, ['Boss掉落', '宝石副本']));
 
         // 属性宝石
         $attrGems = [
@@ -380,23 +405,23 @@ class ItemsSeeder extends Seeder
             ['灌灌羽晶', 'CRIT_DMG', 6, 'gold', 60],
         ];
         foreach ($attrGems as [$id, $stat, $value, $rarity, $unlock]) {
-            $add($gem($id, $id, 'attr', $rarity, 'stat', 'global', ['stat' => $stat, 'value' => $value], $unlock, [1, 2], sprintf('%s型属性宝石，可镶嵌于第1/2孔。', $id), true, in_array($rarity, ['purple', 'gold'], true)));
+            $add($gem($id, $id, 'attr', $rarity, 'stat', 'global', $attrGemPayload($stat, $value), $unlock, [1, 2], sprintf('%s型属性宝石，可镶嵌于第1/2孔。', $id), true, in_array($rarity, ['purple', 'gold'], true)));
         }
 
         // 技能宝石
         $skillGems = [
-            ['gem_skill_xingxing_seal', '狌狌印', 'BING_01', 'range_up', 0.08, 'blue', 40],
-            ['gem_skill_lushu_seal', '鹿蜀印', 'BING_01', 'crit_up', 0.10, 'blue', 40],
-            ['gem_skill_xuangui_seal', '旋龟印', 'BING_01', 'shield_up', 0.12, 'blue', 40],
-            ['gem_skill_guanguan_seal', '灌灌印', 'BING_01', 'cooldown_down', 0.06, 'purple', 50],
-            ['gem_skill_migu_seal', '迷榖印', 'BING_01', 'duration_up', 0.12, 'purple', 50],
-            ['gem_skill_chiyu_seal', '赤鱬印', 'BING_01', 'burn_up', 0.15, 'purple', 50],
-            ['gem_skill_qingqiu_seal', '青丘印', 'BING_01', 'slow_up', 0.12, 'gold', 60],
-            ['gem_skill_yingshui_seal', '英水印', 'BING_01', 'mana_cost_down', 0.10, 'gold', 60],
-            ['gem_skill_jiwei_seal', '箕尾镇印', 'BING_01', 'damage_up', 0.18, 'gold', 60],
+            ['gem_skill_xingxing_seal', '狌狌印', 'BING_01', 'range_up', ['range_multiplier' => 0.08], 'blue', 40],
+            ['gem_skill_lushu_seal', '鹿蜀印', 'BING_01', 'crit_up', ['crit_rate_bonus' => 0.10], 'blue', 40],
+            ['gem_skill_xuangui_seal', '旋龟印', 'BING_01', 'shield_up', ['shield_multiplier' => 0.12], 'blue', 40],
+            ['gem_skill_guanguan_seal', '灌灌印', 'BING_01', 'cooldown_down', ['cooldown_reduction' => 0.06], 'purple', 50],
+            ['gem_skill_migu_seal', '迷榖印', 'BING_01', 'duration_up', ['duration_multiplier' => 0.12], 'purple', 50],
+            ['gem_skill_chiyu_seal', '赤鱬印', 'BING_01', 'burn_up', ['burn_multiplier' => 0.15], 'purple', 50],
+            ['gem_skill_qingqiu_seal', '青丘印', 'BING_01', 'slow_up', ['slow_multiplier' => 0.12], 'gold', 60],
+            ['gem_skill_yingshui_seal', '英水印', 'BING_01', 'mana_cost_down', ['mana_cost_reduction' => 0.10], 'gold', 60],
+            ['gem_skill_jiwei_seal', '箕尾镇印', 'BING_01', 'damage_up', ['damage_multiplier' => 0.18], 'gold', 60],
         ];
-        foreach ($skillGems as [$id, $name, $skillId, $modifier, $value, $rarity, $unlock]) {
-            $add($gem($id, $name, 'skill', $rarity, 'skill_modifier', 'skill_id', ['skill_id' => $skillId, 'modifier' => $modifier, 'value' => $value], $unlock, [3, 4], sprintf('%s型技能宝石，可镶嵌于第3/4孔。', $name), true, in_array($rarity, ['purple', 'gold'], true)));
+        foreach ($skillGems as [$id, $name, $skillId, $effectCode, $params, $rarity, $unlock]) {
+            $add($gem($id, $name, 'skill', $rarity, 'skill_modifier', $skillId, $skillGemPayload($effectCode, $params), $unlock, [3, 4], sprintf('%s型技能宝石，可镶嵌于第3/4孔。', $name), true, in_array($rarity, ['purple', 'gold'], true)));
         }
 
         foreach ($rows as $row) {

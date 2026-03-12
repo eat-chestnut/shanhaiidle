@@ -75,7 +75,7 @@ func _apply_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
+	_btn_nav_map.text = "宗门"
 	_btn_nav_dex.disabled = true
 
 func _setup_filters() -> void:
@@ -93,12 +93,15 @@ func _setup_filters() -> void:
 
 	_opt_slot.clear()
 	_opt_slot.add_item("全部槽位")
-	_opt_slot.add_item("武器")
+	_opt_slot.add_item("主武器")
+	_opt_slot.add_item("副武器")
 	_opt_slot.add_item("头盔")
 	_opt_slot.add_item("盔甲")
-	_opt_slot.add_item("护腿")
+	_opt_slot.add_item("腰带")
 	_opt_slot.add_item("鞋子")
-	_opt_slot.add_item("披风")
+	_opt_slot.add_item("护手")
+	_opt_slot.add_item("项链")
+	_opt_slot.add_item("护符")
 	_opt_slot.add_item("戒指")
 	_opt_slot.add_item("手镯")
 	_opt_slot.select(0)
@@ -192,15 +195,8 @@ func _load_sets() -> void:
 
 func _load_templates() -> void:
 	_rows.clear()
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("equip_db", {})
-	if not (db_any is Dictionary):
-		return
-	var arr_any = (db_any as Dictionary).get("equip_templates", [])
-	if not (arr_any is Array):
-		return
 	var idx := 0
-	for tpl_any in arr_any:
+	for tpl_any in EquipmentModel.get_template_catalog_rows():
 		if not (tpl_any is Dictionary):
 			continue
 		var tpl: Dictionary = tpl_any
@@ -239,7 +235,7 @@ func _apply_filters() -> void:
 	_filter_unlock = unlock_modes[clampi(_opt_unlock.selected, 0, unlock_modes.size() - 1)]
 	var rarity_modes := ["all", "white", "blue", "gold", "purple", "orange"]
 	_filter_rarity = rarity_modes[clampi(_opt_rarity.selected, 0, rarity_modes.size() - 1)]
-	var slot_modes := ["all", "weapon", "helm", "armor", "pants", "shoes", "cloak", "ring", "bracelet"]
+	var slot_modes := ["all", "main_weapon", "off_weapon", "helm", "armor", "belt", "shoes", "gloves", "necklace", "talisman", "ring", "bracelet"]
 	_filter_slot = slot_modes[clampi(_opt_slot.selected, 0, slot_modes.size() - 1)]
 	var sort_modes := ["default", "rarity", "name", "slot", "unlock"]
 	_sort_mode = sort_modes[clampi(_opt_sort.selected, 0, sort_modes.size() - 1)]
@@ -494,25 +490,32 @@ func _on_farm_pressed() -> void:
 
 func _format_stat_rows(rows_any: Variant) -> Array[String]:
 	var out: Array[String] = []
-	if not (rows_any is Array):
-		return out
 	var stats: Dictionary = {}
-	for row_any in rows_any:
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		var stat := str(row.get("stat", "")).strip_edges()
-		if stat.is_empty():
-			continue
-		stats[stat] = int(row.get("value", 0))
-	var ordered := ["HP", "ATK", "DEF", "CRIT_RATE", "CRIT_DMG", "QI"]
+	if rows_any is Dictionary:
+		for stat_any in (rows_any as Dictionary).keys():
+			var stat := _normalize_stat_key(str(stat_any))
+			if stat.is_empty():
+				continue
+			stats[stat] = int((rows_any as Dictionary).get(stat_any, 0))
+	elif rows_any is Array:
+		for row_any in (rows_any as Array):
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var stat := _normalize_stat_key(str(row.get("stat", "")))
+			if stat.is_empty():
+				continue
+			stats[stat] = int(row.get("value", 0))
+	else:
+		return out
+	var ordered := ["HP", "ATK", "DEF", "CRIT_PERCENT", "CRIT_DMG", "QI"]
 	for stat in ordered:
 		if not stats.has(stat):
 			continue
 		var val := int(stats.get(stat, 0))
 		if val == 0:
 			continue
-		var suffix := "%" if stat == "CRIT_RATE" else ""
+		var suffix := "%" if _is_percent_stat(stat) else ""
 		out.append("%s +%d%s" % [I18nService.stat(stat), val, suffix])
 	for key_any in stats.keys():
 		var stat := str(key_any)
@@ -521,7 +524,7 @@ func _format_stat_rows(rows_any: Variant) -> Array[String]:
 		var val := int(stats.get(key_any, 0))
 		if val == 0:
 			continue
-		var suffix := "%" if stat == "CRIT_RATE" else ""
+		var suffix := "%" if _is_percent_stat(stat) else ""
 		out.append("%s +%d%s" % [I18nService.stat(stat), val, suffix])
 	return out
 
@@ -529,6 +532,8 @@ func _socket_rule_name(rule_ref: String) -> String:
 	match rule_ref.strip_edges():
 		"fixed_star_3_6_8_10", "":
 			return "固定开孔（3/6/8/10星）"
+		"none":
+			return "无孔位"
 		_:
 			return rule_ref
 
@@ -565,22 +570,28 @@ func _reward_gold(tpl: Dictionary) -> int:
 
 func _slot_sort_value(slot: String) -> int:
 	match slot.to_lower():
-		"weapon":
+		"main_weapon":
 			return 0
-		"helm":
+		"off_weapon":
 			return 1
-		"armor":
+		"helm":
 			return 2
-		"pants":
+		"armor":
 			return 3
-		"shoes":
+		"belt":
 			return 4
-		"cloak":
+		"shoes":
 			return 5
-		"ring":
+		"gloves":
 			return 6
-		"bracelet":
+		"necklace":
 			return 7
+		"talisman":
+			return 8
+		"ring":
+			return 9
+		"bracelet":
+			return 10
 		_:
 			return 99
 
@@ -621,6 +632,18 @@ func _rarity_name(rarity: String) -> String:
 			return "蓝色"
 		_:
 			return "白色"
+
+func _normalize_stat_key(stat: String) -> String:
+	match stat:
+		"CRIT":
+			return "CRIT_PERCENT"
+		"CRIT_RATE":
+			return "CRIT_PERCENT"
+		_:
+			return stat
+
+func _is_percent_stat(stat: String) -> bool:
+	return stat == "CRIT_PERCENT" or stat == "CRIT_DMG" or stat == "ATK_SPEED" or stat == "CDR" or stat == "LOOT_BONUS_PERCENT"
 
 func _on_filter_changed(_t: String) -> void:
 	var keep_id := ""
@@ -701,7 +724,7 @@ func _on_nav_bag_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_BATTLE)
 
 func _on_nav_map_pressed() -> void:
-	get_tree().change_scene_to_file(PAGE_DUNGEON)
+	get_tree().change_scene_to_file(PAGE_MAP)
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):

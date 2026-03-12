@@ -86,15 +86,8 @@ func _socket_desc_text(idx: int, sockets: int, socket_gems: Array[String]) -> St
 	if gem_id.is_empty():
 		return "可镶嵌"
 	var item_def := _find_item_def(gem_id)
-	var effect_any = item_def.get("gem_effect", {})
-	if effect_any is Dictionary:
-		var effect: Dictionary = effect_any
-		var stat := str(effect.get("stat", "")).strip_edges()
-		var val := int(effect.get("val", 0))
-		if not stat.is_empty() and val != 0:
-			var percent := stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT"
-			return "%s+%d%s" % [I18nService.stat(stat), val, "%" if percent else ""]
-	return "属性未知"
+	var summary := EquipmentModel.describe_gem_effect(item_def)
+	return summary if not summary.is_empty() else "效果未知"
 
 func _find_item_def(item_id: String) -> Dictionary:
 	if item_id.is_empty():

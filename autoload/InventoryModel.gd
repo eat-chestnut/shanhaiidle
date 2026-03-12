@@ -131,7 +131,9 @@ func list_items_sorted(filter_type: String = "") -> Array[Dictionary]:
 			"icon": str(item_def.get("icon", "")),
 			"type": item_type,
 			"trait": str(item_def.get("trait", "")),
-			"gem_effect": item_def.get("gem_effect", {}),
+			"effect_type": str(item_def.get("effect_type", "")),
+			"target_scope": str(item_def.get("target_scope", "")),
+			"effect_payload": item_def.get("effect_payload", {}),
 		})
 
 	result.sort_custom(_sort_item_rows)

@@ -10,6 +10,8 @@ use RuntimeException;
 
 class ExportBlueAffixPoolJson extends Command
 {
+    private const PROJECT_DATA_FILE = '../data/blue_affix_pool_v1.json';
+
     protected $signature = 'game:export-blue-affix-pool';
 
     protected $description = 'Export enabled blue affix pool to storage/app/exports/blue_affix_pool_v1.json';
@@ -37,8 +39,7 @@ class ExportBlueAffixPoolJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['blue_affix_pool' => $rows];
-        $version = ExportMetaService::getNextVersion('blue_affix_pool');
-        $meta = ExportMetaService::makeMeta('blue_affix_pool', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('blue_affix_pool', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -52,9 +53,11 @@ class ExportBlueAffixPoolJson extends Command
         }
 
         $path = $dir . DIRECTORY_SEPARATOR . 'blue_affix_pool_v1.json';
+        $projectDataPath = base_path(self::PROJECT_DATA_FILE);
         File::put($path, $json);
+        File::put($projectDataPath, $json);
 
-        $this->info(sprintf('Exported %d blue affixes -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d blue affixes -> %s, %s', count($rows), $path, $projectDataPath));
 
         return self::SUCCESS;
     }

@@ -18,20 +18,12 @@ class Stage extends Model
         'id',
         'name',
         'unlock_min_level',
-        'elite_every_kills',
-        'boss_every_kills',
-        'spawn_patch',
-        'drops_patch',
-        'monsters_patch',
         'difficulties',
         'sort_order',
         'is_enabled',
     ];
 
     protected $casts = [
-        'spawn_patch' => 'array',
-        'drops_patch' => 'array',
-        'monsters_patch' => 'array',
         'difficulties' => 'array',
         'is_enabled' => 'boolean',
     ];

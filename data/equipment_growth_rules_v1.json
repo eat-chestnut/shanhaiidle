@@ -1,9 +1,9 @@
 {
     "meta": {
         "key": "equipment_growth_rules",
-        "version": 6,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "7808e5d3e044f2df8e12b01f3ed9395ebf6e96eb4c39f8017a177e0ef4d36e8e"
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:40",
+        "sha256": "93ecd025d4cab9c0725abfc717d390f91e8139870704abc0264d16a57b3a1e77"
     },
     "equipment_growth_rules": {
         "set_stage_piece_count": {
@@ -17,19 +17,47 @@
             "50": 8,
             "60": 10
         },
-        "star_material_stage": {
-            "1_3": "初阶星材",
-            "4_6": "中阶星材",
-            "7_8": "高阶星材",
-            "9_10": "极阶星材"
-        },
+        "star_material_stage": [
+            {
+                "star_from": 1,
+                "star_to": 3,
+                "material_id": "star_stone_t1_common",
+                "material_count": 1,
+                "sort": 1,
+                "material_name": "初阶星材"
+            },
+            {
+                "star_from": 4,
+                "star_to": 6,
+                "material_id": "star_stone_t2_common",
+                "material_count": 1,
+                "sort": 2,
+                "material_name": "中阶星材"
+            },
+            {
+                "star_from": 7,
+                "star_to": 8,
+                "material_id": "star_stone_t3_common",
+                "material_count": 1,
+                "sort": 3,
+                "material_name": "高阶星材"
+            },
+            {
+                "star_from": 9,
+                "star_to": 10,
+                "material_id": "star_stone_t4_common",
+                "material_count": 1,
+                "sort": 4,
+                "material_name": "极阶星材"
+            }
+        ],
         "socket_unlocks": {
             "3": 1,
             "6": 2,
             "8": 3,
             "10": 4
         },
-        "blue_affix_unlock_level": 30,
+        "blue_affix_unlock_level": 1,
         "purple_affix_unlock_level": 50,
         "resonance_thresholds": [
             3,

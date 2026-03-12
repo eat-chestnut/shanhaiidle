@@ -5,19 +5,19 @@ namespace App\Filament\Pages;
 use App\Services\EquipmentGrowthRulesService;
 use App\Support\AdminOptions;
 use Filament\Actions\Action;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Artisan;
@@ -28,7 +28,7 @@ class EquipmentGrowthRulesPage extends Page implements HasForms
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     protected static ?string $navigationLabel = '装备成长规则';
 
@@ -36,9 +36,9 @@ class EquipmentGrowthRulesPage extends Page implements HasForms
 
     protected static ?int $navigationSort = 100;
 
-    protected static ?string $navigationGroup = '装备成长';
+    protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
-    protected static string $view = 'filament.pages.equipment-growth-rules-page';
+    protected string $view = 'filament.pages.equipment-growth-rules-page';
 
     public ?array $data = [];
 
@@ -48,9 +48,9 @@ class EquipmentGrowthRulesPage extends Page implements HasForms
         $this->form->fill(EquipmentGrowthRulesService::loadConfig());
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('GrowthRulesTabs')
                     ->persistTabInQueryString()
@@ -84,12 +84,53 @@ class EquipmentGrowthRulesPage extends Page implements HasForms
                                     ])
                                     ->columns(4),
                                 Section::make('升星材料阶段')
-                                    ->description('用于导出给前端识别当前星级段对应的材料档位。')
+                                    ->description('按星级区间维护升星材料与消耗数量，保存时会按录入顺序写入 sort。')
                                     ->schema([
-                                        KeyValue::make('star_material_stage')
-                                            ->label('阶段与材料名称')
-                                            ->keyLabel('阶段区间')
-                                            ->valueLabel('材料显示名')
+                                        Repeater::make('star_material_stage')
+                                            ->hiddenLabel()
+                                            ->default(EquipmentGrowthRulesService::defaultStarMaterialStages())
+                                            ->minItems(1)
+                                            ->columns(12)
+                                            ->reorderable(false)
+                                            ->reorderableWithButtons(false)
+                                            ->reorderableWithDragAndDrop(false)
+                                            ->table([
+                                                TableColumn::make('起始星级'),
+                                                TableColumn::make('结束星级'),
+                                                TableColumn::make('升星材料'),
+                                                TableColumn::make('消耗数量'),
+                                            ])
+                                            ->schema([
+                                                TextInput::make('star_from')
+                                                    ->label('起始星级')
+                                                    ->integer()
+                                                    ->required()
+                                                    ->minValue(1)
+                                                    ->default(1)
+                                                    ->columnSpan(2),
+                                                TextInput::make('star_to')
+                                                    ->label('结束星级')
+                                                    ->integer()
+                                                    ->required()
+                                                    ->minValue(1)
+                                                    ->default(1)
+                                                    ->columnSpan(2),
+                                                Select::make('material_id')
+                                                    ->label('升星材料')
+                                                    ->options(AdminOptions::starMaterialOptions())
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->required()
+                                                    ->columnSpan(5),
+                                                TextInput::make('material_count')
+                                                    ->label('消耗数量')
+                                                    ->integer()
+                                                    ->required()
+                                                    ->minValue(1)
+                                                    ->default(1)
+                                                    ->columnSpan(3),
+                                            ])
+                                            ->addActionLabel('新增升星材料阶段')
                                             ->columnSpanFull(),
                                     ]),
                             ]),
@@ -106,7 +147,7 @@ class EquipmentGrowthRulesPage extends Page implements HasForms
                                 Section::make('词条开放规则')
                                     ->description('蓝词条和紫色洗练在角色达到指定等级后开放。')
                                     ->schema([
-                                        TextInput::make('blue_affix_unlock_level')->label('蓝词条开放等级')->integer()->required()->minValue(1)->helperText('建议 30 级'),
+                                        TextInput::make('blue_affix_unlock_level')->label('蓝词条开放等级')->integer()->required()->minValue(1)->helperText('当前前期蓝词条从 1 级开放'),
                                         TextInput::make('purple_affix_unlock_level')->label('紫色洗练开放等级')->integer()->required()->minValue(1)->helperText('建议 50 级'),
                                         TagsInput::make('resonance_thresholds')
                                             ->label('全身共鸣档位')

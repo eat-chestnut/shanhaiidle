@@ -26,7 +26,6 @@ class ExportPurpleAffixPoolJson extends Command
                 'affix_name' => (string) $row->affix_name,
                 'stat' => (string) $row->stat,
                 'slot_tags' => is_array($row->slot_tags) ? array_values($row->slot_tags) : [],
-                'flow_tags' => is_array($row->flow_tags) ? array_values($row->flow_tags) : [],
                 'rarity_tier' => (string) $row->rarity_tier,
                 'min_value' => (int) $row->min_value,
                 'max_value' => (int) $row->max_value,
@@ -39,8 +38,7 @@ class ExportPurpleAffixPoolJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['purple_affix_pool' => $rows];
-        $version = ExportMetaService::getNextVersion('purple_affix_pool');
-        $meta = ExportMetaService::makeMeta('purple_affix_pool', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('purple_affix_pool', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -56,7 +54,7 @@ class ExportPurpleAffixPoolJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'purple_affix_pool_v1.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d purple affixes -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d purple affixes -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

@@ -36,8 +36,13 @@ func bind_data(data: Dictionary) -> void:
 	var remaining := int(data.get("remaining_count", 0))
 	var daily_limit := int(data.get("daily_limit", 0))
 	var unlock_level := int(data.get("unlock_level", 1))
+	var unlock_stage_name := str(data.get("unlock_stage_name", "")).strip_edges()
+	var unlock_hint := str(data.get("unlock_hint", "")).strip_edges()
 	var rec_power := int(data.get("recommended_power", 0))
 	var show_plus := bool(data.get("show_plus_button", false))
+	var current_level := int(data.get("current_level", 1))
+	var max_level := int(data.get("max_level", 1))
+	var upgrade_cost_summary := str(data.get("upgrade_cost_summary", "")).strip_edges()
 	var reward_preview_any = data.get("reward_preview", [])
 	var reward_preview: Array = reward_preview_any if reward_preview_any is Array else []
 
@@ -58,25 +63,28 @@ func bind_data(data: Dictionary) -> void:
 	_lbl_desc.text = desc
 
 	if daily_limit <= 0 or remaining < 0:
-		_lbl_remaining.text = "今日剩余次数：∞"
+		_lbl_remaining.text = "副本Lv%d/%d｜今日剩余：∞" % [current_level, max_level]
 	else:
-		_lbl_remaining.text = "今日剩余次数：%d" % remaining
+		_lbl_remaining.text = "副本Lv%d/%d｜今日剩余：%d" % [current_level, max_level, remaining]
 
 	_lbl_recommended.text = "推荐战力：%d" % rec_power
 	if not is_unlocked:
-		_lbl_unlock.text = "%d级解锁" % unlock_level
+		if not unlock_hint.is_empty():
+			_lbl_unlock.text = unlock_hint
+		else:
+			_lbl_unlock.text = "%d级解锁" % unlock_level if unlock_stage_name.is_empty() else "需Lv%d并通关%s" % [unlock_level, unlock_stage_name]
 	elif daily_limit > 0 and remaining <= 0:
 		_lbl_unlock.text = "今日次数已用尽"
 	elif not can_sweep:
 		_lbl_unlock.text = "需先通关后开启扫荡"
 	else:
-		_lbl_unlock.text = ""
+		_lbl_unlock.text = upgrade_cost_summary if not upgrade_cost_summary.is_empty() else "已解锁"
 
 	var reward_text := _build_reward_text(reward_preview)
 	_lbl_reward.text = reward_text if not reward_text.is_empty() else "奖励预览：—"
 
 	_btn_plus.visible = show_plus
-	_btn_plus.disabled = not is_unlocked
+	_btn_plus.disabled = not is_unlocked or current_level >= max_level
 
 	_btn_challenge.disabled = not can_challenge
 	_btn_sweep.disabled = not can_sweep

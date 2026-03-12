@@ -55,8 +55,7 @@ class ExportCraftingRecipesJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['crafting_recipes' => $rows];
-        $version = ExportMetaService::getNextVersion('crafting_recipes');
-        $meta = ExportMetaService::makeMeta('crafting_recipes', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('crafting_recipes', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -72,7 +71,7 @@ class ExportCraftingRecipesJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'crafting_recipes_v1.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d crafting recipes -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d crafting recipes -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

@@ -10,6 +10,8 @@ use RuntimeException;
 
 class ExportBlueGearTemplatesJson extends Command
 {
+    private const PROJECT_DATA_FILE = '../data/blue_gear_templates_v1.json';
+
     protected $signature = 'game:export-blue-gear-templates';
 
     protected $description = 'Export enabled blue gear templates to storage/app/exports/blue_gear_templates_v1.json';
@@ -26,7 +28,6 @@ class ExportBlueGearTemplatesJson extends Command
                 'name' => (string) $row->name,
                 'blue_pool_id' => (string) ($row->blue_pool_id ?? ''),
                 'slot_id' => (string) $row->slot_id,
-                'flow_tag' => (string) ($row->flow_tag ?? ''),
                 'required_level' => (int) $row->required_level,
                 'white_stats' => is_array($row->white_stats) ? $row->white_stats : [],
                 'min_affix_count' => $row->resolvedMinAffixCount(),
@@ -41,8 +42,7 @@ class ExportBlueGearTemplatesJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['blue_gear_templates' => $rows];
-        $version = ExportMetaService::getNextVersion('blue_gear_templates');
-        $meta = ExportMetaService::makeMeta('blue_gear_templates', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('blue_gear_templates', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -56,9 +56,11 @@ class ExportBlueGearTemplatesJson extends Command
         }
 
         $path = $dir . DIRECTORY_SEPARATOR . 'blue_gear_templates_v1.json';
+        $projectDataPath = base_path(self::PROJECT_DATA_FILE);
         File::put($path, $json);
+        File::put($projectDataPath, $json);
 
-        $this->info(sprintf('Exported %d blue gear templates -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d blue gear templates -> %s, %s', count($rows), $path, $projectDataPath));
 
         return self::SUCCESS;
     }

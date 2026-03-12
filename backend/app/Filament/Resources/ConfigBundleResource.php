@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ConfigBundleResource\Pages;
 use App\Models\AppSetting;
 use App\Models\ConfigBundle;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -15,15 +15,15 @@ use Filament\Tables\Table;
 class ConfigBundleResource extends Resource
 {
     protected static ?string $model = ConfigBundle::class;
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box-arrow-down';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-archive-box-arrow-down';
     protected static ?string $navigationLabel = '配置包管理';
     protected static ?string $pluralModelLabel = '配置包';
     protected static ?string $modelLabel = '配置包';
-    protected static ?string $navigationGroup = '系统配置';
+    protected static string | \UnitEnum | null $navigationGroup = '系统配置';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([]);
+        return $schema->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -48,8 +48,8 @@ class ConfigBundleResource extends Resource
                         blank: fn ($query) => $query,
                     ),
             ])
-            ->actions([
-                Tables\Actions\Action::make('downloadManifest')
+            ->recordActions([
+                \Filament\Actions\Action::make('downloadManifest')
                     ->label('下载 manifest')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
@@ -58,7 +58,7 @@ class ConfigBundleResource extends Resource
                         sprintf('manifest_%s.json', $record->bundle_id),
                         ['Content-Type' => 'application/json; charset=UTF-8']
                     )),
-                Tables\Actions\Action::make('setLatest')
+                \Filament\Actions\Action::make('setLatest')
                     ->label('设为最新')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -67,7 +67,7 @@ class ConfigBundleResource extends Resource
                         AppSetting::setValue('latest_bundle_id', $record->bundle_id);
                     }),
             ])
-            ->bulkActions([])
+            ->toolbarActions([])
             ->defaultSort('created_at', 'desc');
     }
 

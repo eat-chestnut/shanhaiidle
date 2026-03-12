@@ -5,37 +5,31 @@ const ATTR_ROWS := [
 		"key": "strength",
 		"row": "RowStr",
 		"name_key": "attr.str",
-		"desc": "攻击+1/点；物伤系数+12‰/点",
 	},
 	{
 		"key": "physique",
 		"row": "RowVit",
 		"name_key": "attr.vit",
-		"desc": "生命+1/点；每10点额外+1生命",
 	},
 	{
 		"key": "agility",
 		"row": "RowAgi",
 		"name_key": "attr.agi",
-		"desc": "暴击率每4点≈+1%（显示整数%）",
 	},
 	{
 		"key": "spirit",
 		"row": "RowSpi",
 		"name_key": "attr.spi",
-		"desc": "术伤系数+12‰/点（预留）",
 	},
 	{
 		"key": "true_energy",
 		"row": "RowQi",
 		"name_key": "attr.qi",
-		"desc": "气上限+1/点（预留）",
 	},
 	{
 		"key": "fortune",
 		"row": "RowLuck",
 		"name_key": "attr.luck",
-		"desc": "掉落加成≈+0.6%/点（显示整数%）",
 	},
 ]
 
@@ -81,7 +75,7 @@ func refresh_ui() -> void:
 		var title := I18nService.t(str(row_cfg.get("name_key", key)), key)
 		var value := int(attrs.get(key, 0))
 		name_label.text = "%s  %d" % [title, value]
-		desc_label.text = str(row_cfg.get("desc", ""))
+		desc_label.text = _attr_desc(key)
 		btn.disabled = points <= 0
 		btn.text = "+"
 
@@ -148,7 +142,7 @@ func _apply_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
+	_btn_nav_map.text = "宗门"
 	_btn_nav_character.disabled = true
 	_btn_nav_dex.disabled = false
 	_btn_nav_map.disabled = false
@@ -182,7 +176,7 @@ func _on_nav_dex_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageDexHome.tscn")
 
 func _on_nav_map_pressed() -> void:
-	get_tree().change_scene_to_file("res://ui/pages/PageDungeon.tscn")
+	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):
@@ -191,3 +185,59 @@ func _refresh_badges() -> void:
 		_badge_skill.call("set_value", int(SkillModel.skill_points), false)
 	if _badge_dex != null and _badge_dex.has_method("set_dot"):
 		_badge_dex.call("set_dot", DexHubService.has_pending_rewards())
+
+func _attr_desc(attr_key: String) -> String:
+	var growth := ConfigService.get_character_growth_rules()
+	var formulas_any = growth.get("attribute_formulas", {})
+	var formulas: Dictionary = formulas_any if formulas_any is Dictionary else {}
+	match attr_key:
+		"strength":
+			var cfg_any = formulas.get("strength", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			return "物伤系数+%d‰/点" % int(cfg.get("phys_mul_permille_per_point", 12))
+		"physique":
+			var cfg_any = formulas.get("physique", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			var hp_per_point := float(cfg.get("hp_per_point", 1.0))
+			var hp_extra_every_10 := int(cfg.get("hp_extra_every_10", 1))
+			var parts: Array[String] = ["生命+%s/点" % _format_float_trimmed(hp_per_point)]
+			if hp_extra_every_10 > 0:
+				parts.append("每10点额外+%d生命" % hp_extra_every_10)
+			var def_per_point := float(cfg.get("def_per_point", 0.0))
+			if def_per_point > 0.0:
+				parts.append("防御+%s/点" % _format_float_trimmed(def_per_point))
+			return "；".join(parts)
+		"agility":
+			var cfg_any = formulas.get("agility", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			var parts: Array[String] = []
+			var crit_per_point := float(cfg.get("crit_percent_per_point", 0.25))
+			if crit_per_point > 0.0:
+				parts.append("暴击率+%s%%/点" % _format_float_trimmed(crit_per_point))
+			var dodge_per_point := float(cfg.get("dodge_per_point", 0.0))
+			if dodge_per_point > 0.0:
+				parts.append("闪避+%s/点" % _format_float_trimmed(dodge_per_point))
+			var attack_speed_per_point := float(cfg.get("attack_speed_per_point", 0.0))
+			if attack_speed_per_point > 0.0:
+				parts.append("攻速+%s/点" % _format_float_trimmed(attack_speed_per_point))
+			return "；".join(parts) if not parts.is_empty() else "当前未配置额外换算"
+		"spirit":
+			var cfg_any = formulas.get("spirit", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			return "术伤系数+%d‰/点" % int(cfg.get("spell_mul_permille_per_point", 12))
+		"true_energy":
+			var cfg_any = formulas.get("true_energy", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			return "气上限+%s/点" % _format_float_trimmed(float(cfg.get("qi_per_point", 1.0)))
+		"fortune":
+			var cfg_any = formulas.get("fortune", {})
+			var cfg: Dictionary = cfg_any if cfg_any is Dictionary else {}
+			return "掉落加成+%s%%/点" % _format_float_trimmed(float(cfg.get("loot_bonus_percent_per_point", 0.6)))
+		_:
+			return ""
+
+func _format_float_trimmed(value: float) -> String:
+	var rounded := snappedf(value, 0.01)
+	if is_equal_approx(rounded, float(int(rounded))):
+		return str(int(rounded))
+	return str(rounded)

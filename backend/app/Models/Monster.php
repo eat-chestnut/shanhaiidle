@@ -30,6 +30,7 @@ class Monster extends Model
         'drop_bonus_percent',
         'dex_gold',
         'icon',
+        'drops',
         'is_enabled',
         'sort_order',
     ];
@@ -37,5 +38,6 @@ class Monster extends Model
     protected $casts = [
         'is_enabled' => 'boolean',
         'attack_interval' => 'float',
+        'drops' => 'array',
     ];
 }

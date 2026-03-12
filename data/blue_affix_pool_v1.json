@@ -1,96 +1,1010 @@
 {
     "meta": {
         "key": "blue_affix_pool",
-        "version": 6,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "058ff460d40f5d355db2e57c84dd7a9ad16379be3a9fe6ec24deeb9be1ffc3c9"
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:41",
+        "sha256": "79b87405979934727e7076723079d3e6675e4800c1c89f22a9357d869f6fc9a4"
     },
     "blue_affix_pool": [
         {
-            "affix_id": "blue_atk_flat_1",
-            "affix_name": "锐击",
+            "affix_id": "blue_atk_flat_lv1",
+            "affix_name": "锐击·1级",
             "stat": "ATK",
             "slot_tags": [
                 "main_weapon",
                 "off_weapon",
                 "gloves",
-                "ring"
-            ],
-            "flow_tags": [
-                "berserk",
-                "hunt"
+                "necklace"
             ],
             "min_value": 2,
-            "max_value": 5,
+            "max_value": 4,
             "value_mode": "flat",
-            "weight": 40,
-            "unlock_level": 30,
-            "sort_order": 10
+            "unlock_level": 1,
+            "sort_order": 10,
+            "notes": "前期基础攻击词条，适用于武器、护手与输出项链。（1级档）"
         },
         {
-            "affix_id": "blue_def_flat_1",
-            "affix_name": "坚壁",
-            "stat": "DEF",
-            "slot_tags": [
-                "armor",
-                "belt",
-                "shoes",
-                "helm",
-                "bracelet"
-            ],
-            "flow_tags": [
-                "guard",
-                "frost"
-            ],
-            "min_value": 2,
-            "max_value": 5,
-            "value_mode": "flat",
-            "weight": 40,
-            "unlock_level": 30,
-            "sort_order": 20
-        },
-        {
-            "affix_id": "blue_hp_flat_1",
-            "affix_name": "生息",
+            "affix_id": "blue_hp_flat_lv1",
+            "affix_name": "生息·1级",
             "stat": "HP",
             "slot_tags": [
                 "armor",
                 "belt",
                 "shoes",
                 "helm",
-                "necklace",
-                "talisman"
+                "necklace"
             ],
-            "flow_tags": [
-                "all"
-            ],
-            "min_value": 8,
-            "max_value": 18,
+            "min_value": 18,
+            "max_value": 32,
             "value_mode": "flat",
-            "weight": 35,
-            "unlock_level": 30,
-            "sort_order": 30
+            "unlock_level": 1,
+            "sort_order": 20,
+            "notes": "前期基础生命词条，覆盖防具与生存位项链。（1级档）"
         },
         {
-            "affix_id": "blue_crit_pct_1",
-            "affix_name": "破势",
+            "affix_id": "blue_def_flat_lv1",
+            "affix_name": "坚壁·1级",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "off_weapon"
+            ],
+            "min_value": 1,
+            "max_value": 3,
+            "value_mode": "flat",
+            "unlock_level": 1,
+            "sort_order": 30,
+            "notes": "前期基础防御词条，适用于副武器与防具位。（1级档）"
+        },
+        {
+            "affix_id": "blue_crit_pct_lv1",
+            "affix_name": "破势·1级",
             "stat": "CRIT_PERCENT",
             "slot_tags": [
                 "main_weapon",
                 "off_weapon",
-                "ring",
+                "gloves",
                 "necklace"
             ],
-            "flow_tags": [
-                "berserk",
-                "shadow"
-            ],
             "min_value": 1,
+            "max_value": 1,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 40,
+            "notes": "前期暴击率词条，面向输出型武器与护手。（1级档）"
+        },
+        {
+            "affix_id": "blue_crit_dmg_lv1",
+            "affix_name": "追命·1级",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 2,
             "max_value": 3,
             "value_mode": "percent",
-            "weight": 20,
-            "unlock_level": 30,
-            "sort_order": 40
+            "unlock_level": 1,
+            "sort_order": 50,
+            "notes": "前期暴击伤害词条，作为输出项链和武器的高价值候选。（1级档）"
+        },
+        {
+            "affix_id": "blue_dodge_lv1",
+            "affix_name": "轻影·1级",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 1,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 60,
+            "notes": "前期闪避词条，主要出现在鞋子、腰带和项链。（1级档）"
+        },
+        {
+            "affix_id": "blue_atk_speed_lv1",
+            "affix_name": "迅切·1级",
+            "stat": "ATK_SPEED",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 1,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 70,
+            "notes": "前期攻速词条，面向高频输出蓝装。（1级档）"
+        },
+        {
+            "affix_id": "blue_melee_atk_lv1",
+            "affix_name": "近战专精·1级",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 80,
+            "notes": "前期近战倍率词条，仅出现在近战相关部位。（1级档）"
+        },
+        {
+            "affix_id": "blue_spell_atk_lv1",
+            "affix_name": "术法专精·1级",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 90,
+            "notes": "前期术法倍率词条，适用于法系武器、副手和项链。（1级档）"
+        },
+        {
+            "affix_id": "blue_pdef_lv1",
+            "affix_name": "铁躯·1级",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 100,
+            "notes": "前期物理防御词条，主要用于护甲系蓝装。（1级档）"
+        },
+        {
+            "affix_id": "blue_mdef_lv1",
+            "affix_name": "灵壁·1级",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 110,
+            "notes": "前期法术防御词条，用于头盔、防具与项链。（1级档）"
+        },
+        {
+            "affix_id": "blue_cdr_lv1",
+            "affix_name": "归息·1级",
+            "stat": "CDR",
+            "slot_tags": [
+                "off_weapon",
+                "necklace",
+                "helm"
+            ],
+            "min_value": 1,
+            "max_value": 1,
+            "value_mode": "percent",
+            "unlock_level": 1,
+            "sort_order": 120,
+            "notes": "前期冷却缩减词条，供法系和功能位使用。（1级档）"
+        },
+        {
+            "affix_id": "blue_atk_flat_lv5",
+            "affix_name": "锐击·5级",
+            "stat": "ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 7,
+            "value_mode": "flat",
+            "unlock_level": 5,
+            "sort_order": 130,
+            "notes": "前期基础攻击词条，适用于武器、护手与输出项链。（5级档）"
+        },
+        {
+            "affix_id": "blue_hp_flat_lv5",
+            "affix_name": "生息·5级",
+            "stat": "HP",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 30,
+            "max_value": 52,
+            "value_mode": "flat",
+            "unlock_level": 5,
+            "sort_order": 140,
+            "notes": "前期基础生命词条，覆盖防具与生存位项链。（5级档）"
+        },
+        {
+            "affix_id": "blue_def_flat_lv5",
+            "affix_name": "坚壁·5级",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "off_weapon"
+            ],
+            "min_value": 3,
+            "max_value": 5,
+            "value_mode": "flat",
+            "unlock_level": 5,
+            "sort_order": 150,
+            "notes": "前期基础防御词条，适用于副武器与防具位。（5级档）"
+        },
+        {
+            "affix_id": "blue_crit_pct_lv5",
+            "affix_name": "破势·5级",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 160,
+            "notes": "前期暴击率词条，面向输出型武器与护手。（5级档）"
+        },
+        {
+            "affix_id": "blue_crit_dmg_lv5",
+            "affix_name": "追命·5级",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 170,
+            "notes": "前期暴击伤害词条，作为输出项链和武器的高价值候选。（5级档）"
+        },
+        {
+            "affix_id": "blue_dodge_lv5",
+            "affix_name": "轻影·5级",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 180,
+            "notes": "前期闪避词条，主要出现在鞋子、腰带和项链。（5级档）"
+        },
+        {
+            "affix_id": "blue_atk_speed_lv5",
+            "affix_name": "迅切·5级",
+            "stat": "ATK_SPEED",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 190,
+            "notes": "前期攻速词条，面向高频输出蓝装。（5级档）"
+        },
+        {
+            "affix_id": "blue_melee_atk_lv5",
+            "affix_name": "近战专精·5级",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 200,
+            "notes": "前期近战倍率词条，仅出现在近战相关部位。（5级档）"
+        },
+        {
+            "affix_id": "blue_spell_atk_lv5",
+            "affix_name": "术法专精·5级",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "necklace"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 210,
+            "notes": "前期术法倍率词条，适用于法系武器、副手和项链。（5级档）"
+        },
+        {
+            "affix_id": "blue_pdef_lv5",
+            "affix_name": "铁躯·5级",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 220,
+            "notes": "前期物理防御词条，主要用于护甲系蓝装。（5级档）"
+        },
+        {
+            "affix_id": "blue_mdef_lv5",
+            "affix_name": "灵壁·5级",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 230,
+            "notes": "前期法术防御词条，用于头盔、防具与项链。（5级档）"
+        },
+        {
+            "affix_id": "blue_cdr_lv5",
+            "affix_name": "归息·5级",
+            "stat": "CDR",
+            "slot_tags": [
+                "off_weapon",
+                "necklace",
+                "helm"
+            ],
+            "min_value": 1,
+            "max_value": 2,
+            "value_mode": "percent",
+            "unlock_level": 5,
+            "sort_order": 240,
+            "notes": "前期冷却缩减词条，供法系和功能位使用。（5级档）"
+        },
+        {
+            "affix_id": "blue_atk_flat_lv10",
+            "affix_name": "锐击·10级",
+            "stat": "ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 7,
+            "max_value": 11,
+            "value_mode": "flat",
+            "unlock_level": 10,
+            "sort_order": 250,
+            "notes": "前期基础攻击词条，适用于武器、护手与输出项链。（10级档）"
+        },
+        {
+            "affix_id": "blue_hp_flat_lv10",
+            "affix_name": "生息·10级",
+            "stat": "HP",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 48,
+            "max_value": 80,
+            "value_mode": "flat",
+            "unlock_level": 10,
+            "sort_order": 260,
+            "notes": "前期基础生命词条，覆盖防具与生存位项链。（10级档）"
+        },
+        {
+            "affix_id": "blue_def_flat_lv10",
+            "affix_name": "坚壁·10级",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "off_weapon"
+            ],
+            "min_value": 5,
+            "max_value": 8,
+            "value_mode": "flat",
+            "unlock_level": 10,
+            "sort_order": 270,
+            "notes": "前期基础防御词条，适用于副武器与防具位。（10级档）"
+        },
+        {
+            "affix_id": "blue_crit_pct_lv10",
+            "affix_name": "破势·10级",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 280,
+            "notes": "前期暴击率词条，面向输出型武器与护手。（10级档）"
+        },
+        {
+            "affix_id": "blue_crit_dmg_lv10",
+            "affix_name": "追命·10级",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 6,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 290,
+            "notes": "前期暴击伤害词条，作为输出项链和武器的高价值候选。（10级档）"
+        },
+        {
+            "affix_id": "blue_dodge_lv10",
+            "affix_name": "轻影·10级",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "necklace"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 300,
+            "notes": "前期闪避词条，主要出现在鞋子、腰带和项链。（10级档）"
+        },
+        {
+            "affix_id": "blue_atk_speed_lv10",
+            "affix_name": "迅切·10级",
+            "stat": "ATK_SPEED",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 310,
+            "notes": "前期攻速词条，面向高频输出蓝装。（10级档）"
+        },
+        {
+            "affix_id": "blue_melee_atk_lv10",
+            "affix_name": "近战专精·10级",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 320,
+            "notes": "前期近战倍率词条，仅出现在近战相关部位。（10级档）"
+        },
+        {
+            "affix_id": "blue_spell_atk_lv10",
+            "affix_name": "术法专精·10级",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 330,
+            "notes": "前期术法倍率词条，适用于法系武器、副手和项链。（10级档）"
+        },
+        {
+            "affix_id": "blue_pdef_lv10",
+            "affix_name": "铁躯·10级",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 340,
+            "notes": "前期物理防御词条，主要用于护甲系蓝装。（10级档）"
+        },
+        {
+            "affix_id": "blue_mdef_lv10",
+            "affix_name": "灵壁·10级",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 350,
+            "notes": "前期法术防御词条，用于头盔、防具与项链。（10级档）"
+        },
+        {
+            "affix_id": "blue_cdr_lv10",
+            "affix_name": "归息·10级",
+            "stat": "CDR",
+            "slot_tags": [
+                "off_weapon",
+                "necklace",
+                "helm"
+            ],
+            "min_value": 2,
+            "max_value": 3,
+            "value_mode": "percent",
+            "unlock_level": 10,
+            "sort_order": 360,
+            "notes": "前期冷却缩减词条，供法系和功能位使用。（10级档）"
+        },
+        {
+            "affix_id": "blue_atk_flat_lv15",
+            "affix_name": "锐击·15级",
+            "stat": "ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 10,
+            "max_value": 15,
+            "value_mode": "flat",
+            "unlock_level": 15,
+            "sort_order": 370,
+            "notes": "前期基础攻击词条，适用于武器、护手与输出项链。（15级档）"
+        },
+        {
+            "affix_id": "blue_hp_flat_lv15",
+            "affix_name": "生息·15级",
+            "stat": "HP",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 68,
+            "max_value": 108,
+            "value_mode": "flat",
+            "unlock_level": 15,
+            "sort_order": 380,
+            "notes": "前期基础生命词条，覆盖防具与生存位项链。（15级档）"
+        },
+        {
+            "affix_id": "blue_def_flat_lv15",
+            "affix_name": "坚壁·15级",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "off_weapon"
+            ],
+            "min_value": 7,
+            "max_value": 11,
+            "value_mode": "flat",
+            "unlock_level": 15,
+            "sort_order": 390,
+            "notes": "前期基础防御词条，适用于副武器与防具位。（15级档）"
+        },
+        {
+            "affix_id": "blue_crit_pct_lv15",
+            "affix_name": "破势·15级",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 400,
+            "notes": "前期暴击率词条，面向输出型武器与护手。（15级档）"
+        },
+        {
+            "affix_id": "blue_crit_dmg_lv15",
+            "affix_name": "追命·15级",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 5,
+            "max_value": 7,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 410,
+            "notes": "前期暴击伤害词条，作为输出项链和武器的高价值候选。（15级档）"
+        },
+        {
+            "affix_id": "blue_dodge_lv15",
+            "affix_name": "轻影·15级",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 420,
+            "notes": "前期闪避词条，主要出现在鞋子、腰带和项链。（15级档）"
+        },
+        {
+            "affix_id": "blue_atk_speed_lv15",
+            "affix_name": "迅切·15级",
+            "stat": "ATK_SPEED",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 430,
+            "notes": "前期攻速词条，面向高频输出蓝装。（15级档）"
+        },
+        {
+            "affix_id": "blue_melee_atk_lv15",
+            "affix_name": "近战专精·15级",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves"
+            ],
+            "min_value": 4,
+            "max_value": 6,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 440,
+            "notes": "前期近战倍率词条，仅出现在近战相关部位。（15级档）"
+        },
+        {
+            "affix_id": "blue_spell_atk_lv15",
+            "affix_name": "术法专精·15级",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 6,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 450,
+            "notes": "前期术法倍率词条，适用于法系武器、副手和项链。（15级档）"
+        },
+        {
+            "affix_id": "blue_pdef_lv15",
+            "affix_name": "铁躯·15级",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm"
+            ],
+            "min_value": 4,
+            "max_value": 6,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 460,
+            "notes": "前期物理防御词条，主要用于护甲系蓝装。（15级档）"
+        },
+        {
+            "affix_id": "blue_mdef_lv15",
+            "affix_name": "灵壁·15级",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 6,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 470,
+            "notes": "前期法术防御词条，用于头盔、防具与项链。（15级档）"
+        },
+        {
+            "affix_id": "blue_cdr_lv15",
+            "affix_name": "归息·15级",
+            "stat": "CDR",
+            "slot_tags": [
+                "off_weapon",
+                "necklace",
+                "helm"
+            ],
+            "min_value": 3,
+            "max_value": 4,
+            "value_mode": "percent",
+            "unlock_level": 15,
+            "sort_order": 480,
+            "notes": "前期冷却缩减词条，供法系和功能位使用。（15级档）"
+        },
+        {
+            "affix_id": "blue_atk_flat_lv20",
+            "affix_name": "锐击·20级",
+            "stat": "ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 14,
+            "max_value": 20,
+            "value_mode": "flat",
+            "unlock_level": 20,
+            "sort_order": 490,
+            "notes": "前期基础攻击词条，适用于武器、护手与输出项链。（20级档）"
+        },
+        {
+            "affix_id": "blue_hp_flat_lv20",
+            "affix_name": "生息·20级",
+            "stat": "HP",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 90,
+            "max_value": 140,
+            "value_mode": "flat",
+            "unlock_level": 20,
+            "sort_order": 500,
+            "notes": "前期基础生命词条，覆盖防具与生存位项链。（20级档）"
+        },
+        {
+            "affix_id": "blue_def_flat_lv20",
+            "affix_name": "坚壁·20级",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "off_weapon"
+            ],
+            "min_value": 9,
+            "max_value": 14,
+            "value_mode": "flat",
+            "unlock_level": 20,
+            "sort_order": 510,
+            "notes": "前期基础防御词条，适用于副武器与防具位。（20级档）"
+        },
+        {
+            "affix_id": "blue_crit_pct_lv20",
+            "affix_name": "破势·20级",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 5,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 520,
+            "notes": "前期暴击率词条，面向输出型武器与护手。（20级档）"
+        },
+        {
+            "affix_id": "blue_crit_dmg_lv20",
+            "affix_name": "追命·20级",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 6,
+            "max_value": 8,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 530,
+            "notes": "前期暴击伤害词条，作为输出项链和武器的高价值候选。（20级档）"
+        },
+        {
+            "affix_id": "blue_dodge_lv20",
+            "affix_name": "轻影·20级",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 5,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 540,
+            "notes": "前期闪避词条，主要出现在鞋子、腰带和项链。（20级档）"
+        },
+        {
+            "affix_id": "blue_atk_speed_lv20",
+            "affix_name": "迅切·20级",
+            "stat": "ATK_SPEED",
+            "slot_tags": [
+                "main_weapon",
+                "gloves",
+                "necklace"
+            ],
+            "min_value": 4,
+            "max_value": 5,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 550,
+            "notes": "前期攻速词条，面向高频输出蓝装。（20级档）"
+        },
+        {
+            "affix_id": "blue_melee_atk_lv20",
+            "affix_name": "近战专精·20级",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves"
+            ],
+            "min_value": 5,
+            "max_value": 7,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 560,
+            "notes": "前期近战倍率词条，仅出现在近战相关部位。（20级档）"
+        },
+        {
+            "affix_id": "blue_spell_atk_lv20",
+            "affix_name": "术法专精·20级",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "necklace"
+            ],
+            "min_value": 5,
+            "max_value": 7,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 570,
+            "notes": "前期术法倍率词条，适用于法系武器、副手和项链。（20级档）"
+        },
+        {
+            "affix_id": "blue_pdef_lv20",
+            "affix_name": "铁躯·20级",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm"
+            ],
+            "min_value": 5,
+            "max_value": 7,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 580,
+            "notes": "前期物理防御词条，主要用于护甲系蓝装。（20级档）"
+        },
+        {
+            "affix_id": "blue_mdef_lv20",
+            "affix_name": "灵壁·20级",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "necklace"
+            ],
+            "min_value": 5,
+            "max_value": 7,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 590,
+            "notes": "前期法术防御词条，用于头盔、防具与项链。（20级档）"
+        },
+        {
+            "affix_id": "blue_cdr_lv20",
+            "affix_name": "归息·20级",
+            "stat": "CDR",
+            "slot_tags": [
+                "off_weapon",
+                "necklace",
+                "helm"
+            ],
+            "min_value": 4,
+            "max_value": 5,
+            "value_mode": "percent",
+            "unlock_level": 20,
+            "sort_order": 600,
+            "notes": "前期冷却缩减词条，供法系和功能位使用。（20级档）"
         }
     ]
 }

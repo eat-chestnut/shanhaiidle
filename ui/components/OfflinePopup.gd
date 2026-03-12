@@ -9,7 +9,7 @@ const ITEM_SHOW_LIMIT := 12
 
 func _ready() -> void:
 	visible = false
-	_title.text = "离线收益"
+	_title.text = "自动巡查收益"
 	_btn_ok.text = "确定"
 	if not _btn_ok.pressed.is_connected(close):
 		_btn_ok.pressed.connect(close)
@@ -47,7 +47,7 @@ func _build_summary_text(summary: Dictionary) -> String:
 	var equip_count := maxi(0, int(summary.get("equip_count", 0)))
 
 	var lines: Array[String] = []
-	lines.append("离线时间：%s" % _format_mm_ss(seconds))
+	lines.append("巡查时长：%s" % _format_mm_ss(seconds))
 	lines.append("击杀：%d（精英%d / Boss%d）" % [kills, elite, boss])
 	lines.append("经验：+%d" % exp)
 	lines.append("装备：+%d" % equip_count)

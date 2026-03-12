@@ -249,6 +249,7 @@ func _on_rank_up_pressed() -> void:
 	if not bool(ret.get("ok", false)):
 		refresh()
 		return
+	TaskService.on_forge_done(1)
 	refresh()
 	close()
 

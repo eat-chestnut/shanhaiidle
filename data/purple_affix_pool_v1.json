@@ -1,56 +1,32 @@
 {
     "meta": {
         "key": "purple_affix_pool",
-        "version": 6,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "182021be1fdf1bab6357fe441b17ec74f7d3d427a1cedd5302147e4f09e0f814"
+        "version": 12,
+        "exported_at": "2026-03-11 07:35:43",
+        "sha256": "e60b9e756de4686f544c6e7cb51d31c8a2e40e353ca67228bff8e11c85a5fa68"
     },
     "purple_affix_pool": [
         {
-            "affix_id": "purple_atk_flat_1",
+            "affix_id": "purple_atk_flat_01",
             "affix_name": "战意",
             "stat": "ATK",
             "slot_tags": [
                 "main_weapon",
                 "off_weapon",
-                "ring"
-            ],
-            "flow_tags": [
-                "berserk",
-                "hunt"
+                "gloves",
+                "ring",
+                "necklace"
             ],
             "rarity_tier": "purple",
-            "min_value": 4,
-            "max_value": 9,
+            "min_value": 16,
+            "max_value": 36,
             "value_mode": "flat",
-            "weight": 30,
+            "weight": 100,
             "unlock_level": 50,
             "sort_order": 10
         },
         {
-            "affix_id": "purple_def_flat_1",
-            "affix_name": "山岳",
-            "stat": "DEF",
-            "slot_tags": [
-                "armor",
-                "belt",
-                "helm",
-                "bracelet"
-            ],
-            "flow_tags": [
-                "guard",
-                "frost"
-            ],
-            "rarity_tier": "purple",
-            "min_value": 4,
-            "max_value": 9,
-            "value_mode": "flat",
-            "weight": 30,
-            "unlock_level": 50,
-            "sort_order": 20
-        },
-        {
-            "affix_id": "purple_hp_flat_1",
+            "affix_id": "purple_hp_flat_01",
             "affix_name": "长生",
             "stat": "HP",
             "slot_tags": [
@@ -58,38 +34,408 @@
                 "belt",
                 "shoes",
                 "helm",
+                "bracelet",
                 "talisman"
             ],
-            "flow_tags": [
-                "all"
+            "rarity_tier": "purple",
+            "min_value": 120,
+            "max_value": 280,
+            "value_mode": "flat",
+            "weight": 100,
+            "unlock_level": 50,
+            "sort_order": 20
+        },
+        {
+            "affix_id": "purple_def_flat_01",
+            "affix_name": "山岳",
+            "stat": "DEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "shoes",
+                "helm",
+                "bracelet"
             ],
             "rarity_tier": "purple",
-            "min_value": 16,
+            "min_value": 14,
             "max_value": 32,
             "value_mode": "flat",
-            "weight": 26,
+            "weight": 96,
             "unlock_level": 50,
             "sort_order": 30
         },
         {
-            "affix_id": "gold_loot_pct_1",
-            "affix_name": "天运",
+            "affix_id": "purple_crit_pct_01",
+            "affix_name": "破军",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "ring",
+                "necklace",
+                "gloves"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 3,
+            "max_value": 7,
+            "value_mode": "percent",
+            "weight": 82,
+            "unlock_level": 50,
+            "sort_order": 40
+        },
+        {
+            "affix_id": "purple_crit_dmg_01",
+            "affix_name": "绝锋",
+            "stat": "CRIT_DMG",
+            "slot_tags": [
+                "main_weapon",
+                "ring",
+                "bracelet",
+                "necklace"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 6,
+            "max_value": 14,
+            "value_mode": "percent",
+            "weight": 78,
+            "unlock_level": 50,
+            "sort_order": 50
+        },
+        {
+            "affix_id": "purple_melee_atk_01",
+            "affix_name": "斩岳",
+            "stat": "MELEE_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "ring"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 4,
+            "max_value": 10,
+            "value_mode": "percent",
+            "weight": 72,
+            "unlock_level": 50,
+            "sort_order": 60
+        },
+        {
+            "affix_id": "purple_ranged_atk_01",
+            "affix_name": "穿云",
+            "stat": "RANGED_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "ring",
+                "necklace"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 4,
+            "max_value": 10,
+            "value_mode": "percent",
+            "weight": 72,
+            "unlock_level": 50,
+            "sort_order": 70
+        },
+        {
+            "affix_id": "purple_spell_atk_01",
+            "affix_name": "焚脉",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "ring",
+                "necklace",
+                "talisman"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 4,
+            "max_value": 10,
+            "value_mode": "percent",
+            "weight": 74,
+            "unlock_level": 50,
+            "sort_order": 80
+        },
+        {
+            "affix_id": "purple_final_damage_01",
+            "affix_name": "绝厄",
+            "stat": "FINAL_DAMAGE",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "ring",
+                "necklace"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 2,
+            "max_value": 6,
+            "value_mode": "percent",
+            "weight": 54,
+            "unlock_level": 50,
+            "sort_order": 90
+        },
+        {
+            "affix_id": "purple_cdr_01",
+            "affix_name": "归息",
+            "stat": "CDR",
+            "slot_tags": [
+                "necklace",
+                "bracelet",
+                "talisman"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 2,
+            "max_value": 6,
+            "value_mode": "percent",
+            "weight": 60,
+            "unlock_level": 50,
+            "sort_order": 100
+        },
+        {
+            "affix_id": "purple_dodge_01",
+            "affix_name": "流影",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "belt",
+                "bracelet"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 2,
+            "max_value": 6,
+            "value_mode": "percent",
+            "weight": 58,
+            "unlock_level": 50,
+            "sort_order": 110
+        },
+        {
+            "affix_id": "purple_pdef_01",
+            "affix_name": "镇甲",
+            "stat": "PDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "bracelet"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 4,
+            "max_value": 10,
+            "value_mode": "percent",
+            "weight": 52,
+            "unlock_level": 50,
+            "sort_order": 120
+        },
+        {
+            "affix_id": "purple_mdef_01",
+            "affix_name": "玄屏",
+            "stat": "MDEF",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "bracelet",
+                "talisman"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 4,
+            "max_value": 10,
+            "value_mode": "percent",
+            "weight": 50,
+            "unlock_level": 50,
+            "sort_order": 130
+        },
+        {
+            "affix_id": "purple_final_reduction_01",
+            "affix_name": "封脉",
+            "stat": "FINAL_REDUCTION",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "bracelet",
+                "talisman"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 2,
+            "max_value": 6,
+            "value_mode": "percent",
+            "weight": 48,
+            "unlock_level": 50,
+            "sort_order": 140
+        },
+        {
+            "affix_id": "purple_qi_01",
+            "affix_name": "藏神",
+            "stat": "QI",
+            "slot_tags": [
+                "talisman",
+                "necklace",
+                "bracelet"
+            ],
+            "rarity_tier": "purple",
+            "min_value": 6,
+            "max_value": 14,
+            "value_mode": "flat",
+            "weight": 46,
+            "unlock_level": 50,
+            "sort_order": 150
+        },
+        {
+            "affix_id": "purple_loot_01",
+            "affix_name": "寻珍",
             "stat": "LOOT_BONUS_PERCENT",
             "slot_tags": [
                 "necklace",
-                "ring",
-                "bracelet"
+                "bracelet",
+                "talisman"
             ],
-            "flow_tags": [
-                "all"
-            ],
-            "rarity_tier": "gold",
+            "rarity_tier": "purple",
             "min_value": 2,
             "max_value": 5,
             "value_mode": "percent",
-            "weight": 14,
+            "weight": 28,
+            "unlock_level": 50,
+            "sort_order": 160
+        },
+        {
+            "affix_id": "gold_atk_flat_01",
+            "affix_name": "焚世",
+            "stat": "ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "gloves",
+                "ring"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 28,
+            "max_value": 56,
+            "value_mode": "flat",
+            "weight": 32,
             "unlock_level": 60,
-            "sort_order": 40
+            "sort_order": 170
+        },
+        {
+            "affix_id": "gold_hp_flat_01",
+            "affix_name": "永镇",
+            "stat": "HP",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "helm",
+                "bracelet",
+                "talisman"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 220,
+            "max_value": 420,
+            "value_mode": "flat",
+            "weight": 32,
+            "unlock_level": 60,
+            "sort_order": 180
+        },
+        {
+            "affix_id": "gold_crit_pct_01",
+            "affix_name": "天猎",
+            "stat": "CRIT_PERCENT",
+            "slot_tags": [
+                "main_weapon",
+                "ring",
+                "necklace"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 4,
+            "max_value": 8,
+            "value_mode": "percent",
+            "weight": 28,
+            "unlock_level": 60,
+            "sort_order": 190
+        },
+        {
+            "affix_id": "gold_spell_atk_01",
+            "affix_name": "玄炎",
+            "stat": "SPELL_ATK",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "ring",
+                "talisman"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 5,
+            "max_value": 12,
+            "value_mode": "percent",
+            "weight": 28,
+            "unlock_level": 60,
+            "sort_order": 200
+        },
+        {
+            "affix_id": "gold_final_damage_01",
+            "affix_name": "山海断厄",
+            "stat": "FINAL_DAMAGE",
+            "slot_tags": [
+                "main_weapon",
+                "off_weapon",
+                "ring"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 3,
+            "max_value": 7,
+            "value_mode": "percent",
+            "weight": 24,
+            "unlock_level": 60,
+            "sort_order": 210
+        },
+        {
+            "affix_id": "gold_cdr_01",
+            "affix_name": "空照",
+            "stat": "CDR",
+            "slot_tags": [
+                "bracelet",
+                "necklace",
+                "talisman"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 3,
+            "max_value": 7,
+            "value_mode": "percent",
+            "weight": 24,
+            "unlock_level": 60,
+            "sort_order": 220
+        },
+        {
+            "affix_id": "gold_dodge_01",
+            "affix_name": "九影",
+            "stat": "DODGE",
+            "slot_tags": [
+                "shoes",
+                "bracelet",
+                "belt"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 3,
+            "max_value": 7,
+            "value_mode": "percent",
+            "weight": 22,
+            "unlock_level": 60,
+            "sort_order": 230
+        },
+        {
+            "affix_id": "gold_final_reduction_01",
+            "affix_name": "封岳",
+            "stat": "FINAL_REDUCTION",
+            "slot_tags": [
+                "armor",
+                "belt",
+                "bracelet",
+                "talisman"
+            ],
+            "rarity_tier": "gold",
+            "min_value": 3,
+            "max_value": 7,
+            "value_mode": "percent",
+            "weight": 22,
+            "unlock_level": 60,
+            "sort_order": 240
         }
     ]
 }

@@ -48,3 +48,4 @@ func set_stage_and_diff(id: String, diff: int, emit_update: bool = true) -> void
 	save_data()
 	if emit_update:
 		EventBus.notify_inventory_updated()
+		EventBus.request_profile_sync("stage_route_changed")

@@ -24,7 +24,6 @@ class Item extends Model
         'icon',
         'trait',
         'desc',
-        'gem_effect',
         'effect_type',
         'target_scope',
         'effect_payload',
@@ -40,7 +39,6 @@ class Item extends Model
     ];
 
     protected $casts = [
-        'gem_effect' => 'array',
         'effect_payload' => 'array',
         'socket_limit' => 'array',
         'source_tags' => 'array',

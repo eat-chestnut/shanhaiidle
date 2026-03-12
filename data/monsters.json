@@ -1,55 +1,64 @@
 {
-  "monsters": [
-    {
-      "id": "mob_a",
-      "name": "小妖",
-      "kind": "normal",
-      "hp": 6,
-      "atk": 1,
-      "def": 0,
-      "speed": 85,
-      "radius": 14,
-      "aggro_range": 220,
-      "attack_interval": 1.1,
-      "attack_range": 8,
-      "exp": 1,
-      "drop_bonus_percent": 0,
-      "dex_gold": 3,
-      "icon": ""
+    "meta": {
+        "key": "monsters",
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:43",
+        "sha256": "68359110ef599a08725f8a7dbcaaa1c32507836200ccfbc646159b877ffb0287"
     },
-    {
-      "id": "elite_a",
-      "name": "精英·小妖",
-      "kind": "elite",
-      "hp": 18,
-      "atk": 2,
-      "def": 1,
-      "speed": 92,
-      "radius": 16,
-      "aggro_range": 260,
-      "attack_interval": 1.0,
-      "attack_range": 10,
-      "exp": 5,
-      "drop_bonus_percent": 30,
-      "dex_gold": 8,
-      "icon": ""
-    },
-    {
-      "id": "boss_a",
-      "name": "Boss·妖王",
-      "kind": "boss",
-      "hp": 45,
-      "atk": 3,
-      "def": 2,
-      "speed": 80,
-      "radius": 20,
-      "aggro_range": 320,
-      "attack_interval": 0.9,
-      "attack_range": 12,
-      "exp": 12,
-      "drop_bonus_percent": 80,
-      "dex_gold": 20,
-      "icon": ""
-    }
-  ]
+    "monsters": [
+        {
+            "id": "mob_a",
+            "name": "小妖",
+            "kind": "normal",
+            "hp": 6,
+            "atk": 1,
+            "def": 0,
+            "speed": 85,
+            "radius": 14,
+            "aggro_range": 220,
+            "attack_interval": 1.1,
+            "attack_range": 8,
+            "exp": 1,
+            "drop_bonus_percent": 0,
+            "dex_gold": 3,
+            "icon": "",
+            "drops": []
+        },
+        {
+            "id": "elite_a",
+            "name": "精英·小妖",
+            "kind": "elite",
+            "hp": 18,
+            "atk": 2,
+            "def": 1,
+            "speed": 92,
+            "radius": 16,
+            "aggro_range": 260,
+            "attack_interval": 1,
+            "attack_range": 10,
+            "exp": 5,
+            "drop_bonus_percent": 30,
+            "dex_gold": 8,
+            "icon": "",
+            "drops": []
+        },
+        {
+            "id": "boss_a",
+            "name": "Boss·妖王",
+            "kind": "boss",
+            "hp": 45,
+            "atk": 3,
+            "def": 2,
+            "speed": 80,
+            "radius": 20,
+            "aggro_range": 320,
+            "attack_interval": 0.9,
+            "attack_range": 12,
+            "exp": 12,
+            "drop_bonus_percent": 80,
+            "dex_gold": 20,
+            "icon": "",
+            "drops": []
+        }
+    ]
 }

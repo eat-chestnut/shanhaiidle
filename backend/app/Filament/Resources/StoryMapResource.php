@@ -7,12 +7,12 @@ use App\Models\StoryMap;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,15 +22,15 @@ use Filament\Tables\Table;
 class StoryMapResource extends Resource
 {
     protected static ?string $model = StoryMap::class;
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationLabel = '地图基础';
     protected static ?string $modelLabel = '地图';
     protected static ?string $pluralModelLabel = '地图基础';
-    protected static ?string $navigationGroup = '世界观与主线';
+    protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->schema([
                     TextInput::make('map_id')->label('地图 ID')->required()->maxLength(120)->unique(ignoreRecord: true),
@@ -48,9 +48,9 @@ class StoryMapResource extends Resource
                 ->columns(3),
             Section::make('主题与掉落池')
                 ->schema([
-                    MultiSelect::make('theme_tags')->label('主题标签')->options([
+                    Select::make('theme_tags')->label('主题标签')->options([
                         'forest' => '森林', 'ore' => '矿脉', 'poison' => '毒瘴', 'seal' => '封印', 'ritual' => '祭坛', 'water' => '水域', 'ancient' => '古迹',
-                    ])->searchable()->preload(),
+                    ])->multiple()->searchable()->preload(),
                     Textarea::make('atmosphere_desc')->label('氛围描述')->rows(3)->columnSpanFull(),
                     Textarea::make('unlock_condition')->label('解锁条件')->rows(2)->columnSpanFull(),
                     TextInput::make('normal_drop_pool')->label('普通掉落池')->maxLength(120),
@@ -88,10 +88,10 @@ class StoryMapResource extends Resource
                 Tables\Filters\SelectFilter::make('map_type')->label('地图类型')->options(AdminOptions::mapTypeOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->recordActions([\Filament\Actions\EditAction::make()])
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

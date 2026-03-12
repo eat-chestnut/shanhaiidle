@@ -7,12 +7,12 @@ use App\Models\StoryBoss;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,15 +22,15 @@ use Filament\Tables\Table;
 class StoryBossResource extends Resource
 {
     protected static ?string $model = StoryBoss::class;
-    protected static ?string $navigationIcon = 'heroicon-o-fire';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-fire';
     protected static ?string $navigationLabel = 'Boss基础';
     protected static ?string $modelLabel = 'Boss';
     protected static ?string $pluralModelLabel = 'Boss基础';
-    protected static ?string $navigationGroup = '世界观与主线';
+    protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->schema([
                     TextInput::make('boss_id')->label('Boss ID')->required()->maxLength(120)->unique(ignoreRecord: true),
@@ -46,12 +46,12 @@ class StoryBossResource extends Resource
             Section::make('文案与标签')
                 ->schema([
                     Textarea::make('lore_role')->label('世界观定位')->rows(3)->columnSpanFull(),
-                    MultiSelect::make('visual_tags')->label('视觉关键词')->options([
+                    Select::make('visual_tags')->label('视觉关键词')->options([
                         'beast' => '异兽', 'ritual' => '祭祀', 'fire' => '火焰', 'ice' => '寒霜', 'water' => '水域', 'shadow' => '妖影', 'seal' => '封印',
-                    ])->searchable()->preload(),
-                    MultiSelect::make('combat_tags')->label('战斗关键词')->options([
+                    ])->multiple()->searchable()->preload(),
+                    Select::make('combat_tags')->label('战斗关键词')->options([
                         'melee' => '近战', 'ranged' => '远程', 'summon' => '召唤', 'poison' => '中毒', 'burn' => '灼烧', 'freeze' => '冻结', 'aoe' => '范围伤害',
-                    ])->searchable()->preload(),
+                    ])->multiple()->searchable()->preload(),
                     Textarea::make('intro_copy')->label('出场文案')->rows(4)->columnSpanFull(),
                     Textarea::make('clear_copy')->label('击败文案')->rows(3)->columnSpanFull(),
                 ])
@@ -85,10 +85,10 @@ class StoryBossResource extends Resource
                 Tables\Filters\SelectFilter::make('boss_type')->label('Boss 类型')->options(AdminOptions::bossTypeOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->recordActions([\Filament\Actions\EditAction::make()])
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

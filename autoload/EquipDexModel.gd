@@ -94,14 +94,7 @@ func get_unlock_count() -> int:
 
 func get_total_entry_ids() -> Array[String]:
 	var ids: Array[String] = []
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var equip_db_any = cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return ids
-	var rows_any = (equip_db_any as Dictionary).get("equip_templates", [])
-	if not (rows_any is Array):
-		return ids
-	for row_any in rows_any:
+	for row_any in EquipmentModel.get_template_catalog_rows():
 		if not (row_any is Dictionary):
 			continue
 		var row: Dictionary = row_any

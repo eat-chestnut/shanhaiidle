@@ -30,7 +30,7 @@ class ExportGemCatalogJson extends Command
                     'rarity' => (string) $item->rarity,
                     'effect_type' => (string) ($item->effect_type ?? 'stat'),
                     'target_scope' => (string) ($item->target_scope ?? 'global'),
-                    'effect_payload' => is_array($item->effect_payload) ? $item->effect_payload : (is_array($item->gem_effect) ? $item->gem_effect : []),
+                    'effect_payload' => is_array($item->effect_payload) ? $item->effect_payload : [],
                     'drop_unlock_level' => (int) ($item->drop_unlock_level ?? 1),
                     'socket_limit' => is_array($item->socket_limit) ? array_values($item->socket_limit) : [],
                     'can_compose' => (bool) ($item->can_compose ?? false),
@@ -43,8 +43,7 @@ class ExportGemCatalogJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['gem_catalog' => $rows];
-        $version = ExportMetaService::getNextVersion('gem_catalog');
-        $meta = ExportMetaService::makeMeta('gem_catalog', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('gem_catalog', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -60,7 +59,7 @@ class ExportGemCatalogJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'gem_catalog_v1.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d gems -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d gems -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

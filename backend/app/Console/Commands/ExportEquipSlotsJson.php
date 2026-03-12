@@ -39,8 +39,7 @@ class ExportEquipSlotsJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['equip_slots' => $rows];
-        $version = ExportMetaService::getNextVersion('equip_slots');
-        $meta = ExportMetaService::makeMeta('equip_slots', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('equip_slots', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -56,7 +55,7 @@ class ExportEquipSlotsJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'equip_slots_v1.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d equip slots -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d equip slots -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

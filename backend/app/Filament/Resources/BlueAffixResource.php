@@ -5,13 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BlueAffixResource\Pages;
 use App\Models\BlueAffix;
 use App\Support\AdminOptions;
-use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,7 +25,7 @@ class BlueAffixResource extends Resource
 {
     protected static ?string $model = BlueAffix::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-bolt';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
     protected static ?string $navigationLabel = '蓝词条池';
 
@@ -30,11 +33,11 @@ class BlueAffixResource extends Resource
 
     protected static ?string $pluralModelLabel = '蓝色词条池';
 
-    protected static ?string $navigationGroup = '装备成长';
+    protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->description('蓝色词条只定义词条本体，不再在这里维护流派限制和抽取权重。抽取倾向统一在蓝装模板侧配置。')
                 ->schema([
@@ -43,11 +46,11 @@ class BlueAffixResource extends Resource
                     Select::make('stat')->label('属性')->required()->options(AdminOptions::statOptions())->searchable()->helperText('显示中文名，同时保留内部 Key。'),
                     Select::make('value_mode')->label('数值模式')->required()->options(AdminOptions::valueModeOptions())->default('flat'),
                 ])
-                ->columns(2),
+                ->columns(4),
             Section::make('适用范围')
                 ->description('允许部位会作为蓝装模板配置词条时的过滤条件。')
                 ->schema([
-                    MultiSelect::make('slot_tags')->label('部位')->options(AdminOptions::slotOptions())->searchable()->preload()->helperText('选择该词条可生效的装备部位。'),
+                    Select::make('slot_tags')->label('部位')->multiple()->options(AdminOptions::slotOptions())->searchable()->preload()->helperText('选择该词条可生效的装备部位。'),
                 ])
                 ->columns(1),
             Section::make('数值与启用')
@@ -55,12 +58,12 @@ class BlueAffixResource extends Resource
                 ->schema([
                     TextInput::make('min_value')->label('最小值')->integer()->required()->default(0)->minValue(0),
                     TextInput::make('max_value')->label('最大值')->integer()->required()->default(0)->minValue(0),
-                    TextInput::make('unlock_level')->label('开放等级')->integer()->minValue(1)->required()->default(30),
-                    Toggle::make('is_enabled')->label('启用')->default(true),
+                    TextInput::make('unlock_level')->label('开放等级')->integer()->minValue(1)->required()->default(1)->helperText('按 1 / 5 / 10 / 15 / 20 级档配置'),
                     TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
                     Textarea::make('notes')->label('备注')->rows(3)->columnSpanFull(),
+                    Toggle::make('is_enabled')->label('启用')->default(true),
                 ])
-                ->columns(2),
+                ->columns(5),
         ])->columns(1);
     }
 
@@ -73,9 +76,7 @@ class BlueAffixResource extends Resource
                 TextColumn::make('stat')->label('属性')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::statOptions(), $state))->sortable(),
                 TextColumn::make('slot_tags')
                     ->label('允许部位')
-                    ->formatStateUsing(fn (mixed $state): string => collect(is_array($state) ? $state : [])
-                        ->map(fn (string $slot): string => AdminOptions::optionLabel(AdminOptions::slotOptions(), $slot))
-                        ->implode(' / '))
+                    ->formatStateUsing(fn (?string $state): string => AdminOptions::slotOptions()[$state] ?? $state)
                     ->toggleable(),
                 TextColumn::make('value_mode')->label('数值模式')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::valueModeOptions(), $state)),
                 TextColumn::make('unlock_level')->label('开放等级')->sortable(),
@@ -87,12 +88,14 @@ class BlueAffixResource extends Resource
                 Tables\Filters\SelectFilter::make('value_mode')->label('数值模式')->options(AdminOptions::valueModeOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('delete'),
                 ]),
             ])
             ->defaultSort('sort_order');

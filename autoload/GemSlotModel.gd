@@ -82,14 +82,13 @@ func get_bonus() -> Dictionary:
 		var item_def := _find_item_def(gem_id)
 		if item_def.is_empty():
 			continue
-		var effect_any: Variant = item_def.get("gem_effect", {})
-		if not (effect_any is Dictionary):
+		var stat_bonus := EquipmentModel.get_gem_stat_bonus(item_def)
+		if stat_bonus.is_empty():
 			continue
-		var effect: Dictionary = effect_any
-		var stat := str(effect.get("stat", ""))
+		var stat := str(stat_bonus.get("stat", ""))
 		if stat.is_empty():
 			continue
-		var val := int(effect.get("val", 0))
+		var val := int(round(float(stat_bonus.get("value", 0.0))))
 		if val == 0:
 			continue
 		totals[stat] = int(totals.get(stat, 0)) + val

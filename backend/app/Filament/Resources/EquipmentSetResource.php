@@ -7,16 +7,18 @@ use App\Models\EquipmentSet;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -27,7 +29,7 @@ class EquipmentSetResource extends Resource
 {
     protected static ?string $model = EquipmentSet::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?string $navigationLabel = '套装配置';
 
@@ -35,67 +37,181 @@ class EquipmentSetResource extends Resource
 
     protected static ?string $modelLabel = '套装配置';
 
-    protected static ?string $navigationGroup = '装备成长';
+    protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Tabs::make('EquipmentSetTabs')
-                ->persistTabInQueryString()
-                ->tabs([
-                    Tab::make('基础信息')
-                        ->schema([
-                            Section::make('套装基础')
-                                ->description('按 20 / 40 / 60 三级套装配置，阈值数量会在保存前严格校验。')
-                                ->schema([
-                                    TextInput::make('id')->label('套装 ID')->required()->maxLength(64)->unique(ignoreRecord: true)->disabled(fn (?EquipmentSet $record): bool => $record !== null),
-                                    TextInput::make('set_line_id')->label('套装线 ID')->required()->maxLength(64),
-                                    TextInput::make('name')->label('名称')->required()->maxLength(255),
-                                    TextInput::make('sect')->label('所属宗门')->maxLength(64),
-                                    Select::make('flow_tag')->label('流派')->options(AdminOptions::flowOptions())->searchable()->nullable(),
-                                    Select::make('stage')->label('阶段')->required()->options([20 => '20级套装', 40 => '40级套装', 60 => '60级套装'])->live(),
-                                    TextInput::make('piece_count')->label('套装总件数')->integer()->required()->default(4)->minValue(2)->maxValue(8),
-                                    TextInput::make('max_pieces')->label('兼容总件数')->integer()->required()->default(4)->minValue(2)->maxValue(10)->helperText('旧字段兼容，建议与总件数一致。'),
-                                    MultiSelect::make('slot_ids')->label('套装位')->options(AdminOptions::slotOptions())->searchable()->preload()->helperText('固定套装位请直接从预设部位中选择。'),
-                                    Textarea::make('description')->label('说明')->rows(3)->columnSpanFull(),
-                                    Toggle::make('is_enabled')->label('启用')->default(true),
-                                    TextInput::make('sort_order')->label('排序')->required()->integer()->minValue(0)->default(0),
-                                ])
-                                ->columns(3),
-                        ]),
-                    Tab::make('阈值与加成')
-                        ->schema([
-                            Section::make('阈值配置')
-                                ->description('20级建议 2/4，40级建议 2/4/6，60级建议 2/4/6/8。')
-                                ->schema([
-                                    Repeater::make('thresholds')
-                                        ->label('阈值列表')
-                                        ->default([])
-                                        ->minItems(1)
-                                        ->reorderableWithButtons()
-                                        ->schema([
-                                            TextInput::make('count')->label('阈值件数')->required()->integer()->minValue(1)->maxValue(fn (Get $get): int => max(1, (int) $get('../../../piece_count'))),
-                                            Repeater::make('bonuses')
-                                                ->label('加成列表')
-                                                ->default([])
-                                                ->minItems(1)
-                                                ->schema([
-                                                    Select::make('type')->label('加成类型')->required()->options(static::bonusTypeOptions()),
-                                                    Select::make('stat')->label('属性')->options(AdminOptions::statOptions())->required(fn (Get $get): bool => $get('type') === 'stat')->hidden(fn (Get $get): bool => $get('type') !== 'stat')->dehydrated(fn (Get $get): bool => $get('type') === 'stat')->searchable(),
-                                                    Select::make('skill_id')->label('技能')->options(fn (): array => AdminOptions::skillOptions())->searchable()->required(fn (Get $get): bool => $get('type') === 'skill_level')->hidden(fn (Get $get): bool => $get('type') !== 'skill_level')->dehydrated(fn (Get $get): bool => $get('type') === 'skill_level'),
-                                                    TextInput::make('val')->label('数值')->required()->integer()->minValue(0)->default(0),
-                                                ])
-                                                ->columns(4)
-                                                ->collapsible()
-                                                ->columnSpanFull(),
-                                        ])
-                                        ->columns(2)
-                                        ->collapsible()
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
-                ]),
-        ]);
+        return $schema
+            ->schema([
+                Tabs::make('EquipmentSetTabs')
+                    ->persistTabInQueryString()
+                    ->tabs([
+                        static::baseInfoTab(),
+                        static::thresholdBonusTab(),
+                    ]),
+            ])
+            ->columns(1);
+    }
+
+    protected static function baseInfoTab(): Tab
+    {
+        return Tab::make('基础信息')
+            ->schema([
+                Section::make('套装基础')
+                    ->description('按 20 / 40 / 60 三级套装配置，阈值数量会在保存前严格校验。')
+                    ->schema([
+                        TextInput::make('id')
+                            ->label('套装 ID')
+                            ->required()
+                            ->maxLength(64)
+                            ->unique(ignoreRecord: true)
+                            ->disabled(fn (?EquipmentSet $record): bool => $record !== null),
+
+                        TextInput::make('set_line_id')
+                            ->label('套装线 ID')
+                            ->required()
+                            ->maxLength(64),
+
+                        TextInput::make('name')
+                            ->label('名称')
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('sect')
+                            ->label('所属宗门')
+                            ->maxLength(64),
+
+                        Select::make('flow_tag')
+                            ->label('流派')
+                            ->options(AdminOptions::flowOptions())
+                            ->searchable()
+                            ->nullable(),
+
+                        Select::make('stage')
+                            ->label('阶段')
+                            ->required()
+                            ->options(AdminOptions::setStageOptions())
+                            ->live(),
+
+                        TextInput::make('piece_count')
+                            ->label('套装总件数')
+                            ->integer()
+                            ->required()
+                            ->default(4)
+                            ->minValue(2)
+                            ->maxValue(8),
+
+                        TextInput::make('max_pieces')
+                            ->label('兼容总件数')
+                            ->integer()
+                            ->required()
+                            ->default(4)
+                            ->minValue(2)
+                            ->maxValue(10)
+                            ->helperText('旧字段兼容，建议与总件数一致。'),
+
+                        Select::make('slot_ids')
+                            ->label('套装位')
+                            ->multiple()
+                            ->options(AdminOptions::slotOptions())
+                            ->searchable()
+                            ->preload()
+                            ->helperText('固定套装位请直接从预设部位中选择。'),
+
+                        Textarea::make('description')
+                            ->label('说明')
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Toggle::make('is_enabled')
+                            ->label('启用')
+                            ->default(true),
+
+                        TextInput::make('sort_order')
+                            ->label('排序')
+                            ->required()
+                            ->integer()
+                            ->minValue(0)
+                            ->default(0),
+                    ])
+                    ->columns(3),
+            ]);
+    }
+
+    protected static function thresholdBonusTab(): Tab
+    {
+        return Tab::make('阈值与加成')
+            ->schema([
+                Section::make('阈值配置')
+                    ->description('20级建议 2/4，40级建议 2/4/6，60级建议 2/4/6/8。')
+                    ->schema([
+                        static::thresholdsRepeater(),
+                    ]),
+            ]);
+    }
+
+    protected static function thresholdsRepeater(): Repeater
+    {
+        return Repeater::make('thresholds')
+            ->hiddenLabel()
+            ->addActionLabel('添加配置')
+            ->default([])
+            ->minItems(1)
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->table([
+                TableColumn::make('阈值件数'),
+                TableColumn::make('加成类型'),
+                TableColumn::make('属性'),
+                TableColumn::make('技能'),
+                TableColumn::make('数值'),
+            ])
+            ->schema([
+                TextInput::make('count')
+                    ->label('阈值件数')
+                    ->required()
+                    ->integer()
+                    ->minValue(1),
+
+                Select::make('type')
+                    ->label('加成类型')
+                    ->required()
+                    ->options(static::bonusTypeOptions())
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
+                        if ($state === 'stat') {
+                            $set('skill_id', null);
+                        }
+
+                        if ($state === 'skill_level') {
+                            $set('stat', null);
+                        }
+                    }),
+
+                Select::make('stat')
+                    ->label('属性')
+                    ->options(AdminOptions::statOptions())
+                    ->searchable()
+                    ->disabled(fn (Get $get): bool => $get('type') !== 'stat')
+                    ->required(fn (Get $get): bool => $get('type') === 'stat'),
+
+                Select::make('skill_id')
+                    ->label('技能')
+                    ->options(fn (): array => AdminOptions::skillOptions())
+                    ->searchable()
+                    ->disabled(fn (Get $get): bool => $get('type') !== 'skill_level')
+                    ->required(fn (Get $get): bool => $get('type') === 'skill_level'),
+
+                TextInput::make('val')
+                    ->label('数值')
+                    ->required()
+                    ->integer()
+                    ->minValue(0)
+                    ->default(0),
+            ])
+            ->columns(4)
+            ->columnSpanFull();
     }
 
     public static function table(Table $table): Table
@@ -106,22 +222,25 @@ class EquipmentSetResource extends Resource
                 TextColumn::make('set_line_id')->label('套装线')->searchable()->sortable(),
                 TextColumn::make('name')->label('名称')->searchable()->sortable(),
                 TextColumn::make('flow_tag')->label('流派')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::flowOptions(), $state))->toggleable(),
-                TextColumn::make('stage')->label('阶段')->numeric()->sortable(),
+                TextColumn::make('stage')
+                    ->label('阶段')
+                    ->formatStateUsing(fn (int|string|null $state): string => AdminOptions::optionLabel(AdminOptions::setStageOptions(), $state === null ? null : (string) $state))
+                    ->sortable(),
                 TextColumn::make('piece_count')->label('件数')->numeric()->sortable(),
                 ToggleColumn::make('is_enabled')->label('启用')->sortable(),
                 TextColumn::make('sort_order')->label('排序')->numeric()->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('stage')->label('阶段')->options([20 => '20级', 40 => '40级', 60 => '60级']),
+                Tables\Filters\SelectFilter::make('stage')->label('阶段')->options(AdminOptions::setStageOptions()),
                 Tables\Filters\SelectFilter::make('flow_tag')->label('流派')->options(AdminOptions::flowOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

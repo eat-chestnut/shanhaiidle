@@ -38,7 +38,7 @@ func rebuild_indexes() -> void:
 	_collect_equip_templates_by_rarity(cfg)
 	_collect_blueprints_by_theme_from_items(cfg)
 	_append_material_dungeon_item_sources(cfg)
-	var equip_drop_cfg := _resolve_equip_drop_cfg(cfg)
+	var monster_drop_map := _build_monster_drop_map(cfg)
 
 	var stages_db_any = cfg.get("stages_db", {})
 	if not (stages_db_any is Dictionary):
@@ -69,11 +69,9 @@ func rebuild_indexes() -> void:
 				continue
 			var diff: Dictionary = diff_any
 			var diff_name := _resolve_difficulty_name(diff, diff_idx)
-			var monsters_cfg := _resolve_monsters_for_difficulty(stage, diff)
+			var monsters_cfg := _resolve_monsters_for_difficulty(diff)
 			_collect_stage_monster_sources(stage_id, stage_name, diff_idx, diff_name, monsters_cfg)
-			_append_item_pool_sources(stage_id, stage_name, diff_idx, diff_name, stage, diff)
-			_append_boss_resource_sources(stage_id, stage_name, diff_idx, diff_name, stage)
-			_append_equip_template_sources(stage_id, stage_name, diff_idx, diff_name, equip_drop_cfg)
+			_append_monster_drop_sources(stage_id, stage_name, diff_idx, diff_name, monsters_cfg, monster_drop_map)
 
 	_sort_all_indexes()
 	_indexes_ready = true
@@ -183,15 +181,12 @@ func _resolve_difficulty_name(diff_cfg: Dictionary, diff_index: int) -> String:
 		return DEFAULT_DIFF_NAME
 	return "难度%d" % diff_index
 
-func _resolve_monsters_for_difficulty(stage_cfg: Dictionary, difficulty_cfg: Dictionary) -> Dictionary:
-	for key in ["monsters", "monsters_patch"]:
-		var diff_monsters_any = difficulty_cfg.get(key, {})
-		if diff_monsters_any is Dictionary:
-			return (diff_monsters_any as Dictionary).duplicate(true)
-	var stage_monsters_any = stage_cfg.get("monsters", {})
-	if stage_monsters_any is Dictionary:
-		return (stage_monsters_any as Dictionary).duplicate(true)
-	return {}
+func _resolve_monsters_for_difficulty(difficulty_cfg: Dictionary) -> Dictionary:
+	return {
+		"normal_monsters": difficulty_cfg.get("normal_monsters", []),
+		"elite_monsters": difficulty_cfg.get("elite_monsters", []),
+		"boss_monsters": difficulty_cfg.get("boss_monsters", []),
+	}
 
 func _collect_stage_monster_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, monsters_cfg: Dictionary) -> void:
 	for role in ["normal", "elite", "boss"]:
@@ -212,14 +207,14 @@ func _extract_monster_ids(monsters_cfg: Dictionary, role: String) -> Array[Strin
 	var out: Array[String] = []
 	var seen: Dictionary = {}
 
-	var pool_key := "%s_pool" % role
+	var pool_key := "%s_monsters" % role
 	var pool_any = monsters_cfg.get(pool_key, null)
 	if pool_any is Array:
 		for row_any in (pool_any as Array):
 			if not (row_any is Dictionary):
 				continue
 			var row: Dictionary = row_any
-			var monster_id := str(row.get("id", "")).strip_edges()
+			var monster_id := str(row.get("monster_id", row.get("id", ""))).strip_edges()
 			if monster_id.is_empty() or seen.has(monster_id):
 				continue
 			seen[monster_id] = true
@@ -227,41 +222,75 @@ func _extract_monster_ids(monsters_cfg: Dictionary, role: String) -> Array[Strin
 		if not out.is_empty():
 			return out
 
-	var legacy_id := str(monsters_cfg.get(role, "")).strip_edges()
-	if not legacy_id.is_empty() and not seen.has(legacy_id):
-		out.append(legacy_id)
 	return out
 
-func _append_item_pool_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, stage_cfg: Dictionary, diff_cfg: Dictionary) -> void:
-	var final_drops := BattleService.get_final_drops_for_stage_difficulty(stage_cfg, diff_cfg)
-	var pools_any = final_drops.get("items_by_rarity", {})
-	if not (pools_any is Dictionary):
-		return
-	var pools: Dictionary = pools_any
-	var rarities := _collect_rarity_keys(pools)
-	for rarity in rarities:
-		var pool := _as_clean_string_array(pools.get(rarity, []))
-		if pool.is_empty():
+func _build_monster_drop_map(cfg: Dictionary) -> Dictionary:
+	var out := {}
+	var db_any = cfg.get("monsters_db", {})
+	if not (db_any is Dictionary):
+		return out
+	var rows_any = (db_any as Dictionary).get("monsters", [])
+	if not (rows_any is Array):
+		return out
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
 			continue
-		for item_id in pool:
-			var source := {
-				"stage_id": stage_id,
-				"stage_name": stage_name,
-				"difficulty_index": diff_index,
-				"difficulty_name": diff_name,
-				"rarity": rarity,
-				"source_type": "items_by_rarity",
-				"sort_stage_index": _stage_index(stage_id),
-			}
-			_add_item_source(item_id, source)
+		var row: Dictionary = row_any
+		var monster_id := str(row.get("id", "")).strip_edges()
+		if monster_id.is_empty():
+			continue
+		out[monster_id] = row.get("drops", [])
+	return out
+
+func _append_monster_drop_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, monsters_cfg: Dictionary, monster_drop_map: Dictionary) -> void:
+	for role in ["normal", "elite", "boss"]:
+		var monster_ids := _extract_monster_ids(monsters_cfg, role)
+		for monster_id in monster_ids:
+			var drops_any = monster_drop_map.get(monster_id, [])
+			if not (drops_any is Array):
+				continue
+			for drop_any in drops_any:
+				if not (drop_any is Dictionary):
+					continue
+				var drop: Dictionary = drop_any
+				if not bool(drop.get("is_enabled", true)):
+					continue
+				var item_id := str(drop.get("item_id", "")).strip_edges()
+				if item_id.is_empty():
+					continue
+				_add_item_source(item_id, {
+					"stage_id": stage_id,
+					"stage_name": stage_name,
+					"difficulty_index": diff_index,
+					"difficulty_name": diff_name,
+					"role": role,
+					"role_name": _role_name(role),
+					"monster_id": monster_id,
+					"monster_name": _monster_name(monster_id),
+					"rarity": _item_rarity(item_id, "white"),
+					"source_type": "monster_drop",
+					"sort_stage_index": _stage_index(stage_id),
+				})
 
 func _append_material_dungeon_item_sources(cfg: Dictionary) -> void:
 	var db_any = cfg.get("material_dungeons_db", {})
 	if not (db_any is Dictionary):
 		return
-	var rows_any = (db_any as Dictionary).get("material_dungeons", [])
+	var db: Dictionary = db_any
+	var rows_any = db.get("material_dungeons", [])
 	if not (rows_any is Array):
 		return
+	var group_map := {}
+	var group_rows_any = db.get("material_dungeon_drop_groups", [])
+	if group_rows_any is Array:
+		for group_any in group_rows_any:
+			if not (group_any is Dictionary):
+				continue
+			var group: Dictionary = group_any
+			var group_id := str(group.get("group_id", "")).strip_edges()
+			if group_id.is_empty():
+				continue
+			group_map[group_id] = group
 	for row_any in rows_any:
 		if not (row_any is Dictionary):
 			continue
@@ -272,7 +301,30 @@ func _append_material_dungeon_item_sources(cfg: Dictionary) -> void:
 		var dungeon_name := str(row.get("name", dungeon_id)).strip_edges()
 		var unlock_level := maxi(0, int(row.get("unlock_level", 0)))
 		var dungeon_type := str(row.get("dungeon_type", "")).strip_edges().to_lower()
-		var pool_ids := _as_clean_string_array(row.get("drop_pools", []))
+		var pool_ids := []
+		var layer_rules_any = row.get("layer_rules", [])
+		if layer_rules_any is Array:
+			for rule_any in layer_rules_any:
+				if not (rule_any is Dictionary):
+					continue
+				var rule: Dictionary = rule_any
+				for group_key in ["drop_group_id", "first_clear_reward_group_id"]:
+					var group_id := str(rule.get(group_key, "")).strip_edges()
+					if group_id.is_empty() or not group_map.has(group_id):
+						continue
+					var rewards_any = (group_map.get(group_id, {}) as Dictionary).get("rewards", [])
+					if not (rewards_any is Array):
+						continue
+					for reward_any in rewards_any:
+						if not (reward_any is Dictionary):
+							continue
+						var item_id := str((reward_any as Dictionary).get("item_id", "")).strip_edges()
+						if item_id.is_empty():
+							continue
+						pool_ids.append(item_id)
+		if pool_ids.is_empty():
+			pool_ids = _as_clean_string_array(row.get("display_rewards", []))
+		pool_ids = _as_clean_string_array(pool_ids)
 		for item_id in pool_ids:
 			_add_item_source(item_id, {
 				"stage_id": "dungeon:%s" % dungeon_id,
@@ -285,65 +337,6 @@ func _append_material_dungeon_item_sources(cfg: Dictionary) -> void:
 				"dungeon_type": dungeon_type,
 				"unlock_level": unlock_level,
 				"sort_stage_index": 900000 + unlock_level,
-			})
-
-func _append_boss_resource_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, stage_cfg: Dictionary) -> void:
-	var theme_key := _resolve_stage_theme_key(stage_cfg)
-	if theme_key.is_empty():
-		return
-
-	var mark_id := "boss_mark_%s" % theme_key
-	_add_item_source(mark_id, {
-		"stage_id": stage_id,
-		"stage_name": stage_name,
-		"difficulty_index": diff_index,
-		"difficulty_name": diff_name,
-		"rarity": _item_rarity(mark_id, "blue"),
-		"theme_key": theme_key,
-		"source_type": "boss_mark",
-		"sort_stage_index": _stage_index(stage_id),
-	})
-
-	var fragment_id := "bp_fragment_%s" % theme_key
-	_add_item_source(fragment_id, {
-		"stage_id": stage_id,
-		"stage_name": stage_name,
-		"difficulty_index": diff_index,
-		"difficulty_name": diff_name,
-		"rarity": _item_rarity(fragment_id, "blue"),
-		"theme_key": theme_key,
-		"source_type": "boss_fragment",
-		"sort_stage_index": _stage_index(stage_id),
-	})
-
-	if _theme_has_core_requirement(theme_key) and diff_index >= 1:
-		var core_id := "boss_core_%s" % theme_key
-		_add_item_source(core_id, {
-			"stage_id": stage_id,
-			"stage_name": stage_name,
-			"difficulty_index": diff_index,
-			"difficulty_name": diff_name,
-			"rarity": _item_rarity(core_id, "gold"),
-			"theme_key": theme_key,
-			"source_type": "boss_core",
-			"sort_stage_index": _stage_index(stage_id),
-		})
-
-	var blueprint_any = _blueprints_by_theme.get(theme_key, [])
-	if blueprint_any is Array:
-		for bp_any in (blueprint_any as Array):
-			var bp_id := str(bp_any).strip_edges()
-			if bp_id.is_empty():
-				continue
-			_add_item_source(bp_id, {
-				"stage_id": stage_id,
-				"stage_name": stage_name,
-				"difficulty_index": diff_index,
-				"difficulty_name": diff_name,
-				"rarity": _item_rarity(bp_id, "gold"),
-				"theme_key": theme_key,
-				"source_type": "boss_blueprint",
-				"sort_stage_index": _stage_index(stage_id),
 			})
 
 func _collect_item_rarity_map(cfg: Dictionary) -> void:
@@ -367,13 +360,7 @@ func _collect_item_rarity_map(cfg: Dictionary) -> void:
 		_item_rarity_by_id[item_id] = rarity
 
 func _collect_equip_templates_by_rarity(cfg: Dictionary) -> void:
-	var equip_db_any = cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return
-	var templates_any = (equip_db_any as Dictionary).get("equip_templates", [])
-	if not (templates_any is Array):
-		return
-	for tpl_any in templates_any:
+	for tpl_any in EquipmentModel.get_template_catalog_rows():
 		if not (tpl_any is Dictionary):
 			continue
 		var tpl: Dictionary = tpl_any
@@ -424,93 +411,6 @@ func _collect_blueprints_by_theme_from_items(cfg: Dictionary) -> void:
 			if bp_rows.find(item_id) == -1:
 				bp_rows.append(item_id)
 			_blueprints_by_theme[theme_key] = bp_rows
-
-func _resolve_equip_drop_cfg(cfg: Dictionary) -> Dictionary:
-	var out := {
-		"chance": 0.0,
-		"weights": {},
-		"pool": {},
-	}
-	var battle_any = cfg.get("battle", {})
-	if not (battle_any is Dictionary):
-		return out
-	var drops_any = (battle_any as Dictionary).get("drops", {})
-	if not (drops_any is Dictionary):
-		return out
-	var drops: Dictionary = drops_any
-	out["chance"] = clampf(float(drops.get("equip_chance", 0.0)), 0.0, 1.0)
-
-	var weights: Dictionary = {}
-	var weights_any = drops.get("equip_weights", {})
-	if weights_any is Dictionary:
-		var raw_weights: Dictionary = weights_any
-		for key_any in raw_weights.keys():
-			var rarity := str(key_any).strip_edges().to_lower()
-			if rarity.is_empty():
-				continue
-			weights[rarity] = maxi(0, int(raw_weights.get(key_any, 0)))
-	out["weights"] = weights
-
-	var pool: Dictionary = {}
-	var pool_any = drops.get("equip_by_rarity", {})
-	if pool_any is Dictionary:
-		var raw_pool: Dictionary = pool_any
-		for key_any in raw_pool.keys():
-			var rarity := str(key_any).strip_edges().to_lower()
-			if rarity.is_empty():
-				continue
-			pool[rarity] = _as_clean_string_array(raw_pool.get(key_any, []))
-	out["pool"] = pool
-	return out
-
-func _append_equip_template_sources(stage_id: String, stage_name: String, diff_index: int, diff_name: String, equip_drop_cfg: Dictionary) -> void:
-	var chance := clampf(float(equip_drop_cfg.get("chance", 0.0)), 0.0, 1.0)
-	if chance <= 0.0:
-		return
-	var weights_any = equip_drop_cfg.get("weights", {})
-	if not (weights_any is Dictionary):
-		return
-	var weights: Dictionary = weights_any
-	var pool_any = equip_drop_cfg.get("pool", {})
-	var pool: Dictionary = pool_any if pool_any is Dictionary else {}
-
-	var rarity_keys := _collect_rarity_keys(weights, pool)
-	for rarity in rarity_keys:
-		var weight := maxi(0, int(weights.get(rarity, 0)))
-		if weight <= 0:
-			continue
-
-		var source_base := {
-			"stage_id": stage_id,
-			"stage_name": stage_name,
-			"difficulty_index": diff_index,
-			"difficulty_name": diff_name,
-			"rarity": rarity,
-			"sort_stage_index": _stage_index(stage_id),
-		}
-
-		var explicit_pool := _as_clean_string_array(pool.get(rarity, []))
-		if not explicit_pool.is_empty():
-			for tpl_id in explicit_pool:
-				var source := source_base.duplicate(true)
-				source["source_type"] = "template_pool"
-				source["approx"] = false
-				_add_equip_template_source(tpl_id, source)
-			continue
-
-		# 当前掉落链路没有该 rarity 的 template 级池时，退化为“同稀有度推荐来源”。
-		# 这是近似来源，不表示精确模板必掉。
-		var rarity_tpl_any = _equip_templates_by_rarity.get(rarity, [])
-		if not (rarity_tpl_any is Array):
-			continue
-		for tpl_any in (rarity_tpl_any as Array):
-			var tpl_id := str(tpl_any).strip_edges()
-			if tpl_id.is_empty():
-				continue
-			var source := source_base.duplicate(true)
-			source["source_type"] = "equip_drop"
-			source["approx"] = true
-			_add_equip_template_source(tpl_id, source)
 
 func _add_monster_source(monster_id: String, source: Dictionary) -> void:
 	var id := monster_id.strip_edges()
@@ -563,7 +463,7 @@ func _add_equip_template_source(template_id: String, source: Dictionary) -> void
 		str(source.get("stage_id", "")),
 		int(source.get("difficulty_index", 0)),
 		str(source.get("rarity", "white")),
-		str(source.get("source_type", "equip_drop")),
+		str(source.get("source_type", "")),
 	]
 	var key_map_any = _equip_template_source_keys.get(id, {})
 	var key_map: Dictionary = key_map_any if key_map_any is Dictionary else {}
@@ -733,15 +633,11 @@ func _format_item_source_line(source: Dictionary) -> String:
 			if unlock_level > 0:
 				return "%s - 材料副本（Lv%d解锁）" % [stage_name, unlock_level]
 			return "%s - 材料副本" % stage_name
-		"boss_mark":
-			return "%s - %sBoss稳定掉落印记" % [prefix, _theme_name(theme_key)]
-		"boss_fragment":
-			return "%s - %sBoss掉落图纸碎片" % [prefix, _theme_name(theme_key)]
-		"boss_core":
-			return "%s - %sBoss低概率掉落核心" % [prefix, _theme_name(theme_key)]
-		"boss_blueprint":
-			return "%s - %sBoss低概率掉落完整图纸" % [prefix, _theme_name(theme_key)]
-	return "%s（%s）- %s掉落池" % [stage_name, diff_name, _rarity_name(rarity)]
+		"monster_drop":
+			var role_name := str(source.get("role_name", "怪物")).strip_edges()
+			var monster_name := str(source.get("monster_name", "怪物")).strip_edges()
+			return "%s - %s[%s]掉落" % [prefix, monster_name, role_name]
+	return "%s（%s）- %s来源" % [stage_name, diff_name, _rarity_name(rarity)]
 
 func _format_equip_source_line(source: Dictionary) -> String:
 	var stage_name := str(source.get("stage_name", source.get("stage_id", ""))).strip_edges()
@@ -751,10 +647,7 @@ func _format_equip_source_line(source: Dictionary) -> String:
 		stage_name = str(source.get("stage_id", "未知地图"))
 	if diff_name.is_empty():
 		diff_name = DEFAULT_DIFF_NAME
-	var source_type := str(source.get("source_type", "equip_drop"))
-	if source_type == "template_pool" and not bool(source.get("approx", false)):
-		return "%s（%s）- 可掉落该装备（%s）" % [stage_name, diff_name, _rarity_name(rarity)]
-	return "%s（%s）- 推荐刷%s装来源" % [stage_name, diff_name, _rarity_equip_name(rarity)]
+	return "%s（%s）- %s装来源" % [stage_name, diff_name, _rarity_equip_name(rarity)]
 
 func _rarity_name(rarity: String) -> String:
 	match rarity:
@@ -861,7 +754,7 @@ func _is_stage_diff_unlocked(stage_id: String, diff_index: int) -> bool:
 	var need_level := maxi(1, int(_stage_unlock_level.get(sid, 1)))
 	if ProgressModel.level < need_level:
 		return false
-	return MapProgressModel.get_unlocked_diff(sid) >= maxi(0, diff_index)
+	return diff_index >= 0
 
 func _copy_source_array(raw_any: Variant) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
@@ -885,6 +778,27 @@ func _as_clean_string_array(v: Variant) -> Array[String]:
 		seen[s] = true
 		out.append(s)
 	return out
+
+func _monster_name(monster_id: String) -> String:
+	var target := monster_id.strip_edges()
+	if target.is_empty():
+		return ""
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var db_any = cfg.get("monsters_db", {})
+	if not (db_any is Dictionary):
+		return target
+	var rows_any = (db_any as Dictionary).get("monsters", [])
+	if not (rows_any is Array):
+		return target
+	for row_any in rows_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("id", "")).strip_edges() != target:
+			continue
+		var name := str(row.get("name", target)).strip_edges()
+		return name if not name.is_empty() else target
+	return target
 
 func _collect_rarity_keys(primary_any: Variant, fallback_any: Variant = null) -> Array[String]:
 	var out: Array[String] = []

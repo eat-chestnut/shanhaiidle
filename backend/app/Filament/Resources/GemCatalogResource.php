@@ -5,15 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\GemCatalogResource\Pages;
 use App\Models\Item;
 use App\Support\AdminOptions;
+use App\Support\GemEffectRegistry;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -25,7 +27,7 @@ class GemCatalogResource extends Resource
 {
     protected static ?string $model = Item::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $navigationLabel = '宝石目录';
 
@@ -33,33 +35,85 @@ class GemCatalogResource extends Resource
 
     protected static ?string $pluralModelLabel = '宝石目录';
 
-    protected static ?string $navigationGroup = '基础配置';
+    protected static string | \UnitEnum | null $navigationGroup = '基础配置';
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->where('type', 'gem');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Hidden::make('type')->default('gem'),
+            Hidden::make('effect_type')->default(GemEffectRegistry::effectTypeForGemType('attr')),
             Section::make('基础信息')
                 ->schema([
                     TextInput::make('id')->label('宝石 ID')->required()->maxLength(64)->unique(ignoreRecord: true),
                     TextInput::make('name')->label('名称')->required()->maxLength(255),
-                    Select::make('sub_type')->label('宝石大类')->options(AdminOptions::gemTypeOptions())->required()->default('attr'),
+                    Select::make('sub_type')
+                        ->label('宝石类型')
+                        ->options(AdminOptions::gemTypeOptions())
+                        ->required()
+                        ->default('attr')
+                        ->live()
+                        ->afterStateUpdated(function (Set $set, ?string $state): void {
+                            $set('effect_type', GemEffectRegistry::effectTypeForGemType($state));
+                            if ($state === 'skill') {
+                                $set('target_scope', null);
+
+                                return;
+                            }
+
+                            $set('target_scope', GemEffectRegistry::defaultTargetScope('attr'));
+                        }),
                     Select::make('rarity')->label('稀有度')->required()->options(AdminOptions::rarityOptions())->default('white'),
-                    Select::make('effect_type')->label('效果类型')->required()->options(AdminOptions::gemEffectTypeOptions())->default('stat'),
-                    Select::make('target_scope')->label('目标范围')->options(AdminOptions::gemTargetScopeOptions())->default('global')->helperText('技能宝石可选指定技能范围。'),
                     TextInput::make('drop_unlock_level')->label('掉落开放等级')->integer()->minValue(1)->required()->default(1),
                 ])
                 ->columns(3),
             Section::make('效果配置')
-                ->description('属性宝石和技能宝石都通过效果负载来描述具体加成。')
+                ->description('按宝石类型填写结构化效果，不再手输程序键名。')
                 ->schema([
-                    KeyValue::make('effect_payload')->label('效果配置')->keyLabel('键')->valueLabel('值')->columnSpanFull(),
-                    MultiSelect::make('socket_limit')->label('可镶嵌孔位')->options([
+                    Section::make('属性效果')
+                        ->schema([
+                            Select::make('effect_form.stat')
+                                ->label('属性')
+                                ->options(GemEffectRegistry::pureStatOptions())
+                                ->searchable()
+                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill'),
+                            TextInput::make('effect_form.value')
+                                ->label('数值')
+                                ->numeric()
+                                ->step(0.0001)
+                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill'),
+                            Select::make('effect_form.value_type')
+                                ->label('数值类型')
+                                ->options(AdminOptions::valueModeOptions())
+                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill')
+                                ->default('flat'),
+                        ])
+                        ->columns(3)
+                        ->visible(fn (Get $get): bool => $get('sub_type') !== 'skill'),
+                    Section::make('技能效果')
+                        ->schema([
+                            Select::make('target_scope')
+                                ->label('作用技能')
+                                ->options(fn (): array => GemEffectRegistry::skillTargetOptions())
+                                ->searchable()
+                                ->preload()
+                                ->required(fn (Get $get): bool => $get('sub_type') === 'skill'),
+                            Select::make('effect_form.effect_template_code')
+                                ->label('效果模板')
+                                ->options(GemEffectRegistry::skillTemplateOptions())
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->required(fn (Get $get): bool => $get('sub_type') === 'skill'),
+                            ...static::skillParamInputs(),
+                        ])
+                        ->columns(3)
+                        ->visible(fn (Get $get): bool => $get('sub_type') === 'skill'),
+                    Select::make('socket_limit')->label('可镶嵌孔位')->multiple()->options([
                         '1' => '第1孔',
                         '2' => '第2孔',
                         '3' => '第3孔',
@@ -89,7 +143,12 @@ class GemCatalogResource extends Resource
                 TextColumn::make('name')->label('名称')->searchable(),
                 TextColumn::make('sub_type')->label('大类')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::gemTypeOptions(), $state)),
                 TextColumn::make('rarity')->label('稀有度')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::rarityOptions(), $state)),
-                TextColumn::make('effect_type')->label('效果类型')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::gemEffectTypeOptions(), $state)),
+                TextColumn::make('effect_payload')
+                    ->label('效果')
+                    ->formatStateUsing(fn ($state, Item $record): string => GemEffectRegistry::effectSummary(
+                        is_array($state) ? $state : [],
+                        (string) ($record->target_scope ?? '')
+                    )),
                 TextColumn::make('drop_unlock_level')->label('掉落等级'),
                 ToggleColumn::make('can_compose')->label('合成'),
                 ToggleColumn::make('can_reforge')->label('洗炼'),
@@ -101,12 +160,12 @@ class GemCatalogResource extends Resource
                 Tables\Filters\SelectFilter::make('rarity')->label('稀有度')->options(AdminOptions::rarityOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');
@@ -119,5 +178,28 @@ class GemCatalogResource extends Resource
             'create' => Pages\CreateGemCatalog::route('/create'),
             'edit' => Pages\EditGemCatalog::route('/{record}/edit'),
         ];
+    }
+
+    protected static function skillParamInputs(): array
+    {
+        $inputs = [];
+
+        foreach (GemEffectRegistry::skillParamDefinitions() as $paramKey => $definition) {
+            $templateCodes = [];
+            foreach (GemEffectRegistry::skillTemplates() as $templateCode => $template) {
+                if (array_key_exists($paramKey, $template['params'] ?? [])) {
+                    $templateCodes[] = $templateCode;
+                }
+            }
+
+            $inputs[] = TextInput::make("effect_form.{$paramKey}")
+                ->label((string) $definition['label'])
+                ->numeric()
+                ->step($definition['step'] ?? 0.0001)
+                ->minValue($definition['min'] ?? 0)
+                ->visible(fn (Get $get): bool => $get('sub_type') === 'skill' && in_array((string) $get('effect_form.effect_template_code'), $templateCodes, true));
+        }
+
+        return $inputs;
     }
 }

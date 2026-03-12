@@ -12,11 +12,6 @@ var stage_name: String = "未命名关卡"
 var current_stage_id: String = ""
 var current_diff_index := 0
 var _difficulty_def: Dictionary = {}
-var _difficulty_monster_mult := {
-	"hp": 1.0,
-	"atk": 1.0,
-	"def": 1.0,
-}
 var arena_size: Vector2 = DEFAULT_ARENA_SIZE
 var manual_vec: Vector2 = Vector2.ZERO
 var _base_battle_cfg: Dictionary = {}
@@ -57,23 +52,7 @@ var normal_kill_counter := 0
 var elite_progress := 0
 var boss_progress := 0
 var special_present: String = ""
-var equip_templates_by_id: Dictionary = {}
-
-var drop_chance := 0.0
-var drop_weights: Dictionary = {}
-var drop_items: Dictionary = {}
-var equip_drop_chance := 0.0
-var equip_drop_weights: Dictionary = {}
-var equip_drop_by_rarity: Dictionary = {}
-var special_drops: Dictionary = {}
-var _stage_drop: Dictionary = {}
-var _stage_special: Dictionary = {}
-var _stage_monsters: Dictionary = {}
-var stage_drop_mult := {
-	"item": 1.0,
-	"gem": 1.0,
-	"punch": 1.0,
-}
+var _difficulty_monsters: Dictionary = {}
 var skills_by_id: Dictionary = {}
 var ai_profiles_by_id: Dictionary = {}
 var ai_auto_rules: Array = []
@@ -97,6 +76,7 @@ var loots: Array[Dictionary] = []
 var kills := 0
 
 var battle_time := 0.0
+var cycle_started_at := 0.0
 var attack_timer := 0.0
 var hit_log_cd := 0.0
 var player_last_hit_at := 0.0
@@ -273,42 +253,33 @@ func _apply_stage_overrides(stage: Dictionary, requested_diff_index: int = 0) ->
 	if stage.is_empty():
 		current_diff_index = 0
 		_difficulty_def = _default_difficulty_def()
-		_apply_stage_monsters_patch({})
-		_apply_stage_spawn_patch({})
-		_set_stage_drop_mult({})
-		_apply_stage_drop_patch({})
-		_set_difficulty_monster_mult({})
+		_apply_difficulty_monster_pools({})
+		_apply_difficulty_spawn_patch({})
+		_apply_difficulty_spawn_rules({})
 		return
 	var stage_base_name := str(stage.get("name", stage_name))
-	elite_need = maxi(1, int(stage.get("elite_every_kills", elite_need)))
-	boss_need = maxi(1, int(stage.get("boss_every_kills", boss_need)))
 
 	var difficulty := _resolve_stage_difficulty(stage, requested_diff_index)
-	var difficulty_name := str(difficulty.get("name", "普通"))
+	var difficulty_name := str(difficulty.get("difficulty_name", "普通"))
 	_difficulty_def = difficulty
 	stage_name = stage_base_name if difficulty_name.is_empty() else "%s（%s）" % [stage_base_name, difficulty_name]
 
-	_apply_stage_monsters_patch(stage.get("monsters", {}))
-	_apply_stage_spawn_patch(stage.get("spawn_patch", {}))
-	_set_stage_drop_mult(stage.get("drop_mult", {}))
-	_apply_stage_drop_patch(stage.get("drops_patch", {}))
-	_set_difficulty_monster_mult(difficulty.get("monster_mult", {}))
-	_apply_difficulty_drop_override(difficulty.get("drops_override", {}))
+	_apply_difficulty_monster_pools(difficulty)
+	_apply_difficulty_spawn_patch(difficulty)
+	_apply_difficulty_spawn_rules(difficulty)
 
 func _default_difficulty_def() -> Dictionary:
 	return {
-		"name": "普通",
-		"unlock": {
-			"boss_kills_required": 0,
-			"material_cost": {},
-		},
-		"recommend_score": 0,
-		"monster_mult": {
-			"hp": 1.0,
-			"atk": 1.0,
-			"def": 1.0,
-		},
-		"drops_override": {},
+		"difficulty_name": "普通",
+		"recommended_power": 0,
+		"spawn_interval": 1.6,
+		"onscreen_limit": 10,
+		"spawn_radius": 220,
+		"normal_monsters": [],
+		"elite_monsters": [],
+		"boss_monsters": [],
+		"elite_spawn_rule": null,
+		"boss_spawn_rule": null,
 	}
 
 func _resolve_stage_difficulty(stage: Dictionary, requested_diff_index: int) -> Dictionary:
@@ -323,10 +294,7 @@ func _resolve_stage_difficulty(stage: Dictionary, requested_diff_index: int) -> 
 		return default_diff
 
 	var max_idx := diffs.size() - 1
-	var unlocked_idx := clampi(MapProgressModel.get_unlocked_diff(current_stage_id), 0, max_idx)
 	var target_idx := clampi(requested_diff_index, 0, max_idx)
-	if target_idx > unlocked_idx:
-		target_idx = unlocked_idx
 	current_diff_index = target_idx
 
 	var diff_any = diffs[target_idx]
@@ -337,238 +305,57 @@ func _resolve_stage_difficulty(stage: Dictionary, requested_diff_index: int) -> 
 	out.merge(diff, true)
 	return out
 
-func _set_difficulty_monster_mult(mult_any: Variant) -> void:
-	_difficulty_monster_mult = {
-		"hp": 1.0,
-		"atk": 1.0,
-		"def": 1.0,
-	}
-	if not (mult_any is Dictionary):
+func _apply_difficulty_monster_pools(difficulty_any: Variant) -> void:
+	_difficulty_monsters.clear()
+	if not (difficulty_any is Dictionary):
 		return
-	var mult: Dictionary = mult_any
-	_difficulty_monster_mult["hp"] = maxf(0.01, float(mult.get("hp", 1.0)))
-	_difficulty_monster_mult["atk"] = maxf(0.01, float(mult.get("atk", 1.0)))
-	_difficulty_monster_mult["def"] = maxf(0.01, float(mult.get("def", 1.0)))
+	var difficulty: Dictionary = difficulty_any
+	for role in ["normal", "elite", "boss"]:
+		var key := _difficulty_pool_key(role)
+		var pool_any = difficulty.get(key, [])
+		if pool_any is Array:
+			_difficulty_monsters[key] = (pool_any as Array).duplicate(true)
 
-func _apply_difficulty_drop_override(override_any: Variant) -> void:
-	var bundle := {
-		"drop": _stage_drop.duplicate(true),
-		"special": _stage_special.duplicate(true),
-	}
-	bundle = _apply_drop_override_to_bundle(bundle, override_any)
-	_stage_drop = bundle.get("drop", {}).duplicate(true)
-	_stage_special = bundle.get("special", {}).duplicate(true)
-
-func _apply_monster_difficulty_mult(template: Dictionary) -> Dictionary:
-	if template.is_empty():
-		return {}
-	var out := template.duplicate(true)
-	var hp_mul := maxf(0.01, float(_difficulty_monster_mult.get("hp", 1.0)))
-	var atk_mul := maxf(0.01, float(_difficulty_monster_mult.get("atk", 1.0)))
-	var def_mul := maxf(0.01, float(_difficulty_monster_mult.get("def", 1.0)))
-	out["hp"] = maxi(1, int(round(float(out.get("hp", 1)) * hp_mul)))
-	out["atk"] = maxi(0, int(round(float(out.get("atk", DEFAULT_ENEMY_ATK)) * atk_mul)))
-	out["def"] = maxi(0, int(round(float(out.get("def", 0)) * def_mul)))
-	return out
-
-func _apply_stage_monsters_patch(monsters_any: Variant) -> void:
-	_stage_monsters.clear()
-	if monsters_any is Dictionary:
-		_stage_monsters = (monsters_any as Dictionary).duplicate(true)
-
-func _apply_stage_spawn_patch(patch_any: Variant) -> void:
-	if not (patch_any is Dictionary):
+func _apply_difficulty_spawn_patch(difficulty_any: Variant) -> void:
+	if not (difficulty_any is Dictionary):
 		return
-	var patch: Dictionary = patch_any
-	if patch.has("respawn_s"):
-		spawn_rt["respawn_s"] = maxf(0.05, float(patch.get("respawn_s", spawn_rt.get("respawn_s", 1.6))))
-	if patch.has("max_alive"):
-		spawn_rt["max_alive"] = maxi(0, int(patch.get("max_alive", spawn_rt.get("max_alive", 1))))
-	if patch.has("spawn_radius"):
-		spawn_rt["spawn_radius"] = maxf(0.0, float(patch.get("spawn_radius", spawn_rt.get("spawn_radius", 0.0))))
+	var difficulty: Dictionary = difficulty_any
+	spawn_rt["respawn_s"] = maxf(0.05, float(difficulty.get("spawn_interval", spawn_rt.get("respawn_s", 1.6))))
+	spawn_rt["max_alive"] = maxi(1, int(difficulty.get("onscreen_limit", spawn_rt.get("max_alive", 10))))
+	spawn_rt["spawn_radius"] = maxf(1.0, float(difficulty.get("spawn_radius", spawn_rt.get("spawn_radius", 220.0))))
 
-func _set_stage_drop_mult(mult_any: Variant) -> void:
-	stage_drop_mult = {
-		"item": 1.0,
-		"gem": 1.0,
-		"punch": 1.0,
-	}
-	if not (mult_any is Dictionary):
+func _apply_difficulty_spawn_rules(difficulty_any: Variant) -> void:
+	if not (difficulty_any is Dictionary):
 		return
-	var mult: Dictionary = mult_any
-	stage_drop_mult["item"] = maxf(0.0, float(mult.get("item", 1.0)))
-	stage_drop_mult["gem"] = maxf(0.0, float(mult.get("gem", 1.0)))
-	stage_drop_mult["punch"] = maxf(0.0, float(mult.get("punch", 1.0)))
+	var difficulty: Dictionary = difficulty_any
+	var elite_rule_any: Variant = difficulty.get("elite_spawn_rule", null)
+	var boss_rule_any: Variant = difficulty.get("boss_spawn_rule", null)
+	var elite_override := _resolve_spawn_rule_every_kills(elite_rule_any)
+	var boss_override := _resolve_spawn_rule_every_kills(boss_rule_any)
+	if elite_override > 0:
+		elite_need = elite_override
+	if boss_override > 0:
+		boss_need = boss_override
 
-func _apply_stage_drop_patch(patch_any: Variant) -> void:
-	var bundle := _resolve_final_drop_bundle(patch_any, {})
-	_stage_drop = bundle.get("drop", {}).duplicate(true)
-	_stage_special = bundle.get("special", {}).duplicate(true)
+func _resolve_spawn_rule_every_kills(rule_any: Variant) -> int:
+	if not (rule_any is Dictionary):
+		return 0
+	var rule: Dictionary = rule_any
+	if not rule.has("every_kills"):
+		return 0
+	return maxi(0, int(rule.get("every_kills", 0)))
 
-func get_final_drops_for_stage_difficulty(stage_cfg: Dictionary, difficulty_cfg: Dictionary) -> Dictionary:
-	var stage_patch_any: Variant = stage_cfg.get("drops_patch", {})
-	var diff_override_any: Variant = difficulty_cfg.get("drops_override", {})
-	var bundle := _resolve_final_drop_bundle(stage_patch_any, diff_override_any)
-	var drop_any: Variant = bundle.get("drop", {})
-	var special_any: Variant = bundle.get("special", {})
-	var drop: Dictionary = drop_any if drop_any is Dictionary else {}
-	var special: Dictionary = special_any if special_any is Dictionary else {}
-	var out := drop.duplicate(true)
-	out["special"] = special.duplicate(true)
-	return out
-
-func _resolve_final_drop_bundle(stage_patch_any: Variant, diff_override_any: Variant) -> Dictionary:
-	var base_bundle := {
-		"drop": {
-			"drop_chance": clampf(drop_chance, 0.0, 1.0),
-			"rarity_weights": _normalize_rarity_weights(drop_weights, {}),
-			"items_by_rarity": _normalize_items_by_rarity(drop_items, {}),
-		},
-		"special": _normalize_special_drops(special_drops, {}),
-	}
-	base_bundle = _apply_drop_override_to_bundle(base_bundle, stage_patch_any)
-	base_bundle = _apply_drop_override_to_bundle(base_bundle, diff_override_any)
-	return base_bundle
-
-func _apply_drop_override_to_bundle(bundle_any: Variant, override_any: Variant) -> Dictionary:
-	var bundle: Dictionary = bundle_any if bundle_any is Dictionary else {}
-	var merged_drop_any: Variant = bundle.get("drop", {})
-	var merged_special_any: Variant = bundle.get("special", {})
-	var merged_drop: Dictionary = merged_drop_any if merged_drop_any is Dictionary else {}
-	var merged_special: Dictionary = merged_special_any if merged_special_any is Dictionary else {}
-	if not (override_any is Dictionary):
-		return {"drop": merged_drop, "special": merged_special}
-
-	var override: Dictionary = override_any
-
-	if override.has("drop_chance"):
-		merged_drop["drop_chance"] = clampf(float(override.get("drop_chance", merged_drop.get("drop_chance", 0.0))), 0.0, 1.0)
-
-	if override.has("rarity_weights"):
-		var override_weights := _normalize_rarity_weights(
-			override.get("rarity_weights", {}),
-			{}
-		)
-		if _sum_rarity_weights(override_weights) > 0:
-			merged_drop["rarity_weights"] = override_weights
-
-	if override.has("items_by_rarity"):
-		# NOTE: items_by_rarity 按 rarity 逐项覆盖。空数组/空值表示“继承”，不是“清空”。
-		merged_drop["items_by_rarity"] = _normalize_items_by_rarity(
-			override.get("items_by_rarity", {}),
-			merged_drop.get("items_by_rarity", {})
-		)
-
-	if override.has("special") and override.get("special", {}) is Dictionary:
-		# special 为整块覆盖（不是逐字段 merge）。
-		merged_special = _normalize_special_drops(override.get("special", {}), {})
-
-	return {"drop": merged_drop, "special": merged_special}
-
-func _normalize_rarity_weights(weights_any: Variant, fallback_any: Variant) -> Dictionary:
-	var out: Dictionary = {}
-	var keys := _collect_rarity_keys(weights_any, fallback_any)
-	if fallback_any is Dictionary:
-		var fallback: Dictionary = fallback_any
-		for rarity in keys:
-			out[rarity] = maxi(0, int(fallback.get(rarity, out.get(rarity, 0))))
-	if weights_any is Dictionary:
-		var weights: Dictionary = weights_any
-		for rarity in keys:
-			out[rarity] = maxi(0, int(weights.get(rarity, out.get(rarity, 0))))
-	return out
-
-func _normalize_items_by_rarity(items_any: Variant, fallback_any: Variant) -> Dictionary:
-	var out: Dictionary = {}
-	var keys := _collect_rarity_keys(items_any, fallback_any)
-	if fallback_any is Dictionary:
-		var fallback: Dictionary = fallback_any
-		for rarity in keys:
-			var list_any = fallback.get(rarity, [])
-			if list_any is Array:
-				var names: Array[String] = []
-				for item_any in list_any:
-					var item_id := str(item_any)
-					if item_id.is_empty():
-						continue
-					names.append(item_id)
-				out[rarity] = names
-	if items_any is Dictionary:
-		var items_dict: Dictionary = items_any
-		for rarity in keys:
-			if not items_dict.has(rarity):
-				continue
-			var list_any = items_dict.get(rarity, [])
-			# NOTE: 空数组表示“继承上层掉落池”，不是“清空该 rarity 池”。
-			if not (list_any is Array):
-				continue
-			var names: Array[String] = []
-			for item_any in list_any:
-				var item_id := str(item_any)
-				if item_id.is_empty():
-					continue
-				names.append(item_id)
-			if names.size() > 0:
-				out[rarity] = names
-	return out
-
-func _sum_rarity_weights(weights: Dictionary) -> int:
-	var total := 0
-	for rarity_any in weights.keys():
-		total += maxi(0, int(weights.get(rarity_any, 0)))
-	return total
-
-func _collect_rarity_keys(primary_any: Variant, fallback_any: Variant) -> Array[String]:
-	var ordered: Array[String] = []
-	var seen: Dictionary = {}
-	for rarity in DEFAULT_DROP_RARITIES:
-		ordered.append(rarity)
-		seen[rarity] = true
-
-	if fallback_any is Dictionary:
-		var fallback: Dictionary = fallback_any
-		for key_any in fallback.keys():
-			var key := str(key_any).strip_edges()
-			if key.is_empty() or seen.has(key):
-				continue
-			ordered.append(key)
-			seen[key] = true
-
-	if primary_any is Dictionary:
-		var primary: Dictionary = primary_any
-		for key_any in primary.keys():
-			var key := str(key_any).strip_edges()
-			if key.is_empty() or seen.has(key):
-				continue
-			ordered.append(key)
-			seen[key] = true
-
-	return ordered
-
-func _normalize_special_drops(special_any: Variant, fallback_any: Variant) -> Dictionary:
-	var out: Dictionary = {}
-	if fallback_any is Dictionary:
-		var fallback: Dictionary = fallback_any
-		for kind in ["normal", "elite", "boss"]:
-			var row_any = fallback.get(kind, {})
-			if row_any is Dictionary:
-				out[kind] = (row_any as Dictionary).duplicate(true)
-	if special_any is Dictionary:
-		var special: Dictionary = special_any
-		for kind in ["normal", "elite", "boss"]:
-			if not special.has(kind):
-				continue
-			var row_any = special.get(kind, {})
-			if row_any is Dictionary:
-				out[kind] = (row_any as Dictionary).duplicate(true)
-	return out
+func _difficulty_pool_key(kind: String) -> String:
+	match _normalize_enemy_kind(kind):
+		"elite":
+			return "elite_monsters"
+		"boss":
+			return "boss_monsters"
+		_:
+			return "normal_monsters"
 
 func _default_stage_id() -> String:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("stages_db", {})
-	if not (db_any is Dictionary):
-		return "nan_01"
-	var stages_any = (db_any as Dictionary).get("stages", [])
+	var stages_any = ConfigService.get_stages_db().get("stages", [])
 	if not (stages_any is Array):
 		return "nan_01"
 	for stage_any in stages_any:
@@ -585,8 +372,6 @@ func _apply_battle_cfg(battle_cfg: Dictionary) -> void:
 	_load_monsters_cfg(battle_cfg)
 	_load_spawn_cfg(battle_cfg)
 	_load_special_spawn_cfg(battle_cfg)
-	_load_drop_cfg(battle_cfg)
-	_load_equip_templates()
 	_load_balance_cfg()
 	_apply_spawn_position()
 	var player_radius: float = float(player.get("radius", 18.0))
@@ -637,20 +422,17 @@ func _load_monsters_cfg(battle_cfg: Dictionary) -> void:
 
 func _get_monster_def_by_kind(kind: String) -> Dictionary:
 	var kind_key := _normalize_enemy_kind(kind)
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var monsters_db_any = cfg.get("monsters_db", {})
-	if monsters_db_any is Dictionary:
-		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
-		if monsters_any is Array:
-			for mon_any in monsters_any:
-				if not (mon_any is Dictionary):
-					continue
-				var mon: Dictionary = mon_any
-				if _normalize_enemy_kind(str(mon.get("kind", "normal"))) != kind_key:
-					continue
-				if mon.has("is_enabled") and not bool(mon.get("is_enabled", true)):
-					continue
-				return mon.duplicate(true)
+	var monsters_any = ConfigService.get_monsters_db().get("monsters", [])
+	if monsters_any is Array:
+		for mon_any in monsters_any:
+			if not (mon_any is Dictionary):
+				continue
+			var mon: Dictionary = mon_any
+			if _normalize_enemy_kind(str(mon.get("kind", "normal"))) != kind_key:
+				continue
+			if mon.has("is_enabled") and not bool(mon.get("is_enabled", true)):
+				continue
+			return mon.duplicate(true)
 
 	match kind_key:
 		"elite":
@@ -671,18 +453,16 @@ func _get_monster_def_by_id(monster_id: String) -> Dictionary:
 	if target_id.is_empty():
 		return {}
 
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var monsters_db_any = cfg.get("monsters_db", {})
-	if monsters_db_any is Dictionary:
-		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
-		if monsters_any is Array:
-			for mon_any in monsters_any:
-				if not (mon_any is Dictionary):
-					continue
-				var mon: Dictionary = mon_any
-				if str(mon.get("id", "")).strip_edges() == target_id:
-					return mon.duplicate(true)
+	var monsters_any = ConfigService.get_monsters_db().get("monsters", [])
+	if monsters_any is Array:
+		for mon_any in monsters_any:
+			if not (mon_any is Dictionary):
+				continue
+			var mon: Dictionary = mon_any
+			if str(mon.get("id", "")).strip_edges() == target_id:
+				return mon.duplicate(true)
 
+	var cfg: Dictionary = ConfigService.get_cfg()
 	var battle_any = cfg.get("battle", {})
 	if battle_any is Dictionary:
 		var battle_cfg: Dictionary = battle_any
@@ -729,7 +509,7 @@ func _pick_from_pool(pool: Array) -> String:
 		if not (entry_any is Dictionary):
 			continue
 		var entry: Dictionary = entry_any
-		total += maxi(0, int(entry.get("w", 0)))
+		total += maxi(0, int(entry.get("weight", entry.get("w", 0))))
 	if total <= 0:
 		return ""
 
@@ -739,28 +519,25 @@ func _pick_from_pool(pool: Array) -> String:
 		if not (entry_any is Dictionary):
 			continue
 		var entry: Dictionary = entry_any
-		var w := maxi(0, int(entry.get("w", 0)))
+		var w := maxi(0, int(entry.get("weight", entry.get("w", 0))))
 		acc += w
 		if roll < acc:
-			return str(entry.get("id", "")).strip_edges()
+			return str(entry.get("monster_id", entry.get("id", ""))).strip_edges()
 	return ""
 
 func _get_monster_id_for_kind(kind: String) -> String:
 	var kind_key := _normalize_enemy_kind(kind)
-	if _stage_monsters.is_empty():
+	if _difficulty_monsters.is_empty():
 		return ""
 
-	# pool structure: {normal_pool:[{id,w}], ...}
-	var pool_key := "%s_pool" % kind_key
-	var pool_any = _stage_monsters.get(pool_key, [])
+	var pool_key := _difficulty_pool_key(kind_key)
+	var pool_any = _difficulty_monsters.get(pool_key, [])
 	if pool_any is Array:
 		var picked := _pick_from_pool(pool_any)
 		if not picked.is_empty():
 			return picked
 
-	# legacy structure: {normal:"mob_a", elite:"elite_a", boss:"boss_a"}
-	var legacy_id := str(_stage_monsters.get(kind_key, "")).strip_edges()
-	return legacy_id
+	return ""
 
 func _load_spawn_cfg(battle_cfg: Dictionary) -> void:
 	var spawn_points_any = battle_cfg.get("spawn_points", [])
@@ -803,93 +580,6 @@ func _load_special_spawn_cfg(battle_cfg: Dictionary) -> void:
 	if boss_any is Dictionary:
 		boss_monster_cfg = (boss_any as Dictionary).duplicate(true)
 		boss_monster_cfg["kind"] = "boss"
-
-func _load_drop_cfg(battle_cfg: Dictionary) -> void:
-	drop_chance = 0.0
-	drop_weights.clear()
-	drop_items.clear()
-	equip_drop_chance = 0.0
-	equip_drop_weights.clear()
-	equip_drop_by_rarity.clear()
-	special_drops.clear()
-
-	var drops_any = battle_cfg.get("drops", {})
-	if not (drops_any is Dictionary):
-		_apply_stage_drop_patch({})
-		return
-	var drops: Dictionary = drops_any
-
-	drop_chance = clampf(float(drops.get("drop_chance", 0.0)), 0.0, 1.0)
-	var rarity_weights_any = drops.get("rarity_weights", {})
-	if rarity_weights_any is Dictionary:
-		var rarity_weights: Dictionary = rarity_weights_any
-		for rarity_any in rarity_weights.keys():
-			var rarity := str(rarity_any).strip_edges()
-			if rarity.is_empty():
-				continue
-			drop_weights[rarity] = maxi(0, int(rarity_weights.get(rarity_any, 0)))
-	for rarity in DEFAULT_DROP_RARITIES:
-		if not drop_weights.has(rarity):
-			drop_weights[rarity] = 0
-
-	var items_any = drops.get("items_by_rarity", drops.get("items", {}))
-	if items_any is Dictionary:
-		var items_dict: Dictionary = items_any
-		for rarity_any in items_dict.keys():
-			var rarity := str(rarity_any).strip_edges()
-			if rarity.is_empty():
-				continue
-			var list_any = items_dict.get(rarity_any, [])
-			if list_any is Array:
-				var names: Array[String] = []
-				for item_any in list_any:
-					var item_id := str(item_any).strip_edges()
-					if item_id.is_empty():
-						continue
-					names.append(item_id)
-				drop_items[rarity] = names
-
-	equip_drop_chance = clampf(float(drops.get("equip_chance", 0.0)), 0.0, 1.0)
-	var equip_weights_any = drops.get("equip_weights", {})
-	if equip_weights_any is Dictionary:
-		var equip_weights: Dictionary = equip_weights_any
-		for rarity in ["white", "blue", "gold"]:
-			equip_drop_weights[rarity] = maxi(0, int(equip_weights.get(rarity, 0)))
-
-	var equip_pool_any = drops.get("equip_by_rarity", {})
-	if equip_pool_any is Dictionary:
-		var equip_pool: Dictionary = equip_pool_any
-		for rarity in ["white", "blue", "gold"]:
-			var list_any = equip_pool.get(rarity, [])
-			if list_any is Array:
-				var ids: Array[String] = []
-				for id_any in list_any:
-					ids.append(str(id_any))
-				equip_drop_by_rarity[rarity] = ids
-
-	var special_any = battle_cfg.get("special_drops", {})
-	if special_any is Dictionary:
-		special_drops = (special_any as Dictionary).duplicate(true)
-	_apply_stage_drop_patch({})
-
-func _load_equip_templates() -> void:
-	equip_templates_by_id.clear()
-	var full_cfg: Dictionary = ConfigService.get_cfg()
-	var equip_db_any = full_cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return
-	var equip_db: Dictionary = equip_db_any
-	var templates_any = equip_db.get("equip_templates", [])
-	if not (templates_any is Array):
-		return
-	for tpl_any in templates_any:
-		if not (tpl_any is Dictionary):
-			continue
-		var tpl: Dictionary = tpl_any
-		var tpl_id := str(tpl.get("id", ""))
-		if tpl_id.is_empty():
-			continue
-		equip_templates_by_id[tpl_id] = tpl.duplicate(true)
 
 func _load_balance_cfg() -> void:
 	skills_by_id.clear()
@@ -947,11 +637,7 @@ func _load_balance_cfg() -> void:
 			ai_switch_cooldown = maxf(0.0, float(auto_switch.get("switch_cooldown_sec", 2.0)))
 
 func _find_stage_cfg(stage_id: String) -> Dictionary:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("stages_db", {})
-	if not (db_any is Dictionary):
-		return {}
-	var stages_any = (db_any as Dictionary).get("stages", [])
+	var stages_any = ConfigService.get_stages_db().get("stages", [])
 	if not (stages_any is Array):
 		return {}
 	for stage_any in stages_any:
@@ -986,6 +672,7 @@ func _reset_runtime_for_stage_switch() -> void:
 	spawn_rt["next_spawn_at"] = battle_time
 	qi = mini(qi, qi_max)
 	qi_regen_accum = 0.0
+	cycle_started_at = battle_time
 
 func _sync_player_combat_stats(force_full: bool = false) -> void:
 	var stats: Dictionary = EquipmentModel.get_total_stats()
@@ -1022,7 +709,7 @@ func _reset_player_pos_if_needed() -> void:
 func _process_spawn() -> void:
 	if not _has_special_enemy_alive() and not special_present.is_empty():
 		special_present = ""
-	if special_present != "":
+	if special_present == "boss":
 		return
 
 	var alive_count: int = int(spawn_rt.get("alive_count", 0))
@@ -1041,7 +728,6 @@ func _spawn_enemy() -> bool:
 	if template.is_empty():
 		return false
 	MonsterDexModel.mark_seen(template)
-	template = _apply_monster_difficulty_mult(template)
 	var monster_id: String = str(template.get("id", str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))))
 	if monster_id.is_empty():
 		monster_id = str(spawn_rt.get("monster_id", DEFAULT_MONSTER_ID))
@@ -1074,6 +760,7 @@ func _spawn_enemy() -> bool:
 		"def": int(template.get("def", 2)),
 		"exp": maxi(0, int(template.get("exp", 1))),
 		"drop_bonus_percent": maxi(0, int(template.get("drop_bonus_percent", 0))),
+		"drops": template.get("drops", []),
 	})
 	enemy_uid_seq += 1
 	return true
@@ -1084,7 +771,6 @@ func _spawn_special_enemy(kind: String) -> bool:
 	if template.is_empty():
 		return false
 	MonsterDexModel.mark_seen(template)
-	template = _apply_monster_difficulty_mult(template)
 
 	var monster_id := str(template.get("id", normalized_kind))
 	if monster_id.is_empty():
@@ -1117,6 +803,7 @@ func _spawn_special_enemy(kind: String) -> bool:
 		"def": int(template.get("def", 2)),
 		"exp": maxi(0, int(template.get("exp", 1))),
 		"drop_bonus_percent": maxi(0, int(template.get("drop_bonus_percent", 0))),
+		"drops": template.get("drops", []),
 	})
 	enemy_uid_seq += 1
 	special_present = normalized_kind
@@ -1775,177 +1462,36 @@ func _apply_damage_to_enemy(index: int, damage: int) -> bool:
 		boss_progress += 1
 	else:
 		special_present = ""
-		if enemy_kind == "boss" and not current_stage_id.is_empty():
-			MapProgressModel.add_boss_kill(current_stage_id, current_diff_index, 1)
 		EventBus.add_log("已击败：%s" % enemy_name)
+		if enemy_kind == "boss":
+			var clear_seconds := maxf(1.0, battle_time - cycle_started_at)
+			var patrol_ret := OfflineService.record_patrol_clear(current_stage_id, current_diff_index, clear_seconds)
+			if bool(patrol_ret.get("improved", false)):
+				EventBus.add_log("自动巡查路线更新：%s %.1f秒" % [
+					str(patrol_ret.get("route_name", stage_name)),
+					float(patrol_ret.get("best_clear_seconds", clear_seconds)),
+				])
+			if MapProgressModel.mark_stage_cleared(current_stage_id, current_diff_index):
+				EventBus.add_log("通关地图：%s" % stage_name)
+				TaskService.on_stage_cleared(current_stage_id)
+				EventBus.request_profile_sync("stage_clear")
+			normal_kill_counter = 0
+			elite_progress = 0
+			boss_progress = 0
+			cycle_started_at = battle_time
 	kills += 1
 	_heal_on_kill(enemy_kind)
 	PerfTracker.record_kill(enemy_kind, enemy_exp)
 	ProgressModel.add_exp(enemy_exp, "online")
 	TaskService.on_kill(enemy_kind, 1)
-	_try_spawn_drop(death_pos, enemy_drop_bonus)
-	_apply_special_drops(enemy_kind)
+	_try_spawn_drop(enemy, death_pos, enemy_drop_bonus)
 	if enemy_kind == "normal":
+		_try_trigger_special_spawn()
+	elif enemy_kind == "elite":
 		_try_trigger_special_spawn()
 	if kills % 5 == 0:
 		EventBus.add_log("击杀累计：%d（场上%d）" % [kills, enemies.size()])
 	return true
-
-func _apply_special_drops(kind: String) -> void:
-	var kind_key := _normalize_enemy_kind(kind)
-	var def_any = _stage_special.get(kind_key, {})
-	if not (def_any is Dictionary):
-		return
-	var drop_def: Dictionary = def_any
-
-	if kind_key == "boss":
-		_grant_boss_forge_resources()
-		var core_id := str(drop_def.get("core_guarantee", ""))
-		if not core_id.is_empty():
-			_grant_item_drop(core_id, "gold")
-
-	var punch_ch := clampf(float(drop_def.get("punch_stone_chance", 0.0)), 0.0, 0.90)
-	if punch_ch > 0.0 and randf() < punch_ch:
-		_grant_item_drop("打孔石", "blue")
-
-	var gem_ch := clampf(float(drop_def.get("extra_gem_chance", 0.0)), 0.0, 0.90)
-	if gem_ch <= 0.0 or randf() >= gem_ch:
-		return
-	var gems_any = drop_def.get("extra_gems", [])
-	if not (gems_any is Array):
-		return
-	var gems: Array = gems_any
-	if gems.is_empty():
-		return
-	var gem_id := str(gems[randi() % gems.size()])
-	if gem_id.is_empty():
-		return
-	_grant_item_drop(gem_id, "blue")
-
-func _grant_boss_forge_resources() -> void:
-	var stage := _find_stage_cfg(current_stage_id)
-	var theme_key := _resolve_stage_theme_key(stage)
-	if theme_key.is_empty():
-		return
-
-	var mark_id := "boss_mark_%s" % theme_key
-	_grant_item_drop(mark_id, "blue")
-
-	var frag_chance := clampf(0.40 + float(maxi(0, current_diff_index)) * 0.08, 0.05, 0.85)
-	if randf() < frag_chance:
-		_grant_item_drop("bp_fragment_%s" % theme_key, "blue")
-
-	var blueprint_id := _pick_blueprint_drop_for_theme(theme_key)
-	var blueprint_chance := clampf(0.06 + float(maxi(0, current_diff_index)) * 0.02, 0.01, 0.25)
-	if not blueprint_id.is_empty() and randf() < blueprint_chance:
-		_grant_item_drop(blueprint_id, "gold")
-
-	if _theme_has_core_requirement(theme_key) and current_diff_index >= 1:
-		var core_id := "boss_core_%s" % theme_key
-		var core_chance := clampf(0.08 + float(maxi(0, current_diff_index)) * 0.04, 0.02, 0.35)
-		if randf() < core_chance:
-			_grant_item_drop(core_id, "gold")
-
-func _resolve_stage_theme_key(stage_cfg: Dictionary) -> String:
-	if not stage_cfg.is_empty():
-		var direct := str(stage_cfg.get("theme_key", "")).strip_edges().to_lower()
-		if not direct.is_empty():
-			return direct
-	var stage_id := current_stage_id.strip_edges().to_lower()
-	if stage_id.begins_with("nan"):
-		return "nanshan"
-	if stage_id.begins_with("qing") or stage_id.begins_with("qiu"):
-		return "qingqiu"
-	if stage_id.begins_with("kun"):
-		return "kunlun"
-	var stage_name := str(stage_cfg.get("name", "")).strip_edges()
-	if stage_name.find("南山") != -1:
-		return "nanshan"
-	if stage_name.find("青丘") != -1:
-		return "qingqiu"
-	if stage_name.find("昆仑") != -1:
-		return "kunlun"
-	return ""
-
-func _pick_blueprint_drop_for_theme(theme_key: String) -> String:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var equip_db_any = cfg.get("equip_db", {})
-	if not (equip_db_any is Dictionary):
-		return ""
-	var templates_any = (equip_db_any as Dictionary).get("equip_templates", [])
-	if not (templates_any is Array):
-		return ""
-	var ids: Array[String] = []
-	var seen: Dictionary = {}
-	for tpl_any in templates_any:
-		if not (tpl_any is Dictionary):
-			continue
-		var tpl: Dictionary = tpl_any
-		if str(tpl.get("quality_tier", "")).strip_edges().to_lower() != "high":
-			continue
-		if str(tpl.get("theme_key", "")).strip_edges().to_lower() != theme_key:
-			continue
-		var blueprint_id := str(tpl.get("blueprint_item_id", "")).strip_edges()
-		if blueprint_id.is_empty() or seen.has(blueprint_id):
-			continue
-		seen[blueprint_id] = true
-		ids.append(blueprint_id)
-	if ids.is_empty():
-		var items_db_any = cfg.get("items_db", {})
-		if items_db_any is Dictionary:
-			var items_any = (items_db_any as Dictionary).get("items", [])
-			if items_any is Array:
-				for row_any in (items_any as Array):
-					if not (row_any is Dictionary):
-						continue
-					var row: Dictionary = row_any
-					var item_id := str(row.get("id", "")).strip_edges()
-					if item_id.is_empty():
-						continue
-					var sub_type := str(row.get("sub_type", "")).strip_edges().to_lower()
-					var is_blueprint := sub_type == "equipment_blueprint" or item_id.begins_with("bp_")
-					if not is_blueprint:
-						continue
-					if item_id.find(theme_key) == -1:
-						continue
-					if seen.has(item_id):
-						continue
-					seen[item_id] = true
-					ids.append(item_id)
-	if ids.is_empty():
-		return ""
-	return ids[randi() % ids.size()]
-
-func _theme_has_core_requirement(theme_key: String) -> bool:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var rules_db_any = cfg.get("forge_rules_db", {})
-	if not (rules_db_any is Dictionary):
-		return false
-	var root_any = (rules_db_any as Dictionary).get("forge_rules", {})
-	if not (root_any is Dictionary):
-		return false
-	var high_any = (root_any as Dictionary).get("high_forge_rules", [])
-	if not (high_any is Array):
-		return false
-	var expected_core_id := "boss_core_%s" % theme_key
-	for row_any in (high_any as Array):
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		if str(row.get("theme_key", "")).strip_edges().to_lower() != theme_key:
-			continue
-		var extra_any = row.get("extra_materials", [])
-		if not (extra_any is Array):
-			continue
-		for mat_any in (extra_any as Array):
-			if not (mat_any is Dictionary):
-				continue
-			var mat: Dictionary = mat_any
-			if str(mat.get("item_id", "")).strip_edges() != expected_core_id:
-				continue
-			if int(mat.get("count", 0)) > 0:
-				return true
-	return false
 
 func _find_enemy_index_by_uid(enemy_uid: int) -> int:
 	if enemy_uid <= 0:
@@ -2207,77 +1753,45 @@ func _strip_outer_parens(text: String) -> String:
 		out = out.substr(1, out.length() - 2).strip_edges()
 	return out
 
-func _try_spawn_drop(death_pos: Vector2, kill_drop_bonus_percent: int = 0) -> void:
-	if _try_spawn_equip_drop(death_pos, kill_drop_bonus_percent):
+func _try_spawn_drop(enemy: Dictionary, _death_pos: Vector2, kill_drop_bonus_percent: int = 0) -> void:
+	var drops_any = enemy.get("drops", [])
+	if not (drops_any is Array):
 		return
-	_try_spawn_item_drop(death_pos, kill_drop_bonus_percent)
+	var drops: Array = drops_any
+	var loot_bonus := _get_loot_bonus_percent()
+	for row_any in drops:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if not bool(row.get("is_enabled", true)):
+			continue
+		var item_id := str(row.get("item_id", "")).strip_edges()
+		if item_id.is_empty():
+			continue
+		var count_min := maxi(1, int(row.get("count_min", 1)))
+		var count_max := maxi(count_min, int(row.get("count_max", count_min)))
+		var chance := 1.0
+		if row.has("drop_rate") and row.get("drop_rate", null) != null:
+			chance = clampf(float(row.get("drop_rate", 1.0)), 0.0, 1.0)
+		chance = _apply_loot_bonus(chance, loot_bonus)
+		chance = _apply_kill_drop_bonus(chance, kill_drop_bonus_percent)
+		if chance <= 0.0 or randf() > chance:
+			continue
+		var count := count_min
+		if count_max > count_min:
+			count = randi_range(count_min, count_max)
+		_grant_item_drop(item_id, count)
 
-func _try_spawn_equip_drop(_death_pos: Vector2, kill_drop_bonus_percent: int = 0) -> bool:
-	if equip_drop_chance <= 0.0:
-		return false
-	var effective_drop := equip_drop_chance
-	effective_drop = _apply_kill_drop_bonus(effective_drop, kill_drop_bonus_percent)
-	if randf() >= effective_drop:
-		return false
-	var rarity := _roll_weighted_rarity(equip_drop_weights)
-	if rarity.is_empty():
-		return false
-	var pool_any = equip_drop_by_rarity.get(rarity, [])
-	if not (pool_any is Array):
-		return false
-	var pool: Array = pool_any
-	if pool.is_empty():
-		return false
-
-	var template_id := str(pool[randi() % pool.size()])
-	if template_id.is_empty():
-		return false
-	var equip_name := _resolve_equip_name(template_id)
-	var tag := _rarity_tag(rarity)
-	EventBus.add_log("%s 装备掉落：%s" % [tag, equip_name])
-	EquipmentModel.add_equip(template_id, "online")
-	TaskService.on_loot(1)
-	return true
-
-func _try_spawn_item_drop(_death_pos: Vector2, kill_drop_bonus_percent: int = 0) -> void:
-	var base_drop := clampf(float(_stage_drop.get("drop_chance", drop_chance)), 0.0, 1.0)
-	if base_drop <= 0.0:
-		return
-	var loot_bonus: int = _get_loot_bonus_percent()
-	var effective_drop: float = _calc_effective_drop_chance(base_drop, loot_bonus)
-	effective_drop = _apply_kill_drop_bonus(effective_drop, kill_drop_bonus_percent)
-	if effective_drop <= 0.0:
-		return
-	if randf() >= effective_drop:
-		return
-	var weights_any = _stage_drop.get("rarity_weights", drop_weights)
-	var weights := _normalize_rarity_weights(weights_any, drop_weights)
-	var effective_weights: Dictionary = _calc_effective_rarity_weights(weights, loot_bonus)
-	var rarity := _roll_weighted_rarity(effective_weights)
-	if rarity.is_empty():
-		return
-	var pools_any = _stage_drop.get("items_by_rarity", drop_items)
-	if not (pools_any is Dictionary):
-		return
-	var pools: Dictionary = pools_any
-	var items_any = pools.get(rarity, [])
-	if not (items_any is Array):
-		return
-	var items: Array = items_any
-	if items.is_empty():
-		return
-	var item_name := str(items[randi() % items.size()])
-	if item_name.is_empty():
-		return
-	_grant_item_drop(item_name, rarity)
-
-func _grant_item_drop(item_id: String, fallback_rarity: String = "white") -> void:
+func _grant_item_drop(item_id: String, count: int = 1) -> void:
 	if item_id.is_empty():
 		return
-	InventoryModel.add_item(item_id, 1, "online")
-	TaskService.on_loot(1)
-	var rarity := _item_rarity(item_id, fallback_rarity)
-	EventBus.add_log("%s 掉落：%s" % [_rarity_tag(rarity), item_id])
+	var grant_count := maxi(1, count)
+	InventoryModel.add_item(item_id, grant_count, "online")
+	TaskService.on_loot(grant_count)
+	var rarity := _item_rarity(item_id, "white")
+	var item_name := _item_name(item_id)
+	var label := item_name if not item_name.is_empty() else item_id
+	EventBus.add_log("%s 掉落：%s x%d" % [_rarity_tag(rarity), label, grant_count])
 
 func _item_rarity(item_id: String, fallback_rarity: String = "white") -> String:
 	if item_id.is_empty():
@@ -2299,6 +1813,26 @@ func _item_rarity(item_id: String, fallback_rarity: String = "white") -> String:
 		return rarity if not rarity.is_empty() else fallback_rarity
 	return fallback_rarity
 
+func _item_name(item_id: String) -> String:
+	if item_id.is_empty():
+		return ""
+	var cfg: Dictionary = ConfigService.get_cfg()
+	var items_db_any = cfg.get("items_db", {})
+	if not (items_db_any is Dictionary):
+		return item_id
+	var items_any = (items_db_any as Dictionary).get("items", [])
+	if not (items_any is Array):
+		return item_id
+	for item_any in items_any:
+		if not (item_any is Dictionary):
+			continue
+		var item_def: Dictionary = item_any
+		if str(item_def.get("id", "")).strip_edges() != item_id:
+			continue
+		var name := str(item_def.get("name", item_id)).strip_edges()
+		return name if not name.is_empty() else item_id
+	return item_id
+
 func _update_loot(delta: float) -> void:
 	if loots.is_empty():
 		return
@@ -2308,20 +1842,11 @@ func _update_loot(delta: float) -> void:
 		var loot_pos: Vector2 = loot.get("pos", Vector2.ZERO)
 		if player_pos.distance_to(loot_pos) <= LOOT_PICKUP_RADIUS:
 			var picked_up := false
-			var loot_type := str(loot.get("type", "item"))
-			if loot_type == "equip":
-				var template_id := str(loot.get("template_id", ""))
-				var equip_name := str(loot.get("label", _resolve_equip_name(template_id)))
-				if not template_id.is_empty():
-					EquipmentModel.add_equip(template_id, "online")
-					EventBus.add_log("拾取装备：%s" % equip_name)
-					picked_up = true
-			else:
-				var item_id := str(loot.get("item_id", ""))
-				if not item_id.is_empty():
-					InventoryModel.add_item(item_id, 1, "online")
-					EventBus.add_log("拾取：%s" % item_id)
-					picked_up = true
+			var item_id := str(loot.get("item_id", ""))
+			if not item_id.is_empty():
+				InventoryModel.add_item(item_id, 1, "online")
+				EventBus.add_log("拾取：%s" % _item_name(item_id))
+				picked_up = true
 			if picked_up:
 				TaskService.on_loot(1)
 			loots.remove_at(i)
@@ -2361,6 +1886,7 @@ func _on_player_dead() -> void:
 	qi_regen_accum = 0.0
 	spawn_rt["alive_count"] = 0
 	spawn_rt["next_spawn_at"] = battle_time
+	cycle_started_at = battle_time
 	_log_loot_bonus_info()
 
 func _player_regen(delta: float) -> void:
@@ -2420,28 +1946,6 @@ func _find_nearest_enemy_index() -> int:
 			best_idx = i
 	return best_idx
 
-func _resolve_equip_name(template_id: String) -> String:
-	var tpl_any = equip_templates_by_id.get(template_id, {})
-	if tpl_any is Dictionary:
-		var tpl: Dictionary = tpl_any
-		return str(tpl.get("name", template_id))
-	return template_id
-
-func _roll_weighted_rarity(weights: Dictionary) -> String:
-	var total := _sum_rarity_weights(weights)
-	if total <= 0:
-		return ""
-	var roll := randi() % total
-	var acc := 0
-	for rarity in _collect_rarity_keys(weights, {}):
-		var w := maxi(0, int(weights.get(rarity, 0)))
-		if w <= 0:
-			continue
-		acc += w
-		if roll < acc:
-			return rarity
-	return ""
-
 func _rarity_tag(rarity: String) -> String:
 	match rarity:
 		"blue":
@@ -2459,31 +1963,15 @@ func _get_loot_bonus_percent() -> int:
 	var stats: Dictionary = EquipmentModel.get_total_stats()
 	return maxi(0, int(stats.get("LOOT_BONUS_PERCENT", stats.get("DROP", 0))))
 
-func _calc_effective_drop_chance(base_drop: float, loot_bonus: int) -> float:
-	var effective: float = base_drop * (1.0 + float(loot_bonus) / 100.0)
-	return clampf(effective, 0.0, 0.90)
+func _apply_loot_bonus(chance: float, loot_bonus: int) -> float:
+	if loot_bonus <= 0:
+		return clampf(chance, 0.0, 1.0)
+	return clampf(chance * (1.0 + float(loot_bonus) / 100.0), 0.0, 1.0)
 
 func _apply_kill_drop_bonus(effective_drop: float, kill_drop_bonus_percent: int) -> float:
 	if kill_drop_bonus_percent > 0:
 		effective_drop *= (1.0 + float(kill_drop_bonus_percent) / 100.0)
-	return clampf(effective_drop, 0.0, 0.90)
-
-func _calc_effective_rarity_weights(weights: Dictionary, loot_bonus: int) -> Dictionary:
-	var out: Dictionary = {}
-	for rarity_any in weights.keys():
-		var rarity := str(rarity_any).strip_edges()
-		if rarity.is_empty():
-			continue
-		out[rarity] = maxi(0, int(weights.get(rarity_any, 0)))
-	var w_white: int = maxi(0, int(out.get("white", 0)))
-	var w_blue: int = maxi(0, int(out.get("blue", 0)))
-	var w_gold: int = maxi(0, int(out.get("gold", 0)))
-	var blue_bonus: int = int(floor(float(loot_bonus) / 3.0))
-	var gold_bonus: int = int(floor(float(loot_bonus) / 8.0))
-	out["white"] = w_white
-	out["blue"] = w_blue + blue_bonus
-	out["gold"] = w_gold + gold_bonus
-	return out
+	return clampf(effective_drop, 0.0, 1.0)
 
 func _normalize_enemy_kind(kind: String) -> String:
 	var k := kind.strip_edges().to_lower()
@@ -2511,7 +1999,7 @@ func _has_special_enemy_alive() -> bool:
 
 func _log_loot_bonus_info() -> void:
 	var loot_bonus: int = _get_loot_bonus_percent()
-	EventBus.add_log("运势掉落加成：+%d%%（影响掉落概率与蓝金权重）" % loot_bonus)
+	EventBus.add_log("运势掉落加成：+%d%%（影响怪物掉落概率）" % loot_bonus)
 
 func _random_point_in_circle(radius: float) -> Vector2:
 	if radius <= 0.0:

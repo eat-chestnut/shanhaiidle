@@ -5,6 +5,8 @@ const ACTIVE_ROOT := "user://remote"
 const ACTIVE_DIR := "user://remote/active"
 const TMP_DIR := "user://remote_tmp"
 const ACTIVE_MANIFEST := "user://remote/active_manifest.json"
+const LATEST_MANIFEST_NAME := "manifest.json"
+const BUNDLE_FILE_NAME := "config_bundle_v1.json"
 
 const FILE_KEY_ORDER := [
 	"stages",
@@ -13,12 +15,17 @@ const FILE_KEY_ORDER := [
 	"equipment_sets",
 	"equip_slots",
 	"equipment_growth_rules",
+	"character_growth_rules",
+	"progression_milestones",
 	"blue_gear_templates",
 	"blue_affix_pool",
 	"purple_affix_pool",
 	"gem_catalog",
 	"material_catalog",
 	"material_dungeons",
+	"sect_tasks",
+	"mountain_god",
+	"shop_goods",
 	"crafting_recipes",
 	"monsters",
 	"skills_catalog",
@@ -30,6 +37,19 @@ const OPTIONAL_FILE_KEYS := [
 	"forge_rules",
 ]
 
+const CORE_RUNTIME_KEYS := [
+	"character_growth_rules",
+	"progression_milestones",
+	"monsters",
+	"stages",
+	"blue_affix_pool",
+	"blue_gear_templates",
+	"material_dungeons",
+	"sect_tasks",
+	"mountain_god",
+	"shop_goods",
+]
+
 const FILE_KEY_TO_NAME := {
 	"stages": "stages_v1.json",
 	"items": "items.json",
@@ -37,12 +57,17 @@ const FILE_KEY_TO_NAME := {
 	"equipment_sets": "equipment_sets.json",
 	"equip_slots": "equip_slots_v1.json",
 	"equipment_growth_rules": "equipment_growth_rules_v1.json",
+	"character_growth_rules": "character_growth_rules_v1.json",
+	"progression_milestones": "progression_milestones_v1.json",
 	"blue_gear_templates": "blue_gear_templates_v1.json",
 	"blue_affix_pool": "blue_affix_pool_v1.json",
 	"purple_affix_pool": "purple_affix_pool_v1.json",
 	"gem_catalog": "gem_catalog_v1.json",
 	"material_catalog": "material_catalog_v1.json",
 	"material_dungeons": "material_dungeons_v1.json",
+	"sect_tasks": "sect_tasks_v1.json",
+	"mountain_god": "mountain_god_v1.json",
+	"shop_goods": "shop_goods_v1.json",
 	"crafting_recipes": "crafting_recipes_v1.json",
 	"monsters": "monsters.json",
 	"skills_catalog": "skills_catalog.json",
@@ -50,6 +75,67 @@ const FILE_KEY_TO_NAME := {
 	"star_rules": "star_rules_v1.json",
 	"forge_rules": "forge_rules_v1.json",
 }
+
+func get_managed_file_keys() -> Array[String]:
+	var keys: Array[String] = []
+	for key_any in FILE_KEY_ORDER:
+		keys.append(str(key_any))
+	for key_any in OPTIONAL_FILE_KEYS:
+		var key := str(key_any)
+		if keys.has(key):
+			continue
+		keys.append(key)
+	return keys
+
+func get_core_runtime_keys() -> Array[String]:
+	var keys: Array[String] = []
+	for key_any in CORE_RUNTIME_KEYS:
+		keys.append(str(key_any))
+	return keys
+
+func has_managed_key(key: String) -> bool:
+	return FILE_KEY_TO_NAME.has(key)
+
+func get_filename_for_key(key: String) -> String:
+	return str(FILE_KEY_TO_NAME.get(key, ""))
+
+func get_bundle_manifest_url() -> String:
+	return "%s/%s" % [BASE_URL, LATEST_MANIFEST_NAME]
+
+func get_bundle_filename() -> String:
+	return BUNDLE_FILE_NAME
+
+func get_bundle_file_url(filename: String) -> String:
+	var clean := filename.strip_edges()
+	if clean.is_empty():
+		return ""
+	return "%s/%s" % [BASE_URL, clean]
+
+func get_active_file_text(filename: String) -> String:
+	var clean := filename.strip_edges()
+	if clean.is_empty():
+		return ""
+	var active_path := "%s/%s" % [ACTIVE_DIR, clean]
+	if not FileAccess.file_exists(active_path):
+		return ""
+	return FileAccess.get_file_as_string(active_path)
+
+func get_local_fallback_text(path: String) -> String:
+	var clean := path.strip_edges()
+	if clean.is_empty():
+		return ""
+	if not FileAccess.file_exists(clean):
+		return ""
+	return FileAccess.get_file_as_string(clean)
+
+func get_remote_text_for_key(key: String) -> String:
+	return get_active_file_text(get_filename_for_key(key))
+
+func get_text_for_key(key: String, fallback_res_path: String = "") -> String:
+	return get_active_text(get_filename_for_key(key), fallback_res_path)
+
+func validate_text_for_key(key: String, text: String) -> Dictionary:
+	return _validate_payload_by_key(key, text)
 
 func get_stages_json_text() -> String:
 	return get_active_text("stages_v1.json", "res://data/stages_v1.json")
@@ -69,6 +155,12 @@ func get_equip_slots_text() -> String:
 func get_equipment_growth_rules_text() -> String:
 	return get_active_text("equipment_growth_rules_v1.json", "res://data/equipment_growth_rules_v1.json")
 
+func get_character_growth_rules_text() -> String:
+	return get_active_text("character_growth_rules_v1.json", "res://data/character_growth_rules_v1.json")
+
+func get_progression_milestones_text() -> String:
+	return get_active_text("progression_milestones_v1.json", "res://data/progression_milestones_v1.json")
+
 func get_blue_gear_templates_text() -> String:
 	return get_active_text("blue_gear_templates_v1.json", "res://data/blue_gear_templates_v1.json")
 
@@ -86,6 +178,15 @@ func get_material_catalog_text() -> String:
 
 func get_material_dungeons_text() -> String:
 	return get_active_text("material_dungeons_v1.json", "res://data/material_dungeons_v1.json")
+
+func get_sect_tasks_text() -> String:
+	return get_active_text("sect_tasks_v1.json", "res://data/sect_tasks_v1.json")
+
+func get_mountain_god_text() -> String:
+	return get_active_text("mountain_god_v1.json", "res://data/mountain_god_v1.json")
+
+func get_shop_goods_text() -> String:
+	return get_active_text("shop_goods_v1.json", "res://data/shop_goods_v1.json")
 
 func get_crafting_recipes_text() -> String:
 	return get_active_text("crafting_recipes_v1.json", "res://data/crafting_recipes_v1.json")
@@ -121,12 +222,17 @@ func get_active_versions() -> Dictionary:
 		"equipment_sets": 0,
 		"equip_slots": 0,
 		"equipment_growth_rules": 0,
+		"character_growth_rules": 0,
+		"progression_milestones": 0,
 		"blue_gear_templates": 0,
 		"blue_affix_pool": 0,
 		"purple_affix_pool": 0,
 		"gem_catalog": 0,
 		"material_catalog": 0,
 		"material_dungeons": 0,
+		"sect_tasks": 0,
+		"mountain_god": 0,
+		"shop_goods": 0,
 		"crafting_recipes": 0,
 		"monsters": 0,
 		"skills_catalog": 0,
@@ -171,18 +277,95 @@ func get_active_bundle_id() -> String:
 		return "内置"
 	return bundle_id
 
-func get_meta_version_from_text(text: String) -> int:
-	if text.strip_edges().is_empty():
-		return 0
-	var parsed: Variant = JSON.parse_string(text)
-	if not (parsed is Dictionary):
-		return 0
-	var root: Dictionary = parsed
-	var meta_any: Variant = root.get("meta", null)
-	if not (meta_any is Dictionary):
-		return 0
-	var meta: Dictionary = meta_any
-	return maxi(0, int(meta.get("version", 0)))
+func load_active_manifest_info() -> Dictionary:
+	if not FileAccess.file_exists(ACTIVE_MANIFEST):
+		return {"ok": false, "reason": "active manifest 不存在"}
+	var manifest_text := FileAccess.get_file_as_string(ACTIVE_MANIFEST)
+	return _parse_manifest_info(manifest_text)
+
+func fetch_latest_manifest(on_done: Callable) -> void:
+	_download_text(get_bundle_manifest_url(), func(ok: bool, text: String, msg: String) -> void:
+		if not ok:
+			_call_manifest_done(on_done, false, {}, msg)
+			return
+		var parsed := _parse_manifest_info(text)
+		if not bool(parsed.get("ok", false)):
+			_call_manifest_done(on_done, false, {}, str(parsed.get("reason", "manifest 校验失败")))
+			return
+		if _is_debug_logging_enabled():
+			_debug_log("统一版本文件加载成功：bundle=%s" % str(parsed.get("bundle_id", "")))
+		_call_manifest_done(on_done, true, parsed, "ok")
+	)
+
+func get_versions_from_manifest(manifest: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	var files_any = manifest.get("files", [])
+	if not (files_any is Array):
+		return out
+	for row_any in files_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var key := str(row.get("key", "")).strip_edges()
+		if key.is_empty():
+			continue
+		out[key] = maxi(0, int(row.get("version", 0)))
+	return out
+
+func get_pending_updates_from_manifest(manifest: Dictionary) -> Array[Dictionary]:
+	var current := get_active_versions()
+	var updates: Array[Dictionary] = []
+	var files_any = manifest.get("files", [])
+	if not (files_any is Array):
+		return updates
+	for row_any in files_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		var key := str(row.get("key", "")).strip_edges()
+		if key.is_empty():
+			continue
+		var current_version := maxi(0, int(current.get(key, 0)))
+		var latest_version := maxi(0, int(row.get("version", 0)))
+		if latest_version > current_version:
+			updates.append(row.duplicate(true))
+	return updates
+
+func download_config_file(key: String, on_done: Callable) -> void:
+	var clean_key := key.strip_edges()
+	if not has_managed_key(clean_key):
+		_call_file_done(on_done, false, clean_key, "", {}, "未知配置 key")
+		return
+	fetch_latest_manifest(func(ok: bool, manifest_info: Dictionary, msg: String) -> void:
+		if not ok:
+			_call_file_done(on_done, false, clean_key, "", {}, msg)
+			return
+		var row := _find_manifest_row(manifest_info, clean_key)
+		if row.is_empty():
+			_call_file_done(on_done, false, clean_key, "", {}, "manifest 中缺少配置项")
+			return
+		var filename := str(row.get("filename", "")).strip_edges()
+		var expected_sha := str(row.get("sha256", "")).strip_edges().to_lower()
+		if filename.is_empty() or expected_sha.is_empty():
+			_call_file_done(on_done, false, clean_key, "", {}, "manifest 文件项不完整")
+			return
+		_download_text(get_bundle_file_url(filename), func(file_ok: bool, text: String, file_msg: String) -> void:
+			if not file_ok:
+				_call_file_done(on_done, false, clean_key, "", row, file_msg)
+				return
+			var check := validate_text_for_key(clean_key, text)
+			if not bool(check.get("ok", false)):
+				_call_file_done(on_done, false, clean_key, "", row, str(check.get("reason", "配置校验失败")))
+				return
+			var actual_sha := _sha256_text(text)
+			if actual_sha != expected_sha:
+				_call_file_done(on_done, false, clean_key, "", row, "文件哈希不匹配")
+				return
+			if _is_debug_logging_enabled():
+				_debug_log("单文件拉取成功：%s <- %s" % [clean_key, filename])
+			_call_file_done(on_done, true, clean_key, text, row, "ok")
+		)
+	)
 
 func validate_stages_json(text: String) -> Dictionary:
 	if text.strip_edges().is_empty():
@@ -208,15 +391,7 @@ func validate_stages_json(text: String) -> Dictionary:
 		if not (stage_any is Dictionary):
 			return {"ok": false, "reason": "stage[%d] 不是对象" % i}
 		var stage: Dictionary = stage_any
-		var basic_required := [
-			"id",
-			"name",
-			"unlock_min_level",
-			"elite_every_kills",
-			"boss_every_kills",
-			"spawn_patch",
-		]
-		for key in basic_required:
+		for key in ["id", "name", "unlock_min_level", "difficulties"]:
 			if not stage.has(key):
 				return {"ok": false, "reason": "stage[%d] 缺少字段 %s" % [i, key]}
 
@@ -224,154 +399,12 @@ func validate_stages_json(text: String) -> Dictionary:
 			return {"ok": false, "reason": "stage[%d].id 不能为空" % i}
 		if str(stage.get("name", "")).strip_edges().is_empty():
 			return {"ok": false, "reason": "stage[%d].name 不能为空" % i}
-
-		var unlock_min_level := int(stage.get("unlock_min_level", 0))
-		var elite_every_kills := int(stage.get("elite_every_kills", 0))
-		var boss_every_kills := int(stage.get("boss_every_kills", 0))
-		if unlock_min_level < 1:
+		if int(stage.get("unlock_min_level", 0)) < 1:
 			return {"ok": false, "reason": "stage[%d].unlock_min_level 必须 >= 1" % i}
-		if elite_every_kills < 1:
-			return {"ok": false, "reason": "stage[%d].elite_every_kills 必须 >= 1" % i}
-		if boss_every_kills < 1:
-			return {"ok": false, "reason": "stage[%d].boss_every_kills 必须 >= 1" % i}
 
-		if stage.has("monsters"):
-			var monsters_any: Variant = stage.get("monsters", {})
-			if not (monsters_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].monsters 必须是对象" % i}
-			var monsters_map: Dictionary = monsters_any
-			var has_legacy := false
-			var has_pool := false
-
-			for mk in ["normal", "elite", "boss"]:
-				if not monsters_map.has(mk):
-					continue
-				var legacy_id := str(monsters_map.get(mk, "")).strip_edges()
-				if legacy_id.is_empty():
-					return {"ok": false, "reason": "stage[%d].monsters.%s 不能为空" % [i, mk]}
-				has_legacy = true
-
-			for pool_key in ["normal_pool", "elite_pool", "boss_pool"]:
-				if monsters_map.has(pool_key):
-					has_pool = true
-
-			if has_pool:
-				for pool_key in ["normal_pool", "elite_pool", "boss_pool"]:
-					if not monsters_map.has(pool_key):
-						return {"ok": false, "reason": "stage[%d].monsters.%s 缺失" % [i, pool_key]}
-					var pool_any: Variant = monsters_map.get(pool_key, [])
-					if not (pool_any is Array):
-						return {"ok": false, "reason": "stage[%d].monsters.%s 必须是数组" % [i, pool_key]}
-					var pool: Array = pool_any
-					if pool.is_empty():
-						return {"ok": false, "reason": "stage[%d].monsters.%s 不能为空" % [i, pool_key]}
-					var sum_w := 0
-					for j in range(pool.size()):
-						var row_any: Variant = pool[j]
-						if not (row_any is Dictionary):
-							return {"ok": false, "reason": "stage[%d].monsters.%s[%d] 必须是对象" % [i, pool_key, j]}
-						var row: Dictionary = row_any
-						var monster_id := str(row.get("id", "")).strip_edges()
-						if monster_id.is_empty():
-							return {"ok": false, "reason": "stage[%d].monsters.%s[%d].id 不能为空" % [i, pool_key, j]}
-						var w := int(row.get("w", -1))
-						if w < 0:
-							return {"ok": false, "reason": "stage[%d].monsters.%s[%d].w 不能为负数" % [i, pool_key, j]}
-						sum_w += w
-					if sum_w <= 0:
-						return {"ok": false, "reason": "stage[%d].monsters.%s 权重总和必须 > 0" % [i, pool_key]}
-			elif has_legacy:
-				for mk in ["normal", "elite", "boss"]:
-					var legacy_id := str(monsters_map.get(mk, "")).strip_edges()
-					if legacy_id.is_empty():
-						return {"ok": false, "reason": "stage[%d].monsters.%s 不能为空" % [i, mk]}
-
-			if not has_legacy and not has_pool and not monsters_map.is_empty():
-				return {"ok": false, "reason": "stage[%d].monsters 结构无效" % i}
-
-		var spawn_any: Variant = stage.get("spawn_patch", {})
-		if not (spawn_any is Dictionary):
-			return {"ok": false, "reason": "stage[%d].spawn_patch 必须是对象" % i}
-		var spawn_patch: Dictionary = spawn_any
-		for key in ["respawn_s", "max_alive", "spawn_radius"]:
-			if not spawn_patch.has(key):
-				return {"ok": false, "reason": "stage[%d].spawn_patch 缺少字段 %s" % [i, key]}
-		var respawn_s := float(spawn_patch.get("respawn_s", -1.0))
-		var max_alive := int(spawn_patch.get("max_alive", 0))
-		var spawn_radius := float(spawn_patch.get("spawn_radius", 0.0))
-		if respawn_s <= 0.0:
-			return {"ok": false, "reason": "stage[%d].spawn_patch.respawn_s 必须 > 0" % i}
-		if max_alive < 1:
-			return {"ok": false, "reason": "stage[%d].spawn_patch.max_alive 必须 >= 1" % i}
-		if spawn_radius <= 0.0:
-			return {"ok": false, "reason": "stage[%d].spawn_patch.spawn_radius 必须 > 0" % i}
-
-		if stage.has("drops_patch"):
-			var drops_any: Variant = stage.get("drops_patch", {})
-			if not (drops_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].drops_patch 必须是对象" % i}
-			var drops_patch: Dictionary = drops_any
-			for key in ["drop_chance", "rarity_weights", "items_by_rarity", "special"]:
-				if not drops_patch.has(key):
-					return {"ok": false, "reason": "stage[%d].drops_patch 缺少字段 %s" % [i, key]}
-
-			var drop_chance := float(drops_patch.get("drop_chance", -1.0))
-			if drop_chance < 0.0 or drop_chance > 1.0:
-				return {"ok": false, "reason": "stage[%d].drops_patch.drop_chance 需在0~1" % i}
-
-			var rarity_any: Variant = drops_patch.get("rarity_weights", {})
-			if not (rarity_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].drops_patch.rarity_weights 必须是对象" % i}
-			var rarity_weights: Dictionary = rarity_any
-			var white_w := int(rarity_weights.get("white", -1))
-			var blue_w := int(rarity_weights.get("blue", -1))
-			var gold_w := int(rarity_weights.get("gold", -1))
-			if white_w < 0 or blue_w < 0 or gold_w < 0:
-				return {"ok": false, "reason": "stage[%d].rarity_weights 不能为负数" % i}
-			if white_w + blue_w + gold_w <= 0:
-				return {"ok": false, "reason": "stage[%d].rarity_weights 总和必须 > 0" % i}
-
-			var items_any: Variant = drops_patch.get("items_by_rarity", {})
-			if not (items_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].drops_patch.items_by_rarity 必须是对象" % i}
-			var items_by_rarity: Dictionary = items_any
-			var white_items_any: Variant = items_by_rarity.get("white", [])
-			if not (white_items_any is Array) or (white_items_any as Array).is_empty():
-				return {"ok": false, "reason": "stage[%d].items_by_rarity.white 至少1个" % i}
-			for key in ["blue", "gold"]:
-				var arr_any: Variant = items_by_rarity.get(key, [])
-				if not (arr_any is Array):
-					return {"ok": false, "reason": "stage[%d].items_by_rarity.%s 必须是数组" % [i, key]}
-
-			var special_any: Variant = drops_patch.get("special", {})
-			if not (special_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].drops_patch.special 必须是对象" % i}
-			var special: Dictionary = special_any
-			for kind in ["normal", "elite", "boss"]:
-				var def_any: Variant = special.get(kind, {})
-				if not (def_any is Dictionary):
-					return {"ok": false, "reason": "stage[%d].special.%s 必须是对象" % [i, kind]}
-				var def: Dictionary = def_any
-				if kind == "normal":
-					if not _check_probability(def, "extra_gem_chance"):
-						return {"ok": false, "reason": "stage[%d].special.normal.extra_gem_chance 需在0~1" % i}
-				elif kind == "elite":
-					if not _check_probability(def, "punch_stone_chance"):
-						return {"ok": false, "reason": "stage[%d].special.elite.punch_stone_chance 需在0~1" % i}
-					if not _check_probability(def, "extra_gem_chance"):
-						return {"ok": false, "reason": "stage[%d].special.elite.extra_gem_chance 需在0~1" % i}
-				else:
-					if str(def.get("core_guarantee", "")).strip_edges().is_empty():
-						return {"ok": false, "reason": "stage[%d].special.boss.core_guarantee 必填" % i}
-					if not _check_probability(def, "punch_stone_chance"):
-						return {"ok": false, "reason": "stage[%d].special.boss.punch_stone_chance 需在0~1" % i}
-					if not _check_probability(def, "extra_gem_chance"):
-						return {"ok": false, "reason": "stage[%d].special.boss.extra_gem_chance 需在0~1" % i}
-
-		if stage.has("difficulties"):
-			var diff_check := _validate_stage_difficulties(stage.get("difficulties", []), i)
-			if not bool(diff_check.get("ok", false)):
-				return diff_check
+		var diff_check := _validate_stage_difficulties(stage.get("difficulties", []), i)
+		if not bool(diff_check.get("ok", false)):
+			return diff_check
 
 	return {"ok": true}
 
@@ -386,142 +419,51 @@ func _validate_stage_difficulties(difficulties_any: Variant, stage_index: int) -
 		if not (diff_any is Dictionary):
 			return {"ok": false, "reason": "stage[%d].difficulties[%d] 必须是对象" % [stage_index, j]}
 		var diff: Dictionary = diff_any
-		if str(diff.get("name", "")).strip_edges().is_empty():
-			return {"ok": false, "reason": "stage[%d].difficulties[%d].name 不能为空" % [stage_index, j]}
-		if int(diff.get("recommend_score", 0)) < 0:
-			return {"ok": false, "reason": "stage[%d].difficulties[%d].recommend_score 不能为负数" % [stage_index, j]}
+		if str(diff.get("difficulty_name", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].difficulty_name 不能为空" % [stage_index, j]}
+		if int(diff.get("recommended_power", -1)) < 0:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].recommended_power 不能为负数" % [stage_index, j]}
+		if float(diff.get("spawn_interval", 0.0)) <= 0.0:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].spawn_interval 必须 > 0" % [stage_index, j]}
+		if int(diff.get("onscreen_limit", 0)) < 1:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].onscreen_limit 必须 >= 1" % [stage_index, j]}
+		if float(diff.get("spawn_radius", 0.0)) <= 0.0:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].spawn_radius 必须 > 0" % [stage_index, j]}
 
-		var unlock_any: Variant = diff.get("unlock", {})
-		if unlock_any is Dictionary:
-			var unlock: Dictionary = unlock_any
-			if int(unlock.get("boss_kills_required", 0)) < 0:
-				return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.boss_kills_required 不能为负数" % [stage_index, j]}
-			var material_any: Variant = unlock.get("material_cost", {})
-			if not (material_any is Dictionary):
-				return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost 必须是对象" % [stage_index, j]}
-			var material_cost: Dictionary = material_any
-			for item_id_any in material_cost.keys():
-				var item_id := str(item_id_any).strip_edges()
-				var cnt := int(material_cost.get(item_id_any, 0))
-				if item_id.is_empty():
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost 存在空物品ID" % [stage_index, j]}
-				if cnt < 0:
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].unlock.material_cost.%s 不能为负数" % [stage_index, j, item_id]}
-			if unlock.has("reward"):
-				var reward_any: Variant = unlock.get("reward", {})
-				if not (reward_any is Dictionary):
-					push_warning("RemoteConfigService: 忽略非法 reward，stage[%d] difficulties[%d]" % [stage_index, j])
-				else:
-					var reward: Dictionary = reward_any
-					if int(reward.get("gold", 0)) < 0 or int(reward.get("skill_points", 0)) < 0:
-						push_warning("RemoteConfigService: 忽略非法 reward 数值，stage[%d] difficulties[%d]" % [stage_index, j])
-					var reward_items_any: Variant = reward.get("items", {})
-					if reward_items_any is Dictionary:
-						var reward_items: Dictionary = reward_items_any
-						for rid_any in reward_items.keys():
-							var rid := str(rid_any).strip_edges()
-							var rcnt := int(reward_items.get(rid_any, 0))
-							if rid.is_empty() or rcnt < 0:
-								push_warning("RemoteConfigService: 忽略非法 reward.items，stage[%d] difficulties[%d]" % [stage_index, j])
-								break
-		if diff.has("first_clear_reward"):
-			var first_reward_any: Variant = diff.get("first_clear_reward", {})
-			if not (first_reward_any is Dictionary):
-				push_warning("RemoteConfigService: 忽略非法 first_clear_reward，stage[%d] difficulties[%d]" % [stage_index, j])
-			else:
-				var first_reward: Dictionary = first_reward_any
-				if int(first_reward.get("gold", 0)) < 0 or int(first_reward.get("skill_points", 0)) < 0:
-					push_warning("RemoteConfigService: 忽略非法 first_clear_reward 数值，stage[%d] difficulties[%d]" % [stage_index, j])
-				var first_items_any: Variant = first_reward.get("items", {})
-				if first_items_any is Dictionary:
-					var first_items: Dictionary = first_items_any
-					for fid_any in first_items.keys():
-						var fid := str(fid_any).strip_edges()
-						var fcnt := int(first_items.get(fid_any, 0))
-						if fid.is_empty() or fcnt < 0:
-							push_warning("RemoteConfigService: 忽略非法 first_clear_reward.items，stage[%d] difficulties[%d]" % [stage_index, j])
-							break
+		for pool_key in ["normal_monsters", "elite_monsters", "boss_monsters"]:
+			var pool_check := _validate_stage_monster_pool(diff.get(pool_key, []), stage_index, j, pool_key)
+			if not bool(pool_check.get("ok", false)):
+				return pool_check
 
-		var mult_any: Variant = diff.get("monster_mult", {})
-		if mult_any is Dictionary:
-			var mult: Dictionary = mult_any
-			for key in ["hp", "atk", "def"]:
-				var v := float(mult.get(key, 1.0))
-				if v <= 0.0:
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].monster_mult.%s 必须 > 0" % [stage_index, j, key]}
-		elif diff.has("monster_mult"):
-			return {"ok": false, "reason": "stage[%d].difficulties[%d].monster_mult 必须是对象" % [stage_index, j]}
+		for rule_key in ["elite_spawn_rule", "boss_spawn_rule"]:
+			if diff.has(rule_key) and diff.get(rule_key, null) != null and not (diff.get(rule_key, null) is Dictionary):
+				return {"ok": false, "reason": "stage[%d].difficulties[%d].%s 必须是对象或 null" % [stage_index, j, rule_key]}
+			if diff.get(rule_key, null) is Dictionary:
+				var rule: Dictionary = diff.get(rule_key, {})
+				if rule.has("every_kills") and int(rule.get("every_kills", 0)) < 1:
+					return {"ok": false, "reason": "stage[%d].difficulties[%d].%s.every_kills 必须 >= 1" % [stage_index, j, rule_key]}
+	return {"ok": true}
 
-		if diff.has("drops_override") and not (diff.get("drops_override", {}) is Dictionary):
-			return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override 必须是对象" % [stage_index, j]}
-		if diff.has("drops_override"):
-			var drops_override: Dictionary = diff.get("drops_override", {})
-			if drops_override.has("drop_chance"):
-				var drop_chance := float(drops_override.get("drop_chance", -1.0))
-				if drop_chance < 0.0 or drop_chance > 1.0:
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.drop_chance 需在0~1" % [stage_index, j]}
-			if drops_override.has("rarity_weights"):
-				var rarity_any = drops_override.get("rarity_weights", {})
-				if not (rarity_any is Dictionary):
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 必须是对象" % [stage_index, j]}
-				var rarity_weights: Dictionary = rarity_any
-				var white_w := int(rarity_weights.get("white", 0))
-				var blue_w := int(rarity_weights.get("blue", 0))
-				var gold_w := int(rarity_weights.get("gold", 0))
-				if white_w < 0 or blue_w < 0 or gold_w < 0:
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 不能为负数" % [stage_index, j]}
-				if white_w + blue_w + gold_w <= 0:
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.rarity_weights 总和必须 > 0" % [stage_index, j]}
-			if drops_override.has("items_by_rarity"):
-				var items_any = drops_override.get("items_by_rarity", {})
-				if not (items_any is Dictionary):
-					push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity，stage[%d] difficulties[%d]" % [stage_index, j])
-				else:
-					var items_by_rarity: Dictionary = items_any
-					for rarity_any in items_by_rarity.keys():
-						var rarity := str(rarity_any).strip_edges()
-						if rarity.is_empty():
-							continue
-						var arr_any = items_by_rarity.get(rarity_any, [])
-						if not (arr_any is Array):
-							push_warning("RemoteConfigService: 忽略非法 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
-							continue
-						var arr: Array = arr_any
-						# NOTE: 空数组表示“继承上层掉落池”，是合法输入，不是错误。
-						if arr.is_empty():
-							continue
-						var valid := true
-						for item_any in arr:
-							if str(item_any).strip_edges().is_empty():
-								valid = false
-								break
-						if not valid:
-							push_warning("RemoteConfigService: 忽略包含空物品ID的 drops_override.items_by_rarity.%s，stage[%d] difficulties[%d]" % [rarity, stage_index, j])
-			if drops_override.has("special"):
-				var special_any = drops_override.get("special", {})
-				if not (special_any is Dictionary):
-					return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.special 必须是对象" % [stage_index, j]}
-				var special: Dictionary = special_any
-				for kind in ["normal", "elite", "boss"]:
-					if not special.has(kind):
-						continue
-					var def_any = special.get(kind, {})
-					if not (def_any is Dictionary):
-						return {"ok": false, "reason": "stage[%d].difficulties[%d].drops_override.special.%s 必须是对象" % [stage_index, j, kind]}
-					var def: Dictionary = def_any
-					if kind == "normal":
-						if not _check_probability(def, "extra_gem_chance"):
-							return {"ok": false, "reason": "stage[%d].difficulties[%d].normal.extra_gem_chance 需在0~1" % [stage_index, j]}
-					elif kind == "elite":
-						if not _check_probability(def, "punch_stone_chance"):
-							return {"ok": false, "reason": "stage[%d].difficulties[%d].elite.punch_stone_chance 需在0~1" % [stage_index, j]}
-						if not _check_probability(def, "extra_gem_chance"):
-							return {"ok": false, "reason": "stage[%d].difficulties[%d].elite.extra_gem_chance 需在0~1" % [stage_index, j]}
-					else:
-						if def.has("punch_stone_chance") and not _check_probability(def, "punch_stone_chance"):
-							return {"ok": false, "reason": "stage[%d].difficulties[%d].boss.punch_stone_chance 需在0~1" % [stage_index, j]}
-						if def.has("extra_gem_chance") and not _check_probability(def, "extra_gem_chance"):
-							return {"ok": false, "reason": "stage[%d].difficulties[%d].boss.extra_gem_chance 需在0~1" % [stage_index, j]}
+func _validate_stage_monster_pool(pool_any: Variant, stage_index: int, diff_index: int, pool_key: String) -> Dictionary:
+	if not (pool_any is Array):
+		return {"ok": false, "reason": "stage[%d].difficulties[%d].%s 必须是数组" % [stage_index, diff_index, pool_key]}
+	var pool: Array = pool_any
+	if pool.is_empty():
+		return {"ok": false, "reason": "stage[%d].difficulties[%d].%s 不能为空" % [stage_index, diff_index, pool_key]}
+	var total_weight := 0
+	for row_index in range(pool.size()):
+		var row_any: Variant = pool[row_index]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].%s[%d] 必须是对象" % [stage_index, diff_index, pool_key, row_index]}
+		var row: Dictionary = row_any
+		if str(row.get("monster_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].%s[%d].monster_id 不能为空" % [stage_index, diff_index, pool_key, row_index]}
+		var weight := int(row.get("weight", 0))
+		if weight <= 0:
+			return {"ok": false, "reason": "stage[%d].difficulties[%d].%s[%d].weight 必须 > 0" % [stage_index, diff_index, pool_key, row_index]}
+		total_weight += weight
+	if total_weight <= 0:
+		return {"ok": false, "reason": "stage[%d].difficulties[%d].%s 权重总和必须 > 0" % [stage_index, diff_index, pool_key]}
 	return {"ok": true}
 
 func validate_monsters_json(text: String) -> Dictionary:
@@ -582,6 +524,27 @@ func validate_monsters_json(text: String) -> Dictionary:
 		var attack_interval := float(mon.get("attack_interval", 0.0))
 		if attack_interval < 0.2 or attack_interval > 10.0:
 			return {"ok": false, "reason": "monster[%d].attack_interval 需在0.2~10" % i}
+		var drops_any = mon.get("drops", [])
+		if not (drops_any is Array):
+			return {"ok": false, "reason": "monster[%d].drops 必须是数组" % i}
+		var drops: Array = drops_any
+		for j in range(drops.size()):
+			var drop_any: Variant = drops[j]
+			if not (drop_any is Dictionary):
+				return {"ok": false, "reason": "monster[%d].drops[%d] 必须是对象" % [i, j]}
+			var drop: Dictionary = drop_any
+			if str(drop.get("item_id", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "monster[%d].drops[%d].item_id 不能为空" % [i, j]}
+			var count_min := int(drop.get("count_min", 0))
+			var count_max := int(drop.get("count_max", 0))
+			if count_min < 1:
+				return {"ok": false, "reason": "monster[%d].drops[%d].count_min 必须 >= 1" % [i, j]}
+			if count_max < count_min:
+				return {"ok": false, "reason": "monster[%d].drops[%d].count_max 不能小于 count_min" % [i, j]}
+			if drop.has("drop_rate") and drop.get("drop_rate", null) != null:
+				var drop_rate := float(drop.get("drop_rate", -1.0))
+				if drop_rate < 0.0 or drop_rate > 1.0:
+					return {"ok": false, "reason": "monster[%d].drops[%d].drop_rate 需在0~1" % [i, j]}
 
 	return {"ok": true}
 
@@ -616,6 +579,14 @@ func validate_items_json(text: String) -> Dictionary:
 			return {"ok": false, "reason": "items[%d] id/name 不能为空" % i}
 		if rarity != "white" and rarity != "blue" and rarity != "gold" and rarity != "purple" and rarity != "orange":
 			return {"ok": false, "reason": "items[%d].rarity 非法" % i}
+		if str(row.get("type", "")).strip_edges() == "gem":
+			var gem_check := _validate_gem_row(row, "items", i)
+			if not bool(gem_check.get("ok", false)):
+				return gem_check
+		if str(row.get("type", "")).strip_edges() == "item" and str(row.get("effect_type", "")).strip_edges() == "use_effect":
+			var use_effect_check := _validate_item_use_effect_payload(row, i)
+			if not bool(use_effect_check.get("ok", false)):
+				return use_effect_check
 
 	return {"ok": true}
 
@@ -1100,6 +1071,223 @@ func validate_equipment_growth_rules_json(text: String) -> Dictionary:
 	var rules_any = root.get("equipment_growth_rules", {})
 	if not (rules_any is Dictionary):
 		return {"ok": false, "reason": "缺少 equipment_growth_rules 对象"}
+	var rules: Dictionary = rules_any
+	var star_caps_any = rules.get("star_caps", {})
+	if not (star_caps_any is Dictionary):
+		return {"ok": false, "reason": "equipment_growth_rules.star_caps 必须是对象"}
+	var max_star := 0
+	for value_any in (star_caps_any as Dictionary).values():
+		max_star = maxi(max_star, int(value_any))
+	if max_star < 1:
+		return {"ok": false, "reason": "equipment_growth_rules.star_caps 至少要有一个正整数上限"}
+	var stage_check := _validate_star_material_stage_rows(rules, max_star)
+	if not bool(stage_check.get("ok", false)):
+		return stage_check
+	return {"ok": true}
+
+func validate_character_growth_rules_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "character_growth_rules 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "character_growth_rules 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "character_growth_rules")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rules_any = root.get("character_growth_rules", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 character_growth_rules 对象"}
+	var rules: Dictionary = rules_any
+	var level_cap := int(rules.get("level_cap", 0))
+	if level_cap < 20:
+		return {"ok": false, "reason": "character_growth_rules.level_cap 必须 >= 20"}
+
+	var initial_any = rules.get("initial", {})
+	if not (initial_any is Dictionary):
+		return {"ok": false, "reason": "character_growth_rules.initial 必须是对象"}
+	var initial: Dictionary = initial_any
+	if int(initial.get("level", 0)) < 1:
+		return {"ok": false, "reason": "character_growth_rules.initial.level 必须 >= 1"}
+	if int(initial.get("level", 0)) > level_cap:
+		return {"ok": false, "reason": "character_growth_rules.initial.level 不能超过 level_cap"}
+	if int(initial.get("free_attr_points", -1)) < 0:
+		return {"ok": false, "reason": "character_growth_rules.initial.free_attr_points 不能为负数"}
+	if int(initial.get("skill_points", -1)) < 0:
+		return {"ok": false, "reason": "character_growth_rules.initial.skill_points 不能为负数"}
+	var current_class := str(initial.get("current_class", "")).strip_edges()
+	if current_class != "bing" and current_class != "vajra" and current_class != "talisman":
+		return {"ok": false, "reason": "character_growth_rules.initial.current_class 非法"}
+	var attrs_any = initial.get("base_attributes", {})
+	if not (attrs_any is Dictionary):
+		return {"ok": false, "reason": "character_growth_rules.initial.base_attributes 必须是对象"}
+	for key in ["strength", "physique", "agility", "spirit", "true_energy", "fortune"]:
+		if not (attrs_any as Dictionary).has(key):
+			return {"ok": false, "reason": "character_growth_rules.initial.base_attributes 缺少 %s" % key}
+		if int((attrs_any as Dictionary).get(key, -1)) < 0:
+			return {"ok": false, "reason": "character_growth_rules.initial.base_attributes.%s 不能为负数" % key}
+
+	var exp_rows_any = rules.get("level_exp_table", [])
+	if not (exp_rows_any is Array):
+		return {"ok": false, "reason": "character_growth_rules.level_exp_table 必须是数组"}
+	var exp_rows: Array = exp_rows_any
+	if exp_rows.size() != level_cap - 1:
+		return {"ok": false, "reason": "character_growth_rules.level_exp_table 必须覆盖 1 到 %d 级" % (level_cap - 1)}
+	for i in range(exp_rows.size()):
+		var row_any = exp_rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "character_growth_rules.level_exp_table[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if int(row.get("level", 0)) != i + 1:
+			return {"ok": false, "reason": "character_growth_rules.level_exp_table[%d].level 必须连续递增且从 1 开始" % i}
+		if int(row.get("exp_to_next", 0)) <= 0:
+			return {"ok": false, "reason": "character_growth_rules.level_exp_table[%d].exp_to_next 必须 > 0" % i}
+		if int(row.get("attr_points_gain", -1)) < 0:
+			return {"ok": false, "reason": "character_growth_rules.level_exp_table[%d].attr_points_gain 不能为负数" % i}
+
+	var growth_any = rules.get("base_growth", {})
+	if not (growth_any is Dictionary):
+		return {"ok": false, "reason": "character_growth_rules.base_growth 必须是对象"}
+	var growth: Dictionary = growth_any
+	for key in ["hp", "qi", "atk", "def", "crit_percent", "loot_bonus_percent"]:
+		if not (growth.get(key, null) is Dictionary):
+			return {"ok": false, "reason": "character_growth_rules.base_growth.%s 必须是对象" % key}
+	if int((growth.get("hp", {}) as Dictionary).get("per_level_every", 0)) < 1:
+		return {"ok": false, "reason": "character_growth_rules.base_growth.hp.per_level_every 必须 >= 1"}
+	if int((growth.get("qi", {}) as Dictionary).get("per_level_every", 0)) < 1:
+		return {"ok": false, "reason": "character_growth_rules.base_growth.qi.per_level_every 必须 >= 1"}
+
+	var formulas_any = rules.get("attribute_formulas", {})
+	if not (formulas_any is Dictionary):
+		return {"ok": false, "reason": "character_growth_rules.attribute_formulas 必须是对象"}
+	var formulas: Dictionary = formulas_any
+	for key in ["physique", "true_energy", "agility", "strength", "spirit", "fortune"]:
+		if not (formulas.get(key, null) is Dictionary):
+			return {"ok": false, "reason": "character_growth_rules.attribute_formulas.%s 必须是对象" % key}
+
+	return {"ok": true}
+
+func validate_progression_milestones_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "progression_milestones 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "progression_milestones 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "progression_milestones")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rules_any = root.get("progression_milestones", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 progression_milestones 对象"}
+	var rules: Dictionary = rules_any
+	if int(rules.get("version", 0)) < 1:
+		return {"ok": false, "reason": "progression_milestones.version 必须 >= 1"}
+	var range_any = rules.get("range", {})
+	if not (range_any is Dictionary):
+		return {"ok": false, "reason": "progression_milestones.range 必须是对象"}
+	var level_min := int((range_any as Dictionary).get("min_level", 0))
+	var level_max := int((range_any as Dictionary).get("max_level", 0))
+	if level_min != 1 or level_max != 20:
+		return {"ok": false, "reason": "progression_milestones 当前 V1 只允许 1-20 级范围"}
+	var rows_any = rules.get("milestones", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "progression_milestones.milestones 必须是数组"}
+	var rows: Array = rows_any
+	var allowed_types := ["main_stage", "daily_dungeon", "blue_gear", "feature_unlock"]
+	var seen := {}
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "progression_milestones.milestones[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		var level := int(row.get("level", 0))
+		if level < level_min or level > level_max:
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].level 必须位于 %d-%d 之间" % [i, level_min, level_max]}
+		if seen.has(level):
+			return {"ok": false, "reason": "progression_milestones.milestones level 重复：%d" % level}
+		seen[level] = true
+		if str(row.get("milestone_key", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].milestone_key 不能为空" % i}
+		if str(row.get("title", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].title 不能为空" % i}
+		if str(row.get("summary", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].summary 不能为空" % i}
+		if not (row.get("image", "") is String):
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].image 必须是字符串" % i}
+		var unlocks_any = row.get("unlock_contents", [])
+		if not (unlocks_any is Array):
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].unlock_contents 必须是数组" % i}
+		for j in range((unlocks_any as Array).size()):
+			var unlock_any = (unlocks_any as Array)[j]
+			if not (unlock_any is Dictionary):
+				return {"ok": false, "reason": "progression_milestones.milestones[%d].unlock_contents[%d] 必须是对象" % [i, j]}
+			var unlock_row: Dictionary = unlock_any
+			var unlock_type := str(unlock_row.get("type", "")).strip_edges()
+			if allowed_types.find(unlock_type) == -1:
+				return {"ok": false, "reason": "progression_milestones.milestones[%d].unlock_contents[%d].type 非法" % [i, j]}
+			if str(unlock_row.get("content", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "progression_milestones.milestones[%d].unlock_contents[%d].content 不能为空" % [i, j]}
+		if str(row.get("reward_item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].reward_item_id 不能为空" % i}
+		if int(row.get("reward_count", 0)) < 1:
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].reward_count 必须 >= 1" % i}
+		if int(row.get("sort", -1)) < 0:
+			return {"ok": false, "reason": "progression_milestones.milestones[%d].sort 不能为负数" % i}
+	return {"ok": true}
+
+func _validate_star_material_stage_rows(rules: Dictionary, max_star: int) -> Dictionary:
+	var rows_any = rules.get("star_material_stage", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "equipment_growth_rules.star_material_stage 必须是数组"}
+	var rows: Array = rows_any
+	if rows.is_empty():
+		return {"ok": false, "reason": "equipment_growth_rules.star_material_stage 不能为空"}
+
+	var ranges: Array = []
+	for i in range(rows.size()):
+		var row_any = rows[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		var star_from := int(row.get("star_from", 0))
+		var star_to := int(row.get("star_to", 0))
+		var material_id := str(row.get("material_id", "")).strip_edges()
+		var material_name := str(row.get("material_name", "")).strip_edges()
+		var material_count := int(row.get("material_count", 0))
+		var sort_value := int(row.get("sort", 0))
+
+		if star_from < 1:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].star_from 必须 >= 1" % i}
+		if star_to < 1:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].star_to 必须 >= 1" % i}
+		if star_from > star_to:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d] 起始星级不能大于结束星级" % i}
+		if star_to > max_star:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].star_to 不能超过系统星级上限" % i}
+		if material_id.is_empty():
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].material_id 不能为空" % i}
+		if material_name.is_empty():
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].material_name 不能为空" % i}
+		if material_count < 1:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].material_count 必须 >= 1" % i}
+		if sort_value < 1:
+			return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d].sort 必须 >= 1" % i}
+
+		ranges.append({
+			"index": i,
+			"star_from": star_from,
+			"star_to": star_to,
+		})
+
+	for i in range(ranges.size()):
+		var current: Dictionary = ranges[i]
+		for j in range(i + 1, ranges.size()):
+			var other: Dictionary = ranges[j]
+			var overlaps := maxi(int(current.get("star_from", 0)), int(other.get("star_from", 0))) <= mini(int(current.get("star_to", 0)), int(other.get("star_to", 0)))
+			if overlaps:
+				return {"ok": false, "reason": "equipment_growth_rules.star_material_stage[%d] 与 [%d] 星级区间重叠" % [int(current.get("index", i)), int(other.get("index", j))]}
+
 	return {"ok": true}
 
 func validate_blue_gear_templates_json(text: String) -> Dictionary:
@@ -1140,10 +1328,122 @@ func validate_gem_catalog_json(text: String) -> Dictionary:
 		if not (row_any is Dictionary):
 			return {"ok": false, "reason": "gem_catalog[%d] 必须是对象" % i}
 		var row: Dictionary = row_any
-		if str(row.get("id", "")).strip_edges().is_empty():
-			return {"ok": false, "reason": "gem_catalog[%d].id 不能为空" % i}
-		if str(row.get("gem_type", "")).strip_edges().is_empty():
-			return {"ok": false, "reason": "gem_catalog[%d].gem_type 不能为空" % i}
+		var gem_check := _validate_gem_row(row, "gem_catalog", i)
+		if not bool(gem_check.get("ok", false)):
+			return gem_check
+	return {"ok": true}
+
+func _validate_gem_row(row: Dictionary, root_key: String, index: int) -> Dictionary:
+	if str(row.get("id", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "%s[%d].id 不能为空" % [root_key, index]}
+	var gem_type := str(row.get("gem_type", row.get("sub_type", ""))).strip_edges()
+	if gem_type != "attr" and gem_type != "skill":
+		return {"ok": false, "reason": "%s[%d].gem_type 非法" % [root_key, index]}
+	var effect_type := str(row.get("effect_type", "")).strip_edges()
+	if gem_type == "attr" and effect_type != "stat":
+		return {"ok": false, "reason": "%s[%d].effect_type 必须是 stat" % [root_key, index]}
+	if gem_type == "skill" and effect_type != "skill_modifier":
+		return {"ok": false, "reason": "%s[%d].effect_type 必须是 skill_modifier" % [root_key, index]}
+	var payload_check := _validate_gem_effect_payload(row.get("effect_payload", {}), gem_type, "%s[%d]" % [root_key, index])
+	if not bool(payload_check.get("ok", false)):
+		return payload_check
+	if gem_type == "skill" and str(row.get("target_scope", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "%s[%d].target_scope 不能为空" % [root_key, index]}
+	return {"ok": true}
+
+func _validate_gem_effect_payload(payload_any: Variant, gem_type: String, path: String) -> Dictionary:
+	if not (payload_any is Dictionary):
+		return {"ok": false, "reason": "%s.effect_payload 必须是对象" % path}
+	var payload: Dictionary = payload_any
+	var effect_code := str(payload.get("effect_code", "")).strip_edges()
+	if effect_code.is_empty():
+		return {"ok": false, "reason": "%s.effect_payload.effect_code 不能为空" % path}
+	var params_any: Variant = payload.get("params", {})
+	if not (params_any is Dictionary):
+		return {"ok": false, "reason": "%s.effect_payload.params 必须是对象" % path}
+	var params: Dictionary = params_any
+	if gem_type == "attr":
+		if effect_code != "add_attr":
+			return {"ok": false, "reason": "%s.effect_payload.effect_code 必须是 add_attr" % path}
+		var stat := str(params.get("stat", "")).strip_edges()
+		if stat.is_empty():
+			return {"ok": false, "reason": "%s.effect_payload.params.stat 不能为空" % path}
+		if not params.has("value"):
+			return {"ok": false, "reason": "%s.effect_payload.params.value 不能为空" % path}
+		var value_any: Variant = params.get("value", null)
+		if not (value_any is int or value_any is float):
+			return {"ok": false, "reason": "%s.effect_payload.params.value 必须是数字" % path}
+		var value_type := str(params.get("value_type", "flat")).strip_edges()
+		if value_type != "flat" and value_type != "percent":
+			return {"ok": false, "reason": "%s.effect_payload.params.value_type 非法" % path}
+		for key_any in params.keys():
+			var key := str(key_any)
+			if key != "stat" and key != "value" and key != "value_type":
+				return {"ok": false, "reason": "%s.effect_payload.params.%s 非法" % [path, key]}
+		return {"ok": true}
+
+	var skill_templates := {
+		"damage_up": ["damage_multiplier"],
+		"range_up": ["range_multiplier"],
+		"crit_up": ["crit_rate_bonus"],
+		"shield_up": ["shield_multiplier"],
+		"cooldown_down": ["cooldown_reduction"],
+		"duration_up": ["duration_multiplier"],
+		"burn_up": ["burn_multiplier"],
+		"slow_up": ["slow_multiplier"],
+		"mana_cost_down": ["mana_cost_reduction"],
+	}
+	if not skill_templates.has(effect_code):
+		return {"ok": false, "reason": "%s.effect_payload.effect_code 未知" % path}
+	var required_params: Array = skill_templates.get(effect_code, [])
+	for param_key_any in required_params:
+		var param_key := str(param_key_any)
+		if not params.has(param_key):
+			return {"ok": false, "reason": "%s.effect_payload.params.%s 不能为空" % [path, param_key]}
+		var param_value: Variant = params.get(param_key, null)
+		if not (param_value is int or param_value is float):
+			return {"ok": false, "reason": "%s.effect_payload.params.%s 必须是数字" % [path, param_key]}
+	for key_any in params.keys():
+		var key := str(key_any)
+		if not required_params.has(key):
+			return {"ok": false, "reason": "%s.effect_payload.params.%s 非法" % [path, key]}
+	return {"ok": true}
+
+func _validate_item_use_effect_payload(row: Dictionary, index: int) -> Dictionary:
+	var payload_any: Variant = row.get("effect_payload", {})
+	if not (payload_any is Dictionary):
+		return {"ok": false, "reason": "items[%d].effect_payload 必须是对象" % index}
+	var payload: Dictionary = payload_any
+	var effect_code := str(payload.get("effect_code", "")).strip_edges()
+	if effect_code.is_empty():
+		return {"ok": false, "reason": "items[%d].effect_payload.effect_code 不能为空" % index}
+	var params_any: Variant = payload.get("params", {})
+	if not (params_any is Dictionary):
+		return {"ok": false, "reason": "items[%d].effect_payload.params 必须是对象" % index}
+	var params: Dictionary = params_any
+	var templates := {
+		"restore_stamina": ["stamina_amount"],
+		"grant_exp": ["exp_amount"],
+		"grant_item": ["reward_item_id", "reward_count"],
+		"reset_dungeon_attempt": ["dungeon_id", "reset_count"],
+	}
+	if not templates.has(effect_code):
+		return {"ok": false, "reason": "items[%d].effect_payload.effect_code 未知" % index}
+	var required_params: Array = templates.get(effect_code, [])
+	for param_key_any in required_params:
+		var param_key := str(param_key_any)
+		if not params.has(param_key):
+			return {"ok": false, "reason": "items[%d].effect_payload.params.%s 不能为空" % [index, param_key]}
+		var param_value: Variant = params.get(param_key, null)
+		if param_key == "reward_item_id" or param_key == "dungeon_id":
+			if str(param_value).strip_edges().is_empty():
+				return {"ok": false, "reason": "items[%d].effect_payload.params.%s 不能为空" % [index, param_key]}
+		elif not (param_value is int or param_value is float) or int(param_value) < 1:
+			return {"ok": false, "reason": "items[%d].effect_payload.params.%s 必须是正数" % [index, param_key]}
+	for key_any in params.keys():
+		var key := str(key_any)
+		if not required_params.has(key):
+			return {"ok": false, "reason": "items[%d].effect_payload.params.%s 非法" % [index, key]}
 	return {"ok": true}
 
 func validate_material_catalog_json(text: String) -> Dictionary:
@@ -1167,9 +1467,26 @@ func validate_material_dungeons_json(text: String) -> Dictionary:
 	var check := _validate_catalog_array_json(text, "material_dungeons", "material_dungeons")
 	if not bool(check.get("ok", false)):
 		return check
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "material_dungeons 根节点必须是对象"}
+	var root: Dictionary = parsed_any
 	var rows_any = check.get("rows", [])
 	if not (rows_any is Array):
 		return {"ok": false, "reason": "material_dungeons 结构错误"}
+	var group_rows_any = root.get("material_dungeon_drop_groups", [])
+	if not (group_rows_any is Array):
+		return {"ok": false, "reason": "缺少 material_dungeon_drop_groups 数组"}
+	var group_rows: Array = group_rows_any
+	var valid_group_ids := {}
+	for g in range(group_rows.size()):
+		var group_any = group_rows[g]
+		if not (group_any is Dictionary):
+			return {"ok": false, "reason": "material_dungeon_drop_groups[%d] 必须是对象" % g}
+		var group_check := _validate_material_dungeon_drop_group(group_any as Dictionary, g)
+		if not bool(group_check.get("ok", false)):
+			return group_check
+		valid_group_ids[str((group_any as Dictionary).get("group_id", ""))] = true
 	var rows: Array = rows_any
 	for i in range(rows.size()):
 		var row_any = rows[i]
@@ -1178,6 +1495,99 @@ func validate_material_dungeons_json(text: String) -> Dictionary:
 		var row: Dictionary = row_any
 		if str(row.get("dungeon_id", row.get("id", ""))).strip_edges().is_empty():
 			return {"ok": false, "reason": "material_dungeons[%d].dungeon_id 不能为空" % i}
+		if row.has("unlock_stage_id") and row.get("unlock_stage_id", null) != null and str(row.get("unlock_stage_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "material_dungeons[%d].unlock_stage_id 不能为空字符串" % i}
+		var display_rewards_any = row.get("display_rewards", [])
+		if not (display_rewards_any is Array):
+			return {"ok": false, "reason": "material_dungeons[%d].display_rewards 必须是数组" % i}
+		for reward_index in range((display_rewards_any as Array).size()):
+			if str((display_rewards_any as Array)[reward_index]).strip_edges().is_empty():
+				return {"ok": false, "reason": "material_dungeons[%d].display_rewards[%d] 不能为空" % [i, reward_index]}
+		var level_configs_any = row.get("level_configs", [])
+		if not (level_configs_any is Array):
+			return {"ok": false, "reason": "material_dungeons[%d].level_configs 必须是数组" % i}
+		if (level_configs_any as Array).is_empty():
+			return {"ok": false, "reason": "material_dungeons[%d].level_configs 不能为空" % i}
+		for level_index in range((level_configs_any as Array).size()):
+			var level_any = (level_configs_any as Array)[level_index]
+			if not (level_any is Dictionary):
+				return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d] 必须是对象" % [i, level_index]}
+			var level_row: Dictionary = level_any
+			if int(level_row.get("level", 0)) != level_index + 1:
+				return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].level 必须从1开始连续" % [i, level_index]}
+			if float(level_row.get("reward_multiplier", 0.0)) < 1.0:
+				return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].reward_multiplier 必须 >= 1" % [i, level_index]}
+			var upgrade_costs_any = level_row.get("upgrade_costs", [])
+			if not (upgrade_costs_any is Array):
+				return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].upgrade_costs 必须是数组" % [i, level_index]}
+			if level_index > 0 and (upgrade_costs_any as Array).is_empty():
+				return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].upgrade_costs 不能为空" % [i, level_index]}
+			for cost_index in range((upgrade_costs_any as Array).size()):
+				var cost_any = (upgrade_costs_any as Array)[cost_index]
+				if not (cost_any is Dictionary):
+					return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].upgrade_costs[%d] 必须是对象" % [i, level_index, cost_index]}
+				var cost: Dictionary = cost_any
+				if str(cost.get("item_id", "")).strip_edges().is_empty():
+					return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].upgrade_costs[%d].item_id 不能为空" % [i, level_index, cost_index]}
+				if int(cost.get("count", 0)) < 1:
+					return {"ok": false, "reason": "material_dungeons[%d].level_configs[%d].upgrade_costs[%d].count 必须 >= 1" % [i, level_index, cost_index]}
+		var layer_rules_any = row.get("layer_rules", [])
+		if not (layer_rules_any is Array):
+			return {"ok": false, "reason": "material_dungeons[%d].layer_rules 必须是数组" % i}
+		if (layer_rules_any as Array).is_empty():
+			return {"ok": false, "reason": "material_dungeons[%d].layer_rules 不能为空" % i}
+		var seen_layers := {}
+		for rule_index in range((layer_rules_any as Array).size()):
+			var rule_any = (layer_rules_any as Array)[rule_index]
+			if not (rule_any is Dictionary):
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d] 必须是对象" % [i, rule_index]}
+			var rule: Dictionary = rule_any
+			var layer := int(rule.get("layer", 0))
+			if layer < 1:
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].layer 非法" % [i, rule_index]}
+			if seen_layers.has(layer):
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].layer 重复" % [i, rule_index]}
+			seen_layers[layer] = true
+			var drop_group_id := str(rule.get("drop_group_id", "")).strip_edges()
+			if drop_group_id.is_empty():
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].drop_group_id 不能为空" % [i, rule_index]}
+			if not valid_group_ids.has(drop_group_id):
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].drop_group_id 无效" % [i, rule_index]}
+			var first_clear_value: Variant = rule.get("first_clear_reward_group_id", "")
+			var first_clear_group_id := ""
+			if first_clear_value != null:
+				first_clear_group_id = str(first_clear_value).strip_edges()
+			if not first_clear_group_id.is_empty() and first_clear_group_id != "Null" and not valid_group_ids.has(first_clear_group_id):
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].first_clear_reward_group_id 无效" % [i, rule_index]}
+			if rule.has("recommended_power") and rule.get("recommended_power", null) != null and int(rule.get("recommended_power", 0)) < 0:
+				return {"ok": false, "reason": "material_dungeons[%d].layer_rules[%d].recommended_power 非法" % [i, rule_index]}
+	return {"ok": true}
+
+func _validate_material_dungeon_drop_group(group: Dictionary, index: int) -> Dictionary:
+	var group_id := str(group.get("group_id", "")).strip_edges()
+	if group_id.is_empty():
+		return {"ok": false, "reason": "material_dungeon_drop_groups[%d].group_id 不能为空" % index}
+	if str(group.get("name", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "material_dungeon_drop_groups[%d].name 不能为空" % index}
+	var rewards_any = group.get("rewards", [])
+	if not (rewards_any is Array):
+		return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards 必须是数组" % index}
+	if (rewards_any as Array).is_empty():
+		return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards 不能为空" % index}
+	for reward_index in range((rewards_any as Array).size()):
+		var reward_any = (rewards_any as Array)[reward_index]
+		if not (reward_any is Dictionary):
+			return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards[%d] 必须是对象" % [index, reward_index]}
+		var reward: Dictionary = reward_any
+		if str(reward.get("item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards[%d].item_id 不能为空" % [index, reward_index]}
+		var count_min := int(reward.get("count_min", 0))
+		var count_max := int(reward.get("count_max", 0))
+		if count_min < 1 or count_max < count_min:
+			return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards[%d] count_min/count_max 非法" % [index, reward_index]}
+		var probability_any: Variant = reward.get("probability", 0.0)
+		if not (probability_any is int or probability_any is float) or float(probability_any) <= 0.0 or float(probability_any) > 1.0:
+			return {"ok": false, "reason": "material_dungeon_drop_groups[%d].rewards[%d].probability 非法" % [index, reward_index]}
 	return {"ok": true}
 
 func validate_crafting_recipes_json(text: String) -> Dictionary:
@@ -1273,13 +1683,12 @@ func _validate_refine_effect_pool(pool_any: Variant) -> Dictionary:
 	return {"ok": true}
 
 func download_bundle(on_done: Callable) -> void:
-	var manifest_url := "%s/manifest.json" % BASE_URL
-	_download_text(manifest_url, func(ok: bool, text: String, msg: String) -> void:
+	_download_text(get_bundle_manifest_url(), func(ok: bool, text: String, msg: String) -> void:
 		if not ok:
 			_call_done(on_done, false, "配置包更新失败：%s" % msg)
 			return
 
-		var manifest_check := _validate_bundle_manifest(text)
+		var manifest_check := _parse_manifest_info(text)
 		if not bool(manifest_check.get("ok", false)):
 			_call_done(on_done, false, "配置包更新失败：%s" % str(manifest_check.get("reason", "manifest 校验失败")))
 			return
@@ -1333,14 +1742,13 @@ func _download_bundle_file_recursive(index: int, files: Array, tmp_bundle_dir: S
 		_call_done(on_done, false, "配置包更新失败：manifest 文件项字段缺失")
 		return
 
-	var file_url := "%s/%s" % [BASE_URL, filename]
-	_download_text(file_url, func(ok: bool, text: String, msg: String) -> void:
+	_download_text(get_bundle_file_url(filename), func(ok: bool, text: String, msg: String) -> void:
 		if not ok:
 			_remove_dir_recursive_absolute(tmp_bundle_dir)
 			_call_done(on_done, false, "配置包更新失败：%s 下载失败（%s）" % [key, msg])
 			return
 
-		var payload_check := _validate_payload_by_key(key, text)
+		var payload_check: Dictionary = _validate_payload_by_key(key, text)
 		if not bool(payload_check.get("ok", false)):
 			_remove_dir_recursive_absolute(tmp_bundle_dir)
 			_call_done(on_done, false, "配置包更新失败：%s 校验失败（%s）" % [key, str(payload_check.get("reason", "未知错误"))])
@@ -1376,6 +1784,9 @@ func _validate_bundle_manifest(text: String) -> Dictionary:
 	var bundle_id := str(meta.get("bundle_id", "")).strip_edges()
 	if bundle_id.is_empty():
 		return {"ok": false, "reason": "manifest.meta.bundle_id 不能为空"}
+	var generated_at := str(meta.get("generated_at", "")).strip_edges()
+	if generated_at.is_empty():
+		return {"ok": false, "reason": "manifest.meta.generated_at 不能为空"}
 
 	var files_any: Variant = parsed.get("files", [])
 	if not (files_any is Array):
@@ -1392,8 +1803,14 @@ func _validate_bundle_manifest(text: String) -> Dictionary:
 		var key := str(item.get("key", "")).strip_edges()
 		var filename := str(item.get("filename", "")).strip_edges()
 		var sha256 := str(item.get("sha256", "")).strip_edges()
+		var updated_at := str(item.get("updated_at", "")).strip_edges()
+		var size := int(item.get("size", -1))
 		if key.is_empty() or filename.is_empty() or sha256.is_empty():
 			return {"ok": false, "reason": "manifest.files 项缺少 key/filename/sha256"}
+		if size < 0:
+			return {"ok": false, "reason": "manifest.files.size 必须 >= 0"}
+		if updated_at.is_empty():
+			return {"ok": false, "reason": "manifest.files.updated_at 不能为空"}
 		if not FILE_KEY_TO_NAME.has(key):
 			continue
 		by_key[key] = {
@@ -1401,6 +1818,8 @@ func _validate_bundle_manifest(text: String) -> Dictionary:
 			"filename": filename,
 			"version": maxi(0, int(item.get("version", 0))),
 			"sha256": sha256.to_lower(),
+			"size": size,
+			"updated_at": updated_at,
 		}
 
 	var ordered: Array[Dictionary] = []
@@ -1438,6 +1857,36 @@ func _validate_bundle_manifest(text: String) -> Dictionary:
 		"files": ordered,
 	}
 
+func _parse_manifest_info(text: String) -> Dictionary:
+	var check := _validate_bundle_manifest(text)
+	if not bool(check.get("ok", false)):
+		return check
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "manifest 必须是 JSON 对象"}
+	var parsed: Dictionary = parsed_any
+	var meta_any = parsed.get("meta", {})
+	var meta: Dictionary = meta_any if meta_any is Dictionary else {}
+	return {
+		"ok": true,
+		"bundle_id": str(check.get("bundle_id", "")),
+		"files": check.get("files", []),
+		"manifest": parsed,
+		"meta": meta.duplicate(true),
+	}
+
+func _find_manifest_row(manifest_info: Dictionary, key: String) -> Dictionary:
+	var files_any = manifest_info.get("files", [])
+	if not (files_any is Array):
+		return {}
+	for row_any in files_any:
+		if not (row_any is Dictionary):
+			continue
+		var row: Dictionary = row_any
+		if str(row.get("key", "")).strip_edges() == key.strip_edges():
+			return row.duplicate(true)
+	return {}
+
 func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 	match key:
 		"stages":
@@ -1452,6 +1901,10 @@ func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 			return validate_equip_slots_json(text)
 		"equipment_growth_rules":
 			return validate_equipment_growth_rules_json(text)
+		"character_growth_rules":
+			return validate_character_growth_rules_json(text)
+		"progression_milestones":
+			return validate_progression_milestones_json(text)
 		"blue_gear_templates":
 			return validate_blue_gear_templates_json(text)
 		"blue_affix_pool":
@@ -1464,6 +1917,12 @@ func _validate_payload_by_key(key: String, text: String) -> Dictionary:
 			return validate_material_catalog_json(text)
 		"material_dungeons":
 			return validate_material_dungeons_json(text)
+		"sect_tasks":
+			return validate_sect_tasks_json(text)
+		"mountain_god":
+			return validate_mountain_god_json(text)
+		"shop_goods":
+			return validate_shop_goods_json(text)
 		"crafting_recipes":
 			return validate_crafting_recipes_json(text)
 		"monsters":
@@ -1651,6 +2110,14 @@ func _call_done(cb: Callable, ok: bool, msg: String) -> void:
 	if cb.is_valid():
 		cb.call(ok, msg)
 
+func _call_manifest_done(cb: Callable, ok: bool, manifest_info: Dictionary, msg: String) -> void:
+	if cb.is_valid():
+		cb.call(ok, manifest_info, msg)
+
+func _call_file_done(cb: Callable, ok: bool, key: String, text: String, meta: Dictionary, msg: String) -> void:
+	if cb.is_valid():
+		cb.call(ok, key, text, meta, msg)
+
 func _call_done_results(cb: Callable, results: Array[Dictionary]) -> void:
 	if cb.is_valid():
 		cb.call(results)
@@ -1662,6 +2129,14 @@ func _append_download_result(results: Array[Dictionary], key: String, ok: bool, 
 		"msg": msg,
 	})
 
+func _is_debug_logging_enabled() -> bool:
+	return OS.is_debug_build()
+
+func _debug_log(message: String) -> void:
+	if not _is_debug_logging_enabled():
+		return
+	print("[RemoteConfig] %s" % message)
+
 func _validate_optional_meta(root: Dictionary, expected_key: String) -> Dictionary:
 	if not root.has("meta"):
 		return {"ok": true}
@@ -1670,12 +2145,173 @@ func _validate_optional_meta(root: Dictionary, expected_key: String) -> Dictiona
 	if not (meta_any is Dictionary):
 		return {"ok": false, "reason": "meta 必须是对象"}
 	var meta: Dictionary = meta_any
-	var version := int(meta.get("version", 0))
-	if version < 0:
-		return {"ok": false, "reason": "meta.version 必须 >= 0"}
+	var schema_version := int(meta.get("schema_version", 1))
+	if schema_version < 1:
+		return {"ok": false, "reason": "meta.schema_version 必须 >= 1"}
+	if meta.has("exported_at") and str(meta.get("exported_at", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "meta.exported_at 不能为空"}
 
 	var key := str(meta.get("key", "")).strip_edges()
 	if not key.is_empty() and key != expected_key:
 		return {"ok": false, "reason": "meta.key 不匹配，期望 %s 实际 %s" % [expected_key, key]}
 
+	return {"ok": true}
+
+func validate_sect_tasks_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "sect_tasks 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "sect_tasks 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "sect_tasks")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rules_any = root.get("sect_tasks", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 sect_tasks 对象"}
+	var rules: Dictionary = rules_any
+	for key in ["daily_tasks", "milestone_tasks"]:
+		var rows_any = rules.get(key, [])
+		if not (rows_any is Array):
+			return {"ok": false, "reason": "sect_tasks.%s 必须是数组" % key}
+		for i in range((rows_any as Array).size()):
+			var row_any = (rows_any as Array)[i]
+			if not (row_any is Dictionary):
+				return {"ok": false, "reason": "sect_tasks.%s[%d] 必须是对象" % [key, i]}
+			var row: Dictionary = row_any
+			if str(row.get("task_id", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "sect_tasks.%s[%d].task_id 不能为空" % [key, i]}
+			if str(row.get("name", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "sect_tasks.%s[%d].name 不能为空" % [key, i]}
+			if str(row.get("goal_type", "")).strip_edges().is_empty():
+				return {"ok": false, "reason": "sect_tasks.%s[%d].goal_type 不能为空" % [key, i]}
+			if int(row.get("target", 0)) < 1:
+				return {"ok": false, "reason": "sect_tasks.%s[%d].target 必须 >= 1" % [key, i]}
+			var rewards_check := _validate_task_reward_payload(row.get("rewards", {}), "sect_tasks.%s[%d].rewards" % [key, i])
+			if not bool(rewards_check.get("ok", false)):
+				return rewards_check
+	return {"ok": true}
+
+func validate_mountain_god_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "mountain_god 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "mountain_god 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "mountain_god")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rules_any = root.get("mountain_god", {})
+	if not (rules_any is Dictionary):
+		return {"ok": false, "reason": "缺少 mountain_god 对象"}
+	var rules: Dictionary = rules_any
+	if str(rules.get("god_id", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "mountain_god.god_id 不能为空"}
+	if str(rules.get("name", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "mountain_god.name 不能为空"}
+	if str(rules.get("unlock_stage_id", "")).strip_edges().is_empty():
+		return {"ok": false, "reason": "mountain_god.unlock_stage_id 不能为空"}
+	var offerings_any = rules.get("offerings", [])
+	if not (offerings_any is Array):
+		return {"ok": false, "reason": "mountain_god.offerings 必须是数组"}
+	if (offerings_any as Array).is_empty():
+		return {"ok": false, "reason": "mountain_god.offerings 不能为空"}
+	for i in range((offerings_any as Array).size()):
+		var row_any = (offerings_any as Array)[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "mountain_god.offerings[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		if str(row.get("offering_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "mountain_god.offerings[%d].offering_id 不能为空" % i}
+		if str(row.get("name", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "mountain_god.offerings[%d].name 不能为空" % i}
+		if str(row.get("offering_item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "mountain_god.offerings[%d].offering_item_id 不能为空" % i}
+		if int(row.get("daily_limit", 0)) < 1:
+			return {"ok": false, "reason": "mountain_god.offerings[%d].daily_limit 必须 >= 1" % i}
+		var exchange_any = row.get("exchange_cost", {})
+		if not (exchange_any is Dictionary):
+			return {"ok": false, "reason": "mountain_god.offerings[%d].exchange_cost 必须是对象" % i}
+		var exchange: Dictionary = exchange_any
+		if int(exchange.get("gold", 0)) < 0 or int(exchange.get("sect_contribution", 0)) < 0:
+			return {"ok": false, "reason": "mountain_god.offerings[%d].exchange_cost 不能为负数" % i}
+		var rewards_check := _validate_task_reward_payload(row.get("rewards", {}), "mountain_god.offerings[%d].rewards" % i, true)
+		if not bool(rewards_check.get("ok", false)):
+			return rewards_check
+	return {"ok": true}
+
+func validate_shop_goods_json(text: String) -> Dictionary:
+	if text.strip_edges().is_empty():
+		return {"ok": false, "reason": "shop_goods 内容为空"}
+	var parsed_any: Variant = JSON.parse_string(text)
+	if not (parsed_any is Dictionary):
+		return {"ok": false, "reason": "shop_goods 根节点必须是对象"}
+	var root: Dictionary = parsed_any
+	var meta_check := _validate_optional_meta(root, "shop_goods")
+	if not bool(meta_check.get("ok", false)):
+		return meta_check
+	var rows_any = root.get("shop_goods", [])
+	if not (rows_any is Array):
+		return {"ok": false, "reason": "shop_goods 必须是数组"}
+	var seen_goods: Dictionary = {}
+	for i in range((rows_any as Array).size()):
+		var row_any = (rows_any as Array)[i]
+		if not (row_any is Dictionary):
+			return {"ok": false, "reason": "shop_goods[%d] 必须是对象" % i}
+		var row: Dictionary = row_any
+		var goods_id := str(row.get("goods_id", "")).strip_edges()
+		if goods_id.is_empty():
+			return {"ok": false, "reason": "shop_goods[%d].goods_id 不能为空" % i}
+		if seen_goods.has(goods_id):
+			return {"ok": false, "reason": "shop_goods.goods_id 重复：%s" % goods_id}
+		seen_goods[goods_id] = true
+		var shop_type := str(row.get("shop_type", "")).strip_edges()
+		if shop_type != "gold" and shop_type != "crystal" and shop_type != "contribution":
+			return {"ok": false, "reason": "shop_goods[%d].shop_type 非法" % i}
+		if str(row.get("title", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "shop_goods[%d].title 不能为空" % i}
+		if str(row.get("reward_item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "shop_goods[%d].reward_item_id 不能为空" % i}
+		if int(row.get("reward_count", 0)) < 1:
+			return {"ok": false, "reason": "shop_goods[%d].reward_count 必须 >= 1" % i}
+		var currency_type := str(row.get("cost_currency_type", "")).strip_edges()
+		if currency_type != "gold" and currency_type != "crystal" and currency_type != "contribution":
+			return {"ok": false, "reason": "shop_goods[%d].cost_currency_type 非法" % i}
+		if int(row.get("cost_amount", -1)) < 0:
+			return {"ok": false, "reason": "shop_goods[%d].cost_amount 不能为负数" % i}
+		if int(row.get("unlock_level", 0)) < 1:
+			return {"ok": false, "reason": "shop_goods[%d].unlock_level 必须 >= 1" % i}
+		if int(row.get("sort_order", -1)) < 0:
+			return {"ok": false, "reason": "shop_goods[%d].sort_order 不能为负数" % i}
+		for limit_key in ["daily_limit", "weekly_limit", "lifetime_limit"]:
+			var limit_any: Variant = row.get(limit_key, null)
+			if limit_any == null:
+				continue
+			if int(limit_any) < 1:
+				return {"ok": false, "reason": "shop_goods[%d].%s 必须 >= 1" % [i, limit_key]}
+	return {"ok": true}
+
+func _validate_task_reward_payload(rewards_any: Variant, path: String, allow_spirit_stone: bool = false) -> Dictionary:
+	if not (rewards_any is Dictionary):
+		return {"ok": false, "reason": "%s 必须是对象" % path}
+	var rewards: Dictionary = rewards_any
+	for numeric_key in ["gold", "sect_contribution", "skill_points"]:
+		if int(rewards.get(numeric_key, 0)) < 0:
+			return {"ok": false, "reason": "%s.%s 不能为负数" % [path, numeric_key]}
+	if allow_spirit_stone and int(rewards.get("spirit_stone", 0)) < 0:
+		return {"ok": false, "reason": "%s.spirit_stone 不能为负数" % path}
+	var items_any = rewards.get("items", [])
+	if not (items_any is Array):
+		return {"ok": false, "reason": "%s.items 必须是数组" % path}
+	for i in range((items_any as Array).size()):
+		var item_any = (items_any as Array)[i]
+		if not (item_any is Dictionary):
+			return {"ok": false, "reason": "%s.items[%d] 必须是对象" % [path, i]}
+		var item: Dictionary = item_any
+		if str(item.get("item_id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "%s.items[%d].item_id 不能为空" % [path, i]}
+		if int(item.get("count", 0)) < 1:
+			return {"ok": false, "reason": "%s.items[%d].count 必须 >= 1" % [path, i]}
 	return {"ok": true}

@@ -63,8 +63,7 @@ class ExportEquipTemplatesJson extends Command
         $payloadWithoutMeta = [
             'equip_templates' => $templates,
         ];
-        $version = ExportMetaService::getNextVersion('equip_templates');
-        $meta = ExportMetaService::makeMeta('equip_templates', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('equip_templates', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -80,7 +79,7 @@ class ExportEquipTemplatesJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'equip_templates.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d equip templates -> %s (version=%d)', count($templates), $path, $version));
+        $this->info(sprintf('Exported %d equip templates -> %s', count($templates), $path));
 
         return self::SUCCESS;
     }

@@ -6,12 +6,12 @@ use App\Filament\Resources\StoryChapterResource\Pages;
 use App\Models\StoryChapter;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -21,15 +21,15 @@ use Filament\Tables\Table;
 class StoryChapterResource extends Resource
 {
     protected static ?string $model = StoryChapter::class;
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-book-open';
     protected static ?string $navigationLabel = '章节文案';
     protected static ?string $modelLabel = '章节';
     protected static ?string $pluralModelLabel = '章节文案';
-    protected static ?string $navigationGroup = '世界观与主线';
+    protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->description('维护章节编号、归属地图、等级段与启用状态。')
                 ->schema([
@@ -45,7 +45,7 @@ class StoryChapterResource extends Resource
                     TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
                     Toggle::make('is_enabled')->label('启用')->default(true),
                 ])
-                ->columns(2),
+                ->columns(3),
             Section::make('章节文案')
                 ->description('这部分文案会用于主线推进、Boss 出场和通关表现。')
                 ->schema([
@@ -63,7 +63,7 @@ class StoryChapterResource extends Resource
                     FileUpload::make('banner_path')->label('横幅图')->disk('public')->directory('config/story-chapters/banners')->image()->imagePreviewHeight('100'),
                 ])
                 ->columns(2),
-        ]);
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -85,10 +85,10 @@ class StoryChapterResource extends Resource
                 Tables\Filters\SelectFilter::make('map_id')->label('关联地图')->options(fn (): array => AdminOptions::storyMapOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->recordActions([\Filament\Actions\EditAction::make()])
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

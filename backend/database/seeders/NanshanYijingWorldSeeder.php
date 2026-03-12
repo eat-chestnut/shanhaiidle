@@ -12,11 +12,8 @@ class NanshanYijingWorldSeeder extends Seeder
             WorldNamesSeeder::class,
             StoryChaptersSeeder::class,
             StoryMapsSeeder::class,
-            StoryMapDropsSeeder::class,
             StoryBossesSeeder::class,
-            StoryBossDropsSeeder::class,
             EquipmentSetSourcesSeeder::class,
-            StarterGiftsSeeder::class,
         ]);
     }
 }

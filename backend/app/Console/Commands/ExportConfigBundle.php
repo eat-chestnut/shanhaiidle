@@ -5,15 +5,18 @@ namespace App\Console\Commands;
 use App\Models\AppSetting;
 use App\Models\ConfigBundle;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use RuntimeException;
 
 class ExportConfigBundle extends Command
 {
+    private const MANIFEST_FILE = 'manifest.json';
+
+    private const BUNDLE_FILE = 'config_bundle_v1.json';
+
     protected $signature = 'game:export-bundle';
 
-    protected $description = 'Export config bundle (manifest + all config json files) to storage/app/exports/bundles/{bundle_id}';
+    protected $description = 'Export config bundle (single version manifest + aggregated bundle) to storage/app/exports/bundles/{bundle_id}';
 
     /**
      * @var array<int, array{key:string, command:string, source:string, filename:string}>
@@ -25,21 +28,23 @@ class ExportConfigBundle extends Command
         ['key' => 'equipment_sets', 'command' => 'game:export-equipment-sets', 'source' => 'equipment_sets.json', 'filename' => 'equipment_sets.json'],
         ['key' => 'equip_slots', 'command' => 'game:export-equip-slots', 'source' => 'equip_slots_v1.json', 'filename' => 'equip_slots_v1.json'],
         ['key' => 'equipment_growth_rules', 'command' => 'game:export-equipment-growth-rules', 'source' => 'equipment_growth_rules_v1.json', 'filename' => 'equipment_growth_rules_v1.json'],
+        ['key' => 'character_growth_rules', 'command' => 'game:export-character-growth-rules', 'source' => 'character_growth_rules_v1.json', 'filename' => 'character_growth_rules_v1.json'],
+        ['key' => 'progression_milestones', 'command' => 'game:export-progression-milestones', 'source' => 'progression_milestones_v1.json', 'filename' => 'progression_milestones_v1.json'],
         ['key' => 'blue_gear_templates', 'command' => 'game:export-blue-gear-templates', 'source' => 'blue_gear_templates_v1.json', 'filename' => 'blue_gear_templates_v1.json'],
         ['key' => 'blue_affix_pool', 'command' => 'game:export-blue-affix-pool', 'source' => 'blue_affix_pool_v1.json', 'filename' => 'blue_affix_pool_v1.json'],
         ['key' => 'purple_affix_pool', 'command' => 'game:export-purple-affix-pool', 'source' => 'purple_affix_pool_v1.json', 'filename' => 'purple_affix_pool_v1.json'],
         ['key' => 'gem_catalog', 'command' => 'game:export-gem-catalog', 'source' => 'gem_catalog_v1.json', 'filename' => 'gem_catalog_v1.json'],
         ['key' => 'material_catalog', 'command' => 'game:export-material-catalog', 'source' => 'material_catalog_v1.json', 'filename' => 'material_catalog_v1.json'],
         ['key' => 'material_dungeons', 'command' => 'game:export-material-dungeons', 'source' => 'material_dungeons_v1.json', 'filename' => 'material_dungeons_v1.json'],
+        ['key' => 'sect_tasks', 'command' => 'game:export-sect-task-rules', 'source' => 'sect_tasks_v1.json', 'filename' => 'sect_tasks_v1.json'],
+        ['key' => 'mountain_god', 'command' => 'game:export-mountain-god-offerings', 'source' => 'mountain_god_v1.json', 'filename' => 'mountain_god_v1.json'],
+        ['key' => 'shop_goods', 'command' => 'game:export-shop-goods', 'source' => 'shop_goods_v1.json', 'filename' => 'shop_goods_v1.json'],
         ['key' => 'crafting_recipes', 'command' => 'game:export-crafting-recipes', 'source' => 'crafting_recipes_v1.json', 'filename' => 'crafting_recipes_v1.json'],
         ['key' => 'world_names', 'command' => 'game:export-world-names', 'source' => 'world_names_v1.json', 'filename' => 'world_names_v1.json'],
         ['key' => 'story_chapters', 'command' => 'game:export-story-chapters', 'source' => 'story_chapters_v1.json', 'filename' => 'story_chapters_v1.json'],
         ['key' => 'story_maps', 'command' => 'game:export-story-maps', 'source' => 'story_maps_v1.json', 'filename' => 'story_maps_v1.json'],
-        ['key' => 'story_map_drops', 'command' => 'game:export-story-map-drops', 'source' => 'story_map_drops_v1.json', 'filename' => 'story_map_drops_v1.json'],
         ['key' => 'story_bosses', 'command' => 'game:export-story-bosses', 'source' => 'story_bosses_v1.json', 'filename' => 'story_bosses_v1.json'],
-        ['key' => 'story_boss_drops', 'command' => 'game:export-story-boss-drops', 'source' => 'story_boss_drops_v1.json', 'filename' => 'story_boss_drops_v1.json'],
         ['key' => 'equipment_set_sources', 'command' => 'game:export-equipment-set-sources', 'source' => 'equipment_set_sources_v1.json', 'filename' => 'equipment_set_sources_v1.json'],
-        ['key' => 'starter_gifts', 'command' => 'game:export-starter-gifts', 'source' => 'starter_gifts_v1.json', 'filename' => 'starter_gifts_v1.json'],
         ['key' => 'monsters', 'command' => 'game:export-monsters', 'source' => 'monsters.json', 'filename' => 'monsters.json'],
         ['key' => 'skills_catalog', 'command' => 'game:export-skills-catalog', 'source' => 'skills_catalog.json', 'filename' => 'skills_catalog.json'],
         ['key' => 'battle_defaults', 'command' => 'game:export-battle-defaults', 'source' => 'battle_defaults.json', 'filename' => 'battle_defaults.json'],
@@ -49,23 +54,21 @@ class ExportConfigBundle extends Command
     {
         $bundleId = now()->format('Ymd_His');
         $bundleDir = storage_path('app/exports/bundles/' . $bundleId);
+        $latestExportsDir = storage_path('app/exports');
 
         if (! File::exists($bundleDir)) {
             File::makeDirectory($bundleDir, 0755, true);
         }
 
+        $previousVersions = $this->loadPreviousVersions();
         $manifestFiles = [];
+        $bundleConfigs = [];
 
         try {
             foreach (self::FILES as $spec) {
-                $code = Artisan::call($spec['command']);
-                if ($code !== self::SUCCESS) {
-                    throw new RuntimeException(sprintf('执行命令失败：%s（code=%d）', $spec['command'], $code));
-                }
-
-                $srcPath = storage_path('app/exports/' . $spec['source']);
+                $srcPath = $latestExportsDir . DIRECTORY_SEPARATOR . $spec['source'];
                 if (! File::exists($srcPath)) {
-                    throw new RuntimeException(sprintf('导出文件不存在：%s', $srcPath));
+                    throw new RuntimeException(sprintf('导出文件不存在：%s，请先执行 %s。', $srcPath, $spec['command']));
                 }
 
                 $content = File::get($srcPath);
@@ -74,8 +77,16 @@ class ExportConfigBundle extends Command
                     throw new RuntimeException(sprintf('导出文件不是有效 JSON：%s', $spec['source']));
                 }
 
-                $version = (int) data_get($decoded, 'meta.version', 0);
                 $sha256 = hash('sha256', $content);
+                $size = File::size($srcPath);
+                $updatedAt = (string) data_get($decoded, 'meta.exported_at', now()->format('Y-m-d H:i:s'));
+                $previous = $previousVersions[$spec['key']] ?? null;
+                $version = 1;
+                if (is_array($previous)) {
+                    $previousVersion = max(0, (int) ($previous['version'] ?? 0));
+                    $previousSha256 = (string) ($previous['sha256'] ?? '');
+                    $version = $previousSha256 === $sha256 ? max(1, $previousVersion) : ($previousVersion + 1);
+                }
 
                 $destPath = $bundleDir . DIRECTORY_SEPARATOR . $spec['filename'];
                 File::put($destPath, $content);
@@ -85,15 +96,31 @@ class ExportConfigBundle extends Command
                     'filename' => $spec['filename'],
                     'version' => $version,
                     'sha256' => $sha256,
+                    'size' => $size,
+                    'updated_at' => $updatedAt,
                 ];
+                $bundleConfigs[$spec['key']] = $decoded;
             }
 
             $manifest = [
                 'meta' => [
+                    'kind' => 'config_manifest',
+                    'schema_version' => 1,
                     'bundle_id' => $bundleId,
-                    'exported_at' => now()->format('Y-m-d H:i:s'),
+                    'generated_at' => now()->format('Y-m-d H:i:s'),
                 ],
                 'files' => $manifestFiles,
+            ];
+
+            $bundlePayload = [
+                'meta' => [
+                    'kind' => 'config_bundle',
+                    'schema_version' => 1,
+                    'bundle_id' => $bundleId,
+                    'generated_at' => now()->format('Y-m-d H:i:s'),
+                    'manifest_filename' => self::MANIFEST_FILE,
+                ],
+                'configs' => $bundleConfigs,
             ];
 
             $manifestJson = json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -101,8 +128,16 @@ class ExportConfigBundle extends Command
                 throw new RuntimeException('manifest.json 序列化失败。');
             }
 
-            $manifestAbsolutePath = $bundleDir . DIRECTORY_SEPARATOR . 'manifest.json';
+            $bundleJson = json_encode($bundlePayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($bundleJson === false) {
+                throw new RuntimeException('config_bundle_v1.json 序列化失败。');
+            }
+
+            $manifestAbsolutePath = $bundleDir . DIRECTORY_SEPARATOR . self::MANIFEST_FILE;
+            $bundleAbsolutePath = $bundleDir . DIRECTORY_SEPARATOR . self::BUNDLE_FILE;
             File::put($manifestAbsolutePath, $manifestJson);
+            File::put($bundleAbsolutePath, $bundleJson);
+            File::put($latestExportsDir . DIRECTORY_SEPARATOR . self::BUNDLE_FILE, $bundleJson);
 
             $manifestPath = "exports/bundles/{$bundleId}/manifest.json";
             $manifestSha256 = hash('sha256', $manifestJson);
@@ -119,6 +154,7 @@ class ExportConfigBundle extends Command
             $this->info(sprintf('配置包导出成功：bundle_id=%s', $bundleId));
             $this->info(sprintf('目录：%s', $bundleDir));
             $this->info(sprintf('manifest: %s', $manifestPath));
+            $this->info(sprintf('bundle: %s', "exports/bundles/{$bundleId}/" . self::BUNDLE_FILE));
 
             return self::SUCCESS;
         } catch (\Throwable $e) {
@@ -129,6 +165,51 @@ class ExportConfigBundle extends Command
 
             return self::FAILURE;
         }
+    }
+
+    /**
+     * @return array<string, array{version:int, sha256:string}>
+     */
+    private function loadPreviousVersions(): array
+    {
+        $bundleId = trim((string) AppSetting::getValue('latest_bundle_id', ''));
+        if ($bundleId === '') {
+            return [];
+        }
+
+        $manifestPath = storage_path('app/exports/bundles/' . $bundleId . '/' . self::MANIFEST_FILE);
+        if (! File::exists($manifestPath)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) File::get($manifestPath), true);
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        $files = $decoded['files'] ?? [];
+        if (! is_array($files)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($files as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $key = trim((string) ($row['key'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+
+            $out[$key] = [
+                'version' => max(0, (int) ($row['version'] ?? 0)),
+                'sha256' => (string) ($row['sha256'] ?? ''),
+            ];
+        }
+
+        return $out;
     }
 
     private function cleanupHistory(int $keep): void

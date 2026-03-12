@@ -43,8 +43,7 @@ class ExportWorldNamesJson extends Command
 
     private function writePayload(string $key, string $filename, array $payloadWithoutMeta): int
     {
-        $version = ExportMetaService::getNextVersion($key);
-        $payload = ['meta' => ExportMetaService::makeMeta($key, $version, $payloadWithoutMeta)] + $payloadWithoutMeta;
+        $payload = ['meta' => ExportMetaService::makeMeta($key, $payloadWithoutMeta)] + $payloadWithoutMeta;
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
             throw new RuntimeException("{$filename} 序列化失败。");
@@ -56,7 +55,7 @@ class ExportWorldNamesJson extends Command
         }
         $path = $dir . DIRECTORY_SEPARATOR . $filename;
         File::put($path, $json);
-        $this->info(sprintf('Exported %d rows -> %s (version=%d)', count($payloadWithoutMeta['world_names']), $path, $version));
+        $this->info(sprintf('Exported %d rows -> %s', count($payloadWithoutMeta['world_names']), $path));
 
         return self::SUCCESS;
     }

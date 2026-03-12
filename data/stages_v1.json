@@ -1,1251 +1,592 @@
 {
-  "stages": [
-    {
-      "id": "nan_01",
-      "name": "南山·招摇",
-      "unlock_min_level": 1,
-      "elite_every_kills": 40,
-      "boss_every_kills": 120,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.70,
-        "max_alive": 4,
-        "spawn_radius": 220
-      },
-      "drops_patch": {
-        "drop_chance": 0.27,
-        "rarity_weights": {
-          "white": 90,
-          "blue": 9,
-          "gold": 1
-        },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t1",
-            "forge_weapon_t1",
-            "forge_armor_t1",
-            "forge_cloak_t1",
-            "forge_accessory_t1"
-          ],
-          "blue": [
-            "白玉碎",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_weapon_nanshan_t1_01"
-          ]
-        },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.02,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.12,
-            "extra_gem_chance": 0.06,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.35,
-            "extra_gem_chance": 0.18,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          }
-        }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 0,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 3,
-            "material_cost": {
-              "玉屑": 20,
-              "桂枝": 20
-            },
-            "reward": {
-              "gold": 80,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 10
-              }
-            }
-          },
-          "recommend_score": 900,
-          "monster_mult": {
-            "hp": 1.4,
-            "atk": 1.2,
-            "def": 1.2
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 78,
-              "blue": 19,
-              "gold": 3
-            }
-          },
-          "first_clear_reward": {
-            "gold": 120,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 15
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 10,
-            "material_cost": {
-              "白玉碎": 12,
-              "妖核": 2
-            },
-            "reward": {
-              "gold": 150,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 8,
-                "妖核": 1
-              }
-            }
-          },
-          "recommend_score": 1600,
-          "monster_mult": {
-            "hp": 1.8,
-            "atk": 1.35,
-            "def": 1.35
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 70,
-              "blue": 24,
-              "gold": 6
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.22,
-                "extra_gem_chance": 0.12,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.55,
-                "extra_gem_chance": 0.30,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 240,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 10,
-              "妖核": 1
-            }
-          }
-        }
-      ]
+    "meta": {
+        "key": "stages",
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:40",
+        "sha256": "02a27a1e106ba80e68f56442738930718c16ba9abb8a5ef9496ab89c1c38311f"
     },
-    {
-      "id": "nan_02",
-      "name": "南山·青丘",
-      "unlock_min_level": 5,
-      "elite_every_kills": 36,
-      "boss_every_kills": 108,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.65,
-        "max_alive": 5,
-        "spawn_radius": 228
-      },
-      "drops_patch": {
-        "drop_chance": 0.28,
-        "rarity_weights": {
-          "white": 88,
-          "blue": 10,
-          "gold": 2
+    "stages": [
+        {
+            "id": "nan_01",
+            "name": "南山·招摇",
+            "unlock_min_level": 1,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 0,
+                    "spawn_interval": 1.7,
+                    "onscreen_limit": 4,
+                    "spawn_radius": 220,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 900,
+                    "spawn_interval": 1.7,
+                    "onscreen_limit": 4,
+                    "spawn_radius": 220,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 1600,
+                    "spawn_interval": 1.7,
+                    "onscreen_limit": 4,
+                    "spawn_radius": 220,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
+            ]
         },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t1",
-            "forge_weapon_t1",
-            "forge_armor_t1",
-            "forge_cloak_t1",
-            "forge_accessory_t1"
-          ],
-          "blue": [
-            "白玉碎",
-            "forge_base_t2",
-            "forge_weapon_t2",
-            "forge_armor_t2",
-            "forge_cloak_t2",
-            "forge_accessory_t2",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_armor_nanshan_t1_01"
-          ]
+        {
+            "id": "nan_02",
+            "name": "南山·青丘",
+            "unlock_min_level": 5,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 320,
+                    "spawn_interval": 1.65,
+                    "onscreen_limit": 5,
+                    "spawn_radius": 228,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 1050,
+                    "spawn_interval": 1.65,
+                    "onscreen_limit": 5,
+                    "spawn_radius": 228,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 1800,
+                    "spawn_interval": 1.65,
+                    "onscreen_limit": 5,
+                    "spawn_radius": 228,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
+            ]
         },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.02,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
+        {
+            "id": "nan_03",
+            "name": "南山·涂山",
+            "unlock_min_level": 9,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 620,
+                    "spawn_interval": 1.58,
+                    "onscreen_limit": 6,
+                    "spawn_radius": 236,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 1280,
+                    "spawn_interval": 1.58,
+                    "onscreen_limit": 6,
+                    "spawn_radius": 236,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 2050,
+                    "spawn_interval": 1.58,
+                    "onscreen_limit": 6,
+                    "spawn_radius": 236,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
             ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.14,
-            "extra_gem_chance": 0.07,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
+        },
+        {
+            "id": "nan_04",
+            "name": "南山·丹穴",
+            "unlock_min_level": 13,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 900,
+                    "spawn_interval": 1.52,
+                    "onscreen_limit": 7,
+                    "spawn_radius": 244,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 1520,
+                    "spawn_interval": 1.52,
+                    "onscreen_limit": 7,
+                    "spawn_radius": 244,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 2360,
+                    "spawn_interval": 1.52,
+                    "onscreen_limit": 7,
+                    "spawn_radius": 244,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
             ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.39,
-            "extra_gem_chance": 0.20,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
+        },
+        {
+            "id": "nan_05",
+            "name": "南山·诸沃",
+            "unlock_min_level": 19,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 1200,
+                    "spawn_interval": 1.46,
+                    "onscreen_limit": 8,
+                    "spawn_radius": 252,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 1780,
+                    "spawn_interval": 1.46,
+                    "onscreen_limit": 8,
+                    "spawn_radius": 252,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 2700,
+                    "spawn_interval": 1.46,
+                    "onscreen_limit": 8,
+                    "spawn_radius": 252,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
             ]
-          }
+        },
+        {
+            "id": "nan_06",
+            "name": "南山·堂庭",
+            "unlock_min_level": 25,
+            "difficulties": [
+                {
+                    "difficulty_name": "普通",
+                    "recommended_power": 1500,
+                    "spawn_interval": 1.4,
+                    "onscreen_limit": 9,
+                    "spawn_radius": 260,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难I",
+                    "recommended_power": 2100,
+                    "spawn_interval": 1.4,
+                    "onscreen_limit": 9,
+                    "spawn_radius": 260,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                },
+                {
+                    "difficulty_name": "困难II",
+                    "recommended_power": 3200,
+                    "spawn_interval": 1.4,
+                    "onscreen_limit": 9,
+                    "spawn_radius": 260,
+                    "normal_monsters": [
+                        {
+                            "monster_id": "mob_a",
+                            "monster_name": "小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_monsters": [
+                        {
+                            "monster_id": "elite_a",
+                            "monster_name": "精英·小妖",
+                            "weight": 100
+                        }
+                    ],
+                    "boss_monsters": [
+                        {
+                            "monster_id": "boss_a",
+                            "monster_name": "Boss·妖王",
+                            "weight": 100
+                        }
+                    ],
+                    "elite_spawn_rule": null,
+                    "boss_spawn_rule": null
+                }
+            ]
         }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 320,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 4,
-            "material_cost": {
-              "玉屑": 22,
-              "桂枝": 22
-            },
-            "reward": {
-              "gold": 100,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 12
-              }
-            }
-          },
-          "recommend_score": 1050,
-          "monster_mult": {
-            "hp": 1.45,
-            "atk": 1.22,
-            "def": 1.22
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 76,
-              "blue": 21,
-              "gold": 3
-            }
-          },
-          "first_clear_reward": {
-            "gold": 140,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 17
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 12,
-            "material_cost": {
-              "白玉碎": 14,
-              "妖核": 3
-            },
-            "reward": {
-              "gold": 180,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 10,
-                "妖核": 1
-              }
-            }
-          },
-          "recommend_score": 1800,
-          "monster_mult": {
-            "hp": 1.9,
-            "atk": 1.38,
-            "def": 1.38
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 68,
-              "blue": 25,
-              "gold": 7
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.24,
-                "extra_gem_chance": 0.13,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.58,
-                "extra_gem_chance": 0.31,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 270,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 12,
-              "妖核": 1
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "nan_03",
-      "name": "南山·涂山",
-      "unlock_min_level": 9,
-      "elite_every_kills": 34,
-      "boss_every_kills": 102,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.58,
-        "max_alive": 6,
-        "spawn_radius": 236
-      },
-      "drops_patch": {
-        "drop_chance": 0.29,
-        "rarity_weights": {
-          "white": 85,
-          "blue": 13,
-          "gold": 2
-        },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t2",
-            "forge_weapon_t2",
-            "forge_armor_t2",
-            "forge_cloak_t2",
-            "forge_accessory_t2"
-          ],
-          "blue": [
-            "白玉碎",
-            "forge_base_t3",
-            "forge_weapon_t3",
-            "forge_armor_t3",
-            "forge_cloak_t3",
-            "forge_accessory_t3",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_cloak_nanshan_t2_01"
-          ]
-        },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.025,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.16,
-            "extra_gem_chance": 0.08,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.43,
-            "extra_gem_chance": 0.22,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          }
-        }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 620,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 5,
-            "material_cost": {
-              "玉屑": 25,
-              "桂枝": 25
-            },
-            "reward": {
-              "gold": 120,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 14
-              }
-            }
-          },
-          "recommend_score": 1280,
-          "monster_mult": {
-            "hp": 1.5,
-            "atk": 1.25,
-            "def": 1.25
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 74,
-              "blue": 22,
-              "gold": 4
-            }
-          },
-          "first_clear_reward": {
-            "gold": 160,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 19
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 14,
-            "material_cost": {
-              "白玉碎": 16,
-              "妖核": 3
-            },
-            "reward": {
-              "gold": 210,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 12,
-                "妖核": 2
-              }
-            }
-          },
-          "recommend_score": 2050,
-          "monster_mult": {
-            "hp": 2.0,
-            "atk": 1.42,
-            "def": 1.42
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 66,
-              "blue": 27,
-              "gold": 7
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.25,
-                "extra_gem_chance": 0.14,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.60,
-                "extra_gem_chance": 0.32,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 300,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 14,
-              "妖核": 2
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "nan_04",
-      "name": "南山·丹穴",
-      "unlock_min_level": 13,
-      "elite_every_kills": 32,
-      "boss_every_kills": 96,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.52,
-        "max_alive": 7,
-        "spawn_radius": 244
-      },
-      "drops_patch": {
-        "drop_chance": 0.30,
-        "rarity_weights": {
-          "white": 83,
-          "blue": 15,
-          "gold": 2
-        },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t2",
-            "forge_weapon_t2",
-            "forge_armor_t2",
-            "forge_cloak_t2",
-            "forge_accessory_t2"
-          ],
-          "blue": [
-            "白玉碎",
-            "forge_base_t3",
-            "forge_weapon_t3",
-            "forge_armor_t3",
-            "forge_cloak_t3",
-            "forge_accessory_t3",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_ring_nanshan_t2_01"
-          ]
-        },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.025,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.18,
-            "extra_gem_chance": 0.09,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.47,
-            "extra_gem_chance": 0.24,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          }
-        }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 900,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 6,
-            "material_cost": {
-              "玉屑": 28,
-              "桂枝": 28
-            },
-            "reward": {
-              "gold": 140,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 16
-              }
-            }
-          },
-          "recommend_score": 1520,
-          "monster_mult": {
-            "hp": 1.56,
-            "atk": 1.28,
-            "def": 1.28
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 72,
-              "blue": 23,
-              "gold": 5
-            }
-          },
-          "first_clear_reward": {
-            "gold": 180,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 21
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 16,
-            "material_cost": {
-              "白玉碎": 18,
-              "妖核": 4
-            },
-            "reward": {
-              "gold": 240,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 14,
-                "妖核": 2
-              }
-            }
-          },
-          "recommend_score": 2360,
-          "monster_mult": {
-            "hp": 2.1,
-            "atk": 1.46,
-            "def": 1.46
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 64,
-              "blue": 28,
-              "gold": 8
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.27,
-                "extra_gem_chance": 0.15,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.62,
-                "extra_gem_chance": 0.33,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 330,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 16,
-              "妖核": 2
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "nan_05",
-      "name": "南山·诸沃",
-      "unlock_min_level": 19,
-      "elite_every_kills": 30,
-      "boss_every_kills": 90,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.46,
-        "max_alive": 8,
-        "spawn_radius": 252
-      },
-      "drops_patch": {
-        "drop_chance": 0.31,
-        "rarity_weights": {
-          "white": 80,
-          "blue": 17,
-          "gold": 3
-        },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t3",
-            "forge_weapon_t3",
-            "forge_armor_t3",
-            "forge_cloak_t3",
-            "forge_accessory_t3"
-          ],
-          "blue": [
-            "白玉碎",
-            "forge_base_t4",
-            "forge_weapon_t4",
-            "forge_armor_t4",
-            "forge_cloak_t4",
-            "forge_accessory_t4",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_bracelet_nanshan_t2_01"
-          ]
-        },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.03,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.20,
-            "extra_gem_chance": 0.10,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.51,
-            "extra_gem_chance": 0.26,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          }
-        }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 1200,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 8,
-            "material_cost": {
-              "玉屑": 32,
-              "桂枝": 32
-            },
-            "reward": {
-              "gold": 160,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 18
-              }
-            }
-          },
-          "recommend_score": 1780,
-          "monster_mult": {
-            "hp": 1.62,
-            "atk": 1.31,
-            "def": 1.31
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 70,
-              "blue": 24,
-              "gold": 6
-            }
-          },
-          "first_clear_reward": {
-            "gold": 200,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 23
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 18,
-            "material_cost": {
-              "白玉碎": 20,
-              "妖核": 4
-            },
-            "reward": {
-              "gold": 270,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 16,
-                "妖核": 3
-              }
-            }
-          },
-          "recommend_score": 2700,
-          "monster_mult": {
-            "hp": 2.2,
-            "atk": 1.5,
-            "def": 1.5
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 62,
-              "blue": 29,
-              "gold": 9
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.29,
-                "extra_gem_chance": 0.16,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.64,
-                "extra_gem_chance": 0.34,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 360,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 18,
-              "妖核": 3
-            }
-          }
-        }
-      ]
-    },
-    {
-      "id": "nan_06",
-      "name": "南山·堂庭",
-      "unlock_min_level": 25,
-      "elite_every_kills": 28,
-      "boss_every_kills": 84,
-      "monsters": {
-        "normal_pool": [
-          {
-            "id": "mob_a",
-            "w": 100
-          }
-        ],
-        "elite_pool": [
-          {
-            "id": "elite_a",
-            "w": 100
-          }
-        ],
-        "boss_pool": [
-          {
-            "id": "boss_a",
-            "w": 100
-          }
-        ]
-      },
-      "spawn_patch": {
-        "respawn_s": 1.40,
-        "max_alive": 9,
-        "spawn_radius": 260
-      },
-      "drops_patch": {
-        "drop_chance": 0.31,
-        "rarity_weights": {
-          "white": 78,
-          "blue": 19,
-          "gold": 3
-        },
-        "items_by_rarity": {
-          "white": [
-            "桂枝",
-            "玉屑",
-            "forge_base_t4",
-            "forge_weapon_t4",
-            "forge_armor_t4",
-            "forge_cloak_t4",
-            "forge_accessory_t4"
-          ],
-          "blue": [
-            "白玉碎",
-            "theme_rare_nanshan",
-            "bp_fragment_nanshan"
-          ],
-          "gold": [
-            "妖核",
-            "bp_weapon_nanshan_t1_01",
-            "bp_cloak_nanshan_t2_01",
-            "bp_ring_nanshan_t2_01",
-            "bp_bracelet_nanshan_t2_01"
-          ]
-        },
-        "special": {
-          "normal": {
-            "extra_gem_chance": 0.03,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "elite": {
-            "punch_stone_chance": 0.22,
-            "extra_gem_chance": 0.12,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          },
-          "boss": {
-            "core_guarantee": "妖王核心",
-            "punch_stone_chance": 0.55,
-            "extra_gem_chance": 0.28,
-            "extra_gems": [
-              "赤晶石",
-              "沧澜石",
-              "青木石"
-            ]
-          }
-        }
-      },
-      "difficulties": [
-        {
-          "name": "普通",
-          "unlock": {
-            "boss_kills_required": 0,
-            "material_cost": {},
-            "reward": {}
-          },
-          "recommend_score": 1500,
-          "monster_mult": {
-            "hp": 1.0,
-            "atk": 1.0,
-            "def": 1.0
-          },
-          "drops_override": {},
-          "first_clear_reward": {}
-        },
-        {
-          "name": "困难I",
-          "unlock": {
-            "boss_kills_required": 10,
-            "material_cost": {
-              "玉屑": 36,
-              "桂枝": 36
-            },
-            "reward": {
-              "gold": 180,
-              "skill_points": 1,
-              "items": {
-                "玉屑": 20
-              }
-            }
-          },
-          "recommend_score": 2100,
-          "monster_mult": {
-            "hp": 1.7,
-            "atk": 1.35,
-            "def": 1.35
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 68,
-              "blue": 25,
-              "gold": 7
-            }
-          },
-          "first_clear_reward": {
-            "gold": 220,
-            "skill_points": 1,
-            "items": {
-              "玉屑": 25
-            }
-          }
-        },
-        {
-          "name": "困难II",
-          "unlock": {
-            "boss_kills_required": 20,
-            "material_cost": {
-              "白玉碎": 22,
-              "妖核": 5
-            },
-            "reward": {
-              "gold": 300,
-              "skill_points": 1,
-              "items": {
-                "白玉碎": 18,
-                "妖核": 3
-              }
-            }
-          },
-          "recommend_score": 3200,
-          "monster_mult": {
-            "hp": 2.35,
-            "atk": 1.56,
-            "def": 1.56
-          },
-          "drops_override": {
-            "rarity_weights": {
-              "white": 60,
-              "blue": 30,
-              "gold": 10
-            },
-            "special": {
-              "elite": {
-                "punch_stone_chance": 0.32,
-                "extra_gem_chance": 0.18,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              },
-              "boss": {
-                "core_guarantee": "妖王核心",
-                "punch_stone_chance": 0.68,
-                "extra_gem_chance": 0.36,
-                "extra_gems": [
-                  "赤晶石",
-                  "沧澜石",
-                  "青木石"
-                ]
-              }
-            }
-          },
-          "first_clear_reward": {
-            "gold": 390,
-            "skill_points": 1,
-            "items": {
-              "白玉碎": 20,
-              "妖核": 3
-            }
-          }
-        }
-      ]
-    }
-  ]
+    ]
 }

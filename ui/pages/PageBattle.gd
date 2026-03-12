@@ -69,9 +69,8 @@ func _ready() -> void:
 	if _joystick != null:
 		_joystick.visible = true
 
-	var s := OfflineService.consume_pending_summary()
-	if not s.is_empty() and _offline_popup != null and _offline_popup.has_method("open"):
-		_offline_popup.call("open", s)
+	if _offline_popup != null:
+		_offline_popup.visible = false
 
 	var spawn_count := 1
 	var cfg: Dictionary = ConfigService.get_cfg()
@@ -95,11 +94,6 @@ func _process(_delta: float) -> void:
 		if vec_any is Vector2:
 			input_vec = vec_any
 	BattleService.set_manual_input(input_vec)
-
-	if _offline_popup != null and not _offline_popup.visible:
-		var s2 := OfflineService.consume_pending_summary()
-		if not s2.is_empty() and _offline_popup.has_method("open"):
-			_offline_popup.call("open", s2)
 
 func _on_auto_seek_pressed() -> void:
 	GameSettings.set_auto_seek(not GameSettings.auto_seek_enabled, "按钮切换")
@@ -187,7 +181,7 @@ func _apply_nav_i18n() -> void:
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
+	_btn_nav_map.text = "宗门"
 	_btn_nav_battle.disabled = true
 	_btn_nav_dex.disabled = false
 	_btn_nav_map.disabled = false
@@ -202,7 +196,7 @@ func _on_nav_dex_pressed() -> void:
 	get_tree().change_scene_to_file("res://ui/pages/PageDexHome.tscn")
 
 func _on_nav_map_pressed() -> void:
-	get_tree().change_scene_to_file("res://ui/pages/PageDungeon.tscn")
+	get_tree().change_scene_to_file("res://ui/pages/PageMap.tscn")
 
 func _on_badge_data_changed() -> void:
 	_refresh_badges()

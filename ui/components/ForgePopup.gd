@@ -394,6 +394,7 @@ func _on_forge_pressed() -> void:
 		var ret := ForgeService.do_forge_normal(template_id)
 		if bool(ret.get("ok", false)):
 			EventBus.add_log("打造成功：%s" % _template_name(template_id))
+			TaskService.on_forge_done(1)
 		else:
 			EventBus.add_log("打造失败：%s" % _normal_block_reason(str(ret.get("reason", ""))))
 	else:
@@ -401,6 +402,7 @@ func _on_forge_pressed() -> void:
 		var ret2 := ForgeService.do_forge_high(template_id, base_uid)
 		if bool(ret2.get("ok", false)):
 			EventBus.add_log("升品成功：%s" % _template_name(template_id))
+			TaskService.on_forge_done(1)
 			_selected_base_uid_by_target[template_id] = 0
 		else:
 			var compose := ForgeService.get_blueprint_compose_preview(template_id)
@@ -486,20 +488,7 @@ func _template_name(template_id: String) -> String:
 	return str(tpl.get("name", template_id))
 
 func _find_template(template_id: String) -> Dictionary:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("equip_db", {})
-	if not (db_any is Dictionary):
-		return {}
-	var rows_any = (db_any as Dictionary).get("equip_templates", [])
-	if not (rows_any is Array):
-		return {}
-	for row_any in rows_any:
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		if str(row.get("id", "")).strip_edges() == template_id:
-			return row
-	return {}
+	return EquipmentModel.get_template(template_id)
 
 func _item_name(item_id: String) -> String:
 	if item_id.is_empty():
@@ -557,18 +546,25 @@ func _rarity_name(rarity: String) -> String:
 
 func _format_stats_dict(stats_any: Variant) -> Array[String]:
 	var out: Array[String] = []
-	if not (stats_any is Array):
-		return out
 	var stats: Dictionary = {}
-	for row_any in stats_any:
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		var stat := str(row.get("stat", "")).strip_edges()
-		if stat.is_empty():
-			continue
-		stats[stat] = int(row.get("value", 0))
-	var ordered := ["HP", "ATK", "DEF", "CRIT_RATE", "CRIT_DMG", "QI"]
+	if stats_any is Dictionary:
+		for stat_any in (stats_any as Dictionary).keys():
+			var stat := _normalize_stat_key(str(stat_any))
+			if stat.is_empty():
+				continue
+			stats[stat] = int((stats_any as Dictionary).get(stat_any, 0))
+	elif stats_any is Array:
+		for row_any in (stats_any as Array):
+			if not (row_any is Dictionary):
+				continue
+			var row: Dictionary = row_any
+			var stat := _normalize_stat_key(str(row.get("stat", "")))
+			if stat.is_empty():
+				continue
+			stats[stat] = int(row.get("value", 0))
+	else:
+		return out
+	var ordered := ["HP", "ATK", "DEF", "CRIT_PERCENT", "CRIT_DMG", "QI"]
 	for key in ordered:
 		if not stats.has(key):
 			continue
@@ -587,12 +583,26 @@ func _format_stats_dict(stats_any: Variant) -> Array[String]:
 	return out
 
 func _format_stat_line(stat: String, val: int) -> String:
-	var is_percent := stat == "CRIT_RATE"
+	var is_percent := _is_percent_stat(stat)
 	return "%s +%d%s" % [I18nService.stat(stat), val, "%" if is_percent else ""]
 
 func _socket_rule_name(rule_ref: String) -> String:
 	match rule_ref.strip_edges():
 		"fixed_star_3_6_8_10", "":
 			return "固定开孔（3/6/8/10星）"
+		"none":
+			return "无孔位"
 		_:
 			return rule_ref
+
+func _normalize_stat_key(stat: String) -> String:
+	match stat:
+		"CRIT":
+			return "CRIT_PERCENT"
+		"CRIT_RATE":
+			return "CRIT_PERCENT"
+		_:
+			return stat
+
+func _is_percent_stat(stat: String) -> bool:
+	return stat == "CRIT_PERCENT" or stat == "CRIT_DMG" or stat == "ATK_SPEED" or stat == "CDR" or stat == "LOOT_BONUS_PERCENT"

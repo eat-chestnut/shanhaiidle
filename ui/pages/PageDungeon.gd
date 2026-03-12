@@ -4,6 +4,7 @@ const PAGE_BATTLE := "res://ui/pages/PageBattle.tscn"
 const PAGE_CHARACTER := "res://ui/pages/PageCharacter.tscn"
 const PAGE_SKILLS := "res://ui/pages/PageSkills.tscn"
 const PAGE_DEX := "res://ui/pages/PageDexHome.tscn"
+const PAGE_MAP := "res://ui/pages/PageMap.tscn"
 const CARD_SCENE := preload("res://ui/components/DungeonBannerCard.tscn")
 
 @onready var _title: Label = $RootVBox/Header/Title
@@ -11,6 +12,7 @@ const CARD_SCENE := preload("res://ui/components/DungeonBannerCard.tscn")
 @onready var _btn_tab_elite: Button = $RootVBox/TabBar/BtnTabElite
 @onready var _btn_tab_normal: Button = $RootVBox/TabBar/BtnTabNormal
 @onready var _btn_tab_event: Button = $RootVBox/TabBar/BtnTabEvent
+@onready var _tab_bar: Control = $RootVBox/TabBar
 @onready var _scroll: ScrollContainer = $RootVBox/ListWrap/Scroll
 @onready var _list: VBoxContainer = $RootVBox/ListWrap/Scroll/List
 @onready var _empty_hint: Label = $RootVBox/ListWrap/LblEmpty
@@ -35,19 +37,20 @@ func _ready() -> void:
 	_refresh_badges()
 
 func _apply_i18n() -> void:
-	_title.text = "副本"
-	_hint.text = "选择副本挑战，获取养成材料"
-	_btn_tab_elite.text = "精英副本"
-	_btn_tab_normal.text = "普通副本"
-	_btn_tab_event.text = "活动副本"
+	_title.text = "演武场"
+	_hint.text = "挑战日常副本，消耗体力获取 1-20 养成资源。副本升级只提升产出，不提升战斗强度。"
+	_btn_tab_elite.text = "未启用"
+	_btn_tab_normal.text = "日常副本"
+	_btn_tab_event.text = "未启用"
+	_tab_bar.visible = false
 
 	_btn_nav_character.text = I18nService.t("ui.nav.character", "人物")
 	_btn_nav_skills.text = I18nService.t("ui.nav.skills", "技能")
 	_btn_nav_battle.text = I18nService.t("ui.nav.battle", "战斗")
 	_btn_nav_bag.text = I18nService.t("ui.nav.bag", "背包")
 	_btn_nav_dex.text = I18nService.t("ui.nav.dex", "图鉴")
-	_btn_nav_map.text = I18nService.t("ui.nav.dungeon", "副本")
-	_btn_nav_map.disabled = true
+	_btn_nav_map.text = "宗门"
+	_btn_nav_map.disabled = false
 
 func _connect_signals() -> void:
 	if not _btn_tab_elite.pressed.is_connected(_on_tab_elite_pressed):
@@ -67,6 +70,8 @@ func _connect_signals() -> void:
 		_btn_nav_bag.pressed.connect(_on_nav_bag_pressed)
 	if not _btn_nav_dex.pressed.is_connected(_on_nav_dex_pressed):
 		_btn_nav_dex.pressed.connect(_on_nav_dex_pressed)
+	if not _btn_nav_map.pressed.is_connected(_on_nav_map_pressed):
+		_btn_nav_map.pressed.connect(_on_nav_map_pressed)
 
 	if not EventBus.inventory_updated.is_connected(_on_model_changed):
 		EventBus.inventory_updated.connect(_on_model_changed)
@@ -118,8 +123,14 @@ func _on_card_challenge_pressed(dungeon_id: String) -> void:
 		EventBus.add_log(_challenge_fail_text(ret))
 		_rebuild_list()
 		return
-	EventBus.add_log("进入副本：%s（占位）" % str(ret.get("name", dungeon_id)))
-	get_tree().change_scene_to_file(PAGE_BATTLE)
+	var reward_lines := _take_string_items(ret.get("reward_lines", []), 4)
+	var reward_text := "" if reward_lines.is_empty() else "（%s）" % "、".join(reward_lines)
+	EventBus.add_log("历练完成：%s Lv%d%s" % [
+		str(ret.get("name", dungeon_id)),
+		int(ret.get("current_level", 1)),
+		reward_text,
+	])
+	_rebuild_list()
 
 func _on_card_sweep_pressed(dungeon_id: String) -> void:
 	var ret := DungeonDisplayService.sweep(dungeon_id)
@@ -127,24 +138,45 @@ func _on_card_sweep_pressed(dungeon_id: String) -> void:
 		EventBus.add_log(_sweep_fail_text(ret))
 		_rebuild_list()
 		return
-	var rewards_any = ret.get("reward_preview", [])
-	var rewards: Array = rewards_any if rewards_any is Array else []
-	var reward_line := ""
-	if not rewards.is_empty():
-		reward_line = "（%s）" % "、".join(_take_string_items(rewards, 3))
-	EventBus.add_log("扫荡完成：%s%s（占位）" % [str(ret.get("name", dungeon_id)), reward_line])
+	var rewards := _take_string_items(ret.get("reward_lines", []), 4)
+	var reward_line := "" if rewards.is_empty() else "（%s）" % "、".join(rewards)
+	EventBus.add_log("扫荡完成：%s Lv%d%s" % [str(ret.get("name", dungeon_id)), int(ret.get("current_level", 1)), reward_line])
 	_rebuild_list()
 
 func _on_card_plus_pressed(dungeon_id: String) -> void:
 	var ret := DungeonDisplayService.plus_action(dungeon_id)
-	if not bool(ret.get("ok", false)):
-		EventBus.add_log("%s：暂未开放补充次数" % str(ret.get("name", dungeon_id)))
+	if bool(ret.get("ok", false)):
+		EventBus.add_log("%s 已升级到 Lv%d" % [str(ret.get("name", dungeon_id)), int(ret.get("current_level", 1))])
+		_rebuild_list()
+		return
+	var reason := str(ret.get("reason", ""))
+	match reason:
+		"max_level":
+			EventBus.add_log("%s：当前已达最高等级" % str(ret.get("name", dungeon_id)))
+		"no_material":
+			EventBus.add_log("%s：升级材料不足，缺少 %s×%d" % [
+				str(ret.get("name", dungeon_id)),
+				str(ret.get("item_name", "材料")),
+				int(ret.get("need", 0)),
+			])
+		"locked":
+			EventBus.add_log("%s：当前尚未开放" % str(ret.get("name", dungeon_id)))
+		_:
+			EventBus.add_log("%s：当前无法升级" % str(ret.get("name", dungeon_id)))
 
 func _challenge_fail_text(ret: Dictionary) -> String:
 	var reason := str(ret.get("reason", ""))
 	match reason:
 		"locked":
+			var unlock_hint := str(ret.get("unlock_hint", "")).strip_edges()
+			if not unlock_hint.is_empty():
+				return "副本未开放：%s" % unlock_hint
+			var unlock_stage_name := str(ret.get("unlock_stage_name", "")).strip_edges()
+			if not unlock_stage_name.is_empty():
+				return "副本未开放：需Lv%d并通关%s" % [int(ret.get("unlock_level", 0)), unlock_stage_name]
 			return "副本未开放：%d级解锁" % int(ret.get("unlock_level", 0))
+		"no_stamina":
+			return "体力不足：需要 %d 点" % int(ret.get("stamina_cost", 0))
 		"no_count":
 			return "今日挑战次数不足"
 		"not_found":
@@ -156,9 +188,17 @@ func _sweep_fail_text(ret: Dictionary) -> String:
 	var reason := str(ret.get("reason", ""))
 	match reason:
 		"locked":
+			var unlock_hint := str(ret.get("unlock_hint", "")).strip_edges()
+			if not unlock_hint.is_empty():
+				return "副本未开放：%s" % unlock_hint
+			var unlock_stage_name := str(ret.get("unlock_stage_name", "")).strip_edges()
+			if not unlock_stage_name.is_empty():
+				return "副本未开放：需Lv%d并通关%s" % [int(ret.get("unlock_level", 0)), unlock_stage_name]
 			return "副本未开放：%d级解锁" % int(ret.get("unlock_level", 0))
 		"need_clear":
 			return "需先通关后开启扫荡"
+		"no_stamina":
+			return "体力不足：需要 %d 点" % int(ret.get("stamina_cost", 0))
 		"no_count":
 			return "今日扫荡次数不足"
 		"not_found":
@@ -205,6 +245,9 @@ func _on_nav_bag_pressed() -> void:
 
 func _on_nav_dex_pressed() -> void:
 	get_tree().change_scene_to_file(PAGE_DEX)
+
+func _on_nav_map_pressed() -> void:
+	get_tree().change_scene_to_file(PAGE_MAP)
 
 func _refresh_badges() -> void:
 	if _badge_char != null and _badge_char.has_method("set_dot"):

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\GemCatalogResource\Pages;
 
 use App\Filament\Resources\GemCatalogResource;
+use App\Support\GemEffectRegistry;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateGemCatalog extends CreateRecord
@@ -13,6 +14,6 @@ class CreateGemCatalog extends CreateRecord
     {
         $data['type'] = 'gem';
 
-        return $data;
+        return GemEffectRegistry::normalizeRecordDataOrFail($data);
     }
 }

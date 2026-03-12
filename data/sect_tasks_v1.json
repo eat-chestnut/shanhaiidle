@@ -1,0 +1,155 @@
+{
+    "meta": {
+        "key": "sect_tasks",
+        "schema_version": 1,
+        "exported_at": "2026-03-11 15:04:18",
+        "sha256": "7a23deb62618495345c83a0b0197bb391a7a09362eeebf9c568f6ce4bddc3097"
+    },
+    "sect_tasks": {
+        "daily_tasks": [
+            {
+                "task_id": "sect_check_in",
+                "name": "回宗报到",
+                "desc": "回到宗门主界面 1 次。",
+                "goal_type": "visit_sect",
+                "target": 1,
+                "unlock_stage_id": "nan_01",
+                "rewards": {
+                    "gold": 80,
+                    "spirit_stone": 0,
+                    "sect_contribution": 20,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "sort_order": 10,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_patrol",
+                "name": "巡山历练",
+                "desc": "击杀 20 只普通异兽。",
+                "goal_type": "kill_normal",
+                "target": 20,
+                "unlock_stage_id": "nan_01",
+                "rewards": {
+                    "gold": 100,
+                    "spirit_stone": 0,
+                    "sect_contribution": 20,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "sort_order": 20,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_daily_drill",
+                "name": "完成任意日常副本",
+                "desc": "完成 1 次演武场日常副本。",
+                "goal_type": "complete_dungeon",
+                "target": 1,
+                "unlock_stage_id": "nan_02",
+                "rewards": {
+                    "gold": 120,
+                    "spirit_stone": 0,
+                    "sect_contribution": 25,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "sort_order": 30,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_forge_once",
+                "name": "整备法器",
+                "desc": "完成 1 次打造或升品。",
+                "goal_type": "forge",
+                "target": 1,
+                "unlock_stage_id": "nan_02",
+                "rewards": {
+                    "gold": 140,
+                    "spirit_stone": 0,
+                    "sect_contribution": 25,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "sort_order": 40,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_spend_stamina",
+                "name": "消耗体力",
+                "desc": "累计消耗 20 点体力。",
+                "goal_type": "spend_stamina",
+                "target": 20,
+                "unlock_stage_id": "nan_02",
+                "rewards": {
+                    "gold": 150,
+                    "spirit_stone": 0,
+                    "sect_contribution": 30,
+                    "skill_points": 0,
+                    "items": []
+                },
+                "sort_order": 50,
+                "is_enabled": true
+            }
+        ],
+        "milestone_tasks": [
+            {
+                "task_id": "sect_clear_stage",
+                "name": "山门开路",
+                "desc": "首次通关任意主线关卡。",
+                "goal_type": "clear_stage",
+                "target": 1,
+                "unlock_stage_id": "nan_01",
+                "rewards": {
+                    "gold": 180,
+                    "spirit_stone": 0,
+                    "sect_contribution": 35,
+                    "skill_points": 1,
+                    "items": []
+                },
+                "sort_order": 10,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_boss_hunt",
+                "name": "讨伐大妖",
+                "desc": "击败 1 只 Boss。",
+                "goal_type": "kill_boss",
+                "target": 1,
+                "unlock_stage_id": "nan_03",
+                "rewards": {
+                    "gold": 220,
+                    "spirit_stone": 0,
+                    "sect_contribution": 40,
+                    "skill_points": 1,
+                    "items": []
+                },
+                "sort_order": 20,
+                "is_enabled": true
+            },
+            {
+                "task_id": "sect_collect_loot",
+                "name": "收取历练所得",
+                "desc": "累计获得 15 次掉落。",
+                "goal_type": "collect_loot",
+                "target": 15,
+                "unlock_stage_id": "nan_01",
+                "rewards": {
+                    "gold": 160,
+                    "spirit_stone": 0,
+                    "sect_contribution": 25,
+                    "skill_points": 0,
+                    "items": [
+                        {
+                            "item_id": "宗门令",
+                            "count": 1
+                        }
+                    ]
+                },
+                "sort_order": 30,
+                "is_enabled": true
+            }
+        ]
+    }
+}

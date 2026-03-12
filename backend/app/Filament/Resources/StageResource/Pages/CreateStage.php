@@ -11,14 +11,7 @@ class CreateStage extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['monsters_patch'] = StageResource::normalizeMonstersPatchInput($data['monsters_patch'] ?? []);
-        StageResource::validateMonstersPatchOrFail($data['monsters_patch']);
-        $rawDifficulties = $data['difficulties'] ?? StageResource::defaultDifficultiesForForm();
-        if (! is_array($rawDifficulties) || $rawDifficulties === []) {
-            $rawDifficulties = StageResource::defaultDifficultiesForForm();
-        }
-        $data['difficulties'] = StageResource::normalizeDifficultiesInput($rawDifficulties);
-        StageResource::validateDifficultiesOrFail($data['difficulties']);
+        $data['difficulties'] = StageResource::normalizeAndValidateDifficultiesOrFail($data['difficulties'] ?? []);
 
         return $data;
     }

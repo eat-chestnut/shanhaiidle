@@ -1,0 +1,372 @@
+{
+    "meta": {
+        "key": "character_growth_rules",
+        "schema_version": 1,
+        "exported_at": "2026-03-11 14:20:41",
+        "sha256": "bc290e1111a93d20a62339bee935f96d2a7c7cdba63286086448ced9b672a35d"
+    },
+    "character_growth_rules": {
+        "level_cap": 60,
+        "initial": {
+            "level": 1,
+            "free_attr_points": 0,
+            "skill_points": 1,
+            "current_class": "bing",
+            "base_attributes": {
+                "strength": 0,
+                "physique": 0,
+                "agility": 0,
+                "spirit": 0,
+                "true_energy": 0,
+                "fortune": 0
+            }
+        },
+        "level_exp_table": [
+            {
+                "level": 1,
+                "exp_to_next": 12,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 2,
+                "exp_to_next": 16,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 3,
+                "exp_to_next": 20,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 4,
+                "exp_to_next": 24,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 5,
+                "exp_to_next": 28,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 6,
+                "exp_to_next": 32,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 7,
+                "exp_to_next": 36,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 8,
+                "exp_to_next": 40,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 9,
+                "exp_to_next": 45,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 10,
+                "exp_to_next": 50,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 11,
+                "exp_to_next": 55,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 12,
+                "exp_to_next": 60,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 13,
+                "exp_to_next": 66,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 14,
+                "exp_to_next": 72,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 15,
+                "exp_to_next": 78,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 16,
+                "exp_to_next": 84,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 17,
+                "exp_to_next": 90,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 18,
+                "exp_to_next": 97,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 19,
+                "exp_to_next": 104,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 20,
+                "exp_to_next": 112,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 21,
+                "exp_to_next": 120,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 22,
+                "exp_to_next": 128,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 23,
+                "exp_to_next": 136,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 24,
+                "exp_to_next": 145,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 25,
+                "exp_to_next": 154,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 26,
+                "exp_to_next": 163,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 27,
+                "exp_to_next": 172,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 28,
+                "exp_to_next": 182,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 29,
+                "exp_to_next": 192,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 30,
+                "exp_to_next": 202,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 31,
+                "exp_to_next": 213,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 32,
+                "exp_to_next": 224,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 33,
+                "exp_to_next": 235,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 34,
+                "exp_to_next": 247,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 35,
+                "exp_to_next": 259,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 36,
+                "exp_to_next": 271,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 37,
+                "exp_to_next": 284,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 38,
+                "exp_to_next": 297,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 39,
+                "exp_to_next": 310,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 40,
+                "exp_to_next": 324,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 41,
+                "exp_to_next": 338,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 42,
+                "exp_to_next": 352,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 43,
+                "exp_to_next": 367,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 44,
+                "exp_to_next": 382,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 45,
+                "exp_to_next": 398,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 46,
+                "exp_to_next": 414,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 47,
+                "exp_to_next": 430,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 48,
+                "exp_to_next": 447,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 49,
+                "exp_to_next": 464,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 50,
+                "exp_to_next": 482,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 51,
+                "exp_to_next": 500,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 52,
+                "exp_to_next": 519,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 53,
+                "exp_to_next": 538,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 54,
+                "exp_to_next": 557,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 55,
+                "exp_to_next": 577,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 56,
+                "exp_to_next": 598,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 57,
+                "exp_to_next": 619,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 58,
+                "exp_to_next": 640,
+                "attr_points_gain": 1
+            },
+            {
+                "level": 59,
+                "exp_to_next": 662,
+                "attr_points_gain": 1
+            }
+        ],
+        "base_growth": {
+            "hp": {
+                "base": 10,
+                "per_level_every": 4,
+                "per_level_gain": 1
+            },
+            "qi": {
+                "base": 10,
+                "per_level_every": 5,
+                "per_level_gain": 1
+            },
+            "atk": {
+                "base": 1,
+                "per_level_gain": 0
+            },
+            "def": {
+                "base": 0,
+                "per_level_gain": 0
+            },
+            "crit_percent": {
+                "base": 5
+            },
+            "loot_bonus_percent": {
+                "base": 0
+            }
+        },
+        "attribute_formulas": {
+            "physique": {
+                "hp_per_point": 1,
+                "hp_extra_every_10": 1,
+                "def_per_point": 0
+            },
+            "true_energy": {
+                "qi_per_point": 1
+            },
+            "agility": {
+                "crit_percent_per_point": 0.25,
+                "dodge_per_point": 0,
+                "attack_speed_per_point": 0
+            },
+            "strength": {
+                "phys_mul_permille_per_point": 12
+            },
+            "spirit": {
+                "spell_mul_permille_per_point": 12
+            },
+            "fortune": {
+                "loot_bonus_percent_per_point": 0.6
+            }
+        }
+    }
+}

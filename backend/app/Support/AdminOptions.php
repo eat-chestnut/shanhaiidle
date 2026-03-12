@@ -6,7 +6,10 @@ use App\Models\BlueAffix;
 use App\Models\EquipTemplate;
 use App\Models\EquipmentSet;
 use App\Models\Item;
+use App\Models\MaterialDungeonDropGroup;
+use App\Models\Monster;
 use App\Models\SkillCatalog;
+use App\Models\Stage;
 use App\Models\StoryBoss;
 use App\Models\StoryChapter;
 use App\Models\StoryMap;
@@ -118,6 +121,24 @@ class AdminOptions
         ];
     }
 
+    public static function shopTypeOptions(): array
+    {
+        return [
+            'gold' => '金币商城',
+            'crystal' => '晶石商城',
+            'contribution' => '贡献商城',
+        ];
+    }
+
+    public static function shopCurrencyOptions(): array
+    {
+        return [
+            'gold' => '金币',
+            'crystal' => '晶石',
+            'contribution' => '宗门贡献',
+        ];
+    }
+
     public static function outputTypeOptions(): array
     {
         return [
@@ -153,6 +174,227 @@ class AdminOptions
         ];
     }
 
+    public static function itemMaterialTypeOptions(?string $type = null): array
+    {
+        $all = [
+            'craft' => '打造材料',
+            'boss' => 'Boss材料',
+            'star' => '升星材料',
+            'refine' => '洗练材料',
+            'story' => '剧情材料',
+            'token' => '令牌',
+            'pack' => '奖励包',
+            'dungeon_ticket' => '副本门票',
+            'exchange_ticket' => '兑换凭证',
+            'socket_tool' => '打孔道具',
+            'salvage_tool' => '回收道具',
+            'gem' => '宝石分类',
+            'blueprint' => '图纸材料',
+            'blueprint_fragment' => '图纸碎片材料',
+            'currency' => '货币分类',
+        ];
+
+        return match ($type) {
+            'material' => array_intersect_key($all, array_flip(['craft', 'boss', 'star', 'refine', 'story'])),
+            'item' => array_intersect_key($all, array_flip(array_keys(self::consumableItemSubTypeOptions() + ['token' => '令牌']))),
+            'gem' => ['gem' => $all['gem']],
+            'blueprint' => ['blueprint' => $all['blueprint']],
+            'blueprint_fragment' => ['blueprint_fragment' => $all['blueprint_fragment']],
+            'currency' => ['currency' => $all['currency']],
+            default => $all,
+        };
+    }
+
+    public static function consumableItemSubTypeOptions(): array
+    {
+        return [
+            'pack' => '奖励包',
+            'dungeon_ticket' => '副本门票',
+            'exchange_ticket' => '兑换凭证',
+            'socket_tool' => '打孔道具',
+            'salvage_tool' => '回收道具',
+        ];
+    }
+
+    public static function itemSubTypeOptions(?string $type = null, ?string $materialType = null): array
+    {
+        $materialOptions = match ($materialType) {
+            'boss' => [
+                'boss_mark' => 'Boss印记',
+                'boss_core' => 'Boss核心',
+            ],
+            'star' => [
+                'star' => '升星材料',
+            ],
+            'refine' => [
+                'refine' => '洗练材料',
+            ],
+            'story' => [
+                'story_mat' => '剧情材料',
+            ],
+            default => [
+                'forge_base' => '基础锻材',
+                'forge_part' => '部位锻材',
+                'forge_theme' => '主题锻材',
+                'material' => '通用材料',
+            ],
+        };
+
+        return match ($type) {
+            'material' => $materialOptions,
+            'item' => self::consumableItemSubTypeOptions() + ['token' => '令牌'],
+            'gem' => self::gemTypeOptions(),
+            'blueprint' => ['equipment_blueprint' => '装备图纸'],
+            'blueprint_fragment' => ['theme_blueprint_fragment' => '主题图纸碎片'],
+            'currency' => ['currency' => '货币'],
+            default => [
+                'forge_base' => '基础锻材',
+                'forge_part' => '部位锻材',
+                'forge_theme' => '主题锻材',
+                'material' => '通用材料',
+                'boss_mark' => 'Boss印记',
+                'boss_core' => 'Boss核心',
+                'star' => '升星材料',
+                'refine' => '洗练材料',
+                'story_mat' => '剧情材料',
+                'pack' => '奖励包',
+                'dungeon_ticket' => '副本门票',
+                'exchange_ticket' => '兑换凭证',
+                'socket_tool' => '打孔道具',
+                'salvage_tool' => '回收道具',
+                'token' => '令牌',
+                'attr' => '属性宝石',
+                'skill' => '技能宝石',
+                'equipment_blueprint' => '装备图纸',
+                'theme_blueprint_fragment' => '主题图纸碎片',
+                'currency' => '货币',
+            ],
+        };
+    }
+
+    public static function defaultMaterialTypeForRecord(?string $type): ?string
+    {
+        return match ($type) {
+            'material' => 'craft',
+            'item' => 'pack',
+            'gem' => 'gem',
+            'blueprint' => 'blueprint',
+            'blueprint_fragment' => 'blueprint_fragment',
+            'currency' => 'currency',
+            default => null,
+        };
+    }
+
+    public static function defaultSubTypeForRecord(?string $type, ?string $materialType = null): ?string
+    {
+        $options = self::itemSubTypeOptions($type, $materialType);
+
+        return array_key_first($options);
+    }
+
+    public static function normalizedMaterialTypeForRecord(?string $type, ?string $materialType, ?string $subType): ?string
+    {
+        return match ($type) {
+            'material' => array_key_exists((string) $materialType, self::itemMaterialTypeOptions('material'))
+                ? (string) $materialType
+                : (string) self::defaultMaterialTypeForRecord('material'),
+            'item' => in_array((string) $subType, array_keys(self::consumableItemSubTypeOptions() + ['token' => '令牌']), true)
+                ? (string) $subType
+                : (string) self::defaultMaterialTypeForRecord('item'),
+            'gem' => 'gem',
+            'blueprint' => 'blueprint',
+            'blueprint_fragment' => 'blueprint_fragment',
+            'currency' => 'currency',
+            default => $materialType,
+        };
+    }
+
+    public static function normalizedSubTypeForRecord(?string $type, ?string $materialType, ?string $subType): ?string
+    {
+        $options = self::itemSubTypeOptions($type, $materialType);
+        $subType = (string) $subType;
+
+        return array_key_exists($subType, $options) ? $subType : self::defaultSubTypeForRecord($type, $materialType);
+    }
+
+    public static function itemSubTypeLabel(?string $type, ?string $subType, ?string $materialType = null): string
+    {
+        return self::optionLabel(self::itemSubTypeOptions($type, $materialType), $subType);
+    }
+
+    public static function itemMaterialTypeLabel(?string $materialType): string
+    {
+        return self::optionLabel(self::itemMaterialTypeOptions(), $materialType);
+    }
+
+    public static function itemSourceTagOptions(): array
+    {
+        return [
+            'Boss' => 'Boss',
+            'Boss掉落' => 'Boss掉落',
+            'Boss概率掉落' => 'Boss概率掉落',
+            'Boss稳定掉落' => 'Boss稳定掉落',
+            'boss_drop' => 'Boss掉落',
+            'compose' => '合成来源',
+            'dungeon_drop' => '副本掉落',
+            '主线' => '主线',
+            '主线普通掉落' => '主线普通掉落',
+            '分解' => '分解',
+            '副本' => '副本',
+            '功能区' => '功能区',
+            '图纸副本' => '图纸副本',
+            '图纸合成' => '图纸合成',
+            '宗门' => '宗门',
+            '宝石副本' => '宝石副本',
+            '旧版掉落' => '旧版掉落',
+            '星材副本' => '星材副本',
+            '洗练副本' => '洗练副本',
+            '活动' => '活动',
+            '礼包' => '礼包',
+            '精英' => '精英',
+            '终章' => '终章',
+        ];
+    }
+
+    public static function itemUseTagOptions(): array
+    {
+        return [
+            'craft' => '打造',
+            'high_forge' => '高阶打造',
+            'socket' => '镶嵌',
+            '兑换' => '兑换',
+            '剧情' => '剧情',
+            '副本' => '副本',
+            '升星' => '升星',
+            '升阶' => '升阶',
+            '商店' => '商店',
+            '回收' => '回收',
+            '图纸' => '图纸',
+            '图纸合成' => '图纸合成',
+            '奖励' => '奖励',
+            '套装' => '套装',
+            '宝石合成' => '宝石合成',
+            '开启' => '开启',
+            '成长' => '成长',
+            '打孔' => '打孔',
+            '打造' => '打造',
+            '洗练' => '洗练',
+            '礼包' => '礼包',
+            '终章' => '终章',
+            '终章打造' => '终章打造',
+            '镶嵌' => '镶嵌',
+            '高阶配方' => '高阶配方',
+        ];
+    }
+
+    public static function optionLabels(array $options, array $values): array
+    {
+        return array_values(array_map(
+            fn ($value): string => self::optionLabel($options, (string) $value),
+            $values,
+        ));
+    }
+
     public static function gemTypeOptions(): array
     {
         return [
@@ -182,13 +424,48 @@ class AdminOptions
     public static function dungeonTypeOptions(): array
     {
         return [
-            'craft' => '打造材料副本',
-            'star' => '星材副本',
-            'blueprint' => '图纸副本',
-            'boss' => 'Boss材料副本',
+            'gold' => '金币副本',
+            'exp' => '经验副本',
+            'material' => '材料副本',
             'gem' => '宝石副本',
-            'refine' => '洗练材料副本',
         ];
+    }
+
+    public static function stageOptions(): array
+    {
+        return Stage::query()
+            ->where('is_enabled', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Stage $stage): array => [
+                $stage->id => (string) $stage->name,
+            ])
+            ->all();
+    }
+
+    public static function materialDungeonDropGroupOptions(): array
+    {
+        return MaterialDungeonDropGroup::query()
+            ->where('is_enabled', true)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (MaterialDungeonDropGroup $group): array => [
+                $group->group_id => (string) $group->name,
+            ])
+            ->all();
+    }
+
+    public static function materialDungeonDropGroupName(?string $groupId): string
+    {
+        if (blank($groupId)) {
+            return '';
+        }
+
+        return (string) MaterialDungeonDropGroup::query()
+            ->where('group_id', $groupId)
+            ->value('name');
     }
 
     public static function worldNameCategoryOptions(): array
@@ -273,7 +550,6 @@ class AdminOptions
         return [
             20 => '20级',
             40 => '40级',
-            50 => '50级',
             60 => '60级',
         ];
     }
@@ -319,7 +595,7 @@ class AdminOptions
         }
 
         return $query->get()->mapWithKeys(fn (Item $item): array => [
-            $item->id => sprintf('%s（%s）', $item->name, $item->id),
+            $item->id => (string) $item->name,
         ])->all();
     }
 
@@ -332,21 +608,52 @@ class AdminOptions
         return (string) Item::query()->where('id', $itemId)->value('name');
     }
 
-    public static function blueAffixOptions(?string $slotId = null): array
+    public static function monsterOptions(?string $kind = null): array
     {
-        if (blank($slotId)) {
+        return Monster::query()
+            ->where('is_enabled', true)
+            ->when($kind !== null, fn (Builder $query): Builder => $query->where('kind', $kind))
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Monster $monster): array => [
+                $monster->id => (string) $monster->name,
+            ])
+            ->all();
+    }
+
+    public static function monsterName(?string $monsterId): string
+    {
+        if (blank($monsterId)) {
+            return '';
+        }
+
+        return (string) Monster::query()->where('id', $monsterId)->value('name');
+    }
+
+    public static function starMaterialOptions(): array
+    {
+        return self::itemOptions(fn (Builder $query): Builder => $query
+            ->where('type', 'material')
+            ->where('material_type', 'star'));
+    }
+
+    public static function blueAffixOptions(?string $slotId = null, ?int $level = 0): array
+    {
+        if (blank($slotId) || $level === null || $level < 1) {
             return [];
         }
 
         $query = BlueAffix::query()
             ->where('is_enabled', true)
+            ->where('unlock_level', '=', $level)
             ->orderBy('sort_order')
             ->orderBy('affix_name');
 
         $query->whereJsonContains('slot_tags', $slotId);
 
         return $query->get()->mapWithKeys(fn (BlueAffix $affix): array => [
-            $affix->affix_id => sprintf('%s（%s）', $affix->affix_name, $affix->affix_id),
+            $affix->affix_id => sprintf('%s（%s）', $affix->affix_name, $affix->notes),
         ])->all();
     }
 
@@ -387,7 +694,7 @@ class AdminOptions
             ->where('is_enabled', true)
             ->orderBy('sort_order')
             ->get()
-            ->mapWithKeys(fn (EquipmentSet $set): array => [$set->id => sprintf('%s（%s）', $set->name, $set->id)])
+            ->mapWithKeys(fn (EquipmentSet $set): array => [$set->id => (string) $set->name])
             ->all();
     }
 
@@ -395,10 +702,13 @@ class AdminOptions
     {
         return EquipmentSet::query()
             ->where('is_enabled', true)
-            ->orderBy('set_line_id')
+            ->orderBy('sort_order')
+            ->orderBy('stage')
             ->get()
             ->unique('set_line_id')
-            ->mapWithKeys(fn (EquipmentSet $set): array => [$set->set_line_id => sprintf('%s（%s）', $set->name, $set->set_line_id)])
+            ->mapWithKeys(fn (EquipmentSet $set): array => [
+                $set->set_line_id => static::displaySetLineName((string) $set->name, (string) $set->set_line_id),
+            ])
             ->all();
     }
 
@@ -414,7 +724,7 @@ class AdminOptions
         }
 
         return $query->get()->mapWithKeys(fn (EquipTemplate $template): array => [
-            $template->id => sprintf('%s（%s）', $template->name, $template->id),
+            $template->id => (string) $template->name,
         ])->all();
     }
 
@@ -429,13 +739,7 @@ class AdminOptions
             ->get()
             ->groupBy('forge_family_id')
             ->mapWithKeys(function ($rows, string $forgeFamilyId): array {
-                /** @var EquipTemplate|null $first */
-                $first = $rows->first();
-                $label = $first instanceof EquipTemplate
-                    ? sprintf('%s（%s）', $first->name, $forgeFamilyId)
-                    : $forgeFamilyId;
-
-                return [$forgeFamilyId => $label];
+                return [$forgeFamilyId => static::displayForgeSeriesName($forgeFamilyId, $rows)];
             })
             ->all();
     }
@@ -477,5 +781,56 @@ class AdminOptions
         }
 
         return $options[$value] ?? $value;
+    }
+
+    protected static function displaySetLineName(string $name, ?string $fallback = null): string
+    {
+        $label = trim((string) preg_replace('/[·・]\s*(20|40|60)级$/u', '', $name));
+
+        return $label !== '' ? $label : (string) ($fallback ?? '');
+    }
+
+    protected static function displayForgeSeriesName(string $forgeFamilyId, $rows): string
+    {
+        /** @var EquipTemplate|null $first */
+        $first = $rows
+            ->sortBy(fn (EquipTemplate $row): int => $row->quality_tier === 'normal' ? 0 : 1)
+            ->first();
+
+        if ($first instanceof EquipTemplate) {
+            $slotLabel = self::optionLabel(self::slotOptions(), (string) $first->slot);
+
+            if (filled($first->set_line_id)) {
+                $setLineName = self::displaySetLineName(
+                    (string) EquipmentSet::query()
+                        ->where('set_line_id', $first->set_line_id)
+                        ->orderBy('stage')
+                        ->value('name'),
+                    (string) $first->set_line_id,
+                );
+
+                if ($setLineName !== '') {
+                    return sprintf('%s·%s系列', $setLineName, $slotLabel);
+                }
+            }
+
+            $flowLabel = self::displayBusinessLabel(self::optionLabel(self::flowOptions(), filled($first->flow_tag) ? (string) $first->flow_tag : null));
+            if ($flowLabel !== '—' && $slotLabel !== '—') {
+                return sprintf('%s·%s系列', $flowLabel, $slotLabel);
+            }
+
+            if ($slotLabel !== '—') {
+                return sprintf('%s系列', $slotLabel);
+            }
+        }
+
+        return $forgeFamilyId;
+    }
+
+    protected static function displayBusinessLabel(string $label): string
+    {
+        $cleaned = trim((string) preg_replace('/（[^）]*）/u', '', $label));
+
+        return $cleaned !== '' ? $cleaned : $label;
     }
 }

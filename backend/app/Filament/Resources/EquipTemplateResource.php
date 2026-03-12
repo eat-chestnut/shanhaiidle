@@ -5,28 +5,33 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EquipTemplateResource\Pages;
 use App\Models\EquipTemplate;
 use App\Models\EquipmentSet;
+use App\Models\Item;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 
 class EquipTemplateResource extends Resource
 {
     protected static ?string $model = EquipTemplate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?string $navigationLabel = '装备模板';
 
@@ -34,11 +39,11 @@ class EquipTemplateResource extends Resource
 
     protected static ?string $modelLabel = '装备模板';
 
-    protected static ?string $navigationGroup = '装备成长';
+    protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('EquipTemplateTabs')
                     ->persistTabInQueryString()
@@ -68,6 +73,7 @@ class EquipTemplateResource extends Resource
                                             ->options(AdminOptions::slotOptions())
                                             ->searchable()
                                             ->preload()
+                                            ->live()
                                             ->columnSpan(4),
                                         Select::make('equip_type')
                                             ->label('装备归类')
@@ -76,6 +82,7 @@ class EquipTemplateResource extends Resource
                                             ->options(AdminOptions::equipTypeOptions())
                                             ->searchable()
                                             ->preload()
+                                            ->live()
                                             ->columnSpan(4),
                                         Select::make('rarity')
                                             ->label('稀有度')
@@ -90,6 +97,7 @@ class EquipTemplateResource extends Resource
                                             ->minValue(1)
                                             ->default(1)
                                             ->required()
+                                            ->live()
                                             ->columnSpan(4),
                                         Select::make('set_id')
                                             ->label('所属套装配置')
@@ -107,6 +115,8 @@ class EquipTemplateResource extends Resource
 
                                                 $equipmentSet = EquipmentSet::query()->find($state);
                                                 if (! $equipmentSet instanceof EquipmentSet) {
+                                                    $set('set_line_id', null);
+                                                    $set('set_stage', null);
                                                     return;
                                                 }
 
@@ -120,6 +130,12 @@ class EquipTemplateResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
+                                            ->live()
+                                            ->disabled(fn (Get $get): bool => filled($get('set_id')))
+                                            ->dehydrated(fn (Get $get): bool => blank($get('set_id')))
+                                            ->helperText(fn (Get $get): string => filled($get('set_id'))
+                                                ? '已随所属套装配置自动联动，不能单独修改。'
+                                                : '未选择所属套装配置时，可单独指定套装线。')
                                             ->columnSpan(3),
                                         Select::make('set_stage')
                                             ->label('套装阶段')
@@ -127,11 +143,23 @@ class EquipTemplateResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
+                                            ->live()
+                                            ->disabled(fn (Get $get): bool => filled($get('set_id')))
+                                            ->dehydrated(fn (Get $get): bool => blank($get('set_id')))
+                                            ->helperText(fn (Get $get): string => filled($get('set_id'))
+                                                ? '已随所属套装配置自动联动，不能单独修改。'
+                                                : '仅支持 20级 / 40级 / 60级。')
                                             ->columnSpan(3),
                                     ]),
                                 Section::make('资源与状态')
-                                    ->columns(12)
+                                    ->columns(2)
                                     ->schema([
+                                        TextInput::make('sort_order')
+                                            ->label('排序')
+                                            ->integer()
+                                            ->minValue(0)
+                                            ->required()
+                                            ->default(0),
                                         FileUpload::make('icon')
                                             ->label('图标')
                                             ->disk('public')
@@ -142,13 +170,6 @@ class EquipTemplateResource extends Resource
                                         Toggle::make('is_enabled')
                                             ->label('启用')
                                             ->default(true)
-                                            ->columnSpan(3),
-                                        TextInput::make('sort_order')
-                                            ->label('排序')
-                                            ->integer()
-                                            ->minValue(0)
-                                            ->required()
-                                            ->default(0)
                                             ->columnSpan(3),
                                     ]),
                             ]),
@@ -226,6 +247,7 @@ class EquipTemplateResource extends Resource
                                             ->required()
                                             ->searchable()
                                             ->preload()
+                                            ->live()
                                             ->columnSpan(3),
                                         Select::make('forge_tier')
                                             ->label('打造段位')
@@ -254,27 +276,26 @@ class EquipTemplateResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
+                                            ->live()
                                             ->helperText('同系列普通装与高品质装共享同一打造系列。')
                                             ->columnSpan(3),
                                         Select::make('upgrade_from_template_id')
                                             ->label('升品来源模板')
-                                            ->options(fn (): array => AdminOptions::equipTemplateOptions())
+                                            ->options(fn (Get $get): array => static::resolveUpgradeFromTemplateOptions($get))
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
                                             ->columnSpan(6),
                                         Select::make('upgrade_to_template_id')
                                             ->label('可升到模板')
-                                            ->options(fn (): array => AdminOptions::equipTemplateOptions())
+                                            ->options(fn (Get $get): array => static::resolveUpgradeToTemplateOptions($get))
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
                                             ->columnSpan(6),
                                         Select::make('blueprint_item_id')
                                             ->label('图纸物品')
-                                            ->options(fn (): array => AdminOptions::itemOptions(
-                                                fn ($query) => $query->where('type', 'blueprint')
-                                            ))
+                                            ->options(fn (Get $get): array => static::resolveBlueprintItemOptions($get))
                                             ->searchable()
                                             ->preload()
                                             ->nullable()
@@ -321,12 +342,12 @@ class EquipTemplateResource extends Resource
                 Tables\Filters\SelectFilter::make('forge_tier')->label('打造段位')->options(static::forgeTierOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');
@@ -348,13 +369,11 @@ class EquipTemplateResource extends Resource
 
     public static function normalizeFormData(array $data): array
     {
-        $data['white_stats'] = static::normalizeStatEntries($data['white_stats'] ?? []);
-        $data['star_growth'] = static::normalizeStatEntries($data['star_growth'] ?? []);
-        $data['socket_rule_ref'] = filled($data['socket_rule_ref'] ?? null)
-            ? trim((string) $data['socket_rule_ref'])
-            : 'fixed_star_3_6_8_10';
-
         foreach ([
+            'id',
+            'slot',
+            'equip_type',
+            'quality_tier',
             'set_id',
             'set_line_id',
             'forge_tier',
@@ -369,7 +388,19 @@ class EquipTemplateResource extends Resource
             $data[$field] = filled($data[$field] ?? null) ? trim((string) $data[$field]) : null;
         }
 
+        static::validateStatEntriesOrFail($data['white_stats'] ?? [], 'white_stats', '白色基础属性');
+        static::validateStatEntriesOrFail($data['star_growth'] ?? [], 'star_growth', '每星成长');
+
+        $data['white_stats'] = static::normalizeStatEntries($data['white_stats'] ?? []);
+        $data['star_growth'] = static::normalizeStatEntries($data['star_growth'] ?? []);
+        $data['socket_rule_ref'] = filled($data['socket_rule_ref'] ?? null)
+            ? trim((string) $data['socket_rule_ref'])
+            : 'fixed_star_3_6_8_10';
         $data['set_stage'] = filled($data['set_stage'] ?? null) ? (int) $data['set_stage'] : null;
+        $data['required_level'] = filled($data['required_level'] ?? null) ? (int) $data['required_level'] : null;
+
+        $data = static::normalizeSetRelationDataOrFail($data);
+        static::validateUpgradeRelationsOrFail($data);
 
         return $data;
     }
@@ -381,7 +412,6 @@ class EquipTemplateResource extends Resource
         }
 
         $rows = [];
-        $indexes = [];
 
         foreach ($raw as $row) {
             if (! is_array($row)) {
@@ -398,17 +428,339 @@ class EquipTemplateResource extends Resource
                 'value' => max(0, (int) ($row['value'] ?? 0)),
             ];
 
-            if (array_key_exists($stat, $indexes)) {
-                $rows[$indexes[$stat]] = $normalized;
-
-                continue;
-            }
-
-            $indexes[$stat] = count($rows);
             $rows[] = $normalized;
         }
 
         return array_values($rows);
+    }
+
+    protected static function validateStatEntriesOrFail(mixed $raw, string $field, string $fieldLabel): void
+    {
+        if (! is_array($raw)) {
+            return;
+        }
+
+        $duplicates = [];
+        $seen = [];
+
+        foreach ($raw as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $stat = trim((string) ($row['stat'] ?? ''));
+            if ($stat === '') {
+                continue;
+            }
+
+            if (isset($seen[$stat])) {
+                $duplicates[$stat] = static::displayStatLabel($stat);
+                continue;
+            }
+
+            $seen[$stat] = true;
+        }
+
+        if ($duplicates === []) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            $field => sprintf('%s中存在重复属性：%s', $fieldLabel, implode('、', array_values($duplicates))),
+        ]);
+    }
+
+    protected static function normalizeSetRelationDataOrFail(array $data): array
+    {
+        $allowedStages = array_map('intval', array_keys(AdminOptions::setStageOptions()));
+        $setId = static::nullableString($data['set_id'] ?? null);
+        $setLineId = static::nullableString($data['set_line_id'] ?? null);
+        $setStage = isset($data['set_stage']) && $data['set_stage'] !== null ? (int) $data['set_stage'] : null;
+
+        if ($setStage !== null && ! in_array($setStage, $allowedStages, true)) {
+            throw ValidationException::withMessages([
+                'set_stage' => '套装阶段只支持 20级 / 40级 / 60级。',
+            ]);
+        }
+
+        if ($setId !== null) {
+            $equipmentSet = EquipmentSet::query()->find($setId);
+            if (! $equipmentSet instanceof EquipmentSet) {
+                throw ValidationException::withMessages([
+                    'set_id' => '所选套装配置不存在，请重新选择。',
+                ]);
+            }
+
+            $data['set_id'] = $setId;
+            $data['set_line_id'] = static::nullableString($equipmentSet->set_line_id);
+            $data['set_stage'] = (int) $equipmentSet->stage;
+
+            return $data;
+        }
+
+        if (($setLineId === null) xor ($setStage === null)) {
+            throw ValidationException::withMessages([
+                'set_line_id' => '未选择所属套装配置时，套装线和套装阶段必须同时填写，或同时留空。',
+                'set_stage' => '未选择所属套装配置时，套装线和套装阶段必须同时填写，或同时留空。',
+            ]);
+        }
+
+        $data['set_id'] = null;
+        $data['set_line_id'] = $setLineId;
+        $data['set_stage'] = $setStage;
+
+        return $data;
+    }
+
+    protected static function validateUpgradeRelationsOrFail(array $data): void
+    {
+        $messages = [];
+        $upgradeFrom = static::nullableString($data['upgrade_from_template_id'] ?? null);
+        $upgradeTo = static::nullableString($data['upgrade_to_template_id'] ?? null);
+        $blueprintItemId = static::nullableString($data['blueprint_item_id'] ?? null);
+
+        if ($upgradeFrom !== null && ! array_key_exists($upgradeFrom, static::resolveUpgradeFromTemplateOptionsFromData($data))) {
+            $messages['upgrade_from_template_id'] = '升品来源模板与当前模板的部位、归类或品质链不匹配，请重新选择。';
+        }
+
+        if ($upgradeTo !== null && ! array_key_exists($upgradeTo, static::resolveUpgradeToTemplateOptionsFromData($data))) {
+            $messages['upgrade_to_template_id'] = '可升到模板与当前模板的部位、归类或品质链不匹配，请重新选择。';
+        }
+
+        if ($blueprintItemId !== null && ! array_key_exists($blueprintItemId, static::resolveBlueprintItemOptionsFromData($data))) {
+            $messages['blueprint_item_id'] = '图纸物品与当前模板的部位或套装上下文不匹配，请重新选择。';
+        }
+
+        if ($messages !== []) {
+            throw ValidationException::withMessages($messages);
+        }
+    }
+
+    protected static function resolveUpgradeFromTemplateOptions(Get $get): array
+    {
+        return static::resolveUpgradeFromTemplateOptionsFromData(static::extractRelationContextFromGet($get));
+    }
+
+    protected static function resolveUpgradeFromTemplateOptionsFromData(array $data): array
+    {
+        if (($data['quality_tier'] ?? null) !== 'high' || blank($data['slot'] ?? null) || blank($data['equip_type'] ?? null)) {
+            return [];
+        }
+
+        $query = static::buildRelatedTemplateQuery($data)
+            ->where('quality_tier', 'normal');
+
+        static::applyUpgradeContextFilters($query, $data);
+
+        return static::mapTemplateOptions($query);
+    }
+
+    protected static function resolveUpgradeToTemplateOptions(Get $get): array
+    {
+        return static::resolveUpgradeToTemplateOptionsFromData(static::extractRelationContextFromGet($get));
+    }
+
+    protected static function resolveUpgradeToTemplateOptionsFromData(array $data): array
+    {
+        if (($data['quality_tier'] ?? null) !== 'normal' || blank($data['slot'] ?? null) || blank($data['equip_type'] ?? null)) {
+            return [];
+        }
+
+        $query = static::buildRelatedTemplateQuery($data)
+            ->where('quality_tier', 'high');
+
+        static::applyUpgradeContextFilters($query, $data);
+
+        return static::mapTemplateOptions($query);
+    }
+
+    protected static function resolveBlueprintItemOptions(Get $get): array
+    {
+        return static::resolveBlueprintItemOptionsFromData(static::extractRelationContextFromGet($get));
+    }
+
+    protected static function resolveBlueprintItemOptionsFromData(array $data): array
+    {
+        if (blank($data['slot'] ?? null) || blank($data['equip_type'] ?? null)) {
+            return [];
+        }
+
+        $candidateIds = static::resolveBlueprintCandidateIds($data);
+        if ($candidateIds === []) {
+            return [];
+        }
+
+        return Item::query()
+            ->where('is_enabled', true)
+            ->where('type', 'blueprint')
+            ->whereIn('id', $candidateIds)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Item $item): array => [$item->id => (string) $item->name])
+            ->all();
+    }
+
+    protected static function extractRelationContextFromGet(Get $get): array
+    {
+        return static::hydrateSetContext([
+            'id' => static::nullableString($get('id')),
+            'slot' => static::nullableString($get('slot')),
+            'equip_type' => static::nullableString($get('equip_type')),
+            'quality_tier' => static::nullableString($get('quality_tier')),
+            'required_level' => filled($get('required_level')) ? (int) $get('required_level') : null,
+            'set_id' => static::nullableString($get('set_id')),
+            'set_line_id' => static::nullableString($get('set_line_id')),
+            'set_stage' => filled($get('set_stage')) ? (int) $get('set_stage') : null,
+            'forge_family_id' => static::nullableString($get('forge_family_id')),
+        ]);
+    }
+
+    protected static function hydrateSetContext(array $data): array
+    {
+        $setId = static::nullableString($data['set_id'] ?? null);
+        if ($setId === null) {
+            return $data;
+        }
+
+        $equipmentSet = EquipmentSet::query()->find($setId);
+        if (! $equipmentSet instanceof EquipmentSet) {
+            return $data;
+        }
+
+        $data['set_line_id'] = static::nullableString($equipmentSet->set_line_id);
+        $data['set_stage'] = (int) $equipmentSet->stage;
+
+        return $data;
+    }
+
+    protected static function buildRelatedTemplateQuery(array $data): Builder
+    {
+        $query = EquipTemplate::query()
+            ->where('is_enabled', true);
+
+        if (filled($data['slot'] ?? null)) {
+            $query->where('slot', (string) $data['slot']);
+        }
+
+        if (filled($data['equip_type'] ?? null)) {
+            $query->where('equip_type', (string) $data['equip_type']);
+        }
+
+        $currentId = static::nullableString($data['id'] ?? null);
+        if ($currentId !== null) {
+            $query->where('id', '!=', $currentId);
+        }
+
+        return $query;
+    }
+
+    protected static function applyUpgradeContextFilters(Builder $query, array $data): void
+    {
+        if (filled($data['forge_family_id'] ?? null)) {
+            $query->where('forge_family_id', (string) $data['forge_family_id']);
+        }
+
+        if (filled($data['set_line_id'] ?? null)) {
+            $query->where('set_line_id', (string) $data['set_line_id']);
+        }
+
+        if (($data['set_stage'] ?? null) !== null) {
+            $query->where('set_stage', (int) $data['set_stage']);
+        }
+
+        if (($data['required_level'] ?? null) !== null) {
+            $query->where('required_level', (int) $data['required_level']);
+        }
+    }
+
+    protected static function mapTemplateOptions(Builder $query): array
+    {
+        return $query
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (EquipTemplate $template): array => [$template->id => (string) $template->name])
+            ->all();
+    }
+
+    protected static function resolveBlueprintCandidateIds(array $data): array
+    {
+        $query = EquipTemplate::query()
+            ->where('is_enabled', true)
+            ->whereNotNull('blueprint_item_id')
+            ->where('blueprint_item_id', '!=', '');
+
+        if (filled($data['slot'] ?? null)) {
+            $query->where('slot', (string) $data['slot']);
+        }
+
+        if (filled($data['equip_type'] ?? null)) {
+            $query->where('equip_type', (string) $data['equip_type']);
+        }
+
+        if (filled($data['forge_family_id'] ?? null)) {
+            $query->where('forge_family_id', (string) $data['forge_family_id']);
+        }
+
+        if (filled($data['set_line_id'] ?? null)) {
+            $query->where('set_line_id', (string) $data['set_line_id']);
+        }
+
+        if (($data['set_stage'] ?? null) !== null) {
+            $query->where('set_stage', (int) $data['set_stage']);
+        } elseif (($data['required_level'] ?? null) !== null) {
+            $query->where('required_level', (int) $data['required_level']);
+        }
+
+        $candidateIds = $query
+            ->orderBy('sort_order')
+            ->pluck('blueprint_item_id')
+            ->filter(fn (?string $value): bool => filled($value))
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($candidateIds !== []) {
+            return $candidateIds;
+        }
+
+        $derivedSetBlueprintId = static::resolveDerivedSetBlueprintId($data);
+        if ($derivedSetBlueprintId !== null) {
+            return [$derivedSetBlueprintId];
+        }
+
+        return [];
+    }
+
+    protected static function resolveDerivedSetBlueprintId(array $data): ?string
+    {
+        $setLineId = static::nullableString($data['set_line_id'] ?? null);
+        $setStage = isset($data['set_stage']) && $data['set_stage'] !== null ? (int) $data['set_stage'] : null;
+
+        if ($setLineId === null || ! in_array($setStage, [40, 60], true)) {
+            return null;
+        }
+
+        $itemId = sprintf('bp_%s_%d', str_replace('setline_', 'set_', $setLineId), $setStage);
+
+        return Item::query()
+            ->where('is_enabled', true)
+            ->where('type', 'blueprint')
+            ->where('id', $itemId)
+            ->value('id');
+    }
+
+    protected static function nullableString(mixed $value): ?string
+    {
+        $trimmed = trim((string) ($value ?? ''));
+
+        return $trimmed === '' ? null : $trimmed;
+    }
+
+    protected static function displayStatLabel(string $stat): string
+    {
+        return trim((string) preg_replace('/（[^）]*）/u', '', AdminOptions::optionLabel(AdminOptions::statOptions(), $stat)));
     }
 
     protected static function statEntryRepeater(
@@ -419,33 +771,24 @@ class EquipTemplateResource extends Resource
         int $minItems = 0,
     ): Repeater {
         $repeater = Repeater::make($name)
-            ->label($label)
+            ->hiddenLabel()
             ->default([])
             ->columns(12)
-            ->reorderableWithButtons()
-            ->itemLabel(function (array $state) use ($valueLabel): ?string {
-                $stat = trim((string) ($state['stat'] ?? ''));
-                if ($stat === '') {
-                    return null;
-                }
-
-                return sprintf(
-                    '%s %s %d',
-                    AdminOptions::optionLabel(AdminOptions::statOptions(), $stat),
-                    $valueLabel,
-                    max(0, (int) ($state['value'] ?? 0)),
-                );
-            })
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->table([
+                TableColumn::make('属性'),
+                TableColumn::make($valueLabel),
+            ])
             ->schema([
                 Select::make('stat')
-                    ->label('属性')
                     ->options(AdminOptions::statOptions())
                     ->searchable()
                     ->preload()
                     ->required()
                     ->columnSpan(7),
                 TextInput::make('value')
-                    ->label($valueLabel)
                     ->integer()
                     ->minValue(0)
                     ->required()

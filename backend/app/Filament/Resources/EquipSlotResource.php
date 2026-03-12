@@ -6,12 +6,12 @@ use App\Filament\Resources\EquipSlotResource\Pages;
 use App\Models\EquipSlot;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -21,7 +21,7 @@ class EquipSlotResource extends Resource
 {
     protected static ?string $model = EquipSlot::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-columns';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     protected static ?string $navigationLabel = '装备槽位';
 
@@ -29,11 +29,11 @@ class EquipSlotResource extends Resource
 
     protected static ?string $pluralModelLabel = '装备槽位';
 
-    protected static ?string $navigationGroup = '基础配置';
+    protected static string | \UnitEnum | null $navigationGroup = '基础配置';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('槽位基础信息')
                 ->description('部位是固定枚举，选择后会自动带出中文名称。')
                 ->schema([
@@ -89,12 +89,12 @@ class EquipSlotResource extends Resource
                 Tables\Filters\SelectFilter::make('slot_id')->label('部位')->options(AdminOptions::slotOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Item;
 use App\Services\ExportMetaService;
+use App\Support\AdminOptions;
+use App\Support\ItemEffectRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use RuntimeException;
@@ -27,8 +29,11 @@ class ExportItemsJson extends Command
                     'name' => (string) $item->name,
                     'rarity' => (string) $item->rarity,
                     'type' => (string) $item->type,
+                    'type_name' => AdminOptions::optionLabel(AdminOptions::itemTypeOptions(), (string) $item->type),
                     'sub_type' => (string) ($item->sub_type ?? ''),
+                    'sub_type_name' => AdminOptions::itemSubTypeLabel((string) $item->type, (string) ($item->sub_type ?? ''), (string) ($item->material_type ?? '')),
                     'material_type' => (string) ($item->material_type ?? ''),
+                    'material_type_name' => AdminOptions::itemMaterialTypeLabel((string) ($item->material_type ?? '')),
                     'stack_limit' => (int) ($item->stack_limit ?? 9999),
                     'drop_unlock_level' => (int) ($item->drop_unlock_level ?? 1),
                     'can_compose' => (bool) ($item->can_compose ?? false),
@@ -47,27 +52,45 @@ class ExportItemsJson extends Command
                     $row['desc'] = (string) $item->desc;
                 }
 
-                if (is_array($item->gem_effect) && $item->gem_effect !== []) {
-                    $row['gem_effect'] = $item->gem_effect;
-                }
-
                 if (filled($item->effect_type)) {
                     $row['effect_type'] = (string) $item->effect_type;
+                    $row['effect_type_name'] = ItemEffectRegistry::effectTypeLabel((string) $item->type, (string) ($item->sub_type ?? ''), (string) $item->effect_type);
                 }
                 if (filled($item->target_scope)) {
                     $row['target_scope'] = (string) $item->target_scope;
+                    $targetScopeName = ItemEffectRegistry::targetScopeLabel((string) $item->type, (string) ($item->sub_type ?? ''), (string) $item->target_scope);
+                    if ($targetScopeName !== '') {
+                        $row['target_scope_name'] = $targetScopeName;
+                    }
                 }
+                $effectSummary = ItemEffectRegistry::effectSummary($item);
                 if (is_array($item->effect_payload) && $item->effect_payload !== []) {
                     $row['effect_payload'] = $item->effect_payload;
                 }
+                if ($effectSummary !== '') {
+                    $row['effect_summary'] = $effectSummary;
+                }
                 if (is_array($item->socket_limit) && $item->socket_limit !== []) {
                     $row['socket_limit'] = array_values($item->socket_limit);
+                    $row['socket_limit_names'] = array_values(array_map(
+                        fn ($value): string => AdminOptions::optionLabel([
+                            '1' => '第1孔',
+                            '2' => '第2孔',
+                            '3' => '第3孔',
+                            '4' => '第4孔',
+                            'attr' => '属性孔',
+                            'skill' => '技能孔',
+                        ], (string) $value),
+                        $row['socket_limit'],
+                    ));
                 }
                 if (is_array($item->source_tags) && $item->source_tags !== []) {
                     $row['source_tags'] = array_values($item->source_tags);
+                    $row['source_tag_names'] = AdminOptions::optionLabels(AdminOptions::itemSourceTagOptions(), $row['source_tags']);
                 }
                 if (is_array($item->use_tags) && $item->use_tags !== []) {
                     $row['use_tags'] = array_values($item->use_tags);
+                    $row['use_tag_names'] = AdminOptions::optionLabels(AdminOptions::itemUseTagOptions(), $row['use_tags']);
                 }
 
                 return $row;
@@ -85,8 +108,7 @@ class ExportItemsJson extends Command
                 'orange' => ['r' => 1.0, 'g' => 0.56, 'b' => 0.18, 'a' => 1.0],
             ],
         ];
-        $version = ExportMetaService::getNextVersion('items');
-        $meta = ExportMetaService::makeMeta('items', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('items', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -102,7 +124,7 @@ class ExportItemsJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'items.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d items -> %s (version=%d)', count($items), $path, $version));
+        $this->info(sprintf('Exported %d items -> %s', count($items), $path));
 
         return self::SUCCESS;
     }

@@ -51,8 +51,7 @@ class ExportEquipmentSetsJson extends Command
         $payloadWithoutMeta = [
             'equipment_sets' => $rows,
         ];
-        $version = ExportMetaService::getNextVersion('equipment_sets');
-        $meta = ExportMetaService::makeMeta('equipment_sets', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('equipment_sets', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -68,7 +67,7 @@ class ExportEquipmentSetsJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'equipment_sets.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d equipment sets -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d equipment sets -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

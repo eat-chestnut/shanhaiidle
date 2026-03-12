@@ -8,14 +8,15 @@ use App\Support\AdminOptions;
 use Filament\Actions\Action;
 use Filament\Forms\Components\MultiSelect;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Artisan;
@@ -27,7 +28,7 @@ class BattleDefaultsPage extends Page implements HasForms
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = '战斗默认配置';
 
@@ -35,9 +36,9 @@ class BattleDefaultsPage extends Page implements HasForms
 
     protected static ?int $navigationSort = 99;
 
-    protected static ?string $navigationGroup = '系统配置';
+    protected static string | \UnitEnum | null $navigationGroup = '系统配置';
 
-    protected static string $view = 'filament.pages.battle-defaults-page';
+    protected string $view = 'filament.pages.battle-defaults-page';
 
     public ?array $data = [];
 
@@ -47,9 +48,9 @@ class BattleDefaultsPage extends Page implements HasForms
         $this->form->fill($this->toFormState(BattleDefaultsService::loadConfig()));
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Tabs::make('BattleDefaultsTabs')
                     ->persistTabInQueryString()
@@ -107,20 +108,23 @@ class BattleDefaultsPage extends Page implements HasForms
                                 Section::make('按稀有度掉落池')
                                     ->description('掉落池统一用可搜索多选录入，不允许手输物品 ID。')
                                     ->schema([
-                                        MultiSelect::make('drops.items_by_rarity.white')
+                                        Select::make('drops.items_by_rarity.white')
                                             ->label('白色掉落池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->itemOptions())
                                             ->searchable()
                                             ->preload()
                                             ->required()
                                             ->minItems(1),
-                                        MultiSelect::make('drops.items_by_rarity.blue')
+                                        Select::make('drops.items_by_rarity.blue')
                                             ->label('蓝色掉落池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->itemOptions())
                                             ->searchable()
                                             ->preload(),
-                                        MultiSelect::make('drops.items_by_rarity.gold')
+                                        Select::make('drops.items_by_rarity.gold')
                                             ->label('金色掉落池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->itemOptions())
                                             ->searchable()
                                             ->preload(),
@@ -138,8 +142,9 @@ class BattleDefaultsPage extends Page implements HasForms
                                             ->numeric()
                                             ->minValue(0)
                                             ->maxValue(1),
-                                        MultiSelect::make('special_drops.normal.extra_gems')
+                                        Select::make('special_drops.normal.extra_gems')
                                             ->label('宝石池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->gemOptions())
                                             ->searchable()
                                             ->preload(),
@@ -159,8 +164,9 @@ class BattleDefaultsPage extends Page implements HasForms
                                             ->numeric()
                                             ->minValue(0)
                                             ->maxValue(1),
-                                        MultiSelect::make('special_drops.elite.extra_gems')
+                                        Select::make('special_drops.elite.extra_gems')
                                             ->label('宝石池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->gemOptions())
                                             ->searchable()
                                             ->preload()
@@ -187,8 +193,9 @@ class BattleDefaultsPage extends Page implements HasForms
                                             ->numeric()
                                             ->minValue(0)
                                             ->maxValue(1),
-                                        MultiSelect::make('special_drops.boss.extra_gems')
+                                        Select::make('special_drops.boss.extra_gems')
                                             ->label('宝石池')
+                                            ->multiple()
                                             ->options(fn (): array => $this->gemOptions())
                                             ->searchable()
                                             ->preload()
@@ -298,6 +305,9 @@ class BattleDefaultsPage extends Page implements HasForms
                                             ->required()
                                             ->minItems(1)
                                             ->defaultItems(1)
+                                            ->reorderable(false)
+                                            ->reorderableWithButtons(false)
+                                            ->reorderableWithDragAndDrop(false)
                                             ->schema([
                                                 TextInput::make('w')
                                                     ->label('权重')
@@ -316,16 +326,16 @@ class BattleDefaultsPage extends Page implements HasForms
                                                 Select::make('stat')
                                                     ->label('属性')
                                                     ->options(fn (): array => $this->statOptions())
-                                                    ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat')
-                                                    ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'stat')
-                                                    ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'stat'),
+                                                    ->required(fn (Get $get): bool => $get('type') === 'stat')
+                                                    ->hidden(fn (Get $get): bool => $get('type') !== 'stat')
+                                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'stat'),
                                                 Select::make('skill_id')
                                                     ->label('技能')
                                                     ->options(fn (): array => $this->skillOptions())
                                                     ->searchable()
-                                                    ->required(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level')
-                                                    ->hidden(fn (\Filament\Forms\Get $get): bool => $get('type') !== 'skill_level')
-                                                    ->dehydrated(fn (\Filament\Forms\Get $get): bool => $get('type') === 'skill_level'),
+                                                    ->required(fn (Get $get): bool => $get('type') === 'skill_level')
+                                                    ->hidden(fn (Get $get): bool => $get('type') !== 'skill_level')
+                                                    ->dehydrated(fn (Get $get): bool => $get('type') === 'skill_level'),
                                                 TextInput::make('val')
                                                     ->label('数值')
                                                     ->required()
@@ -349,6 +359,9 @@ class BattleDefaultsPage extends Page implements HasForms
             ->label($label)
             ->defaultItems(0)
             ->addActionLabel('添加材料')
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
             ->collapsible()
             ->columnSpanFull()
             ->schema([

@@ -212,6 +212,10 @@ func _class_name(class_id: String) -> String:
 	return class_id
 
 func _default_class_id(balance: Dictionary) -> String:
+	var growth_initial := _initial_growth_cfg()
+	var from_growth := str(growth_initial.get("current_class", "")).strip_edges()
+	if not from_growth.is_empty():
+		return from_growth
 	var starter_any = balance.get("starter", {})
 	if starter_any is Dictionary:
 		var starter: Dictionary = starter_any
@@ -230,6 +234,9 @@ func _default_class_id(balance: Dictionary) -> String:
 	return "bing"
 
 func _default_skill_points(balance: Dictionary) -> int:
+	var growth_initial := _initial_growth_cfg()
+	if growth_initial.has("skill_points"):
+		return maxi(0, int(growth_initial.get("skill_points", 1)))
 	var starter_any = balance.get("starter", {})
 	if starter_any is Dictionary:
 		var starter: Dictionary = starter_any
@@ -250,6 +257,16 @@ func _balance_cfg() -> Dictionary:
 	var balance_any = cfg.get("balance", {})
 	if balance_any is Dictionary:
 		return balance_any
+	return {}
+
+func _character_growth_cfg() -> Dictionary:
+	return ConfigService.get_character_growth_rules()
+
+func _initial_growth_cfg() -> Dictionary:
+	var growth := _character_growth_cfg()
+	var initial_any = growth.get("initial", {})
+	if initial_any is Dictionary:
+		return initial_any
 	return {}
 
 func _is_valid_ai_profile(p: String) -> bool:

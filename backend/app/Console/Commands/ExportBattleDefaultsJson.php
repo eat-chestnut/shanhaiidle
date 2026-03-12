@@ -22,8 +22,7 @@ class ExportBattleDefaultsJson extends Command
         $payloadWithoutMeta = [
             'battle' => $battle,
         ];
-        $version = ExportMetaService::getNextVersion('battle_defaults');
-        $meta = ExportMetaService::makeMeta('battle_defaults', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('battle_defaults', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -39,9 +38,8 @@ class ExportBattleDefaultsJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'battle_defaults.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported battle defaults -> %s (version=%d)', $path, $version));
+        $this->info(sprintf('Exported battle defaults -> %s', $path));
 
         return self::SUCCESS;
     }
 }
-

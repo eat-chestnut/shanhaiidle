@@ -67,19 +67,9 @@ func refresh() -> void:
 			var row: Dictionary = rows[i]
 			var item_id := str(row.get("id", ""))
 			var item_name := str(row.get("name", item_id))
-			var effect_any = row.get("gem_effect", {})
-			if effect_any is Dictionary:
-				var effect: Dictionary = effect_any
-				var stat := str(effect.get("stat", "")).strip_edges()
-				var val := int(effect.get("val", 0))
-				if not stat.is_empty() and val != 0:
-					var is_percent := stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT"
-					item_name = "%s（%s+%d%s）" % [
-						item_name,
-						I18nService.stat(stat),
-						val,
-						"%" if is_percent else ""
-					]
+			var effect_summary := EquipmentModel.describe_gem_effect(row)
+			if not effect_summary.is_empty():
+				item_name = "%s（%s）" % [item_name, effect_summary]
 			var rarity := str(row.get("rarity", "white"))
 			var count := int(row.get("count", 1))
 			var icon_path := str(row.get("icon", ""))

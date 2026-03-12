@@ -40,8 +40,7 @@ class ExportMaterialCatalogJson extends Command
             ->all();
 
         $payloadWithoutMeta = ['material_catalog' => $rows];
-        $version = ExportMetaService::getNextVersion('material_catalog');
-        $meta = ExportMetaService::makeMeta('material_catalog', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('material_catalog', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -57,7 +56,7 @@ class ExportMaterialCatalogJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'material_catalog_v1.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d material items -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d material items -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

@@ -37,8 +37,7 @@ class ExportSkillsCatalogJson extends Command
         $payloadWithoutMeta = [
             'skills_catalog' => $rows,
         ];
-        $version = ExportMetaService::getNextVersion('skills_catalog');
-        $meta = ExportMetaService::makeMeta('skills_catalog', $version, $payloadWithoutMeta);
+        $meta = ExportMetaService::makeMeta('skills_catalog', $payloadWithoutMeta);
         $payload = ['meta' => $meta] + $payloadWithoutMeta;
 
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -54,7 +53,7 @@ class ExportSkillsCatalogJson extends Command
         $path = $dir . DIRECTORY_SEPARATOR . 'skills_catalog.json';
         File::put($path, $json);
 
-        $this->info(sprintf('Exported %d skills -> %s (version=%d)', count($rows), $path, $version));
+        $this->info(sprintf('Exported %d skills -> %s', count($rows), $path));
 
         return self::SUCCESS;
     }

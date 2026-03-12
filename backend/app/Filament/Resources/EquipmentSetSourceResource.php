@@ -7,12 +7,12 @@ use App\Models\EquipmentSetSource;
 use App\Support\AdminOptions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Get;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -22,11 +22,11 @@ use Filament\Tables\Table;
 class EquipmentSetSourceResource extends Resource
 {
     protected static ?string $model = EquipmentSetSource::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
     protected static ?string $navigationLabel = '套装来源';
     protected static ?string $modelLabel = '套装来源';
     protected static ?string $pluralModelLabel = '套装来源';
-    protected static ?string $navigationGroup = '世界观与主线';
+    protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
     public static function normalizeFormData(array $data): array
     {
@@ -40,9 +40,9 @@ class EquipmentSetSourceResource extends Resource
         return $data;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->description('这里只维护套装阶段概览、图纸需求和主材料标识。实际打造数量与真实成本统一在“打造配方”页维护。')
                 ->schema([
@@ -75,7 +75,7 @@ class EquipmentSetSourceResource extends Resource
                         ->searchable()
                         ->preload()
                         ->visible(fn (Get $get): bool => (string) $get('need_blueprint') === '1')
-                        ->helperText('如果该阶段需要图纸，这里只绑定图纸物品；图纸实际来源请在地图掉落 / Boss掉落 / 物品资料中维护。'),
+                        ->helperText('如果该阶段需要图纸，这里只绑定图纸物品；图纸实际来源请在 Boss掉落 / 物品资料中维护。'),
                     TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
                     Radio::make('is_enabled')
                         ->label('启用')
@@ -87,7 +87,7 @@ class EquipmentSetSourceResource extends Resource
                 ])
                 ->columns(3),
             Section::make('套装说明')
-                ->description('来源地图、来源 Boss、材料出处不再在本页维护，统一回到物品、地图掉落和 Boss掉落页面。')
+                ->description('来源地图、来源 Boss、材料出处不再在本页维护，统一回到物品和 Boss掉落页面。')
                 ->schema([
                     Textarea::make('craft_desc')
                         ->label('套装说明')
@@ -102,7 +102,7 @@ class EquipmentSetSourceResource extends Resource
                     FileUpload::make('image_path')->label('展示图')->disk('public')->directory('config/set-sources/images')->image()->imagePreviewHeight('100'),
                 ])
                 ->columns(2),
-        ]);
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -123,10 +123,10 @@ class EquipmentSetSourceResource extends Resource
                 Tables\Filters\TernaryFilter::make('need_blueprint')->label('需要图纸'),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->recordActions([\Filament\Actions\EditAction::make()])
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

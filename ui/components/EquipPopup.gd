@@ -504,7 +504,7 @@ func _calc_instance_stat_contrib(inst: Dictionary) -> Dictionary:
 			continue
 		var effect := _gem_effect(gem_id)
 		var stat := _normalize_stat_key(str(effect.get("stat", "")))
-		var val := int(effect.get("val", 0))
+		var val := int(round(float(effect.get("value", 0.0))))
 		if totals.has(stat):
 			totals[stat] = int(totals.get(stat, 0)) + val
 	return totals
@@ -621,7 +621,7 @@ func _count_filled_sockets(socket_gems: Array[String]) -> int:
 	return n
 
 func _stat_value_text(stat: String, val: int) -> String:
-	var is_percent := stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT"
+	var is_percent := _is_percent_stat(stat)
 	return "%s +%d%s" % [_stat_label(stat), val, "%" if is_percent else ""]
 
 func _format_stat_lines(stats: Dictionary) -> Array[String]:
@@ -854,7 +854,8 @@ func _format_effect_cn(e: Dictionary) -> String:
 	if effect_type == "stat":
 		var stat := str(e.get("stat", ""))
 		var name := I18nService.stat(stat)
-		if stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT":
+		var value_mode := str(e.get("value_mode", "")).strip_edges()
+		if value_mode == "percent" or _is_percent_stat(stat):
 			return "%s+%d%%" % [name, val]
 		return "%s+%d" % [name, val]
 	if effect_type == "skill_level":
@@ -912,6 +913,9 @@ func _normalize_stat_key(stat: String) -> String:
 		_:
 			return stat
 
+func _is_percent_stat(stat: String) -> bool:
+	return stat == "LOOT_BONUS_PERCENT" or stat == "CRIT_PERCENT" or stat == "CRIT_DMG" or stat == "ATK_SPEED" or stat == "CDR"
+
 func _normalize_socket_gems(gems_any: Variant, sockets: int) -> Array[String]:
 	var arr: Array[String] = []
 	if gems_any is Array:
@@ -938,10 +942,7 @@ func _gem_effect(gem_id: String) -> Dictionary:
 		var item_def: Dictionary = item_any
 		if str(item_def.get("id", "")) != gem_id:
 			continue
-		var effect_any: Variant = item_def.get("gem_effect", {})
-		if effect_any is Dictionary:
-			return effect_any
-		return {}
+		return EquipmentModel.get_gem_stat_bonus(item_def)
 	return {}
 
 func _find_equipment_set_def(set_id: String) -> Dictionary:

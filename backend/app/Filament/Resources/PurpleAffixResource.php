@@ -5,12 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PurpleAffixResource\Pages;
 use App\Models\PurpleAffix;
 use App\Support\AdminOptions;
-use Filament\Forms\Components\MultiSelect;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +20,7 @@ class PurpleAffixResource extends Resource
 {
     protected static ?string $model = PurpleAffix::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $navigationLabel = '紫词条池';
 
@@ -29,11 +28,11 @@ class PurpleAffixResource extends Resource
 
     protected static ?string $pluralModelLabel = '紫色词条池';
 
-    protected static ?string $navigationGroup = '装备成长';
+    protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Section::make('基础信息')
                 ->description('紫色词条用于洗练，录入规则与蓝词条保持一致。')
                 ->schema([
@@ -45,13 +44,12 @@ class PurpleAffixResource extends Resource
                         'gold' => '金色',
                     ])->default('purple')->required(),
                 ])
-                ->columns(2),
+                ->columns(4),
             Section::make('适用范围')
                 ->schema([
-                    MultiSelect::make('slot_tags')->label('部位')->options(AdminOptions::slotOptions())->searchable()->preload(),
-                    MultiSelect::make('flow_tags')->label('流派')->options(AdminOptions::flowOptions())->searchable()->preload(),
+                    Select::make('slot_tags')->multiple()->label('部位')->options(AdminOptions::slotOptions())->searchable()->preload(),
                 ])
-                ->columns(2),
+                ->columns(1),
             Section::make('数值与启用')
                 ->schema([
                     TextInput::make('min_value')->label('最小值')->integer()->required()->default(0)->minValue(0),
@@ -84,12 +82,12 @@ class PurpleAffixResource extends Resource
                 Tables\Filters\SelectFilter::make('stat')->label('属性')->options(AdminOptions::statOptions()),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

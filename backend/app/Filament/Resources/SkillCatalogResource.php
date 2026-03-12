@@ -5,13 +5,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SkillCatalogResource\Pages;
 use App\Models\SkillCatalog;
 use App\Support\AdminOptions;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -21,15 +21,15 @@ use Filament\Tables\Table;
 class SkillCatalogResource extends Resource
 {
     protected static ?string $model = SkillCatalog::class;
-    protected static ?string $navigationIcon = 'heroicon-o-bolt';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
     protected static ?string $navigationLabel = '技能字典';
     protected static ?string $pluralModelLabel = '技能字典';
     protected static ?string $modelLabel = '技能';
-    protected static ?string $navigationGroup = '基础配置';
+    protected static string | \UnitEnum | null $navigationGroup = '基础配置';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Tabs::make('SkillCatalogTabs')
                 ->persistTabInQueryString()
                 ->tabs([
@@ -47,7 +47,7 @@ class SkillCatalogResource extends Resource
                                 ->columns(2),
                         ]),
                 ]),
-        ]);
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -63,12 +63,12 @@ class SkillCatalogResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用状态'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                \Filament\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');

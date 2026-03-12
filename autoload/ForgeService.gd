@@ -466,15 +466,7 @@ func _equip_templates() -> Array:
 	return []
 
 func _find_template(template_id: String) -> Dictionary:
-	if template_id.strip_edges().is_empty():
-		return {}
-	for row_any in _equip_templates():
-		if not (row_any is Dictionary):
-			continue
-		var row: Dictionary = row_any
-		if str(row.get("id", "")).strip_edges() == template_id:
-			return row
-	return {}
+	return EquipmentModel.get_template(template_id)
 
 func _is_template_forge_enabled(tpl: Dictionary) -> bool:
 	if tpl.has("forge_enabled"):
