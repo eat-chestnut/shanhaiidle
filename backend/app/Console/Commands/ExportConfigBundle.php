@@ -41,6 +41,7 @@ class ExportConfigBundle extends Command
         ['key' => 'shop_goods', 'command' => 'game:export-shop-goods', 'source' => 'shop_goods_v1.json', 'filename' => 'shop_goods_v1.json'],
         ['key' => 'crafting_recipes', 'command' => 'game:export-crafting-recipes', 'source' => 'crafting_recipes_v1.json', 'filename' => 'crafting_recipes_v1.json'],
         ['key' => 'world_names', 'command' => 'game:export-world-names', 'source' => 'world_names_v1.json', 'filename' => 'world_names_v1.json'],
+        ['key' => 'main_stage_module', 'command' => 'game:export-main-stage-module', 'source' => 'main_stage_module_v1.json', 'filename' => 'main_stage_module_v1.json'],
         ['key' => 'story_chapters', 'command' => 'game:export-story-chapters', 'source' => 'story_chapters_v1.json', 'filename' => 'story_chapters_v1.json'],
         ['key' => 'story_maps', 'command' => 'game:export-story-maps', 'source' => 'story_maps_v1.json', 'filename' => 'story_maps_v1.json'],
         ['key' => 'story_bosses', 'command' => 'game:export-story-bosses', 'source' => 'story_bosses_v1.json', 'filename' => 'story_bosses_v1.json'],

@@ -6,6 +6,7 @@ use App\Models\BlueAffix;
 use App\Models\EquipTemplate;
 use App\Models\EquipmentSet;
 use App\Models\Item;
+use App\Models\MainStageChapter;
 use App\Models\MaterialDungeonDropGroup;
 use App\Models\Monster;
 use App\Models\SkillCatalog;
@@ -848,6 +849,28 @@ class AdminOptions
             ->orderBy('sort_order')
             ->get()
             ->mapWithKeys(fn (StoryChapter $chapter): array => [$chapter->chapter_id => sprintf('%s（%s）', $chapter->chapter_name, $chapter->chapter_id)])
+            ->all();
+    }
+
+    public static function mainStageChapterOptions(?string $exceptChapterId = null): array
+    {
+        return MainStageChapter::query()
+            ->where('is_enabled', true)
+            ->when(filled($exceptChapterId), fn ($query) => $query->where('chapter_id', '!=', $exceptChapterId))
+            ->orderBy('sort_order')
+            ->get()
+            ->mapWithKeys(fn (MainStageChapter $chapter): array => [$chapter->chapter_id => (string) $chapter->chapter_name])
+            ->all();
+    }
+
+    public static function mainStageCombatChapterOptions(): array
+    {
+        return MainStageChapter::query()
+            ->where('is_enabled', true)
+            ->where('has_combat', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->mapWithKeys(fn (MainStageChapter $chapter): array => [$chapter->chapter_id => (string) $chapter->chapter_name])
             ->all();
     }
 

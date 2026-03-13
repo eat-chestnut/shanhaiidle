@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ShopGoodsSeeder::class,
             MonstersSeeder::class,
             StagesSeeder::class,
+            MainStageModuleSeeder::class,
             NanshanYijingWorldSeeder::class,
         ]);
     }

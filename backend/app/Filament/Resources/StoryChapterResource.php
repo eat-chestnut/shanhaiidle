@@ -27,6 +27,11 @@ class StoryChapterResource extends Resource
     protected static ?string $pluralModelLabel = '章节文案';
     protected static string | \UnitEnum | null $navigationGroup = '世界观与主线';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
