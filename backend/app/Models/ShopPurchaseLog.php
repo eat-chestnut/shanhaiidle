@@ -13,11 +13,12 @@ class ShopPurchaseLog extends Model
     protected $fillable = [
         'player_id',
         'goods_id',
-        'shop_type',
+        'shop_tab',
+        'goods_type',
         'reward_item_id',
         'reward_count',
-        'cost_currency_type',
-        'cost_amount',
+        'price_item_id',
+        'price_amount',
         'quantity',
         'purchased_at',
         'reset_bucket_date',
@@ -28,7 +29,7 @@ class ShopPurchaseLog extends Model
 
     protected $casts = [
         'reward_count' => 'integer',
-        'cost_amount' => 'integer',
+        'price_amount' => 'integer',
         'quantity' => 'integer',
         'purchased_at' => 'datetime',
         'reset_bucket_date' => 'date',

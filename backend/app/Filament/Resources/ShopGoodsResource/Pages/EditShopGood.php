@@ -10,6 +10,11 @@ class EditShopGood extends EditRecord
 {
     protected static string $resource = ShopGoodsResource::class;
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return ShopGoodsResource::normalizeFormDataOrFail($data);
+    }
+
     protected function getHeaderActions(): array
     {
         return [

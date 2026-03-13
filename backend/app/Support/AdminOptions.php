@@ -128,22 +128,19 @@ class AdminOptions
         ];
     }
 
-    public static function shopTypeOptions(): array
+    public static function shopTabOptions(): array
     {
-        return [
-            'gold' => '金币商城',
-            'crystal' => '晶石商城',
-            'contribution' => '贡献商城',
-        ];
+        return \App\Models\ShopGood::SHOP_TAB_OPTIONS;
     }
 
-    public static function shopCurrencyOptions(): array
+    public static function shopGoodsTypeOptions(): array
     {
-        return [
-            'gold' => '金币',
-            'crystal' => '晶石',
-            'contribution' => '宗门贡献',
-        ];
+        return \App\Models\ShopGood::GOODS_TYPE_OPTIONS;
+    }
+
+    public static function shopBuyLimitTypeOptions(): array
+    {
+        return \App\Models\ShopGood::BUY_LIMIT_TYPE_OPTIONS;
     }
 
     public static function outputTypeOptions(): array
@@ -704,6 +701,24 @@ class AdminOptions
     public static function giftPackContentItemOptions(): array
     {
         return self::itemOptions(fn (Builder $query): Builder => $query->where('main_type', '!=', 'gift_pack'));
+    }
+
+    public static function shopRewardItemOptions(?string $goodsType = null): array
+    {
+        return match ($goodsType) {
+            'direct_item' => self::giftPackContentItemOptions(),
+            'gift_pack' => self::giftPackCarrierItemOptions(),
+            default => self::itemOptions(),
+        };
+    }
+
+    public static function shopPriceItemOptions(): array
+    {
+        return self::itemOptions(
+            fn (Builder $query): Builder => $query
+                ->where('main_type', 'currency')
+                ->whereIn('item_id', ShopGoodsSupport::supportedPriceItemIds())
+        );
     }
 
     public static function monsterOptions(?string $kind = null, ?string $chapterId = null): array

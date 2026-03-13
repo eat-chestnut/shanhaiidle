@@ -37,7 +37,8 @@ class ShopPurchaseController extends Controller
         return response()->json([
             'success' => true,
             'goods_id' => $result['goods_id'],
-            'shop_type' => $result['shop_type'],
+            'shop_tab' => $result['shop_tab'],
+            'goods_type' => $result['goods_type'],
             'granted_items' => $result['granted_items'],
             'updated_currencies' => $result['updated_currencies'],
             'remaining_limits' => $result['remaining_limits'],

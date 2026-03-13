@@ -196,7 +196,9 @@
 - 礼包本体本身也应存在于 `items`
 - 礼包内容通过 `gift_pack_items.item_id` 继续引用 `items.item_id`
 - V1 禁止 `gift_pack_items.item_id` 再指向 `gift_pack` 类型 item
-- 商城商品的 `reward_item_id` 优先引用 `items.item_id`
+- 商城商品的 `reward_item_id` 与 `price_item_id` 都统一引用 `items.item_id`
+- 商城商品一次只卖单个 `reward_item_id`
+- 多奖励商城商品必须先做成礼包 item，再由 `shop_goods.reward_item_id` 指向该礼包 item
 - 成品实体与配置定义分离：
   - 蓝装模板不是 item
   - 蓝装成品是 item
@@ -209,6 +211,14 @@
 - 礼包主表 `gift_packs.item_id` 必须命中对应礼包 item
 - 礼包内容表 `gift_pack_items.item_id` 只引用普通 item，不再拆成货币 / 材料 / 装备多套结构
 - `recommended_sect` 仅是礼包自选内容的展示标签，不是领取限制
+
+## 商城承载方式
+
+- `shop_goods.reward_item_id` 统一引用 `items.item_id`
+- `shop_goods.price_item_id` 统一引用 `items.item_id`
+- `goods_type = direct_item` 时直接售卖单个 item
+- `goods_type = gift_pack` 时售卖礼包 item
+- 商城表不直接挂多条奖励明细，多奖励必须通过礼包 item 承载
 
 ## 数据源规则
 
