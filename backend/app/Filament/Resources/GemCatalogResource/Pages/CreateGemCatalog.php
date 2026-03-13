@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\GemCatalogResource\Pages;
 
 use App\Filament\Resources\GemCatalogResource;
-use App\Support\GemEffectRegistry;
+use App\Support\GemModuleSupport;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateGemCatalog extends CreateRecord
@@ -12,8 +12,6 @@ class CreateGemCatalog extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['type'] = 'gem';
-
-        return GemEffectRegistry::normalizeRecordDataOrFail($data);
+        return GemModuleSupport::normalizeRowOrFail($data);
     }
 }

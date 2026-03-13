@@ -21,7 +21,8 @@
 - 主线章节 / 难度 / 副本
 - 蓝色词条本体
 - 套装线 / 套装效果定义
-- 宝石类型定义 / 护符类型定义
+- 宝石配置定义（写入 `gems`）
+- 护符类型定义
 - 掉落条目 / 奖励条目
 - 蓝装模板
 
@@ -88,6 +89,13 @@
 - `can_reforge`
 
 这些字段不是新的统一锚点口径，但在当前版本中仍可承接旧专用模块的扩展属性。
+
+其中宝石正式效果配置已迁移到 `gems`：
+
+- `items` 只承接宝石成品 item
+- `gems.item_id` 统一引用 `items.item_id`
+- 后续掉落、礼包、商城都应引用宝石 `item_id`
+- `gems` 本身不负责孔位、镶嵌、合成、分解
 
 ## quality 与 rarity
 
@@ -207,8 +215,20 @@
 - 成品实体与配置定义分离：
   - 蓝装模板不是 item
   - 蓝装成品是 item
+  - 宝石配置不是 item，宝石成品是 item
   - 套装线不是 item
   - 套装成品装备是 item
+
+## 宝石承载方式
+
+- 宝石成品是 item，正式 carrier 为 `items.item_id`
+- `gems.item_id` 必须命中对应宝石 item
+- `items.main_type` 必须为 `gem`
+- `items.sub_type` 当前只支持：
+  - `attr_gem`
+  - `skill_gem`
+- `slot_group` 定义写在 `gems`，用于表达属性孔 / 技能孔的使用边界
+- 掉落、礼包、商城后续都通过宝石 `item_id` 引用，不直接发 `gem_id`
 
 ## 礼包承载方式
 

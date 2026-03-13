@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Item;
+use App\Models\Gem;
 use App\Services\ExportMetaService;
+use App\Services\GemModuleImportService;
+use App\Support\GemModuleSupport;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use RuntimeException;
@@ -16,31 +18,12 @@ class ExportGemCatalogJson extends Command
 
     public function handle(): int
     {
-        $rows = Item::query()
+        $rows = Gem::query()
             ->where('is_enabled', true)
-            ->where('type', 'gem')
             ->orderBy('sort_order')
             ->orderBy('display_name')
             ->get()
-            ->map(function (Item $item): array {
-                return [
-                    'item_id' => (string) $item->item_id,
-                    'display_name' => (string) $item->display_name,
-                    'id' => (string) $item->item_id,
-                    'name' => (string) $item->display_name,
-                    'gem_type' => (string) ($item->sub_type ?? 'attr'),
-                    'rarity' => (string) $item->rarity,
-                    'effect_type' => (string) ($item->effect_type ?? 'stat'),
-                    'target_scope' => (string) ($item->target_scope ?? 'global'),
-                    'effect_payload' => is_array($item->effect_payload) ? $item->effect_payload : [],
-                    'drop_unlock_level' => (int) ($item->drop_unlock_level ?? 1),
-                    'socket_limit' => is_array($item->socket_limit) ? array_values($item->socket_limit) : [],
-                    'can_compose' => (bool) ($item->can_compose ?? false),
-                    'can_reforge' => (bool) ($item->can_reforge ?? false),
-                    'icon' => (string) ($item->icon ?? ''),
-                    'sort_order' => (int) ($item->sort_order ?? 0),
-                ];
-            })
+            ->map(fn (Gem $gem): array => GemModuleSupport::exportRow($gem))
             ->values()
             ->all();
 
@@ -60,6 +43,7 @@ class ExportGemCatalogJson extends Command
 
         $path = $dir . DIRECTORY_SEPARATOR . 'gem_catalog_v1.json';
         File::put($path, $json);
+        File::put(base_path(GemModuleImportService::PROJECT_DATA_FILE), $json);
 
         $this->info(sprintf('Exported %d gems -> %s', count($rows), $path));
 

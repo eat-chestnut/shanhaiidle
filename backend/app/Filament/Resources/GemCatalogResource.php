@@ -3,15 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GemCatalogResource\Pages;
-use App\Models\Item;
+use App\Models\Gem;
 use App\Support\AdminOptions;
-use App\Support\GemEffectRegistry;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\MultiSelect;
+use App\Support\GemModuleSupport;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -21,115 +19,139 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class GemCatalogResource extends Resource
 {
-    protected static ?string $model = Item::class;
+    protected static ?string $model = Gem::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-sparkles';
 
-    protected static ?string $navigationLabel = '宝石目录';
+    protected static ?string $navigationLabel = '宝石配置';
 
     protected static ?string $modelLabel = '宝石';
 
-    protected static ?string $pluralModelLabel = '宝石目录';
+    protected static ?string $pluralModelLabel = '宝石配置';
 
     protected static string | \UnitEnum | null $navigationGroup = '基础配置';
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('type', 'gem');
-    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Hidden::make('type')->default('gem'),
-            Hidden::make('effect_type')->default(GemEffectRegistry::effectTypeForGemType('attr')),
             Section::make('基础信息')
+                ->description('宝石成品统一由 items.item_id 承接；gems 只维护宝石配置，不处理掉落、镶嵌、合成与开孔逻辑。')
                 ->schema([
-                    TextInput::make('id')->label('宝石 ID')->required()->maxLength(64)->unique(ignoreRecord: true),
-                    TextInput::make('name')->label('名称')->required()->maxLength(255),
-                    Select::make('sub_type')
-                        ->label('宝石类型')
-                        ->options(AdminOptions::gemTypeOptions())
+                    TextInput::make('gem_id')
+                        ->label('宝石 ID')
                         ->required()
-                        ->default('attr')
+                        ->maxLength(64)
+                        ->unique(ignoreRecord: true, column: 'gem_id')
+                        ->disabled(fn (?Gem $record): bool => $record !== null)
+                        ->helperText('宝石业务唯一 ID，建议创建后保持稳定。'),
+                    Select::make('item_id')
+                        ->label('成品物品')
+                        ->options(fn (Get $get): array => GemModuleSupport::itemOptions((string) $get('gem_type')))
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->unique(ignoreRecord: true, column: 'item_id')
+                        ->helperText('只允许选择 `main_type = gem` 且 `sub_type` 与当前 gem_type 一致的 item；后续掉落、礼包、商城都应通过该 item_id 引用宝石。'),
+                    TextInput::make('gem_name')
+                        ->label('内部名称')
+                        ->required()
+                        ->maxLength(255)
+                        ->helperText('配置内部使用的名称。'),
+                    TextInput::make('display_name')
+                        ->label('展示名称')
+                        ->required()
+                        ->maxLength(255)
+                        ->helperText('前端展示名称。'),
+                    Select::make('gem_type')
+                        ->label('宝石类型')
+                        ->options(Gem::GEM_TYPE_OPTIONS)
+                        ->required()
+                        ->default('attr_gem')
                         ->live()
                         ->afterStateUpdated(function (Set $set, ?string $state): void {
-                            $set('effect_type', GemEffectRegistry::effectTypeForGemType($state));
-                            if ($state === 'skill') {
-                                $set('target_scope', null);
-
-                                return;
-                            }
-
-                            $set('target_scope', GemEffectRegistry::defaultTargetScope('attr'));
-                        }),
-                    Select::make('rarity')->label('稀有度')->required()->options(AdminOptions::rarityOptions())->default('white'),
-                    TextInput::make('drop_unlock_level')->label('掉落开放等级')->integer()->minValue(1)->required()->default(1),
+                            $set('slot_group', GemModuleSupport::defaultSlotGroupForGemType($state));
+                            $set('stat_key', null);
+                            $set('item_id', null);
+                        })
+                        ->helperText('首版仅支持 attr_gem / skill_gem 两类。'),
+                    TextInput::make('icon')
+                        ->label('图标')
+                        ->maxLength(255)
+                        ->helperText('可填写资源路径；为空时由前端自行兜底。'),
+                    Textarea::make('summary')
+                        ->label('效果简述')
+                        ->rows(3)
+                        ->helperText('用于前端展示的简短效果说明。')
+                        ->columnSpanFull(),
+                    TextInput::make('sort_order')
+                        ->label('排序')
+                        ->integer()
+                        ->minValue(0)
+                        ->default(0)
+                        ->required(),
+                    Toggle::make('is_enabled')
+                        ->label('启用')
+                        ->default(true),
+                    Textarea::make('remark')
+                        ->label('备注')
+                        ->rows(2)
+                        ->columnSpanFull(),
                 ])
                 ->columns(3),
             Section::make('效果配置')
-                ->description('按宝石类型填写结构化效果，不再手输程序键名。')
+                ->description('直接配置 stat_key + value_type + value，不依赖公式自动生成。')
                 ->schema([
-                    Section::make('属性效果')
-                        ->schema([
-                            Select::make('effect_form.stat')
-                                ->label('属性')
-                                ->options(GemEffectRegistry::pureStatOptions())
-                                ->searchable()
-                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill'),
-                            TextInput::make('effect_form.value')
-                                ->label('数值')
-                                ->numeric()
-                                ->step(0.0001)
-                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill'),
-                            Select::make('effect_form.value_type')
-                                ->label('数值类型')
-                                ->options(AdminOptions::valueModeOptions())
-                                ->required(fn (Get $get): bool => $get('sub_type') !== 'skill')
-                                ->default('flat'),
-                        ])
-                        ->columns(3)
-                        ->visible(fn (Get $get): bool => $get('sub_type') !== 'skill'),
-                    Section::make('技能效果')
-                        ->schema([
-                            Select::make('target_scope')
-                                ->label('作用技能')
-                                ->options(fn (): array => GemEffectRegistry::skillTargetOptions())
-                                ->searchable()
-                                ->preload()
-                                ->required(fn (Get $get): bool => $get('sub_type') === 'skill'),
-                            Select::make('effect_form.effect_template_code')
-                                ->label('效果模板')
-                                ->options(GemEffectRegistry::skillTemplateOptions())
-                                ->searchable()
-                                ->preload()
-                                ->live()
-                                ->required(fn (Get $get): bool => $get('sub_type') === 'skill'),
-                            ...static::skillParamInputs(),
-                        ])
-                        ->columns(3)
-                        ->visible(fn (Get $get): bool => $get('sub_type') === 'skill'),
-                    Select::make('socket_limit')->label('可镶嵌孔位')->multiple()->options([
-                        '1' => '第1孔',
-                        '2' => '第2孔',
-                        '3' => '第3孔',
-                        '4' => '第4孔',
-                        'attr' => '属性孔',
-                        'skill' => '技能孔',
-                    ])->searchable()->preload()->helperText('第1/2孔通常为属性孔，第3/4孔通常为技能孔。')->columnSpanFull(),
+                    Select::make('stat_key')
+                        ->label('作用 Key')
+                        ->options(fn (Get $get): array => GemModuleSupport::statKeyOptions((string) $get('gem_type')))
+                        ->searchable()
+                        ->required()
+                        ->helperText('属性宝石与技能宝石使用不同的正式 key，禁止填写随意中文文本。'),
+                    Select::make('value_type')
+                        ->label('数值类型')
+                        ->options(Gem::VALUE_TYPE_OPTIONS)
+                        ->required()
+                        ->default('flat')
+                        ->helperText('flat = 固定值；percent = 百分比。'),
+                    TextInput::make('value')
+                        ->label('数值')
+                        ->numeric()
+                        ->step(0.0001)
+                        ->required()
+                        ->helperText('直接填写宝石实际数值，不从公式推导。'),
                 ])
-                ->columns(2),
-            Section::make('图片与状态')
+                ->columns(3),
+            Section::make('展示与使用')
+                ->description('slot_group 用于表达属性孔 / 技能孔的使用边界，本模块不处理开孔或镶嵌逻辑。')
                 ->schema([
-                    FileUpload::make('icon')->label('图标')->disk('public')->directory('config/gem-icons')->image()->imagePreviewHeight('120'),
-                    Toggle::make('can_compose')->label('可合成')->default(true),
-                    Toggle::make('can_reforge')->label('可洗炼')->default(false),
-                    Toggle::make('is_enabled')->label('启用')->default(true),
-                    TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
+                    Select::make('quality')
+                        ->label('玩法品质')
+                        ->options(AdminOptions::qualityOptions())
+                        ->required()
+                        ->default('white')
+                        ->helperText('首版保留 white / blue / purple / gold / red 五档。'),
+                    Select::make('rarity')
+                        ->label('展示稀有度')
+                        ->options(AdminOptions::rarityOptions())
+                        ->required()
+                        ->default('white')
+                        ->helperText('用于 UI 展示层级，可与 quality 同值。'),
+                    Select::make('slot_group')
+                        ->label('孔位分组')
+                        ->options(Gem::SLOT_GROUP_OPTIONS)
+                        ->required()
+                        ->default('attr_only')
+                        ->helperText('attr_gem 只能用 attr_only；skill_gem 只能用 skill_only。'),
+                    TextInput::make('unlock_level')
+                        ->label('解锁等级')
+                        ->integer()
+                        ->minValue(1)
+                        ->required()
+                        ->default(1)
+                        ->helperText('用于表示可获得或可使用的最低/推荐等级。'),
                 ])
                 ->columns(4),
         ])->columns(1);
@@ -139,25 +161,25 @@ class GemCatalogResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('宝石 ID')->searchable()->sortable(),
-                TextColumn::make('name')->label('名称')->searchable(),
-                TextColumn::make('sub_type')->label('大类')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::gemTypeOptions(), $state)),
-                TextColumn::make('rarity')->label('稀有度')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::rarityOptions(), $state)),
-                TextColumn::make('effect_payload')
-                    ->label('效果')
-                    ->formatStateUsing(fn ($state, Item $record): string => GemEffectRegistry::effectSummary(
-                        is_array($state) ? $state : [],
-                        (string) ($record->target_scope ?? '')
-                    )),
-                TextColumn::make('drop_unlock_level')->label('掉落等级'),
-                ToggleColumn::make('can_compose')->label('合成'),
-                ToggleColumn::make('can_reforge')->label('洗炼'),
+                TextColumn::make('gem_id')->label('宝石 ID')->searchable()->sortable(),
+                TextColumn::make('item_id')->label('物品 ID')->searchable()->sortable(),
+                TextColumn::make('display_name')->label('展示名称')->searchable()->sortable(),
+                TextColumn::make('gem_type')->label('宝石类型')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(Gem::GEM_TYPE_OPTIONS, $state))->badge()->sortable(),
+                TextColumn::make('stat_key')->label('作用 Key')->searchable()->sortable(),
+                TextColumn::make('value_type')->label('数值类型')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(Gem::VALUE_TYPE_OPTIONS, $state))->badge(),
+                TextColumn::make('value')
+                    ->label('数值')
+                    ->formatStateUsing(fn (int|float|string|null $state): int|float => GemModuleSupport::normalizeNumericValue((float) $state)),
+                TextColumn::make('quality')->label('玩法品质')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::qualityOptions(), $state))->badge()->sortable(),
+                TextColumn::make('slot_group')->label('孔位分组')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(Gem::SLOT_GROUP_OPTIONS, $state))->badge()->sortable(),
+                TextColumn::make('unlock_level')->label('解锁等级')->sortable(),
                 ToggleColumn::make('is_enabled')->label('启用'),
                 TextColumn::make('sort_order')->label('排序')->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('sub_type')->label('宝石大类')->options(AdminOptions::gemTypeOptions()),
-                Tables\Filters\SelectFilter::make('rarity')->label('稀有度')->options(AdminOptions::rarityOptions()),
+                Tables\Filters\SelectFilter::make('gem_type')->label('宝石类型')->options(Gem::GEM_TYPE_OPTIONS),
+                Tables\Filters\SelectFilter::make('quality')->label('玩法品质')->options(AdminOptions::qualityOptions()),
+                Tables\Filters\SelectFilter::make('slot_group')->label('孔位分组')->options(Gem::SLOT_GROUP_OPTIONS),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
             ->recordActions([
@@ -178,28 +200,5 @@ class GemCatalogResource extends Resource
             'create' => Pages\CreateGemCatalog::route('/create'),
             'edit' => Pages\EditGemCatalog::route('/{record}/edit'),
         ];
-    }
-
-    protected static function skillParamInputs(): array
-    {
-        $inputs = [];
-
-        foreach (GemEffectRegistry::skillParamDefinitions() as $paramKey => $definition) {
-            $templateCodes = [];
-            foreach (GemEffectRegistry::skillTemplates() as $templateCode => $template) {
-                if (array_key_exists($paramKey, $template['params'] ?? [])) {
-                    $templateCodes[] = $templateCode;
-                }
-            }
-
-            $inputs[] = TextInput::make("effect_form.{$paramKey}")
-                ->label((string) $definition['label'])
-                ->numeric()
-                ->step($definition['step'] ?? 0.0001)
-                ->minValue($definition['min'] ?? 0)
-                ->visible(fn (Get $get): bool => $get('sub_type') === 'skill' && in_array((string) $get('effect_form.effect_template_code'), $templateCodes, true));
-        }
-
-        return $inputs;
     }
 }

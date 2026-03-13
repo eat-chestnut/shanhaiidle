@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             ItemsSeeder::class,
+            GemsSeeder::class,
             GiftPackModuleSeeder::class,
             EquipSlotsSeeder::class,
             EquipmentSetsSeeder::class,

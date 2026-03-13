@@ -1,663 +1,105 @@
 {
     "meta": {
         "key": "gem_catalog",
-        "version": 12,
-        "exported_at": "2026-03-11 08:06:12",
-        "sha256": "becc9d69d925c756a2b74cd7a848f480e2dd0049d68aa22e31317f42b74653dd"
+        "schema_version": 1,
+        "exported_at": "2026-03-13 12:03:49",
+        "sha256": "3856623a6c42a1711e32aaed3992d563ba55f8dd683c4713d40178b2fb3171d5"
     },
     "gem_catalog": [
         {
-            "id": "妖王核心",
-            "name": "妖王核心",
-            "gem_type": "skill",
-            "rarity": "gold",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "damage_up",
-                "params": {
-                    "damage_multiplier": 0.08
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "res://assets/icons/icon_ld_02.png",
-            "sort_order": 100
-        },
-        {
-            "id": "赤晶石",
-            "name": "赤晶石",
-            "gem_type": "attr",
+            "gem_id": "gem_attr_attack_white_01",
+            "item_id": "itm_gem_attr_chijinshi_white",
+            "gem_name": "赤金石",
+            "display_name": "赤金石",
+            "gem_type": "attr_gem",
+            "stat_key": "MELEE_ATK",
+            "value_type": "flat",
+            "value": 6,
+            "quality": "white",
             "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "ATK",
-                    "value": 2,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 1,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
+            "slot_group": "attr_only",
+            "unlock_level": 23,
             "icon": "",
-            "sort_order": 1620
+            "summary": "近战攻击 +6",
+            "sort_order": 900070,
+            "is_enabled": true,
+            "remark": "属性宝石最小样例。"
         },
         {
-            "id": "沧澜石",
-            "name": "沧澜石",
-            "gem_type": "attr",
-            "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "HP",
-                    "value": 12,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 1,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1630
-        },
-        {
-            "id": "青木石",
-            "name": "青木石",
-            "gem_type": "attr",
-            "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "DEF",
-                    "value": 2,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 1,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1640
-        },
-        {
-            "id": "裂石符玉",
-            "name": "裂石符玉",
-            "gem_type": "skill",
+            "gem_id": "gem_attr_hp_blue_01",
+            "item_id": "itm_gem_attr_baiyujing_blue",
+            "gem_name": "白玉晶",
+            "display_name": "白玉晶",
+            "gem_type": "attr_gem",
+            "stat_key": "HP",
+            "value_type": "flat",
+            "value": 90,
+            "quality": "blue",
             "rarity": "blue",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "damage_up",
-                "params": {
-                    "damage_multiplier": 0.08
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": false,
+            "slot_group": "attr_only",
+            "unlock_level": 23,
             "icon": "",
-            "sort_order": 1650
+            "summary": "生命 +90",
+            "sort_order": 900080,
+            "is_enabled": true,
+            "remark": "属性宝石最小样例。"
         },
         {
-            "id": "赤金石",
-            "name": "赤金石",
-            "gem_type": "attr",
-            "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "ATK",
-                    "value": 6,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1660
-        },
-        {
-            "id": "白玉晶",
-            "name": "白玉晶",
-            "gem_type": "attr",
-            "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "HP",
-                    "value": 28,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1670
-        },
-        {
-            "id": "青雘珠",
-            "name": "青雘珠",
-            "gem_type": "attr",
-            "rarity": "white",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "DEF",
-                    "value": 6,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1680
-        },
-        {
-            "id": "鹿蜀纹石",
-            "name": "鹿蜀纹石",
-            "gem_type": "attr",
-            "rarity": "blue",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "CRIT_RATE",
-                    "value": 2,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1690
-        },
-        {
-            "id": "狌狌血玉",
-            "name": "狌狌血玉",
-            "gem_type": "attr",
-            "rarity": "blue",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "ATK_SPEED",
-                    "value": 3,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 20,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1700
-        },
-        {
-            "id": "迷榖风晶",
-            "name": "迷榖风晶",
-            "gem_type": "attr",
-            "rarity": "blue",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "DODGE",
-                    "value": 3,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 20,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1710
-        },
-        {
-            "id": "祝余灵晶",
-            "name": "祝余灵晶",
-            "gem_type": "attr",
-            "rarity": "blue",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "HP",
-                    "value": 48,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 20,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1720
-        },
-        {
-            "id": "育沛珠",
-            "name": "育沛珠",
-            "gem_type": "attr",
-            "rarity": "blue",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "SPELL_ATK",
-                    "value": 8,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 20,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1730
-        },
-        {
-            "id": "英水灵珠",
-            "name": "英水灵珠",
-            "gem_type": "attr",
+            "gem_id": "gem_attr_speed_purple_01",
+            "item_id": "itm_gem_attr_yingshuilingzhu_purple",
+            "gem_name": "英水灵珠",
+            "display_name": "英水灵珠",
+            "gem_type": "attr_gem",
+            "stat_key": "ATK_SPEED",
+            "value_type": "percent",
+            "value": 0.9,
+            "quality": "purple",
             "rarity": "purple",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "RANGED_ATK",
-                    "value": 8,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": true,
+            "slot_group": "attr_only",
+            "unlock_level": 28,
             "icon": "",
-            "sort_order": 1740
+            "summary": "攻击速度 +0.9%",
+            "sort_order": 900090,
+            "is_enabled": true,
+            "remark": "属性宝石最小样例。"
         },
         {
-            "id": "赤鱬内珠",
-            "name": "赤鱬内珠",
-            "gem_type": "attr",
-            "rarity": "purple",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "FINAL_DAMAGE",
-                    "value": 2,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 50,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": true,
+            "gem_id": "gem_skill_frost_blue_01",
+            "item_id": "itm_gem_skill_qingqiuyin_blue",
+            "gem_name": "青丘印",
+            "display_name": "青丘印",
+            "gem_type": "skill_gem",
+            "stat_key": "skill_frost_focus",
+            "value_type": "percent",
+            "value": 8,
+            "quality": "blue",
+            "rarity": "blue",
+            "slot_group": "skill_only",
+            "unlock_level": 40,
             "icon": "",
-            "sort_order": 1750
+            "summary": "寒霜技能效果 +8%",
+            "sort_order": 900100,
+            "is_enabled": true,
+            "remark": "技能宝石代表样例。"
         },
         {
-            "id": "旋龟甲石",
-            "name": "旋龟甲石",
-            "gem_type": "attr",
-            "rarity": "purple",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "PDEF",
-                    "value": 10,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1760
-        },
-        {
-            "id": "白金髓",
-            "name": "白金髓",
-            "gem_type": "attr",
+            "gem_id": "gem_skill_flame_gold_01",
+            "item_id": "itm_gem_skill_chiyuyin_gold",
+            "gem_name": "赤鱬印",
+            "display_name": "赤鱬印",
+            "gem_type": "skill_gem",
+            "stat_key": "skill_flame_focus",
+            "value_type": "percent",
+            "value": 18,
+            "quality": "gold",
             "rarity": "gold",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "MDEF",
-                    "value": 10,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 60,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": true,
+            "slot_group": "skill_only",
+            "unlock_level": 40,
             "icon": "",
-            "sort_order": 1770
-        },
-        {
-            "id": "灌灌羽晶",
-            "name": "灌灌羽晶",
-            "gem_type": "attr",
-            "rarity": "gold",
-            "effect_type": "stat",
-            "target_scope": "global",
-            "effect_payload": {
-                "effect_code": "add_attr",
-                "params": {
-                    "stat": "CRIT_DMG",
-                    "value": 6,
-                    "value_type": "flat"
-                }
-            },
-            "drop_unlock_level": 60,
-            "socket_limit": [
-                1,
-                2
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1780
-        },
-        {
-            "id": "gem_skill_xingxing_seal",
-            "name": "狌狌印",
-            "gem_type": "skill",
-            "rarity": "blue",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "range_up",
-                "params": {
-                    "range_multiplier": 0.08
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1790
-        },
-        {
-            "id": "gem_skill_lushu_seal",
-            "name": "鹿蜀印",
-            "gem_type": "skill",
-            "rarity": "blue",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "crit_up",
-                "params": {
-                    "crit_rate_bonus": 0.1
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1800
-        },
-        {
-            "id": "gem_skill_xuangui_seal",
-            "name": "旋龟印",
-            "gem_type": "skill",
-            "rarity": "blue",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "shield_up",
-                "params": {
-                    "shield_multiplier": 0.12
-                }
-            },
-            "drop_unlock_level": 40,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": false,
-            "icon": "",
-            "sort_order": 1810
-        },
-        {
-            "id": "gem_skill_guanguan_seal",
-            "name": "灌灌印",
-            "gem_type": "skill",
-            "rarity": "purple",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "cooldown_down",
-                "params": {
-                    "cooldown_reduction": 0.06
-                }
-            },
-            "drop_unlock_level": 50,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1820
-        },
-        {
-            "id": "gem_skill_migu_seal",
-            "name": "迷榖印",
-            "gem_type": "skill",
-            "rarity": "purple",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "duration_up",
-                "params": {
-                    "duration_multiplier": 0.12
-                }
-            },
-            "drop_unlock_level": 50,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1830
-        },
-        {
-            "id": "gem_skill_chiyu_seal",
-            "name": "赤鱬印",
-            "gem_type": "skill",
-            "rarity": "purple",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "burn_up",
-                "params": {
-                    "burn_multiplier": 0.15
-                }
-            },
-            "drop_unlock_level": 50,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1840
-        },
-        {
-            "id": "gem_skill_qingqiu_seal",
-            "name": "青丘印",
-            "gem_type": "skill",
-            "rarity": "gold",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "slow_up",
-                "params": {
-                    "slow_multiplier": 0.12
-                }
-            },
-            "drop_unlock_level": 60,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1850
-        },
-        {
-            "id": "gem_skill_yingshui_seal",
-            "name": "英水印",
-            "gem_type": "skill",
-            "rarity": "gold",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "mana_cost_down",
-                "params": {
-                    "mana_cost_reduction": 0.1
-                }
-            },
-            "drop_unlock_level": 60,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1860
-        },
-        {
-            "id": "gem_skill_jiwei_seal",
-            "name": "箕尾镇印",
-            "gem_type": "skill",
-            "rarity": "gold",
-            "effect_type": "skill_modifier",
-            "target_scope": "BING_01",
-            "effect_payload": {
-                "effect_code": "damage_up",
-                "params": {
-                    "damage_multiplier": 0.18
-                }
-            },
-            "drop_unlock_level": 60,
-            "socket_limit": [
-                3,
-                4
-            ],
-            "can_compose": true,
-            "can_reforge": true,
-            "icon": "",
-            "sort_order": 1870
+            "summary": "炎火技能效果 +18%",
+            "sort_order": 900110,
+            "is_enabled": true,
+            "remark": "gold 档结构验证样例。"
         }
     ]
 }
