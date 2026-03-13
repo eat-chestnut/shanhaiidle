@@ -1,0 +1,297 @@
+{
+  "version": "v1",
+  "module": "equipment_rule_resolver_examples",
+  "return_format": {
+    "ok": "boolean",
+    "reason": "string|null",
+    "data": "object|null"
+  },
+  "set_effect_resolver_example": {
+    "input": {
+      "loadouts": [
+        { "slot_type": "main_weapon", "instance_id": "eq_inst_set_weapon_40_a001" },
+        { "slot_type": "sub_weapon", "instance_id": "eq_inst_set_sub_weapon_40_a001" },
+        { "slot_type": "armor", "instance_id": "eq_inst_set_armor_40_a001" },
+        { "slot_type": "shoe", "instance_id": "eq_inst_set_shoe_40_a001" },
+        { "slot_type": "talisman", "instance_id": "eq_inst_talisman_40_a001" }
+      ],
+      "equipment_instances": [
+        {
+          "instance_id": "eq_inst_set_weapon_40_a001",
+          "set_id": "set_zhaoyao_40",
+          "slot_type": "main_weapon"
+        },
+        {
+          "instance_id": "eq_inst_set_sub_weapon_40_a001",
+          "set_id": "set_zhaoyao_40",
+          "slot_type": "sub_weapon"
+        },
+        {
+          "instance_id": "eq_inst_set_armor_40_a001",
+          "set_id": "set_zhaoyao_40",
+          "slot_type": "armor"
+        },
+        {
+          "instance_id": "eq_inst_set_shoe_40_a001",
+          "set_id": "set_zhaoyao_40",
+          "slot_type": "shoe"
+        },
+        {
+          "instance_id": "eq_inst_talisman_40_a001",
+          "set_id": null,
+          "slot_type": "talisman"
+        }
+      ],
+      "set_effects": [
+        {
+          "set_id": "set_zhaoyao_40",
+          "piece_count": 2,
+          "effect_key": "bonus_melee_atk",
+          "value_type": "percent",
+          "value": 8
+        },
+        {
+          "set_id": "set_zhaoyao_40",
+          "piece_count": 4,
+          "effect_key": "bonus_crit_rate",
+          "value_type": "percent",
+          "value": 6
+        },
+        {
+          "set_id": "set_zhaoyao_40",
+          "piece_count": 6,
+          "effect_key": "bonus_boss_dmg",
+          "value_type": "percent",
+          "value": 12
+        }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "set_counts": [
+          {
+            "set_id": "set_zhaoyao_40",
+            "equipped_count": 4
+          }
+        ],
+        "activated_effects": [
+          {
+            "set_id": "set_zhaoyao_40",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 8
+          },
+          {
+            "set_id": "set_zhaoyao_40",
+            "piece_count": 4,
+            "effect_key": "bonus_crit_rate",
+            "value_type": "percent",
+            "value": 6
+          }
+        ]
+      }
+    }
+  },
+  "talisman_star_link_resolver_example": {
+    "input": {
+      "loadouts": [
+        { "slot_type": "main_weapon", "instance_id": "eq_inst_mw" },
+        { "slot_type": "sub_weapon", "instance_id": "eq_inst_sw" },
+        { "slot_type": "armor", "instance_id": "eq_inst_ar" },
+        { "slot_type": "ring_1", "instance_id": "eq_inst_r1" },
+        { "slot_type": "ring_2", "instance_id": "eq_inst_r2" },
+        { "slot_type": "talisman", "instance_id": "eq_inst_tal" }
+      ],
+      "equipment_instances": [
+        { "instance_id": "eq_inst_mw", "star": 6, "slot_type": "main_weapon" },
+        { "instance_id": "eq_inst_sw", "star": 6, "slot_type": "sub_weapon" },
+        { "instance_id": "eq_inst_ar", "star": 6, "slot_type": "armor" },
+        { "instance_id": "eq_inst_r1", "star": 6, "slot_type": "ring_1" },
+        { "instance_id": "eq_inst_r2", "star": 6, "slot_type": "ring_2" },
+        { "instance_id": "eq_inst_tal", "star": 0, "slot_type": "talisman" }
+      ],
+      "talisman_star_links": [
+        {
+          "required_equipment_star": 6,
+          "effect_key": "bonus_skill_dmg",
+          "value_type": "percent",
+          "value": 5
+        },
+        {
+          "required_equipment_star": 8,
+          "effect_key": "bonus_crit_dmg",
+          "value_type": "percent",
+          "value": 10
+        }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "qualified_star_links": [
+          {
+            "required_equipment_star": 6,
+            "effect_key": "bonus_skill_dmg",
+            "value_type": "percent",
+            "value": 5
+          }
+        ],
+        "missing_requirements": [
+          {
+            "required_equipment_star": 8,
+            "reason": "one or more participating slots have stars below 8"
+          }
+        ]
+      }
+    }
+  },
+  "gem_slot_resolver_example": {
+    "input": {
+      "instance": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "star": 3
+      },
+      "slot_unlock_rules": [
+        { "required_star": 3, "slot_index": 1, "slot_group": "attr_only" },
+        { "required_star": 6, "slot_index": 2, "slot_group": "attr_only" },
+        { "required_star": 8, "slot_index": 3, "slot_group": "skill_only" },
+        { "required_star": 10, "slot_index": 4, "slot_group": "skill_only" }
+      ],
+      "gem_item": {
+        "item_id": "itm_gem_attr_chijinshi_white"
+      },
+      "gem_config": {
+        "item_id": "itm_gem_attr_chijinshi_white",
+        "slot_group": "attr_only"
+      }
+    },
+    "resolved_slots_output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "star": 3,
+        "unlocked_slots": [
+          {
+            "slot_index": 1,
+            "slot_group": "attr_only",
+            "required_star": 3
+          }
+        ]
+      }
+    },
+    "can_socket_output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "allowed": true
+      }
+    }
+  },
+  "stage_progression_resolver_example": {
+    "input": {
+      "instance": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "set_level": 20,
+        "star": 3,
+        "max_star": 3
+      },
+      "progression_rules": [
+        {
+          "from_set_level": 20,
+          "to_set_level": 40,
+          "required_max_star": 3,
+          "star_keep_mode": "keep_current_star"
+        }
+      ],
+      "recipe_map": [
+        {
+          "from_set_level": 20,
+          "to_set_level": 40,
+          "slot_type": "main_weapon",
+          "result_item_id": "itm_set_main_weapon_zhaoyao_40"
+        }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "can_progress": true,
+        "next_state": {
+          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "set_level": 40,
+          "star": 3,
+          "max_star": 6
+        }
+      }
+    }
+  },
+  "blue_affix_eligibility_resolver_example": {
+    "input": {
+      "instance": {
+        "instance_id": "eq_inst_blue_ring_45_a001",
+        "item_id": "itm_blue_ring_45",
+        "slot_type": "ring_1"
+      },
+      "blue_template": {
+        "template_id": "blue_ring_45",
+        "slot_type": "ring",
+        "level_band": 45
+      },
+      "blue_affixes": [
+        {
+          "affix_id": "affix_boss_dmg_45",
+          "effect_key": "bonus_boss_dmg",
+          "value_min": 3.0,
+          "value_max": 6.0,
+          "level_band": 45
+        },
+        {
+          "affix_id": "affix_crit_dmg_45",
+          "effect_key": "bonus_crit_dmg",
+          "value_min": 4.0,
+          "value_max": 8.0,
+          "level_band": 45
+        },
+        {
+          "affix_id": "affix_hp_35",
+          "effect_key": "bonus_hp",
+          "value_min": 90,
+          "value_max": 150,
+          "level_band": 35
+        }
+      ],
+      "blue_affix_slot_rules": [
+        { "affix_id": "affix_boss_dmg_45", "slot_type": "ring" },
+        { "affix_id": "affix_crit_dmg_45", "slot_type": "ring" },
+        { "affix_id": "affix_hp_35", "slot_type": "armor" }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "eligible_affixes": [
+          {
+            "affix_id": "affix_boss_dmg_45",
+            "effect_key": "bonus_boss_dmg",
+            "value_min": 3.0,
+            "value_max": 6.0
+          },
+          {
+            "affix_id": "affix_crit_dmg_45",
+            "effect_key": "bonus_crit_dmg",
+            "value_min": 4.0,
+            "value_max": 8.0
+          }
+        ]
+      }
+    }
+  }
+}

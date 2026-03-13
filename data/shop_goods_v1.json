@@ -2,8 +2,8 @@
     "meta": {
         "key": "shop_goods",
         "schema_version": 1,
-        "exported_at": "2026-03-13 08:49:17",
-        "sha256": "9c42ff2fde61d80fd9cd80b7a927d813db672783c5abe2123ca0976063528bf5"
+        "exported_at": "2026-03-13 17:29:07",
+        "sha256": "de486d7ec071299dbef3b339e7ff3672b35f2dfbb3c14c5e081b02aa476e8008"
     },
     "shop_goods": [
         {
@@ -119,7 +119,7 @@
             "goods_type": "direct_item",
             "goods_type_name": "直接道具",
             "reward_item_id": "itm_talisman_common_40",
-            "reward_item_name": "通用护符·40",
+            "reward_item_name": "通用护符·巡山简符",
             "reward_count": 1,
             "price_item_id": "cur_contribution",
             "price_item_name": "宗门贡献",

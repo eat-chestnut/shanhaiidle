@@ -69,6 +69,7 @@ class DailyDungeonResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('dungeon_id')->label('副本 ID')->searchable()->sortable(),
+                TextColumn::make('title')->label('标题')->searchable(),
                 TextColumn::make('display_name')->label('展示名')->searchable(),
                 TextColumn::make('dungeon_type')
                     ->label('副本类型')

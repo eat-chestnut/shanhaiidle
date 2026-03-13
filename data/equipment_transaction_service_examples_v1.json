@@ -1,0 +1,142 @@
+{
+  "version": "v1",
+  "module": "equipment_transaction_service_examples",
+  "return_format": {
+    "ok": "boolean",
+    "reason": "string|null",
+    "data": "object|null"
+  },
+  "equip_service_example": {
+    "input": {
+      "player_id": 10001,
+      "instance_id": "eq_inst_blue_ring_45_a001",
+      "target_slot_type": "ring_1"
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "equipped_instance_id": "eq_inst_blue_ring_45_a001",
+        "target_slot_type": "ring_1",
+        "replaced_instance_id": null
+      }
+    }
+  },
+  "star_upgrade_service_example": {
+    "input": {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_weapon_20_a001"
+    },
+    "before_instance": {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "set_level": 20,
+      "star": 2,
+      "max_star": 3
+    },
+    "after_output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "old_star": 2,
+        "new_star": 3,
+        "newly_unlocked_slots": [1]
+      }
+    }
+  },
+  "stage_progression_service_example": {
+    "input": {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_weapon_20_a001"
+    },
+    "before_instance": {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "set_level": 20,
+      "star": 3,
+      "max_star": 3
+    },
+    "after_output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "old_item_id": "itm_set_main_weapon_zhaoyao_20",
+        "new_item_id": "itm_set_main_weapon_zhaoyao_40",
+        "old_set_level": 20,
+        "new_set_level": 40,
+        "star": 3,
+        "max_star": 6
+      }
+    }
+  },
+  "gem_socket_service_example": {
+    "input": {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 1,
+      "gem_item_id": "itm_gem_attr_chijinshi_white"
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "slot_index": 1,
+        "gem_item_id": "itm_gem_attr_chijinshi_white"
+      }
+    }
+  },
+  "gem_unsocket_service_example": {
+    "input": {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 1
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "slot_index": 1,
+        "removed_gem_item_id": "itm_gem_attr_chijinshi_white"
+      }
+    }
+  },
+  "failure_examples": [
+    {
+      "service": "EquipmentGemSocketService",
+      "input": {
+        "player_id": 10001,
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "slot_index": 3,
+        "gem_item_id": "itm_gem_attr_chijinshi_white"
+      },
+      "output": {
+        "ok": false,
+        "reason": "slot 3 is not unlocked",
+        "data": null
+      }
+    },
+    {
+      "service": "EquipmentStageProgressionService",
+      "input": {
+        "player_id": 10001,
+        "instance_id": "eq_inst_set_weapon_20_b001"
+      },
+      "before_instance": {
+        "instance_id": "eq_inst_set_weapon_20_b001",
+        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "set_level": 20,
+        "star": 2,
+        "max_star": 3
+      },
+      "output": {
+        "ok": false,
+        "reason": "current star is 2, required max star is 3",
+        "data": null
+      }
+    }
+  ]
+}

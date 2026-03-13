@@ -2,7 +2,7 @@
     "meta": {
         "key": "boss_core_module",
         "schema_version": 1,
-        "exported_at": "2026-03-13 13:44:08",
+        "exported_at": "2026-03-13 17:29:05",
         "sha256": "26480a5106339c7604ed9f9b23c29995cbe1fafbea91a26262e6f49e21575557"
     },
     "boss_core_rules": {
