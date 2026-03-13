@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             ItemsSeeder::class,
             GemsSeeder::class,
+            TalismansSeeder::class,
             GiftPackModuleSeeder::class,
             EquipSlotsSeeder::class,
             EquipmentSetsSeeder::class,

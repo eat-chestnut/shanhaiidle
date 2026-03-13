@@ -97,6 +97,14 @@
 - 后续掉落、礼包、商城都应引用宝石 `item_id`
 - `gems` 本身不负责孔位、镶嵌、合成、分解
 
+护符正式成长配置已迁移到 `talismans` + `talisman_tiers` + `talisman_tier_upgrade_costs` + `talisman_star_links`：
+
+- `items` 只承接护符成品 item
+- `talismans.item_id` 统一引用 `items.item_id`
+- 后续商城、礼包、奖励都应引用护符 `item_id`
+- 护符位不参与全身装备星级统计
+- 护符模块本身不负责穿戴与执行逻辑
+
 ## quality 与 rarity
 
 ### quality
@@ -229,6 +237,17 @@
   - `skill_gem`
 - `slot_group` 定义写在 `gems`，用于表达属性孔 / 技能孔的使用边界
 - 掉落、礼包、商城后续都通过宝石 `item_id` 引用，不直接发 `gem_id`
+
+## 护符承载方式
+
+- 护符成品是 item，正式 carrier 为 `items.item_id`
+- `talismans.item_id` 必须命中对应护符 item
+- `items.main_type` 必须为 `talisman`
+- `items.sub_type` 当前只支持：
+  - `common_talisman`
+  - `sect_talisman`
+- 护符成长、升阶消耗、星级连锁定义写在护符模块表中，不写回 `items`
+- 商城、礼包、奖励后续都通过护符 `item_id` 引用
 
 ## 礼包承载方式
 
