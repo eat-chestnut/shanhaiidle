@@ -6,6 +6,7 @@ use App\Models\BlueGearTemplate;
 use App\Models\EquipTemplate;
 use App\Models\GmOperationLog;
 use App\Models\Item;
+use App\Models\PlayerMilestone;
 use App\Models\ShopPlayerProfile;
 use App\Models\ShopPurchaseLog;
 use App\Models\User;
@@ -225,6 +226,9 @@ class GmDebugService
             'reset_milestones',
             [],
             function (ShopPlayerProfile $profile): array {
+                PlayerMilestone::query()
+                    ->where('player_id', (string) $profile->player_id)
+                    ->delete();
                 $profile->claimed_milestones = [];
                 $profile->save();
 

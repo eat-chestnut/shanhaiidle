@@ -199,6 +199,8 @@
 - 商城商品的 `reward_item_id` 与 `price_item_id` 都统一引用 `items.item_id`
 - 商城商品一次只卖单个 `reward_item_id`
 - 多奖励商城商品必须先做成礼包 item，再由 `shop_goods.reward_item_id` 指向该礼包 item
+- 成长里程碑的 `reward_item_id` 统一引用 `items.item_id`
+- 多奖励里程碑必须先做成礼包 item，再由 `milestones.reward_item_id` 指向该礼包 item
 - 成品实体与配置定义分离：
   - 蓝装模板不是 item
   - 蓝装成品是 item
@@ -219,6 +221,12 @@
 - `goods_type = direct_item` 时直接售卖单个 item
 - `goods_type = gift_pack` 时售卖礼包 item
 - 商城表不直接挂多条奖励明细，多奖励必须通过礼包 item 承载
+
+## 里程碑承载方式
+
+- `milestones.reward_item_id` 统一引用 `items.item_id`
+- 一个里程碑只发单个 `reward_item_id`
+- 多奖励里程碑必须先做成礼包 item，再由里程碑节点发放该礼包 item
 
 ## 数据源规则
 

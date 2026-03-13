@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Item;
+use App\Models\PlayerMilestone;
 use App\Models\ShopPlayerProfile;
 use App\Models\Stage;
 use Illuminate\Support\Collection;
@@ -80,6 +81,10 @@ class PlayerProfileSyncService
 
         $profile->save();
 
+        $summary = app(MilestonePlayerService::class)->syncForProfile($profile);
+        $profile->claimed_milestones = $summary['claimed_milestones'] ?? [];
+        $profile->save();
+
         return $profile;
     }
 
@@ -151,7 +156,10 @@ class PlayerProfileSyncService
     {
         $inventory = is_array($profile->inventory) ? $profile->inventory : [];
         $equipment = is_array($profile->equipment) ? $profile->equipment : [];
-        $claimedMilestones = is_array($profile->claimed_milestones) ? $profile->claimed_milestones : [];
+        $milestoneSummary = app(MilestonePlayerService::class)->summaryForPlayer((string) $profile->player_id);
+        $claimedMilestones = is_array($milestoneSummary['claimed_milestones'] ?? null)
+            ? $milestoneSummary['claimed_milestones']
+            : (is_array($profile->claimed_milestones) ? $profile->claimed_milestones : []);
         $attrs = is_array($profile->attrs_json) ? $this->normalizeAttrs($profile->attrs_json) : $this->normalizeAttrs([]);
         $patrolSummary = is_array($profile->patrol_summary) ? $profile->patrol_summary : [];
         $taskSummary = is_array($profile->task_summary) ? $profile->task_summary : [];
@@ -188,8 +196,11 @@ class PlayerProfileSyncService
             'bag_equipment_count' => (int) $equipmentPreview['bag_count'],
             'equipment_count' => (int) $equipmentPreview['equipment_count'],
             'equipment_preview_lines' => $equipmentPreview['lines'],
-            'claimed_milestone_count' => count($claimedMilestones),
+            'claimed_milestone_count' => (int) ($milestoneSummary['claimed_milestone_count'] ?? count($claimedMilestones)),
             'claimed_milestones' => $claimedMilestones,
+            'milestone_total' => (int) ($milestoneSummary['milestone_total'] ?? 0),
+            'milestone_unlocked' => (int) ($milestoneSummary['milestone_unlocked'] ?? 0),
+            'milestone_claimable' => (int) ($milestoneSummary['milestone_claimable'] ?? 0),
             'patrol_summary' => $patrolSummary,
             'task_summary' => $taskSummary,
             'updated_at' => $profile->updated_at?->format('Y-m-d H:i:s') ?? '—',

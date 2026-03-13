@@ -8,6 +8,7 @@ use App\Models\EquipmentSet;
 use App\Models\Item;
 use App\Models\MainStageChapter;
 use App\Models\MaterialDungeonDropGroup;
+use App\Models\Milestone;
 use App\Models\Monster;
 use App\Models\SkillCatalog;
 use App\Models\Stage;
@@ -141,6 +142,11 @@ class AdminOptions
     public static function shopBuyLimitTypeOptions(): array
     {
         return \App\Models\ShopGood::BUY_LIMIT_TYPE_OPTIONS;
+    }
+
+    public static function milestoneConditionTypeOptions(): array
+    {
+        return Milestone::CONDITION_TYPE_OPTIONS;
     }
 
     public static function outputTypeOptions(): array
@@ -721,6 +727,44 @@ class AdminOptions
         );
     }
 
+    public static function milestoneOptions(?string $exceptMilestoneId = null): array
+    {
+        return Milestone::query()
+            ->when(
+                filled($exceptMilestoneId),
+                fn (Builder $query): Builder => $query->where('milestone_id', '!=', trim((string) $exceptMilestoneId))
+            )
+            ->orderBy('sort_order')
+            ->orderBy('milestone_id')
+            ->get()
+            ->mapWithKeys(fn (Milestone $milestone): array => [
+                (string) $milestone->milestone_id => sprintf(
+                    '%s｜%s',
+                    (string) $milestone->milestone_id,
+                    (string) $milestone->display_name
+                ),
+            ])
+            ->all();
+    }
+
+    public static function mainStageCombatChapterOptions(): array
+    {
+        return MainStageChapter::query()
+            ->where('is_enabled', true)
+            ->where('has_combat', true)
+            ->orderBy('sort_order')
+            ->orderBy('chapter_id')
+            ->get()
+            ->mapWithKeys(fn (MainStageChapter $chapter): array => [
+                (string) $chapter->chapter_id => sprintf(
+                    '%s｜%s',
+                    (string) $chapter->chapter_id,
+                    (string) $chapter->chapter_name
+                ),
+            ])
+            ->all();
+    }
+
     public static function monsterOptions(?string $kind = null, ?string $chapterId = null): array
     {
         return Monster::query()
@@ -969,17 +1013,6 @@ class AdminOptions
         return MainStageChapter::query()
             ->where('is_enabled', true)
             ->when(filled($exceptChapterId), fn ($query) => $query->where('chapter_id', '!=', $exceptChapterId))
-            ->orderBy('sort_order')
-            ->get()
-            ->mapWithKeys(fn (MainStageChapter $chapter): array => [$chapter->chapter_id => (string) $chapter->chapter_name])
-            ->all();
-    }
-
-    public static function mainStageCombatChapterOptions(): array
-    {
-        return MainStageChapter::query()
-            ->where('is_enabled', true)
-            ->where('has_combat', true)
             ->orderBy('sort_order')
             ->get()
             ->mapWithKeys(fn (MainStageChapter $chapter): array => [$chapter->chapter_id => (string) $chapter->chapter_name])

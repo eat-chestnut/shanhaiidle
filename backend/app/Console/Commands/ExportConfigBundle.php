@@ -30,7 +30,7 @@ class ExportConfigBundle extends Command
         ['key' => 'equip_slots', 'command' => 'game:export-equip-slots', 'source' => 'equip_slots_v1.json', 'filename' => 'equip_slots_v1.json'],
         ['key' => 'equipment_growth_rules', 'command' => 'game:export-equipment-growth-rules', 'source' => 'equipment_growth_rules_v1.json', 'filename' => 'equipment_growth_rules_v1.json'],
         ['key' => 'character_growth_rules', 'command' => 'game:export-character-growth-rules', 'source' => 'character_growth_rules_v1.json', 'filename' => 'character_growth_rules_v1.json'],
-        ['key' => 'progression_milestones', 'command' => 'game:export-progression-milestones', 'source' => 'progression_milestones_v1.json', 'filename' => 'progression_milestones_v1.json'],
+        ['key' => 'milestones', 'command' => 'game:export-progression-milestones', 'source' => 'progression_milestones_v1.json', 'filename' => 'progression_milestones_v1.json'],
         ['key' => 'blue_gear_templates', 'command' => 'game:export-blue-gear-templates', 'source' => 'blue_gear_templates_v1.json', 'filename' => 'blue_gear_templates_v1.json'],
         ['key' => 'blue_affix_pool', 'command' => 'game:export-blue-affix-pool', 'source' => 'blue_affix_pool_v1.json', 'filename' => 'blue_affix_pool_v1.json'],
         ['key' => 'purple_affix_pool', 'command' => 'game:export-purple-affix-pool', 'source' => 'purple_affix_pool_v1.json', 'filename' => 'purple_affix_pool_v1.json'],

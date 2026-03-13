@@ -1,171 +1,100 @@
 {
     "meta": {
-        "key": "progression_milestones",
+        "key": "milestones",
         "schema_version": 1,
-        "exported_at": "2026-03-12 12:52:32",
-        "sha256": "b11fbca4add6eb62a58d5caa93829b05ddee3586b3fe062b4896376e9cd51933"
+        "exported_at": "2026-03-13 09:23:58",
+        "sha256": "f7db3905c8cdb6ec7313eb1083d2172fd8affd591ce305e9d3350b128abc6192"
     },
-    "progression_milestones": {
-        "version": 1,
-        "range": {
-            "min_level": 1,
-            "max_level": 20
+    "milestones": [
+        {
+            "milestone_id": "ms_lv_05",
+            "title": "等级达成 5 级",
+            "display_name": "5级成长节点",
+            "condition_type": "player_level_reached",
+            "condition_value": 5,
+            "pre_milestone_id": null,
+            "reward_item_id": "cur_gold",
+            "reward_count": 500,
+            "icon": null,
+            "summary": "玩家达到 5 级后可领取一次铜贝奖励。",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": "等级线样例"
         },
-        "milestones": [
-            {
-                "level": 1,
-                "milestone_key": "lv1_start",
-                "title": "初入宗门",
-                "summary": "完成新手引导，开始巡山。",
-                "image": "",
-                "unlock_contents": [
-                    {
-                        "type": "main_stage",
-                        "content": "开放主线第1关"
-                    },
-                    {
-                        "type": "blue_gear",
-                        "content": "蓝装进入1级档"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放主线巡山"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放工坊"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放宗门任务"
-                    }
-                ],
-                "reward_item_id": "milestone_pack_lv1",
-                "reward_count": 1,
-                "claim_once": true,
-                "is_enabled": true,
-                "sort": 10
-            },
-            {
-                "level": 5,
-                "milestone_key": "lv5_early_growth",
-                "title": "初步成型",
-                "summary": "蓝装进入5级档，主线进入稳定推进。",
-                "image": "",
-                "unlock_contents": [
-                    {
-                        "type": "main_stage",
-                        "content": "开放主线第2关"
-                    },
-                    {
-                        "type": "daily_dungeon",
-                        "content": "开放金币副本"
-                    },
-                    {
-                        "type": "blue_gear",
-                        "content": "蓝装进入5级档"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放金币副本"
-                    }
-                ],
-                "reward_item_id": "milestone_pack_lv5",
-                "reward_count": 1,
-                "claim_once": true,
-                "is_enabled": true,
-                "sort": 20
-            },
-            {
-                "level": 10,
-                "milestone_key": "lv10_stable_push",
-                "title": "稳定推进",
-                "summary": "主线进入第一轮稳定期，蓝词条开始显现差异。",
-                "image": "",
-                "unlock_contents": [
-                    {
-                        "type": "main_stage",
-                        "content": "开放主线第3关"
-                    },
-                    {
-                        "type": "daily_dungeon",
-                        "content": "开放经验副本"
-                    },
-                    {
-                        "type": "blue_gear",
-                        "content": "蓝装进入10级档"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放经验副本"
-                    }
-                ],
-                "reward_item_id": "milestone_pack_lv10",
-                "reward_count": 1,
-                "claim_once": true,
-                "is_enabled": true,
-                "sort": 30
-            },
-            {
-                "level": 15,
-                "milestone_key": "lv15_affix_upgrade",
-                "title": "蓝装强化",
-                "summary": "蓝装进入双词条阶段，流派差异开始形成。",
-                "image": "",
-                "unlock_contents": [
-                    {
-                        "type": "main_stage",
-                        "content": "开放主线第4关"
-                    },
-                    {
-                        "type": "daily_dungeon",
-                        "content": "开放材料副本"
-                    },
-                    {
-                        "type": "blue_gear",
-                        "content": "蓝装进入15级双词条阶段"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放材料副本"
-                    }
-                ],
-                "reward_item_id": "milestone_pack_lv15",
-                "reward_count": 1,
-                "claim_once": true,
-                "is_enabled": true,
-                "sort": 40
-            },
-            {
-                "level": 20,
-                "milestone_key": "lv20_mid_ready",
-                "title": "迈入中期",
-                "summary": "20级蓝装完整成型，准备进入20-40阶段。",
-                "image": "",
-                "unlock_contents": [
-                    {
-                        "type": "main_stage",
-                        "content": "开放主线第5关"
-                    },
-                    {
-                        "type": "daily_dungeon",
-                        "content": "开放宝石副本"
-                    },
-                    {
-                        "type": "blue_gear",
-                        "content": "蓝装进入20级双词条阶段"
-                    },
-                    {
-                        "type": "feature_unlock",
-                        "content": "开放宝石副本"
-                    }
-                ],
-                "reward_item_id": "milestone_pack_lv20",
-                "reward_count": 1,
-                "claim_once": true,
-                "is_enabled": true,
-                "sort": 50
-            }
-        ]
-    }
+        {
+            "milestone_id": "ms_lv_10",
+            "title": "等级达成 10 级",
+            "display_name": "10级成长节点",
+            "condition_type": "player_level_reached",
+            "condition_value": 10,
+            "pre_milestone_id": "ms_lv_05",
+            "reward_item_id": "mat_upgrade_star_low",
+            "reward_count": 10,
+            "icon": null,
+            "summary": "玩家达到 10 级并完成前置节点后可领取强化材料。",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": "等级线样例"
+        },
+        {
+            "milestone_id": "ms_lv_20",
+            "title": "等级达成 20 级",
+            "display_name": "20级成长礼包节点",
+            "condition_type": "player_level_reached",
+            "condition_value": 20,
+            "pre_milestone_id": "ms_lv_10",
+            "reward_item_id": "gift_lv20_growth",
+            "reward_count": 1,
+            "icon": null,
+            "summary": "玩家达到 20 级并完成前置节点后发放成长礼包 item。",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": "等级线礼包样例"
+        },
+        {
+            "milestone_id": "ms_stage_01_clear",
+            "title": "通关主线章节 stage_01",
+            "display_name": "主线第一章通关",
+            "condition_type": "chapter_cleared",
+            "condition_value": "stage_01",
+            "pre_milestone_id": null,
+            "reward_item_id": "gift_stage01_first_clear",
+            "reward_count": 1,
+            "icon": null,
+            "summary": "玩家通关主线章节 stage_01 后可领取首通礼包 item。",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": "章节线样例"
+        },
+        {
+            "milestone_id": "ms_stage_03_clear",
+            "title": "通关主线章节 stage_03",
+            "display_name": "主线第三章通关",
+            "condition_type": "chapter_cleared",
+            "condition_value": "stage_03",
+            "pre_milestone_id": "ms_stage_01_clear",
+            "reward_item_id": "cur_premium_jade",
+            "reward_count": 30,
+            "icon": null,
+            "summary": "玩家通关主线章节 stage_03 并完成前置章节节点后可领取灵石。",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": "章节线样例"
+        },
+        {
+            "milestone_id": "ms_stage_08_clear",
+            "title": "通关主线章节 stage_08",
+            "display_name": "主线第八章通关",
+            "condition_type": "chapter_cleared",
+            "condition_value": "stage_08",
+            "pre_milestone_id": "ms_stage_03_clear",
+            "reward_item_id": "gift_shop_weapon_select_20",
+            "reward_count": 1,
+            "icon": null,
+            "summary": "玩家通关主线章节 stage_08 并完成前置章节节点后可领取武器自选礼包 item。",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": "章节线礼包样例"
+        }
+    ]
 }

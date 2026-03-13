@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ShopPlayerProfile extends Model
 {
@@ -48,4 +49,9 @@ class ShopPlayerProfile extends Model
         'patrol_summary' => 'array',
         'task_summary' => 'array',
     ];
+
+    public function playerMilestones(): HasMany
+    {
+        return $this->hasMany(PlayerMilestone::class, 'player_id', 'player_id');
+    }
 }
