@@ -10,6 +10,8 @@ use RuntimeException;
 
 class ExportBattleDefaultsJson extends Command
 {
+    private const PROJECT_DATA_FILE = '../data/battle_defaults.json';
+
     protected $signature = 'game:export-battle-defaults';
 
     protected $description = 'Export battle defaults to storage/app/exports/battle_defaults.json';
@@ -36,9 +38,11 @@ class ExportBattleDefaultsJson extends Command
         }
 
         $path = $dir . DIRECTORY_SEPARATOR . 'battle_defaults.json';
+        $projectDataPath = base_path(self::PROJECT_DATA_FILE);
         File::put($path, $json);
+        File::put($projectDataPath, $json);
 
-        $this->info(sprintf('Exported battle defaults -> %s', $path));
+        $this->info(sprintf('Exported battle defaults -> %s, %s', $path, $projectDataPath));
 
         return self::SUCCESS;
     }

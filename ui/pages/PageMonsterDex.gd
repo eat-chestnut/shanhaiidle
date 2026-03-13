@@ -96,9 +96,7 @@ func _connect_signals() -> void:
 
 func _load_monsters() -> void:
 	_monsters.clear()
-	var cfg: Dictionary = ConfigService.get_cfg()
-
-	var monsters_db_any = cfg.get("monsters_db", {})
+	var monsters_db_any = ConfigService.get_monsters_db()
 	if monsters_db_any is Dictionary:
 		var monsters_any = (monsters_db_any as Dictionary).get("monsters", [])
 		if monsters_any is Array and not (monsters_any as Array).is_empty():
@@ -118,7 +116,7 @@ func _load_monsters() -> void:
 					_monsters.append(row)
 				return
 
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if not (battle_any is Dictionary):
 		return
 	var battle_cfg: Dictionary = battle_any

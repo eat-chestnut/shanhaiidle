@@ -147,8 +147,6 @@ class ProgressionMilestonesService
             return self::defaultConfig();
         }
 
-        $decoded = self::upgradeLegacyConfig($decoded);
-
         return self::mergeRecursive(self::defaultConfig(), $decoded);
     }
 
@@ -222,9 +220,8 @@ class ProgressionMilestonesService
             $title = trim((string) ($row['title'] ?? ''));
             $summary = trim((string) ($row['summary'] ?? ''));
             $image = trim((string) ($row['image'] ?? ''));
-            $reward = self::resolveRewardFields($row);
-            $rewardItemId = $reward['reward_item_id'];
-            $rewardCount = $reward['reward_count'];
+            $rewardItemId = trim((string) ($row['reward_item_id'] ?? ''));
+            $rewardCount = max(1, (int) ($row['reward_count'] ?? 1));
             $claimOnce = (bool) ($row['claim_once'] ?? true);
             $isEnabled = (bool) ($row['is_enabled'] ?? true);
             $sort = max(0, (int) ($row['sort'] ?? (($index + 1) * 10)));
@@ -290,163 +287,6 @@ class ProgressionMilestonesService
         });
 
         return array_values($normalized);
-    }
-
-    private static function upgradeLegacyConfig(array $config): array
-    {
-        $rows = $config['milestones'] ?? null;
-        if (! is_array($rows)) {
-            return $config;
-        }
-
-        $needsUpgrade = false;
-        foreach ($rows as $row) {
-            if (is_array($row) && (
-                array_key_exists('stage_key', $row)
-                || ! array_key_exists('milestone_key', $row)
-                || array_key_exists('rewards', $row)
-                || ! array_key_exists('reward_item_id', $row)
-            )) {
-                $needsUpgrade = true;
-                break;
-            }
-        }
-
-        if (! $needsUpgrade) {
-            return $config;
-        }
-
-        $config['milestones'] = collect($rows)
-            ->filter(fn ($row): bool => is_array($row))
-            ->map(function (array $row, int $index): array {
-                $level = (int) ($row['level'] ?? 0);
-                $reward = self::resolveRewardFields($row);
-
-                return [
-                    'level' => $level,
-                    'milestone_key' => trim((string) ($row['milestone_key'] ?? $row['stage_key'] ?? ('lv' . $level))),
-                    'title' => trim((string) ($row['title'] ?? '未命名里程碑')),
-                    'summary' => trim((string) ($row['summary'] ?? '')),
-                    'image' => trim((string) ($row['image'] ?? '')),
-                    'unlock_contents' => self::legacyUnlockContents($row),
-                    'reward_item_id' => $reward['reward_item_id'] !== '' ? $reward['reward_item_id'] : self::defaultRewardItemId($level),
-                    'reward_count' => $reward['reward_count'],
-                    'claim_once' => (bool) ($row['claim_once'] ?? true),
-                    'is_enabled' => (bool) ($row['is_enabled'] ?? true),
-                    'sort' => max(0, (int) ($row['sort'] ?? (($index + 1) * 10))),
-                ];
-            })
-            ->values()
-            ->all();
-
-        return $config;
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     * @return array{reward_item_id:string, reward_count:int}
-     */
-    private static function resolveRewardFields(array $row): array
-    {
-        $rewardItemId = trim((string) ($row['reward_item_id'] ?? ''));
-        $rewardCount = max(1, (int) ($row['reward_count'] ?? 1));
-
-        if ($rewardItemId !== '') {
-            return [
-                'reward_item_id' => $rewardItemId,
-                'reward_count' => $rewardCount,
-            ];
-        }
-
-        $legacyRewards = $row['rewards'] ?? [];
-        if (! is_array($legacyRewards) || $legacyRewards === []) {
-            return [
-                'reward_item_id' => '',
-                'reward_count' => $rewardCount,
-            ];
-        }
-
-        $first = collect($legacyRewards)
-            ->first(fn ($reward): bool => is_array($reward) && filled($reward['reward_item_id'] ?? $reward['item_id'] ?? null));
-
-        if (! is_array($first)) {
-            return [
-                'reward_item_id' => '',
-                'reward_count' => $rewardCount,
-            ];
-        }
-
-        return [
-            'reward_item_id' => trim((string) ($first['reward_item_id'] ?? $first['item_id'] ?? '')),
-            'reward_count' => max(1, (int) ($first['reward_count'] ?? $first['count'] ?? 1)),
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     * @return array<int, array{type:string, content:string}>
-     */
-    private static function legacyUnlockContents(array $row): array
-    {
-        $contents = [];
-
-        $mainStageUnlock = (int) ($row['main_stage_unlock'] ?? 0);
-        if ($mainStageUnlock >= 1) {
-            $contents[] = [
-                'type' => 'main_stage',
-                'content' => sprintf('开放主线第%d关', $mainStageUnlock),
-            ];
-        }
-
-        foreach ((array) ($row['daily_dungeon_unlocks'] ?? []) as $value) {
-            $label = match (trim((string) $value)) {
-                'daily_gold' => '开放金币副本',
-                'daily_exp' => '开放经验副本',
-                'daily_material' => '开放材料副本',
-                'daily_gem' => '开放宝石副本',
-                default => '',
-            };
-            if ($label !== '') {
-                $contents[] = ['type' => 'daily_dungeon', 'content' => $label];
-            }
-        }
-
-        $blueGearStage = (int) ($row['blue_gear_stage'] ?? 0);
-        if ($blueGearStage > 0) {
-            $affixCount = max(1, (int) ($row['blue_affix_count'] ?? 1));
-            $contents[] = [
-                'type' => 'blue_gear',
-                'content' => $affixCount >= 2
-                    ? sprintf('蓝装进入%d级双词条阶段', $blueGearStage)
-                    : sprintf('蓝装进入%d级档', $blueGearStage),
-            ];
-        }
-
-        foreach ((array) ($row['system_unlocks'] ?? []) as $value) {
-            $label = match (trim((string) $value)) {
-                'main_story' => '开放主线巡山',
-                'equipment' => '开放工坊',
-                'sect_tasks' => '开放宗门任务',
-                default => '',
-            };
-            if ($label !== '') {
-                $contents[] = ['type' => 'feature_unlock', 'content' => $label];
-            }
-        }
-
-        return $contents;
-    }
-
-    private static function defaultRewardItemId(int $level): string
-    {
-        return match ($level) {
-            1 => 'milestone_pack_lv1',
-            5 => 'milestone_pack_lv5',
-            10 => 'milestone_pack_lv10',
-            15 => 'milestone_pack_lv15',
-            20 => 'milestone_pack_lv20',
-            default => '',
-        };
     }
 
     /**

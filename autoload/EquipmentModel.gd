@@ -71,7 +71,6 @@ func create_instance(template_id: String) -> Dictionary:
 		"main_min": main_val,
 		"main_max": main_val,
 		"main_val": main_val,
-		"tier": 0,
 		"set_id": str(template.get("set_id", "")),
 		"effects": _roll_blue_effects_for_template(template) if _is_blue_template(template) else [],
 		"extra_effects": [],
@@ -647,7 +646,7 @@ func get_active_set_bonuses(set_counts_override: Dictionary = {}) -> Dictionary:
 		if set_id.is_empty():
 			continue
 		var set_name := str(set_row.get("name", set_id))
-		var max_pieces := maxi(1, int(set_row.get("max_pieces", 1)))
+		var piece_count := maxi(1, int(set_row.get("piece_count", 1)))
 		var pieces := int(set_counts.get(set_id, 0))
 		var thresholds := _normalize_set_thresholds(set_row.get("thresholds", []))
 		var next_line := ""
@@ -662,7 +661,7 @@ func get_active_set_bonuses(set_counts_override: Dictionary = {}) -> Dictionary:
 			if pieces >= need:
 				_apply_set_bonus(stats, skills, bonuses)
 				if not bonus_text.is_empty():
-					lines.append("%s %d/%d：%d件 %s（已激活）" % [set_name, pieces, max_pieces, need, bonus_text])
+					lines.append("%s %d/%d：%d件 %s（已激活）" % [set_name, pieces, piece_count, need, bonus_text])
 			elif next_line.is_empty():
 				if bonus_text.is_empty():
 					next_line = "%s：下一档 %d件" % [set_name, need]
@@ -1115,8 +1114,7 @@ func get_refine_cost(rarity: String) -> Dictionary:
 	if fallback_items_any is Dictionary:
 		out["items"] = (fallback_items_any as Dictionary).duplicate(true)
 
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if not (battle_any is Dictionary):
 		return out
 	var economy_any = (battle_any as Dictionary).get("economy", {})
@@ -1301,102 +1299,6 @@ func remove_socket_gem(uid: int, socket_idx: int) -> bool:
 		return false
 	EventBus.notify_inventory_updated()
 	_request_save()
-	return true
-
-func can_upgrade(uid: int) -> Dictionary:
-	var result := {
-		"ok": false,
-		"reason": "invalid",
-		"cost": {},
-		"next_tier": 0,
-	}
-	if uid <= 0:
-		return result
-
-	var inst := _get_instance_by_uid(uid)
-	if inst.is_empty():
-		result["reason"] = "not_found"
-		return result
-
-	var tier := clampi(int(inst.get("tier", 0)), 0, 2)
-	if tier >= 2:
-		result["reason"] = "max"
-		return result
-
-	var next_tier := tier + 1
-	var slot_key := str(inst.get("slot", ""))
-	var cost := _resolve_upgrade_recipe(slot_key, next_tier)
-	result["next_tier"] = next_tier
-	result["cost"] = cost
-	if cost.is_empty():
-		result["reason"] = "no_recipe"
-		return result
-
-	if not _has_materials(cost):
-		result["reason"] = "lack"
-		return result
-
-	result["ok"] = true
-	result["reason"] = ""
-	return result
-
-func upgrade_equipment(uid: int) -> bool:
-	var info: Dictionary = can_upgrade(uid)
-	if not bool(info.get("ok", false)):
-		return false
-
-	var inst := _get_instance_by_uid(uid)
-	if inst.is_empty():
-		return false
-
-	var cost_any: Variant = info.get("cost", {})
-	if not (cost_any is Dictionary):
-		return false
-	var cost: Dictionary = cost_any
-	if not _has_materials(cost):
-		return false
-
-	var spent: Array[Dictionary] = []
-	for mat_key_any in cost.keys():
-		var mat_id := str(mat_key_any)
-		var cnt := int(cost.get(mat_key_any, 0))
-		if mat_id.is_empty() or cnt <= 0:
-			continue
-		if InventoryModel.spend_item(mat_id, cnt, "system"):
-			spent.append({
-				"id": mat_id,
-				"count": cnt,
-			})
-		else:
-			for entry_any in spent:
-				if not (entry_any is Dictionary):
-					continue
-				var entry: Dictionary = entry_any
-				var rollback_id := str(entry.get("id", ""))
-				var rollback_cnt := int(entry.get("count", 0))
-				if rollback_id.is_empty() or rollback_cnt <= 0:
-					continue
-				InventoryModel.add_item(rollback_id, rollback_cnt, "system")
-			return false
-
-	var old_tier := clampi(int(inst.get("tier", 0)), 0, 2)
-	var new_tier := mini(2, old_tier + 1)
-	inst["tier"] = new_tier
-	if not _set_instance_by_uid(uid, inst):
-		for entry_any in spent:
-			if not (entry_any is Dictionary):
-				continue
-			var entry: Dictionary = entry_any
-			var rollback_id := str(entry.get("id", ""))
-			var rollback_cnt := int(entry.get("count", 0))
-			if rollback_id.is_empty() or rollback_cnt <= 0:
-				continue
-			InventoryModel.add_item(rollback_id, rollback_cnt, "system")
-		return false
-
-	EventBus.notify_inventory_updated()
-	_request_save()
-	EventBus.add_log("装备进阶成功：%s -> %s" % [_tier_name(old_tier), _tier_name(new_tier)])
 	return true
 
 func list_bag_sorted() -> Array[Dictionary]:
@@ -2178,63 +2080,6 @@ func _skill_display_name(skill_id: String) -> String:
 		return SkillNameService.name(skill_id)
 	return skill_id
 
-func _upgrade_db() -> Dictionary:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("upgrade_db", {})
-	if db_any is Dictionary:
-		return db_any
-	return {}
-
-func _tier_name(tier: int) -> String:
-	var names_any: Variant = _upgrade_db().get("tier_names", [])
-	if names_any is Array:
-		var names: Array = names_any
-		if tier >= 0 and tier < names.size():
-			return str(names[tier])
-	match tier:
-		1:
-			return "灵"
-		2:
-			return "玄"
-		_:
-			return "凡"
-
-func _resolve_upgrade_recipe(slot_key: String, next_tier: int) -> Dictionary:
-	if slot_key.is_empty():
-		return {}
-	var db := _upgrade_db()
-	var recipes_any: Variant = db.get("recipes", {})
-	if not (recipes_any is Dictionary):
-		return {}
-	var recipes: Dictionary = recipes_any
-	var slot_recipe_any: Variant = recipes.get(slot_key, {})
-	if not (slot_recipe_any is Dictionary):
-		return {}
-	var slot_recipe: Dictionary = slot_recipe_any
-	var tier_key := "to%d" % next_tier
-	var cost_any: Variant = slot_recipe.get(tier_key, {})
-	if not (cost_any is Dictionary):
-		return {}
-	var cost_raw: Dictionary = cost_any
-	var cost: Dictionary = {}
-	for key_any in cost_raw.keys():
-		var item_id := str(key_any)
-		var cnt := int(cost_raw.get(key_any, 0))
-		if item_id.is_empty() or cnt <= 0:
-			continue
-		cost[item_id] = cnt
-	return cost
-
-func _has_materials(cost: Dictionary) -> bool:
-	for key_any in cost.keys():
-		var item_id := str(key_any)
-		var need := int(cost.get(key_any, 0))
-		if item_id.is_empty() or need <= 0:
-			continue
-		if InventoryModel.get_count(item_id) < need:
-			return false
-	return true
-
 func _find_bag_index(uid: int) -> int:
 	for i in bag.size():
 		var entry_any = bag[i]
@@ -2481,8 +2326,7 @@ func _identify_cost_for_rarity(rarity: String) -> int:
 		"blue": 60,
 		"gold": 160,
 	}
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if battle_any is Dictionary:
 		var economy_any = (battle_any as Dictionary).get("economy", {})
 		if economy_any is Dictionary:
@@ -2507,8 +2351,7 @@ func _salvage_reward_for_rarity(rarity: String) -> Dictionary:
 	if fallback_items_any is Dictionary:
 		out["items"] = (fallback_items_any as Dictionary).duplicate(true)
 
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if not (battle_any is Dictionary):
 		return out
 	var economy_any = (battle_any as Dictionary).get("economy", {})
@@ -2655,8 +2498,7 @@ func _effect_key(e: Dictionary) -> String:
 
 func _get_refine_effect_pool() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if battle_any is Dictionary:
 		var battle: Dictionary = battle_any
 		var pool_any = battle.get("refine_effect_pool", [])

@@ -86,8 +86,7 @@ func claim(monster_def: Dictionary) -> bool:
 func get_total_entry_ids() -> Array[String]:
 	var ids: Array[String] = []
 	var seen: Dictionary = {}
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var db_any = cfg.get("monsters_db", {})
+	var db_any = ConfigService.get_monsters_db()
 	if not (db_any is Dictionary):
 		db_any = {}
 	var rows_any = (db_any as Dictionary).get("monsters", [])
@@ -105,31 +104,6 @@ func get_total_entry_ids() -> Array[String]:
 			ids.append(monster_id)
 	if not ids.is_empty():
 		return ids
-
-	# 兼容旧配置：没有 monsters_db 时回退 battle_config 三类怪定义。
-	var battle_any = cfg.get("battle", {})
-	if not (battle_any is Dictionary):
-		return ids
-	var battle_cfg: Dictionary = battle_any
-	var normal_any = battle_cfg.get("monsters", [])
-	if normal_any is Array and not (normal_any as Array).is_empty():
-		var first_any = (normal_any as Array)[0]
-		if first_any is Dictionary:
-			var normal_id := str((first_any as Dictionary).get("id", "")).strip_edges()
-			if not normal_id.is_empty() and not seen.has(normal_id):
-				seen[normal_id] = true
-				ids.append(normal_id)
-	var elite_any = battle_cfg.get("elite_monster", {})
-	if elite_any is Dictionary:
-		var elite_id := str((elite_any as Dictionary).get("id", "")).strip_edges()
-		if not elite_id.is_empty() and not seen.has(elite_id):
-			seen[elite_id] = true
-			ids.append(elite_id)
-	var boss_any = battle_cfg.get("boss_monster", {})
-	if boss_any is Dictionary:
-		var boss_id := str((boss_any as Dictionary).get("id", "")).strip_edges()
-		if not boss_id.is_empty() and not seen.has(boss_id):
-			ids.append(boss_id)
 	return ids
 
 func get_unlock_count() -> int:

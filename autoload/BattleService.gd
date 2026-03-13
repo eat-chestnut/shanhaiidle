@@ -232,8 +232,7 @@ func _process(delta: float) -> void:
 		_player_auto_attack()
 
 func _load_battle_cfg() -> void:
-	var full_cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = full_cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if battle_any is Dictionary:
 		_base_battle_cfg = (battle_any as Dictionary).duplicate(true)
 	else:
@@ -462,8 +461,7 @@ func _get_monster_def_by_id(monster_id: String) -> Dictionary:
 			if str(mon.get("id", "")).strip_edges() == target_id:
 				return mon.duplicate(true)
 
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if battle_any is Dictionary:
 		var battle_cfg: Dictionary = battle_any
 		var normal_any = battle_cfg.get("monsters", [])
@@ -589,13 +587,7 @@ func _load_balance_cfg() -> void:
 	default_skill_per_level = 0.03
 	ai_switch_cooldown = 2.0
 
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var balance_any = cfg.get("balance", {})
-	if not (balance_any is Dictionary):
-		return
-	var balance: Dictionary = balance_any
-
-	var skills_any = balance.get("skills", [])
+	var skills_any = ConfigService.get_skills_catalog_db().get("skills_catalog", [])
 	if skills_any is Array:
 		for skill_any in skills_any:
 			if not (skill_any is Dictionary):
@@ -606,16 +598,13 @@ func _load_balance_cfg() -> void:
 				continue
 			skills_by_id[skill_id] = skill.duplicate(true)
 
-	var globals_any = balance.get("globals", {})
-	if globals_any is Dictionary:
-		var globals: Dictionary = globals_any
-		var combat_any = globals.get("combat", {})
-		if combat_any is Dictionary:
-			var combat: Dictionary = combat_any
-			base_gcd = maxf(0.05, float(combat.get("gcd_seconds", 0.4)))
-			default_skill_per_level = float(combat.get("default_skill_coef_per_level", 0.03))
+	var combat_any = ConfigService.get_battle_cfg().get("combat", {})
+	if combat_any is Dictionary:
+		var combat: Dictionary = combat_any
+		base_gcd = maxf(0.05, float(combat.get("gcd_seconds", 0.4)))
+		default_skill_per_level = float(combat.get("default_skill_coef_per_level", 0.03))
 
-	var ai_any = balance.get("ai_profiles", {})
+	var ai_any = ConfigService.get_battle_cfg().get("ai_profiles", {})
 	if ai_any is Dictionary:
 		var ai_profiles: Dictionary = ai_any
 		var profiles_any = ai_profiles.get("profiles", [])

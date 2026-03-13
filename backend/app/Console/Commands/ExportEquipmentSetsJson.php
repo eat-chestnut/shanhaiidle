@@ -10,6 +10,8 @@ use RuntimeException;
 
 class ExportEquipmentSetsJson extends Command
 {
+    private const PROJECT_DATA_FILE = '../data/equipment_sets.json';
+
     protected $signature = 'game:export-equipment-sets';
 
     protected $description = 'Export enabled equipment sets to storage/app/exports/equipment_sets.json';
@@ -24,11 +26,7 @@ class ExportEquipmentSetsJson extends Command
             ->map(function (EquipmentSet $set): array {
                 $thresholds = $this->normalizeThresholds($set->thresholds);
                 $slotIds = is_array($set->slot_ids) ? array_values($set->slot_ids) : [];
-                $pieceCount = (int) ($set->piece_count ?? 0);
-                $maxPieces = (int) $set->max_pieces;
-                if ($pieceCount <= 0) {
-                    $pieceCount = $maxPieces;
-                }
+                $pieceCount = max(1, (int) ($set->piece_count ?? 0));
 
                 return [
                     'id' => (string) $set->id,
@@ -39,7 +37,6 @@ class ExportEquipmentSetsJson extends Command
                     'stage' => (int) ($set->stage ?? 0),
                     'piece_count' => $pieceCount,
                     'slot_ids' => $slotIds,
-                    'max_pieces' => $maxPieces,
                     'thresholds' => $thresholds,
                     'description' => (string) ($set->description ?? ''),
                     'sort_order' => (int) $set->sort_order,
@@ -65,9 +62,11 @@ class ExportEquipmentSetsJson extends Command
         }
 
         $path = $dir . DIRECTORY_SEPARATOR . 'equipment_sets.json';
+        $projectDataPath = base_path(self::PROJECT_DATA_FILE);
         File::put($path, $json);
+        File::put($projectDataPath, $json);
 
-        $this->info(sprintf('Exported %d equipment sets -> %s', count($rows), $path));
+        $this->info(sprintf('Exported %d equipment sets -> %s, %s', count($rows), $path, $projectDataPath));
 
         return self::SUCCESS;
     }

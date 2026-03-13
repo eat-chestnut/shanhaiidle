@@ -682,16 +682,16 @@ func validate_equipment_sets_json(text: String) -> Dictionary:
 		if not (row_any is Dictionary):
 			return {"ok": false, "reason": "equipment_sets[%d] 不是对象" % i}
 		var row: Dictionary = row_any
-		for key in ["id", "name", "max_pieces", "thresholds"]:
+		for key in ["id", "name", "piece_count", "thresholds"]:
 			if not row.has(key):
 				return {"ok": false, "reason": "equipment_sets[%d] 缺少字段 %s" % [i, key]}
 		var set_id := str(row.get("id", "")).strip_edges()
 		var set_name := str(row.get("name", "")).strip_edges()
-		var max_pieces := int(row.get("max_pieces", 0))
+		var piece_count := int(row.get("piece_count", 0))
 		if set_id.is_empty() or set_name.is_empty():
 			return {"ok": false, "reason": "equipment_sets[%d] id/name 不能为空" % i}
-		if max_pieces < 1:
-			return {"ok": false, "reason": "equipment_sets[%d].max_pieces 必须 >= 1" % i}
+		if piece_count < 1:
+			return {"ok": false, "reason": "equipment_sets[%d].piece_count 必须 >= 1" % i}
 
 		var thresholds_any: Variant = row.get("thresholds", [])
 		if not (thresholds_any is Array):
@@ -760,6 +760,17 @@ func validate_skills_catalog(text: String) -> Dictionary:
 			return {"ok": false, "reason": "skills_catalog[%d].id 不能为空" % i}
 		if skill_name.is_empty():
 			return {"ok": false, "reason": "skills_catalog[%d].name 不能为空" % i}
+		if str(row.get("class", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "skills_catalog[%d].class 不能为空" % i}
+		if str(row.get("type", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "skills_catalog[%d].type 不能为空" % i}
+		if int(row.get("min_level", 0)) < 1:
+			return {"ok": false, "reason": "skills_catalog[%d].min_level 非法" % i}
+		if int(row.get("max_level", 0)) < 1:
+			return {"ok": false, "reason": "skills_catalog[%d].max_level 非法" % i}
+		var tags_any: Variant = row.get("tags", [])
+		if not (tags_any is Array):
+			return {"ok": false, "reason": "skills_catalog[%d].tags 必须是数组" % i}
 
 	return {"ok": true}
 
@@ -780,6 +791,35 @@ func validate_battle_defaults(text: String) -> Dictionary:
 		return {"ok": false, "reason": "缺少 battle 对象"}
 
 	var battle: Dictionary = battle_any
+	var classes_any: Variant = battle.get("classes", [])
+	if not (classes_any is Array):
+		return {"ok": false, "reason": "battle.classes 必须是数组"}
+	var classes: Array = classes_any
+	if classes.is_empty():
+		return {"ok": false, "reason": "battle.classes 不能为空"}
+	for i in range(classes.size()):
+		var class_any: Variant = classes[i]
+		if not (class_any is Dictionary):
+			return {"ok": false, "reason": "battle.classes[%d] 不是对象" % i}
+		var class_row: Dictionary = class_any
+		if str(class_row.get("id", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "battle.classes[%d].id 不能为空" % i}
+		if str(class_row.get("name", "")).strip_edges().is_empty():
+			return {"ok": false, "reason": "battle.classes[%d].name 不能为空" % i}
+
+	var combat_any: Variant = battle.get("combat", null)
+	if not (combat_any is Dictionary):
+		return {"ok": false, "reason": "battle.combat 必须是对象"}
+	if float((combat_any as Dictionary).get("gcd_seconds", 0.0)) <= 0.0:
+		return {"ok": false, "reason": "battle.combat.gcd_seconds 必须大于0"}
+
+	var ai_any: Variant = battle.get("ai_profiles", null)
+	if not (ai_any is Dictionary):
+		return {"ok": false, "reason": "battle.ai_profiles 必须是对象"}
+	var profiles_any: Variant = (ai_any as Dictionary).get("profiles", [])
+	if not (profiles_any is Array):
+		return {"ok": false, "reason": "battle.ai_profiles.profiles 必须是数组"}
+
 	if battle.has("refine_effect_pool"):
 		var refine_check := _validate_refine_effect_pool(battle.get("refine_effect_pool", []))
 		if not bool(refine_check.get("ok", false)):

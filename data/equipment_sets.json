@@ -1,15 +1,15 @@
 {
     "meta": {
         "key": "equipment_sets",
-        "version": 10,
-        "exported_at": "2026-03-10 13:02:52",
-        "sha256": "dad67af0bfceb1010072f6930c6b73090cb33c6cd7bedb582412c75cbdcd82db"
+        "schema_version": 1,
+        "exported_at": "2026-03-12 13:00:12",
+        "sha256": "17dad4f368be2ab8db395ca0adc9dea31a0216c72319fc4330633e1c168d9cbe"
     },
     "equipment_sets": [
         {
-            "id": "setline_kuangzhan_20",
-            "set_line_id": "setline_kuangzhan",
-            "name": "狂战套·20级",
+            "id": "setline_lushu_20",
+            "set_line_id": "setline_lushu",
+            "name": "鹿蜀套·20级",
             "sect": "兵宗",
             "flow_tag": "berserk",
             "stage": 20,
@@ -24,7 +24,6 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
@@ -32,7 +31,7 @@
                         {
                             "type": "stat",
                             "stat": "ATK",
-                            "val": 3
+                            "val": 6
                         }
                     ]
                 },
@@ -41,19 +40,19 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
+                            "stat": "CRIT_RATE",
                             "val": 3
                         }
                     ]
                 }
             ],
-            "description": "狂战套（20级）套装效果",
+            "description": "鹿蜀套在20级阶段的套装效果配置。",
             "sort_order": 10
         },
         {
-            "id": "setline_kuangzhan_40",
-            "set_line_id": "setline_kuangzhan",
-            "name": "狂战套·40级",
+            "id": "setline_lushu_40",
+            "set_line_id": "setline_lushu",
+            "name": "鹿蜀套·40级",
             "sect": "兵宗",
             "flow_tag": "berserk",
             "stage": 40,
@@ -68,7 +67,6 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
@@ -76,7 +74,7 @@
                         {
                             "type": "stat",
                             "stat": "ATK",
-                            "val": 6
+                            "val": 12
                         }
                     ]
                 },
@@ -85,8 +83,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "CRIT_RATE",
+                            "val": 5
                         }
                     ]
                 },
@@ -95,19 +93,19 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
+                            "stat": "FINAL_DAMAGE",
                             "val": 4
                         }
                     ]
                 }
             ],
-            "description": "狂战套（40级）套装效果",
+            "description": "鹿蜀套在40级阶段的套装效果配置。",
             "sort_order": 20
         },
         {
-            "id": "setline_kuangzhan_60",
-            "set_line_id": "setline_kuangzhan",
-            "name": "狂战套·60级",
+            "id": "setline_lushu_60",
+            "set_line_id": "setline_lushu",
+            "name": "鹿蜀套·60级",
             "sect": "兵宗",
             "flow_tag": "berserk",
             "stage": 60,
@@ -122,7 +120,6 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
@@ -130,7 +127,7 @@
                         {
                             "type": "stat",
                             "stat": "ATK",
-                            "val": 10
+                            "val": 18
                         }
                     ]
                 },
@@ -139,8 +136,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 10
+                            "stat": "CRIT_RATE",
+                            "val": 7
                         }
                     ]
                 },
@@ -149,8 +146,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "FINAL_DAMAGE",
+                            "val": 4
                         }
                     ]
                 },
@@ -159,19 +156,19 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "stat": "CRIT_DMG",
+                            "val": 8
                         }
                     ]
                 }
             ],
-            "description": "狂战套（60级）套装效果",
+            "description": "鹿蜀套在60级阶段的套装效果配置。",
             "sort_order": 30
         },
         {
-            "id": "setline_fangzhan_20",
-            "set_line_id": "setline_fangzhan",
-            "name": "防战套·20级",
+            "id": "setline_xuangui_20",
+            "set_line_id": "setline_xuangui",
+            "name": "旋龟套·20级",
             "sect": "兵宗",
             "flow_tag": "guard",
             "stage": 20,
@@ -186,15 +183,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 3
+                            "stat": "DEF",
+                            "val": 8
                         }
                     ]
                 },
@@ -203,19 +199,19 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 3
+                            "stat": "HP",
+                            "val": 40
                         }
                     ]
                 }
             ],
-            "description": "防战套（20级）套装效果",
+            "description": "旋龟套在20级阶段的套装效果配置。",
             "sort_order": 40
         },
         {
-            "id": "setline_fangzhan_40",
-            "set_line_id": "setline_fangzhan",
-            "name": "防战套·40级",
+            "id": "setline_xuangui_40",
+            "set_line_id": "setline_xuangui",
+            "name": "旋龟套·40级",
             "sect": "兵宗",
             "flow_tag": "guard",
             "stage": 40,
@@ -230,15 +226,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
+                            "stat": "DEF",
+                            "val": 16
                         }
                     ]
                 },
@@ -247,8 +242,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "HP",
+                            "val": 80
                         }
                     ]
                 },
@@ -257,19 +252,19 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
+                            "stat": "FINAL_REDUCTION",
                             "val": 4
                         }
                     ]
                 }
             ],
-            "description": "防战套（40级）套装效果",
+            "description": "旋龟套在40级阶段的套装效果配置。",
             "sort_order": 50
         },
         {
-            "id": "setline_fangzhan_60",
-            "set_line_id": "setline_fangzhan",
-            "name": "防战套·60级",
+            "id": "setline_xuangui_60",
+            "set_line_id": "setline_xuangui",
+            "name": "旋龟套·60级",
             "sect": "兵宗",
             "flow_tag": "guard",
             "stage": 60,
@@ -284,15 +279,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 10
+                            "stat": "DEF",
+                            "val": 24
                         }
                     ]
                 },
@@ -301,8 +295,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 10
+                            "stat": "HP",
+                            "val": 120
                         }
                     ]
                 },
@@ -311,8 +305,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "FINAL_REDUCTION",
+                            "val": 4
                         }
                     ]
                 },
@@ -321,20 +315,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "stat": "PDEF",
+                            "val": 18
                         }
                     ]
                 }
             ],
-            "description": "防战套（60级）套装效果",
+            "description": "旋龟套在60级阶段的套装效果配置。",
             "sort_order": 60
         },
         {
-            "id": "setline_liesha_20",
-            "set_line_id": "setline_liesha",
-            "name": "猎杀号套·20级",
-            "sect": "体宗",
+            "id": "setline_guanguan_20",
+            "set_line_id": "setline_guanguan",
+            "name": "灌灌套·20级",
+            "sect": "巧宗",
             "flow_tag": "hunt",
             "stage": 20,
             "piece_count": 4,
@@ -348,14 +342,13 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
+                            "stat": "CRIT_RATE",
                             "val": 3
                         }
                     ]
@@ -365,20 +358,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
+                            "stat": "ATK_SPEED",
                             "val": 3
                         }
                     ]
                 }
             ],
-            "description": "猎杀号套（20级）套装效果",
+            "description": "灌灌套在20级阶段的套装效果配置。",
             "sort_order": 70
         },
         {
-            "id": "setline_liesha_40",
-            "set_line_id": "setline_liesha",
-            "name": "猎杀号套·40级",
-            "sect": "体宗",
+            "id": "setline_guanguan_40",
+            "set_line_id": "setline_guanguan",
+            "name": "灌灌套·40级",
+            "sect": "巧宗",
             "flow_tag": "hunt",
             "stage": 40,
             "piece_count": 6,
@@ -392,15 +385,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
+                            "stat": "CRIT_RATE",
+                            "val": 5
                         }
                     ]
                 },
@@ -409,8 +401,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "ATK_SPEED",
+                            "val": 5
                         }
                     ]
                 },
@@ -419,20 +411,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 4
+                            "stat": "RANGED_ATK",
+                            "val": 14
                         }
                     ]
                 }
             ],
-            "description": "猎杀号套（40级）套装效果",
+            "description": "灌灌套在40级阶段的套装效果配置。",
             "sort_order": 80
         },
         {
-            "id": "setline_liesha_60",
-            "set_line_id": "setline_liesha",
-            "name": "猎杀号套·60级",
-            "sect": "体宗",
+            "id": "setline_guanguan_60",
+            "set_line_id": "setline_guanguan",
+            "name": "灌灌套·60级",
+            "sect": "巧宗",
             "flow_tag": "hunt",
             "stage": 60,
             "piece_count": 8,
@@ -446,15 +438,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 10
+                            "stat": "CRIT_RATE",
+                            "val": 7
                         }
                     ]
                 },
@@ -463,8 +454,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 10
+                            "stat": "ATK_SPEED",
+                            "val": 7
                         }
                     ]
                 },
@@ -473,8 +464,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "RANGED_ATK",
+                            "val": 14
                         }
                     ]
                 },
@@ -483,21 +474,21 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "stat": "DODGE",
+                            "val": 8
                         }
                     ]
                 }
             ],
-            "description": "猎杀号套（60级）套装效果",
+            "description": "灌灌套在60级阶段的套装效果配置。",
             "sort_order": 90
         },
         {
-            "id": "setline_zhuying_20",
-            "set_line_id": "setline_zhuying",
-            "name": "逐影套·20级",
-            "sect": "法宗",
-            "flow_tag": "shadow",
+            "id": "setline_migu_20",
+            "set_line_id": "setline_migu",
+            "name": "迷榖套·20级",
+            "sect": "游宗",
+            "flow_tag": "evade",
             "stage": 20,
             "piece_count": 4,
             "slot_ids": [
@@ -510,14 +501,13 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
+                            "stat": "DODGE",
                             "val": 3
                         }
                     ]
@@ -527,21 +517,21 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 3
+                            "stat": "HP",
+                            "val": 32
                         }
                     ]
                 }
             ],
-            "description": "逐影套（20级）套装效果",
+            "description": "迷榖套在20级阶段的套装效果配置。",
             "sort_order": 100
         },
         {
-            "id": "setline_zhuying_40",
-            "set_line_id": "setline_zhuying",
-            "name": "逐影套·40级",
-            "sect": "法宗",
-            "flow_tag": "shadow",
+            "id": "setline_migu_40",
+            "set_line_id": "setline_migu",
+            "name": "迷榖套·40级",
+            "sect": "游宗",
+            "flow_tag": "evade",
             "stage": 40,
             "piece_count": 6,
             "slot_ids": [
@@ -554,15 +544,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
+                            "stat": "DODGE",
+                            "val": 5
                         }
                     ]
                 },
@@ -571,8 +560,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "HP",
+                            "val": 68
                         }
                     ]
                 },
@@ -581,21 +570,21 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
+                            "stat": "CDR",
                             "val": 4
                         }
                     ]
                 }
             ],
-            "description": "逐影套（40级）套装效果",
+            "description": "迷榖套在40级阶段的套装效果配置。",
             "sort_order": 110
         },
         {
-            "id": "setline_zhuying_60",
-            "set_line_id": "setline_zhuying",
-            "name": "逐影套·60级",
-            "sect": "法宗",
-            "flow_tag": "shadow",
+            "id": "setline_migu_60",
+            "set_line_id": "setline_migu",
+            "name": "迷榖套·60级",
+            "sect": "游宗",
+            "flow_tag": "evade",
             "stage": 60,
             "piece_count": 8,
             "slot_ids": [
@@ -608,15 +597,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 10
+                            "stat": "DODGE",
+                            "val": 7
                         }
                     ]
                 },
@@ -625,8 +613,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 10
+                            "stat": "HP",
+                            "val": 108
                         }
                     ]
                 },
@@ -635,8 +623,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "CDR",
+                            "val": 4
                         }
                     ]
                 },
@@ -646,19 +634,19 @@
                         {
                             "type": "stat",
                             "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "val": 8
                         }
                     ]
                 }
             ],
-            "description": "逐影套（60级）套装效果",
+            "description": "迷榖套在60级阶段的套装效果配置。",
             "sort_order": 120
         },
         {
-            "id": "setline_fentian_20",
-            "set_line_id": "setline_fentian",
-            "name": "焚天套·20级",
-            "sect": "法宗",
+            "id": "setline_chiyu_20",
+            "set_line_id": "setline_chiyu",
+            "name": "赤鱬套·20级",
+            "sect": "术宗",
             "flow_tag": "flame",
             "stage": 20,
             "piece_count": 4,
@@ -672,15 +660,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 3
+                            "stat": "SPELL_ATK",
+                            "val": 8
                         }
                     ]
                 },
@@ -689,20 +676,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 3
+                            "stat": "CRIT_DMG",
+                            "val": 4
                         }
                     ]
                 }
             ],
-            "description": "焚天套（20级）套装效果",
+            "description": "赤鱬套在20级阶段的套装效果配置。",
             "sort_order": 130
         },
         {
-            "id": "setline_fentian_40",
-            "set_line_id": "setline_fentian",
-            "name": "焚天套·40级",
-            "sect": "法宗",
+            "id": "setline_chiyu_40",
+            "set_line_id": "setline_chiyu",
+            "name": "赤鱬套·40级",
+            "sect": "术宗",
             "flow_tag": "flame",
             "stage": 40,
             "piece_count": 6,
@@ -716,15 +703,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
+                            "stat": "SPELL_ATK",
+                            "val": 16
                         }
                     ]
                 },
@@ -733,8 +719,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "CRIT_DMG",
+                            "val": 7
                         }
                     ]
                 },
@@ -743,20 +729,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
+                            "stat": "FINAL_DAMAGE",
                             "val": 4
                         }
                     ]
                 }
             ],
-            "description": "焚天套（40级）套装效果",
+            "description": "赤鱬套在40级阶段的套装效果配置。",
             "sort_order": 140
         },
         {
-            "id": "setline_fentian_60",
-            "set_line_id": "setline_fentian",
-            "name": "焚天套·60级",
-            "sect": "法宗",
+            "id": "setline_chiyu_60",
+            "set_line_id": "setline_chiyu",
+            "name": "赤鱬套·60级",
+            "sect": "术宗",
             "flow_tag": "flame",
             "stage": 60,
             "piece_count": 8,
@@ -770,15 +756,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 10
+                            "stat": "SPELL_ATK",
+                            "val": 24
                         }
                     ]
                 },
@@ -787,7 +772,7 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
+                            "stat": "CRIT_DMG",
                             "val": 10
                         }
                     ]
@@ -797,8 +782,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "FINAL_DAMAGE",
+                            "val": 4
                         }
                     ]
                 },
@@ -807,20 +792,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "stat": "SP",
+                            "val": 18
                         }
                     ]
                 }
             ],
-            "description": "焚天套（60级）套装效果",
+            "description": "赤鱬套在60级阶段的套装效果配置。",
             "sort_order": 150
         },
         {
-            "id": "setline_xuanshuang_20",
-            "set_line_id": "setline_xuanshuang",
-            "name": "玄霜套·20级",
-            "sect": "法宗",
+            "id": "setline_qingqiu_20",
+            "set_line_id": "setline_qingqiu",
+            "name": "青丘套·20级",
+            "sect": "术宗",
             "flow_tag": "frost",
             "stage": 20,
             "piece_count": 4,
@@ -834,15 +819,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 4,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 3
+                            "stat": "MDEF",
+                            "val": 8
                         }
                     ]
                 },
@@ -851,20 +835,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
+                            "stat": "CDR",
                             "val": 3
                         }
                     ]
                 }
             ],
-            "description": "玄霜套（20级）套装效果",
+            "description": "青丘套在20级阶段的套装效果配置。",
             "sort_order": 160
         },
         {
-            "id": "setline_xuanshuang_40",
-            "set_line_id": "setline_xuanshuang",
-            "name": "玄霜套·40级",
-            "sect": "法宗",
+            "id": "setline_qingqiu_40",
+            "set_line_id": "setline_qingqiu",
+            "name": "青丘套·40级",
+            "sect": "术宗",
             "flow_tag": "frost",
             "stage": 40,
             "piece_count": 6,
@@ -878,15 +862,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 6,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
+                            "stat": "MDEF",
+                            "val": 16
                         }
                     ]
                 },
@@ -895,8 +878,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 6
+                            "stat": "CDR",
+                            "val": 5
                         }
                     ]
                 },
@@ -905,20 +888,20 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 4
+                            "stat": "SPELL_ATK",
+                            "val": 12
                         }
                     ]
                 }
             ],
-            "description": "玄霜套（40级）套装效果",
+            "description": "青丘套在40级阶段的套装效果配置。",
             "sort_order": 170
         },
         {
-            "id": "setline_xuanshuang_60",
-            "set_line_id": "setline_xuanshuang",
-            "name": "玄霜套·60级",
-            "sect": "法宗",
+            "id": "setline_qingqiu_60",
+            "set_line_id": "setline_qingqiu",
+            "name": "青丘套·60级",
+            "sect": "术宗",
             "flow_tag": "frost",
             "stage": 60,
             "piece_count": 8,
@@ -932,15 +915,14 @@
                 "helm",
                 "necklace"
             ],
-            "max_pieces": 8,
             "thresholds": [
                 {
                     "count": 2,
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "ATK",
-                            "val": 10
+                            "stat": "MDEF",
+                            "val": 24
                         }
                     ]
                 },
@@ -949,8 +931,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "DEF",
-                            "val": 10
+                            "stat": "CDR",
+                            "val": 7
                         }
                     ]
                 },
@@ -959,8 +941,8 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "CRIT_PERCENT",
-                            "val": 6
+                            "stat": "SPELL_ATK",
+                            "val": 12
                         }
                     ]
                 },
@@ -969,13 +951,13 @@
                     "bonuses": [
                         {
                             "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 6
+                            "stat": "FINAL_REDUCTION",
+                            "val": 4
                         }
                     ]
                 }
             ],
-            "description": "玄霜套（60级）套装效果",
+            "description": "青丘套在60级阶段的套装效果配置。",
             "sort_order": 180
         }
     ]

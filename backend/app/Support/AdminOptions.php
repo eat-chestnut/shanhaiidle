@@ -13,6 +13,7 @@ use App\Models\Stage;
 use App\Models\StoryBoss;
 use App\Models\StoryChapter;
 use App\Models\StoryMap;
+use App\Services\BattleDefaultsService;
 use Illuminate\Database\Eloquent\Builder;
 
 class AdminOptions
@@ -674,6 +675,82 @@ class AdminOptions
             ->get()
             ->mapWithKeys(fn (SkillCatalog $skill): array => [$skill->id => sprintf('%s（%s）', $skill->name, $skill->id)])
             ->all();
+    }
+
+    public static function skillClassOptions(): array
+    {
+        $runtime = BattleDefaultsService::classOptions();
+        if ($runtime !== []) {
+            return $runtime;
+        }
+
+        return [
+            'bing' => '兵宗',
+            'vajra' => '金刚宗',
+            'talisman' => '符箓宗',
+            'global' => '通用',
+        ];
+    }
+
+    public static function skillTypeOptions(): array
+    {
+        return [
+            'active' => '主动技能',
+            'passive' => '被动技能',
+        ];
+    }
+
+    public static function skillTargetRuleOptions(): array
+    {
+        return [
+            'primary' => '主目标',
+            'self' => '自身',
+            'cluster' => '范围聚类',
+        ];
+    }
+
+    public static function skillTagOptions(): array
+    {
+        return [
+            'single' => '单体',
+            'aoe' => '范围',
+            'armor_break' => '破甲',
+            'barrier' => '结界',
+            'boss' => 'Boss向',
+            'burst' => '爆发',
+            'chain' => '连锁',
+            'cleanse' => '净化',
+            'clear' => '清图',
+            'control' => '控制',
+            'control_resist' => '抗控',
+            'counter' => '反击',
+            'damage' => '伤害',
+            'damage_down' => '减伤',
+            'debuff' => '减益',
+            'defense' => '防御',
+            'delayed' => '延时',
+            'dot' => '持续伤害',
+            'gap_close' => '突进',
+            'loot' => '掉落',
+            'meta' => '成长',
+            'resource' => '资源',
+            'shield' => '护盾',
+            'spell' => '术法',
+            'splash' => '溅射',
+            'stance' => '架势',
+            'summon' => '召唤',
+            'survival' => '生存',
+            'sustain' => '续航',
+            'ultimate' => '终结技',
+        ];
+    }
+
+    public static function combatDamageSourceOptions(): array
+    {
+        return [
+            'WD' => '物伤（WD）',
+            'SP' => '术伤（SP）',
+        ];
     }
 
     public static function sectOptions(): array

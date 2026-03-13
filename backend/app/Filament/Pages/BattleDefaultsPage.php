@@ -249,6 +249,138 @@ class BattleDefaultsPage extends Page implements HasForms
                                     ->columns(3),
                             ]),
 
+                        Tab::make('宗门与AI')
+                            ->schema([
+                                Section::make('宗门基础战斗')
+                                    ->description('技能页的宗门切换、基础攻击参数和战斗 AI 默认资料统一从这里读取。')
+                                    ->schema([
+                                        Repeater::make('classes')
+                                            ->label('宗门列表')
+                                            ->defaultItems(0)
+                                            ->addActionLabel('新增宗门')
+                                            ->reorderable(false)
+                                            ->reorderableWithButtons(false)
+                                            ->reorderableWithDragAndDrop(false)
+                                            ->itemLabel(fn (array $state): string => trim((string) ($state['name'] ?? $state['id'] ?? '宗门')))
+                                            ->schema([
+                                                TextInput::make('id')->label('宗门ID')->required()->maxLength(64),
+                                                TextInput::make('name')->label('宗门名称')->required()->maxLength(64),
+                                                TextInput::make('role')->label('定位文案')->maxLength(255),
+                                                TextInput::make('starter.skill_points')->label('默认技能点兜底')->required()->integer()->minValue(0)->default(1),
+                                                TextInput::make('base_combat.move_speed')->label('移速倍率')->required()->numeric()->minValue(0.1)->default(1),
+                                                TextInput::make('base_combat.attack_range')->label('普攻距离')->required()->numeric()->minValue(0.1)->default(1.8),
+                                                TextInput::make('base_combat.basic_attack_cd')->label('普攻间隔')->required()->numeric()->minValue(0.05)->default(1.2),
+                                                Select::make('base_combat.basic_attack_damage.source')
+                                                    ->label('普攻伤害来源')
+                                                    ->required()
+                                                    ->options(AdminOptions::combatDamageSourceOptions())
+                                                    ->default('WD'),
+                                                TextInput::make('base_combat.basic_attack_damage.coef')->label('普攻伤害系数')->required()->numeric()->minValue(0)->default(0.7),
+                                                Textarea::make('base_combat.notes')->label('战斗备注')->rows(2)->columnSpanFull(),
+                                            ])
+                                            ->columns(3)
+                                            ->collapsible()
+                                            ->columnSpanFull(),
+                                    ]),
+                                Section::make('战斗全局')
+                                    ->schema([
+                                        TextInput::make('combat.gcd_seconds')
+                                            ->label('公共施法间隔（秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0.05),
+                                        TextInput::make('combat.default_skill_coef_per_level')
+                                            ->label('技能默认每级成长系数')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0),
+                                        TextInput::make('combat.avoid_waste.debuff_refresh_threshold_sec')
+                                            ->label('减益刷新阈值（秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0),
+                                        TextInput::make('combat.avoid_waste.shield_keep_threshold_pct')
+                                            ->label('护盾保留阈值')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(1),
+                                    ])
+                                    ->columns(4),
+                                Section::make('AI 策略')
+                                    ->description('优先级和施法条件使用 JSON 对象维护，键名为宗门ID或技能ID。')
+                                    ->schema([
+                                        Repeater::make('ai_profiles.profiles')
+                                            ->label('策略列表')
+                                            ->defaultItems(0)
+                                            ->addActionLabel('新增策略')
+                                            ->reorderable(false)
+                                            ->reorderableWithButtons(false)
+                                            ->reorderableWithDragAndDrop(false)
+                                            ->itemLabel(fn (array $state): string => trim((string) ($state['name'] ?? $state['id'] ?? '策略')))
+                                            ->schema([
+                                                TextInput::make('id')->label('策略ID')->required()->maxLength(64),
+                                                TextInput::make('name')->label('策略名称')->required()->maxLength(64),
+                                                Textarea::make('priorities_json')
+                                                    ->label('优先级 JSON')
+                                                    ->rows(8)
+                                                    ->helperText('示例：{\"bing\":{\"BING_01\":95}}')
+                                                    ->rule(static function (): \Closure {
+                                                        return function (string $attribute, mixed $value, \Closure $fail): void {
+                                                            $text = trim((string) $value);
+                                                            if ($text === '') {
+                                                                return;
+                                                            }
+
+                                                            $decoded = json_decode($text, true);
+                                                            if (! is_array($decoded) || array_is_list($decoded)) {
+                                                                $fail('优先级 JSON 必须是对象。');
+                                                            }
+                                                        };
+                                                    }),
+                                                Textarea::make('cast_conditions_json')
+                                                    ->label('施法条件 JSON')
+                                                    ->rows(8)
+                                                    ->helperText('示例：{\"BING_01\":\"boss_present || elite_present\"}')
+                                                    ->rule(static function (): \Closure {
+                                                        return function (string $attribute, mixed $value, \Closure $fail): void {
+                                                            $text = trim((string) $value);
+                                                            if ($text === '') {
+                                                                return;
+                                                            }
+
+                                                            $decoded = json_decode($text, true);
+                                                            if (! is_array($decoded) || array_is_list($decoded)) {
+                                                                $fail('施法条件 JSON 必须是对象。');
+                                                            }
+                                                        };
+                                                    }),
+                                            ])
+                                            ->columns(2)
+                                            ->collapsible()
+                                            ->columnSpanFull(),
+                                        TextInput::make('ai_profiles.auto_switch.switch_cooldown_sec')
+                                            ->label('自动切换冷却（秒）')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0),
+                                        Repeater::make('ai_profiles.auto_switch.rules_in_order')
+                                            ->label('自动切换规则')
+                                            ->defaultItems(0)
+                                            ->addActionLabel('新增切换规则')
+                                            ->reorderable(false)
+                                            ->reorderableWithButtons(false)
+                                            ->reorderableWithDragAndDrop(false)
+                                            ->schema([
+                                                TextInput::make('if')->label('条件表达式')->required()->maxLength(255),
+                                                TextInput::make('profile')->label('目标策略ID')->required()->maxLength(64),
+                                            ])
+                                            ->columns(2)
+                                            ->collapsible()
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+
                         Tab::make('经济')
                             ->schema([
                                 Section::make('鉴定消耗')
@@ -466,6 +598,22 @@ class BattleDefaultsPage extends Page implements HasForms
                     'boss' => (int) ($state['player_regen']['heal_on_kill']['boss'] ?? 4),
                 ],
             ],
+            'classes' => $this->normalizeRuntimeClasses($state['classes'] ?? []),
+            'combat' => [
+                'gcd_seconds' => (float) ($state['combat']['gcd_seconds'] ?? 0.4),
+                'default_skill_coef_per_level' => (float) ($state['combat']['default_skill_coef_per_level'] ?? 0.03),
+                'avoid_waste' => [
+                    'debuff_refresh_threshold_sec' => (float) ($state['combat']['avoid_waste']['debuff_refresh_threshold_sec'] ?? 2.0),
+                    'shield_keep_threshold_pct' => (float) ($state['combat']['avoid_waste']['shield_keep_threshold_pct'] ?? 0.3),
+                ],
+            ],
+            'ai_profiles' => [
+                'profiles' => $this->normalizeAiProfiles($state['ai_profiles']['profiles'] ?? []),
+                'auto_switch' => [
+                    'switch_cooldown_sec' => (float) ($state['ai_profiles']['auto_switch']['switch_cooldown_sec'] ?? 2.0),
+                    'rules_in_order' => $this->normalizeAiRules($state['ai_profiles']['auto_switch']['rules_in_order'] ?? []),
+                ],
+            ],
             'refine_effect_pool' => $this->normalizeRefineEffectPool($state['refine_effect_pool'] ?? []),
             'economy' => [
                 'identify_cost_by_rarity' => [
@@ -646,6 +794,104 @@ class BattleDefaultsPage extends Page implements HasForms
             }
         }
 
+        $classes = $payload['classes'] ?? [];
+        if (! is_array($classes) || $classes === []) {
+            $errors['classes'] = '至少配置1个宗门。';
+        } else {
+            $seenClassIds = [];
+            foreach ($classes as $index => $class) {
+                if (! is_array($class)) {
+                    $errors["classes.{$index}"] = '宗门配置格式错误。';
+                    continue;
+                }
+                $classId = trim((string) ($class['id'] ?? ''));
+                $className = trim((string) ($class['name'] ?? ''));
+                if ($classId === '') {
+                    $errors["classes.{$index}.id"] = '宗门ID不能为空。';
+                } elseif (in_array($classId, $seenClassIds, true)) {
+                    $errors["classes.{$index}.id"] = '宗门ID不能重复。';
+                } else {
+                    $seenClassIds[] = $classId;
+                }
+                if ($className === '') {
+                    $errors["classes.{$index}.name"] = '宗门名称不能为空。';
+                }
+                if ((int) (($class['starter']['skill_points'] ?? 0)) < 0) {
+                    $errors["classes.{$index}.starter.skill_points"] = '默认技能点不能为负数。';
+                }
+
+                $baseCombat = is_array($class['base_combat'] ?? null) ? $class['base_combat'] : [];
+                if ((float) ($baseCombat['move_speed'] ?? 0) <= 0) {
+                    $errors["classes.{$index}.base_combat.move_speed"] = '移速倍率必须大于0。';
+                }
+                if ((float) ($baseCombat['attack_range'] ?? 0) <= 0) {
+                    $errors["classes.{$index}.base_combat.attack_range"] = '普攻距离必须大于0。';
+                }
+                if ((float) ($baseCombat['basic_attack_cd'] ?? 0) <= 0) {
+                    $errors["classes.{$index}.base_combat.basic_attack_cd"] = '普攻间隔必须大于0。';
+                }
+                $source = trim((string) ($baseCombat['basic_attack_damage']['source'] ?? ''));
+                if (! in_array($source, array_keys(AdminOptions::combatDamageSourceOptions()), true)) {
+                    $errors["classes.{$index}.base_combat.basic_attack_damage.source"] = '普攻伤害来源非法。';
+                }
+            }
+        }
+
+        if ((float) ($payload['combat']['gcd_seconds'] ?? 0) <= 0) {
+            $errors['combat.gcd_seconds'] = '公共施法间隔必须大于0。';
+        }
+        if ((float) ($payload['combat']['default_skill_coef_per_level'] ?? -1) < 0) {
+            $errors['combat.default_skill_coef_per_level'] = '技能默认成长系数不能为负数。';
+        }
+        $shieldKeep = (float) ($payload['combat']['avoid_waste']['shield_keep_threshold_pct'] ?? -1);
+        if ($shieldKeep < 0 || $shieldKeep > 1) {
+            $errors['combat.avoid_waste.shield_keep_threshold_pct'] = '护盾保留阈值必须在0~1之间。';
+        }
+
+        $profiles = $payload['ai_profiles']['profiles'] ?? [];
+        $profileIds = [];
+        if (! is_array($profiles) || $profiles === []) {
+            $errors['ai_profiles.profiles'] = '至少配置1套AI策略。';
+        } else {
+            $seenProfileIds = [];
+            foreach ($profiles as $index => $profile) {
+                if (! is_array($profile)) {
+                    $errors["ai_profiles.profiles.{$index}"] = 'AI策略格式错误。';
+                    continue;
+                }
+                $profileId = trim((string) ($profile['id'] ?? ''));
+                if ($profileId === '') {
+                    $errors["ai_profiles.profiles.{$index}.id"] = '策略ID不能为空。';
+                } elseif (in_array($profileId, $seenProfileIds, true)) {
+                    $errors["ai_profiles.profiles.{$index}.id"] = '策略ID不能重复。';
+                } else {
+                    $seenProfileIds[] = $profileId;
+                    $profileIds[] = $profileId;
+                }
+                if (trim((string) ($profile['name'] ?? '')) === '') {
+                    $errors["ai_profiles.profiles.{$index}.name"] = '策略名称不能为空。';
+                }
+            }
+        }
+
+        $rules = $payload['ai_profiles']['auto_switch']['rules_in_order'] ?? [];
+        if (is_array($rules)) {
+            foreach ($rules as $index => $rule) {
+                if (! is_array($rule)) {
+                    $errors["ai_profiles.auto_switch.rules_in_order.{$index}"] = '自动切换规则格式错误。';
+                    continue;
+                }
+                if (trim((string) ($rule['if'] ?? '')) === '') {
+                    $errors["ai_profiles.auto_switch.rules_in_order.{$index}.if"] = '自动切换条件不能为空。';
+                }
+                if (trim((string) ($rule['profile'] ?? '')) === '') {
+                    $errors["ai_profiles.auto_switch.rules_in_order.{$index}.profile"] = '目标策略ID不能为空。';
+                } elseif ($profileIds !== [] && ! in_array(trim((string) $rule['profile']), $profileIds, true)) {
+                    $errors["ai_profiles.auto_switch.rules_in_order.{$index}.profile"] = '目标策略ID必须已在上方策略列表中配置。';
+                }
+            }
+        }
+
         if ($errors !== []) {
             throw ValidationException::withMessages($errors);
         }
@@ -699,6 +945,115 @@ class BattleDefaultsPage extends Page implements HasForms
         }
 
         return $out;
+    }
+
+    private function normalizeRuntimeClasses(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $rows = [];
+        foreach ($value as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $id = trim((string) ($row['id'] ?? ''));
+            $name = trim((string) ($row['name'] ?? ''));
+            if ($id === '' || $name === '') {
+                continue;
+            }
+
+            $rows[] = [
+                'id' => $id,
+                'name' => $name,
+                'role' => trim((string) ($row['role'] ?? '')),
+                'starter' => [
+                    'skill_points' => max(0, (int) ($row['starter']['skill_points'] ?? 1)),
+                ],
+                'base_combat' => [
+                    'move_speed' => (float) ($row['base_combat']['move_speed'] ?? 1),
+                    'attack_range' => (float) ($row['base_combat']['attack_range'] ?? 1.8),
+                    'basic_attack_cd' => (float) ($row['base_combat']['basic_attack_cd'] ?? 1.2),
+                    'basic_attack_damage' => [
+                        'source' => trim((string) ($row['base_combat']['basic_attack_damage']['source'] ?? 'WD')),
+                        'coef' => (float) ($row['base_combat']['basic_attack_damage']['coef'] ?? 0.7),
+                    ],
+                    'notes' => trim((string) ($row['base_combat']['notes'] ?? '')),
+                ],
+            ];
+        }
+
+        return array_values($rows);
+    }
+
+    private function normalizeAiProfiles(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $rows = [];
+        foreach ($value as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $id = trim((string) ($row['id'] ?? ''));
+            $name = trim((string) ($row['name'] ?? ''));
+            if ($id === '' || $name === '') {
+                continue;
+            }
+
+            $rows[] = [
+                'id' => $id,
+                'name' => $name,
+                'priorities' => $this->decodeJsonObjectText($row['priorities_json'] ?? null),
+                'cast_conditions' => $this->decodeJsonObjectText($row['cast_conditions_json'] ?? null),
+            ];
+        }
+
+        return array_values($rows);
+    }
+
+    private function normalizeAiRules(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $rows = [];
+        foreach ($value as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $condition = trim((string) ($row['if'] ?? ''));
+            $profile = trim((string) ($row['profile'] ?? ''));
+            if ($condition === '' || $profile === '') {
+                continue;
+            }
+
+            $rows[] = [
+                'if' => $condition,
+                'profile' => $profile,
+            ];
+        }
+
+        return array_values($rows);
+    }
+
+    private function decodeJsonObjectText(mixed $value): array
+    {
+        $text = trim((string) $value);
+        if ($text === '') {
+            return [];
+        }
+
+        $decoded = json_decode($text, true);
+
+        return is_array($decoded) && ! array_is_list($decoded) ? $decoded : [];
     }
 
     private function normalizeRefineEffectPool(mixed $value): array
@@ -775,7 +1130,39 @@ class BattleDefaultsPage extends Page implements HasForms
             $payload['economy']['salvage_reward_by_rarity'][$rarity]['items_rows'] = $rows;
         }
 
+        $classes = $payload['classes'] ?? [];
+        if (is_array($classes)) {
+            foreach ($classes as $index => $class) {
+                if (! is_array($class)) {
+                    continue;
+                }
+                $payload['classes'][$index]['starter']['skill_points'] = max(0, (int) ($class['starter']['skill_points'] ?? 1));
+            }
+        }
+
+        $profiles = $payload['ai_profiles']['profiles'] ?? [];
+        if (is_array($profiles)) {
+            foreach ($profiles as $index => $profile) {
+                if (! is_array($profile)) {
+                    continue;
+                }
+                $payload['ai_profiles']['profiles'][$index]['priorities_json'] = $this->prettyJson($profile['priorities'] ?? []);
+                $payload['ai_profiles']['profiles'][$index]['cast_conditions_json'] = $this->prettyJson($profile['cast_conditions'] ?? []);
+            }
+        }
+
         return $payload;
+    }
+
+    private function prettyJson(mixed $value): string
+    {
+        if (! is_array($value) || $value === []) {
+            return '';
+        }
+
+        $json = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return $json === false ? '' : $json;
     }
 
     private function itemOptions(): array

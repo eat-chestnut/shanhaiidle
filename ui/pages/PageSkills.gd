@@ -146,18 +146,7 @@ func _build_skill_desc(skill: Dictionary) -> String:
 
 func _active_skills_for_current_class() -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var balance_any = cfg.get("balance", {})
-	if not (balance_any is Dictionary):
-		return rows
-	var balance: Dictionary = balance_any
-	var skills_any = balance.get("skills", [])
-	if not (skills_any is Array):
-		return rows
-	for skill_any in skills_any:
-		if not (skill_any is Dictionary):
-			continue
-		var skill: Dictionary = skill_any
+	for skill in ConfigService.get_skills_catalog_rows():
 		if str(skill.get("type", "")) != "active":
 			continue
 		if str(skill.get("class", "")) != SkillModel.current_class:
@@ -175,17 +164,7 @@ func _sort_skill_rows(a: Dictionary, b: Dictionary) -> bool:
 
 func _classes_order() -> Array[String]:
 	var order: Array[String] = []
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var balance_any = cfg.get("balance", {})
-	if not (balance_any is Dictionary):
-		return order
-	var classes_any = (balance_any as Dictionary).get("classes", [])
-	if not (classes_any is Array):
-		return order
-	for cls_any in classes_any:
-		if not (cls_any is Dictionary):
-			continue
-		var cls: Dictionary = cls_any
+	for cls in ConfigService.get_battle_classes():
 		var cls_id := str(cls.get("id", ""))
 		if cls_id.is_empty():
 			continue
@@ -193,17 +172,9 @@ func _classes_order() -> Array[String]:
 	return order
 
 func _class_name(class_id: String) -> String:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var balance_any = cfg.get("balance", {})
-	if balance_any is Dictionary:
-		var classes_any = (balance_any as Dictionary).get("classes", [])
-		if classes_any is Array:
-			for cls_any in classes_any:
-				if not (cls_any is Dictionary):
-					continue
-				var cls: Dictionary = cls_any
-				if str(cls.get("id", "")) == class_id:
-					return str(cls.get("name", class_id))
+	for cls in ConfigService.get_battle_classes():
+		if str(cls.get("id", "")) == class_id:
+			return str(cls.get("name", class_id))
 	return class_id
 
 func _next_class_id() -> String:

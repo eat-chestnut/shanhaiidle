@@ -3,10 +3,13 @@
 namespace App\Services;
 
 use App\Models\AppSetting;
+use Illuminate\Support\Facades\File;
 
 class BattleDefaultsService
 {
     public const SETTING_KEY = 'battle_defaults';
+
+    private const PROJECT_BATTLE_DEFAULTS_FILE = '../data/battle_defaults.json';
 
     public static function defaultConfig(): array
     {
@@ -97,6 +100,9 @@ class BattleDefaultsService
                     ],
                 ],
             ],
+            'classes' => self::projectBattleDefaults()['classes'] ?? self::fallbackClasses(),
+            'combat' => self::projectBattleDefaults()['combat'] ?? self::fallbackCombat(),
+            'ai_profiles' => self::projectBattleDefaults()['ai_profiles'] ?? self::fallbackAiProfiles(),
         ];
     }
 
@@ -136,6 +142,41 @@ class BattleDefaultsService
         );
     }
 
+    public static function classOptions(): array
+    {
+        $rows = self::loadConfig()['classes'] ?? [];
+        if (! is_array($rows)) {
+            return [];
+        }
+
+        $options = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $id = trim((string) ($row['id'] ?? ''));
+            $name = trim((string) ($row['name'] ?? ''));
+            if ($id === '' || $name === '') {
+                continue;
+            }
+
+            $options[$id] = $name;
+        }
+
+        return $options;
+    }
+
+    public static function classNameById(?string $classId): string
+    {
+        $classId = trim((string) $classId);
+        if ($classId === '') {
+            return '';
+        }
+
+        return self::classOptions()[$classId] ?? '';
+    }
+
     private static function mergeRecursive(array $base, array $override): array
     {
         foreach ($override as $key => $value) {
@@ -160,5 +201,132 @@ class BattleDefaultsService
         }
 
         return array_values($value) === $value;
+    }
+
+    private static function projectBattleDefaults(): array
+    {
+        static $cache = null;
+
+        if (is_array($cache)) {
+            return $cache;
+        }
+
+        $path = base_path(self::PROJECT_BATTLE_DEFAULTS_FILE);
+        if (! File::exists($path)) {
+            return $cache = [];
+        }
+
+        $decoded = json_decode((string) File::get($path), true);
+        if (! is_array($decoded)) {
+            return $cache = [];
+        }
+
+        $battle = $decoded['battle'] ?? [];
+
+        return $cache = is_array($battle) ? $battle : [];
+    }
+
+    private static function fallbackClasses(): array
+    {
+        return [
+            [
+                'id' => 'bing',
+                'name' => '兵宗',
+                'role' => '武技派（不绑定武器）',
+                'starter' => [
+                    'level' => 1,
+                    'free_attribute_points' => 0,
+                    'skill_points' => 1,
+                    'base_attributes' => [
+                        'strength' => 0,
+                        'physique' => 0,
+                        'agility' => 0,
+                        'spirit' => 0,
+                        'true_energy' => 0,
+                        'fortune' => 0,
+                    ],
+                ],
+                'base_combat' => [
+                    'move_speed' => 1.0,
+                    'attack_range' => 1.8,
+                    'basic_attack_cd' => 1.2,
+                    'basic_attack_damage' => ['source' => 'WD', 'coef' => 0.7],
+                    'notes' => '近战；基础攻击在技能空档自动执行。',
+                ],
+            ],
+            [
+                'id' => 'vajra',
+                'name' => '金刚宗',
+                'role' => '硬抗派（护盾/结界/反噬/震慑）',
+                'starter' => [
+                    'level' => 1,
+                    'free_attribute_points' => 0,
+                    'skill_points' => 1,
+                    'base_attributes' => [
+                        'strength' => 0,
+                        'physique' => 0,
+                        'agility' => 0,
+                        'spirit' => 0,
+                        'true_energy' => 0,
+                        'fortune' => 0,
+                    ],
+                ],
+                'base_combat' => [
+                    'move_speed' => 0.95,
+                    'attack_range' => 1.7,
+                    'basic_attack_cd' => 1.3,
+                    'basic_attack_damage' => ['source' => 'WD', 'coef' => 0.65],
+                    'notes' => '近战；偏稳推。',
+                ],
+            ],
+            [
+                'id' => 'talisman',
+                'name' => '符箓宗',
+                'role' => '术法派（连锁/灼烧/控制/召唤）',
+                'starter' => [
+                    'level' => 1,
+                    'free_attribute_points' => 0,
+                    'skill_points' => 1,
+                    'base_attributes' => [
+                        'strength' => 0,
+                        'physique' => 0,
+                        'agility' => 0,
+                        'spirit' => 0,
+                        'true_energy' => 0,
+                        'fortune' => 0,
+                    ],
+                ],
+                'base_combat' => [
+                    'move_speed' => 1.0,
+                    'attack_range' => 4.8,
+                    'basic_attack_cd' => 1.25,
+                    'basic_attack_damage' => ['source' => 'SP', 'coef' => 0.7],
+                    'notes' => '远程；保持距离施法。',
+                ],
+            ],
+        ];
+    }
+
+    private static function fallbackCombat(): array
+    {
+        return [
+            'gcd_seconds' => 0.4,
+            'default_skill_coef_per_level' => 0.03,
+            'avoid_waste' => [
+                'debuff_refresh_threshold_sec' => 2.0,
+                'shield_keep_threshold_pct' => 0.3,
+            ],
+        ];
+    }
+
+    private static function fallbackAiProfiles(): array
+    {
+        return [
+            'profiles' => [],
+            'auto_switch' => [
+                'rules_in_order' => [],
+                'switch_cooldown_sec' => 2.0,
+            ],
+        ];
     }
 }

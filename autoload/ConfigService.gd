@@ -22,15 +22,7 @@ func load_all() -> void:
 	cfg.clear()
 	cfg["_config_sources"] = {}
 	_log_manifest_status()
-	var battle_cfg: Variant = _load_json_file("res://data/battle_config.json")
-	if battle_cfg is Dictionary:
-		cfg.merge(battle_cfg, true)
-	_apply_battle_defaults_override()
-
-	var balance_cfg: Variant = _load_json_file("res://data/balance_v1.json")
-	if not (balance_cfg is Dictionary):
-		balance_cfg = {}
-	cfg["balance"] = balance_cfg
+	_load_battle_cfg()
 	_load_core_remote_configs()
 
 	_load_items_cfg()
@@ -45,29 +37,7 @@ func load_all() -> void:
 	_load_forge_rules_cfg()
 	_load_equipment_sets_cfg()
 
-	var leveling_cfg: Variant = _load_json_file("res://data/leveling.json")
-	if not (leveling_cfg is Dictionary):
-		leveling_cfg = {
-			"level_cap": 60,
-			"exp_curve": {
-				"base": 20,
-				"linear": 6,
-				"quadratic": 0.2,
-			},
-			"kill_exp": 2,
-		}
-	cfg["leveling"] = leveling_cfg
-
 	_load_skills_catalog_cfg()
-
-	var upgrade_db: Variant = _load_json_file("res://data/upgrade_v1.json")
-	if not (upgrade_db is Dictionary):
-		upgrade_db = {
-			"tier_names": ["凡", "灵", "玄"],
-			"tier_bonus": {"0": 0, "1": 1, "2": 2},
-			"recipes": {},
-		}
-	cfg["upgrade_db"] = upgrade_db
 
 	cfg["ui_frames"] = {
 		"empty": "res://assets/ui_frames/common_board_quality_mask.png",
@@ -101,6 +71,45 @@ func get_character_growth_rules() -> Dictionary:
 func get_progression_milestones() -> Dictionary:
 	var milestones_any = cfg.get("progression_milestones", {})
 	return milestones_any if milestones_any is Dictionary else _default_progression_milestones()
+
+func get_battle_cfg() -> Dictionary:
+	var battle_any = cfg.get("battle_cfg", {})
+	return battle_any if battle_any is Dictionary else {}
+
+func get_skills_catalog_db() -> Dictionary:
+	var db_any = cfg.get("skills_catalog_db", {})
+	if db_any is Dictionary and not (db_any as Dictionary).is_empty():
+		var db: Dictionary = db_any
+		var rows_any = db.get("skills_catalog", [])
+		if rows_any is Array and not (rows_any as Array).is_empty():
+			var first_any = (rows_any as Array)[0]
+			if first_any is Dictionary:
+				var first: Dictionary = first_any
+				if first.has("class") and first.has("type") and first.has("min_level"):
+					return db
+	return {"skills_catalog": []}
+
+func get_skills_catalog_rows() -> Array[Dictionary]:
+	var db := get_skills_catalog_db()
+	var rows_any = db.get("skills_catalog", [])
+	if not (rows_any is Array):
+		return []
+	var rows: Array[Dictionary] = []
+	for row_any in rows_any:
+		if row_any is Dictionary:
+			rows.append((row_any as Dictionary).duplicate(true))
+	return rows
+
+func get_battle_classes() -> Array[Dictionary]:
+	var battle := get_battle_cfg()
+	var classes_any = battle.get("classes", [])
+	if not (classes_any is Array):
+		return []
+	var rows: Array[Dictionary] = []
+	for row_any in classes_any:
+		if row_any is Dictionary:
+			rows.append((row_any as Dictionary).duplicate(true))
+	return rows
 
 func get_monsters_db() -> Dictionary:
 	var db_any = cfg.get("monsters_db", {})
@@ -363,6 +372,36 @@ func _load_stages_cfg() -> void:
 
 func _load_monsters_cfg() -> void:
 	_load_core_remote_config("monsters")
+
+func _load_battle_cfg() -> void:
+	cfg["battle_cfg"] = {}
+	var remote_text := RemoteConfigService.get_remote_text_for_key("battle_defaults")
+	if not remote_text.strip_edges().is_empty():
+		var check: Dictionary = RemoteConfigService.validate_battle_defaults(remote_text)
+		if bool(check.get("ok", false)):
+			var parsed_any: Variant = JSON.parse_string(remote_text)
+			if parsed_any is Dictionary:
+				var battle_any = (parsed_any as Dictionary).get("battle", {})
+				if battle_any is Dictionary:
+					cfg["battle_cfg"] = (battle_any as Dictionary).duplicate(true)
+					_record_config_source("battle_defaults", "remote", "battle_defaults.json")
+					return
+		_config_warn("battle_defaults 配置远程校验失败：%s" % str(check.get("reason", "unknown")))
+
+	var local_text := _read_text_file("res://data/battle_defaults.json")
+	if not local_text.strip_edges().is_empty():
+		var local_check: Dictionary = RemoteConfigService.validate_battle_defaults(local_text)
+		if bool(local_check.get("ok", false)):
+			var local_parsed_any: Variant = JSON.parse_string(local_text)
+			if local_parsed_any is Dictionary:
+				var local_battle_any = (local_parsed_any as Dictionary).get("battle", {})
+				if local_battle_any is Dictionary:
+					cfg["battle_cfg"] = (local_battle_any as Dictionary).duplicate(true)
+					_record_config_source("battle_defaults", "local", "battle_defaults.json")
+					return
+			_config_warn("battle_defaults 配置本地校验失败：%s" % str(local_check.get("reason", "unknown")))
+
+	_record_config_source("battle_defaults", "default", "empty")
 
 func _load_items_cfg() -> void:
 	var fallback: Dictionary = {
@@ -889,51 +928,6 @@ func _default_progression_milestones() -> Dictionary:
 			},
 		],
 	}
-
-func _apply_battle_defaults_override() -> void:
-	var current_battle_any: Variant = cfg.get("battle", {})
-	var current_battle: Dictionary = current_battle_any if current_battle_any is Dictionary else {}
-
-	var source_text = RemoteConfigService.get_active_text("battle_defaults.json", "res://data/battle_defaults.json")
-	if source_text.strip_edges().is_empty():
-		cfg["battle"] = current_battle
-		return
-
-	var check: Dictionary = RemoteConfigService.validate_battle_defaults(source_text)
-	if not bool(check.get("ok", false)):
-		push_warning("ConfigService: battle defaults invalid: %s" % str(check.get("reason", "unknown")))
-		cfg["battle"] = current_battle
-		return
-
-	var parsed_any: Variant = JSON.parse_string(source_text)
-	if not (parsed_any is Dictionary):
-		cfg["battle"] = current_battle
-		return
-	var parsed: Dictionary = parsed_any
-	var battle_override_any: Variant = parsed.get("battle", {})
-	if not (battle_override_any is Dictionary):
-		cfg["battle"] = current_battle
-		return
-	var battle_override: Dictionary = (battle_override_any as Dictionary).duplicate(true)
-	if battle_override.has("refine_effect_pool"):
-		if not RemoteConfigService.is_valid_refine_effect_pool(battle_override.get("refine_effect_pool", [])):
-			battle_override.erase("refine_effect_pool")
-			push_warning("ConfigService: ignored invalid battle.refine_effect_pool")
-
-	cfg["battle"] = _deep_merge_dict(current_battle, battle_override)
-
-func _deep_merge_dict(base: Dictionary, override: Dictionary) -> Dictionary:
-	var out: Dictionary = base.duplicate(true)
-	for key_any in override.keys():
-		var key = key_any
-		var over_val: Variant = override.get(key)
-		if out.has(key) and out[key] is Dictionary and over_val is Dictionary:
-			var base_child: Dictionary = out[key]
-			var over_child: Dictionary = over_val
-			out[key] = _deep_merge_dict(base_child, over_child)
-		else:
-			out[key] = over_val
-	return out
 
 func _load_json_file(path: String) -> Variant:
 	if not FileAccess.file_exists(path):

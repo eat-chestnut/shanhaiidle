@@ -401,34 +401,11 @@ func _normalize_growth_milestone(row: Dictionary) -> Dictionary:
 
 	var reward_item_id := str(out.get("reward_item_id", "")).strip_edges()
 	var reward_count := maxi(1, int(out.get("reward_count", 1)))
-	if reward_item_id.is_empty():
-		var legacy_reward := _resolve_legacy_milestone_reward(out.get("rewards", []))
-		reward_item_id = str(legacy_reward.get("reward_item_id", "")).strip_edges()
-		reward_count = maxi(1, int(legacy_reward.get("reward_count", reward_count)))
 	out["reward_item_id"] = reward_item_id
 	out["reward_count"] = reward_count
-	out.erase("rewards")
 
 	out["unlock_contents"] = _normalize_milestone_unlock_contents(out.get("unlock_contents", []))
 	return out
-
-func _resolve_legacy_milestone_reward(rewards_any: Variant) -> Dictionary:
-	if not (rewards_any is Array):
-		return {}
-	var rewards: Array = rewards_any
-	if rewards.is_empty():
-		return {}
-	var first: Variant = rewards[0]
-	if not (first is Dictionary):
-		return {}
-	var row: Dictionary = first
-	var item_id := str(row.get("reward_item_id", row.get("item_id", ""))).strip_edges()
-	if item_id.is_empty():
-		return {}
-	return {
-		"reward_item_id": item_id,
-		"reward_count": maxi(1, int(row.get("reward_count", row.get("count", 1)))),
-	}
 
 func _normalize_milestone_unlock_contents(rows_any: Variant) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []

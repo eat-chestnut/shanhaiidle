@@ -101,15 +101,6 @@ class EquipmentSetResource extends Resource
                             ->minValue(2)
                             ->maxValue(8),
 
-                        TextInput::make('max_pieces')
-                            ->label('兼容总件数')
-                            ->integer()
-                            ->required()
-                            ->default(4)
-                            ->minValue(2)
-                            ->maxValue(10)
-                            ->helperText('旧字段兼容，建议与总件数一致。'),
-
                         Select::make('slot_ids')
                             ->label('套装位')
                             ->multiple()

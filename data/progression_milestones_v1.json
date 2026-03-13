@@ -2,8 +2,8 @@
     "meta": {
         "key": "progression_milestones",
         "schema_version": 1,
-        "exported_at": "2026-03-11 17:08:49",
-        "sha256": "5caf2d8fb2437b741dde3b14e3282917ebdc89771d6f9129da106e859a5abc42"
+        "exported_at": "2026-03-12 12:52:32",
+        "sha256": "b11fbca4add6eb62a58d5caa93829b05ddee3586b3fe062b4896376e9cd51933"
     },
     "progression_milestones": {
         "version": 1,
@@ -64,6 +64,10 @@
                     {
                         "type": "blue_gear",
                         "content": "蓝装进入5级档"
+                    },
+                    {
+                        "type": "feature_unlock",
+                        "content": "开放金币副本"
                     }
                 ],
                 "reward_item_id": "milestone_pack_lv5",
@@ -90,6 +94,10 @@
                     {
                         "type": "blue_gear",
                         "content": "蓝装进入10级档"
+                    },
+                    {
+                        "type": "feature_unlock",
+                        "content": "开放经验副本"
                     }
                 ],
                 "reward_item_id": "milestone_pack_lv10",
@@ -116,6 +124,10 @@
                     {
                         "type": "blue_gear",
                         "content": "蓝装进入15级双词条阶段"
+                    },
+                    {
+                        "type": "feature_unlock",
+                        "content": "开放材料副本"
                     }
                 ],
                 "reward_item_id": "milestone_pack_lv15",
@@ -142,6 +154,10 @@
                     {
                         "type": "blue_gear",
                         "content": "蓝装进入20级双词条阶段"
+                    },
+                    {
+                        "type": "feature_unlock",
+                        "content": "开放宝石副本"
                     }
                 ],
                 "reward_item_id": "milestone_pack_lv20",

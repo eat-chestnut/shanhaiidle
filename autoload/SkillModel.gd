@@ -124,9 +124,9 @@ func save() -> void:
 	save_skills()
 
 func load_skills() -> void:
-	var balance := _balance_cfg()
-	var default_class := _default_class_id(balance)
-	var default_points := _default_skill_points(balance)
+	var battle := _battle_cfg()
+	var default_class := _default_class_id(battle)
+	var default_points := _default_skill_points(battle)
 
 	current_class = default_class
 	skill_points = default_points
@@ -173,56 +173,29 @@ func save_skills() -> void:
 	file.store_string(JSON.stringify(payload))
 
 func _find_skill(skill_id: String) -> Dictionary:
-	var balance := _balance_cfg()
-	var skills_any = balance.get("skills", [])
-	if not (skills_any is Array):
-		return {}
-	for skill_any in skills_any:
-		if not (skill_any is Dictionary):
-			continue
-		var skill: Dictionary = skill_any
+	for skill in ConfigService.get_skills_catalog_rows():
 		if str(skill.get("id", "")) == skill_id:
 			return skill
 	return {}
 
 func _has_class(class_id: String) -> bool:
-	var balance := _balance_cfg()
-	var classes_any = balance.get("classes", [])
-	if not (classes_any is Array):
-		return false
-	for cls_any in classes_any:
-		if not (cls_any is Dictionary):
-			continue
-		var cls: Dictionary = cls_any
+	for cls in ConfigService.get_battle_classes():
 		if str(cls.get("id", "")) == class_id:
 			return true
 	return false
 
 func _class_name(class_id: String) -> String:
-	var balance := _balance_cfg()
-	var classes_any = balance.get("classes", [])
-	if not (classes_any is Array):
-		return class_id
-	for cls_any in classes_any:
-		if not (cls_any is Dictionary):
-			continue
-		var cls: Dictionary = cls_any
+	for cls in ConfigService.get_battle_classes():
 		if str(cls.get("id", "")) == class_id:
 			return str(cls.get("name", class_id))
 	return class_id
 
-func _default_class_id(balance: Dictionary) -> String:
+func _default_class_id(battle: Dictionary) -> String:
 	var growth_initial := _initial_growth_cfg()
 	var from_growth := str(growth_initial.get("current_class", "")).strip_edges()
 	if not from_growth.is_empty():
 		return from_growth
-	var starter_any = balance.get("starter", {})
-	if starter_any is Dictionary:
-		var starter: Dictionary = starter_any
-		var from_starter := str(starter.get("starting_class_id", ""))
-		if not from_starter.is_empty():
-			return from_starter
-	var classes_any = balance.get("classes", [])
+	var classes_any = battle.get("classes", [])
 	if classes_any is Array:
 		for cls_any in classes_any:
 			if not (cls_any is Dictionary):
@@ -233,15 +206,11 @@ func _default_class_id(balance: Dictionary) -> String:
 				return cls_id
 	return "bing"
 
-func _default_skill_points(balance: Dictionary) -> int:
+func _default_skill_points(battle: Dictionary) -> int:
 	var growth_initial := _initial_growth_cfg()
 	if growth_initial.has("skill_points"):
 		return maxi(0, int(growth_initial.get("skill_points", 1)))
-	var starter_any = balance.get("starter", {})
-	if starter_any is Dictionary:
-		var starter: Dictionary = starter_any
-		return maxi(0, int(starter.get("skill_points", 1)))
-	var classes_any = balance.get("classes", [])
+	var classes_any = battle.get("classes", [])
 	if classes_any is Array:
 		for cls_any in classes_any:
 			if not (cls_any is Dictionary):
@@ -252,12 +221,8 @@ func _default_skill_points(balance: Dictionary) -> int:
 				return maxi(0, int((cls_starter_any as Dictionary).get("skill_points", 1)))
 	return 1
 
-func _balance_cfg() -> Dictionary:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var balance_any = cfg.get("balance", {})
-	if balance_any is Dictionary:
-		return balance_any
-	return {}
+func _battle_cfg() -> Dictionary:
+	return ConfigService.get_battle_cfg()
 
 func _character_growth_cfg() -> Dictionary:
 	return ConfigService.get_character_growth_rules()

@@ -335,14 +335,14 @@ func _format_inst_detail(inst: Dictionary, slot_key: String) -> String:
 	var set_id := str(inst.get("set_id", "")).strip_edges()
 	if set_id.is_empty():
 		lines.append("套装：无")
-	else:
-		var set_def := _find_equipment_set_def(set_id)
-		var set_name := str(set_def.get("name", set_id))
-		var max_pieces := maxi(1, int(set_def.get("max_pieces", 1)))
-		var set_counts := EquipmentModel.get_set_counts(true)
-		var pieces := int(set_counts.get(set_id, 0))
-		lines.append("套装：%s" % set_name)
-		lines.append("进度：%d/%d" % [pieces, max_pieces])
+		else:
+			var set_def := _find_equipment_set_def(set_id)
+			var set_name := str(set_def.get("name", set_id))
+			var piece_count := maxi(1, int(set_def.get("piece_count", 1)))
+			var set_counts := EquipmentModel.get_set_counts(true)
+			var pieces := int(set_counts.get(set_id, 0))
+			lines.append("套装：%s" % set_name)
+			lines.append("进度：%d/%d" % [pieces, piece_count])
 
 	var effect_lines := _format_effect_lines(inst)
 	if effect_lines.is_empty():
@@ -863,23 +863,6 @@ func _format_effect_cn(e: Dictionary) -> String:
 		var skill_name := SkillNameService.name(skill_id)
 		return "%s+%d级" % [skill_name, val]
 	return "未知词条"
-
-func _tier_name(tier: int) -> String:
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var upgrade_db_any = cfg.get("upgrade_db", {})
-	if upgrade_db_any is Dictionary:
-		var names_any = (upgrade_db_any as Dictionary).get("tier_names", [])
-		if names_any is Array:
-			var names: Array = names_any
-			if tier >= 0 and tier < names.size():
-				return str(names[tier])
-	match tier:
-		1:
-			return "灵"
-		2:
-			return "玄"
-		_:
-			return "凡"
 
 func _set_upgrade_hint(text: String, color: Color) -> void:
 	_lbl_upgrade_hint.text = text

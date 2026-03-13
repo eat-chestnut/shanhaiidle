@@ -1,12 +1,1215 @@
 {
-  "skills_catalog": [
-    {
-      "id": "BING_01",
-      "name": "裂石击",
-      "desc": "",
-      "sect": "兵宗",
-      "sort_order": 10,
-      "is_enabled": true
-    }
-  ]
+    "meta": {
+        "key": "skills_catalog",
+        "schema_version": 1,
+        "exported_at": "2026-03-12 12:58:51",
+        "sha256": "5159dbf45591e7c6af30a004da0dcd8074a8a580c51fa4af388ba93c811a3faa"
+    },
+    "skills_catalog": [
+        {
+            "id": "BING_01",
+            "name": "裂甲",
+            "desc": "挥出沉重一击，适合贴身清怪。",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 10,
+            "cost_qi": 3,
+            "cast_range": 2.4,
+            "tags": [
+                "single",
+                "debuff",
+                "armor_break"
+            ],
+            "sort_order": 10,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 0.85,
+                "per_level": 0.03
+            },
+            "debuffs": [
+                {
+                    "id": "armor_break",
+                    "duration_sec": 6,
+                    "armor_reduction_pct": 0.1,
+                    "boss_effect_mul": 0.7,
+                    "stack_rule": "refresh"
+                }
+            ],
+            "milestones": {
+                "5": {
+                    "add_debuff_duration_sec": 2
+                },
+                "10": {
+                    "set_armor_reduction_pct": 0.15
+                },
+                "15": {
+                    "self_buff": {
+                        "id": "vs_armor_break_damage_up",
+                        "duration_sec": 6,
+                        "damage_add_pct": 0.06
+                    }
+                }
+            }
+        },
+        {
+            "id": "BING_02",
+            "name": "破阵一击",
+            "desc": "",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 12,
+            "cost_qi": 4,
+            "cast_range": 2.4,
+            "tags": [
+                "single",
+                "burst"
+            ],
+            "sort_order": 20,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 1.1,
+                "per_level": 0.03
+            },
+            "milestones": {
+                "5": {
+                    "elite_boss_damage_add_pct": 0.06
+                },
+                "10": {
+                    "cd_delta_sec": -2
+                },
+                "15": {
+                    "execute": {
+                        "hp_pct_lt": 0.2,
+                        "damage_add_pct": 0.1
+                    }
+                }
+            }
+        },
+        {
+            "id": "BING_03",
+            "name": "横扫",
+            "desc": "",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 10,
+            "cost_qi": 4,
+            "cast_range": 0,
+            "tags": [
+                "aoe",
+                "clear"
+            ],
+            "sort_order": 30,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 0.9,
+                "per_level": 0.03,
+                "aoe": {
+                    "shape": "circle",
+                    "radius": 2.2
+                }
+            },
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15
+                },
+                "10": {
+                    "refund_qi": {
+                        "if_enemy_hit_gte": 4,
+                        "amount": 1
+                    }
+                },
+                "15": {
+                    "damage_add_per_extra_target_pct": 0.02,
+                    "damage_add_cap_pct": 0.1
+                }
+            }
+        },
+        {
+            "id": "BING_04",
+            "name": "追击",
+            "desc": "",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 9,
+            "cost_qi": 3,
+            "cast_range": 2.4,
+            "tags": [
+                "gap_close",
+                "single"
+            ],
+            "sort_order": 40,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 0.95,
+                "per_level": 0.03
+            },
+            "milestones": {
+                "5": {
+                    "self_buff": {
+                        "id": "dash_dr",
+                        "duration_sec": 2,
+                        "damage_taken_down_add_pct": 0.1
+                    }
+                },
+                "10": {
+                    "cost_qi_delta": -1
+                },
+                "15": {
+                    "self_buff": {
+                        "id": "dash_evasion",
+                        "duration_sec": 3,
+                        "evasion_add_pct": 0.06
+                    }
+                }
+            },
+            "movement": {
+                "dash_to_target": true,
+                "min_distance": 3
+            }
+        },
+        {
+            "id": "BING_05",
+            "name": "铁腕格挡",
+            "desc": "",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 20,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 18,
+            "cost_qi": 6,
+            "cast_range": 0,
+            "tags": [
+                "defense",
+                "shield"
+            ],
+            "sort_order": 50,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "refund_qi_on_end": 1
+                },
+                "10": {
+                    "self_buff": {
+                        "id": "cc_resist",
+                        "duration_sec": 2,
+                        "cc_duration_down_add_pct": 0.2
+                    }
+                },
+                "15": {
+                    "counter": {
+                        "trigger": "first_hit_while_shielded",
+                        "damage": {
+                            "source": "WD",
+                            "coef": 0.55
+                        }
+                    }
+                }
+            },
+            "shield": {
+                "base_value": 6,
+                "per_level": 0.45,
+                "duration_sec": 2
+            }
+        },
+        {
+            "id": "BING_06",
+            "name": "奥义·天崩",
+            "desc": "",
+            "sect": "兵宗",
+            "class": "bing",
+            "type": "active",
+            "min_level": 35,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 26,
+            "cost_qi": 10,
+            "cast_range": 2.4,
+            "tags": [
+                "ultimate",
+                "single",
+                "splash"
+            ],
+            "sort_order": 60,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 1.6,
+                "per_level": 0.03,
+                "splash": {
+                    "pct_of_main": 0.3,
+                    "shape": "circle",
+                    "radius": 1.8
+                }
+            },
+            "milestones": {
+                "5": {
+                    "splash_radius_mul": 1.15
+                },
+                "10": {
+                    "refund_cost_pct_on_boss_hit": 0.5
+                },
+                "15": {
+                    "ignore_armor_pct_on_boss": 0.1
+                }
+            }
+        },
+        {
+            "id": "VAJ_01",
+            "name": "金钟罩",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 18,
+            "cost_qi": 6,
+            "cast_range": 0,
+            "tags": [
+                "defense",
+                "shield"
+            ],
+            "sort_order": 70,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "self_buff": {
+                        "id": "block_up",
+                        "duration_sec": 6,
+                        "block_add_pct": 0.06
+                    }
+                },
+                "10": {
+                    "cost_qi_delta": -1
+                },
+                "15": {
+                    "on_break": {
+                        "damage": {
+                            "source": "WD",
+                            "coef": 0.6,
+                            "aoe": {
+                                "shape": "circle",
+                                "radius": 2.2
+                            }
+                        }
+                    }
+                }
+            },
+            "shield": {
+                "base_value": 8,
+                "per_level": 0.55,
+                "duration_sec": 6
+            }
+        },
+        {
+            "id": "VAJ_02",
+            "name": "震甲反噬",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 16,
+            "cost_qi": 6,
+            "cast_range": 0,
+            "tags": [
+                "stance",
+                "counter"
+            ],
+            "sort_order": 80,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "add_dot": {
+                        "id": "bleed_small",
+                        "duration_sec": 4,
+                        "tick_sec": 1,
+                        "coef_per_tick": 0.1,
+                        "source": "WD"
+                    }
+                },
+                "10": {
+                    "lifesteal_pct": 0.03,
+                    "boss_lifesteal_mul": 0.5
+                },
+                "15": {
+                    "can_crit": true
+                }
+            },
+            "stance": {
+                "duration_sec": 6,
+                "trigger": "on_take_melee_hit",
+                "internal_cd_sec": 2,
+                "counter_damage": {
+                    "source": "WD",
+                    "base_coef": 0.5,
+                    "per_level": 0.02
+                }
+            }
+        },
+        {
+            "id": "VAJ_03",
+            "name": "狮吼·震慑",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 20,
+            "cost_qi": 7,
+            "cast_range": 0,
+            "tags": [
+                "aoe",
+                "debuff",
+                "damage_down"
+            ],
+            "sort_order": 90,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 0.55,
+                "per_level": 0.03,
+                "aoe": {
+                    "shape": "circle",
+                    "radius": 2.4
+                }
+            },
+            "debuffs": [
+                {
+                    "id": "intimidate",
+                    "duration_sec": 6,
+                    "enemy_damage_down_add_pct": 0.06,
+                    "boss_effect_mul": 0.7,
+                    "stack_rule": "refresh",
+                    "cap_group": "enemy_damage_down"
+                }
+            ],
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15,
+                    "add_debuff_duration_sec": 2
+                },
+                "10": {
+                    "set_enemy_damage_down_add_pct": 0.08
+                },
+                "15": {
+                    "enemy_attack_speed_down_add_pct": 0.08,
+                    "boss_attack_speed_mul": 0.5
+                }
+            }
+        },
+        {
+            "id": "VAJ_04",
+            "name": "回震冲击",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 14,
+            "cost_qi": 6,
+            "cast_range": 0,
+            "tags": [
+                "aoe",
+                "clear"
+            ],
+            "sort_order": 100,
+            "is_enabled": true,
+            "damage": {
+                "source": "WD",
+                "base_coef": 1,
+                "per_level": 0.03,
+                "aoe": {
+                    "shape": "circle",
+                    "radius": 2.5
+                }
+            },
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15
+                },
+                "10": {
+                    "gain_shield_on_hit": {
+                        "base_value": 2,
+                        "per_level": 0.15,
+                        "duration_sec": 4
+                    }
+                },
+                "15": {
+                    "elite_boss_damage_add_pct": 0.08
+                }
+            }
+        },
+        {
+            "id": "VAJ_05",
+            "name": "大结界",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 20,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 26,
+            "cost_qi": 10,
+            "cast_range": 0,
+            "tags": [
+                "defense",
+                "barrier",
+                "cleanse"
+            ],
+            "sort_order": 110,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "element_resist_add": 10
+                },
+                "10": {
+                    "cd_delta_sec": -4
+                },
+                "15": {
+                    "cleanse": {
+                        "count": 1,
+                        "internal_cd_sec": 10,
+                        "trigger": "on_barrier_end"
+                    }
+                }
+            },
+            "barrier": {
+                "base_value": 10,
+                "per_level": 0.55,
+                "duration_sec": 8
+            }
+        },
+        {
+            "id": "VAJ_06",
+            "name": "奥义·不坏身",
+            "desc": "",
+            "sect": "金刚宗",
+            "class": "vajra",
+            "type": "active",
+            "min_level": 35,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 34,
+            "cost_qi": 12,
+            "cast_range": 0,
+            "tags": [
+                "ultimate",
+                "defense",
+                "counter"
+            ],
+            "sort_order": 120,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "self_buff_extend_sec": 2
+                },
+                "10": {
+                    "refund_qi_total": 2
+                },
+                "15": {
+                    "grant_immunity": [
+                        "knockback",
+                        "hitstun"
+                    ],
+                    "duration_sec": 8
+                }
+            },
+            "self_buff": {
+                "id": "unyielding",
+                "duration_sec": 6,
+                "damage_taken_down_add_pct": 0.12
+            },
+            "extra": {
+                "force_counter_triggers": 2,
+                "ignore_counter_internal_cd": true
+            }
+        },
+        {
+            "id": "TAL_01",
+            "name": "雷符连锁",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 8,
+            "cost_qi": 3,
+            "cast_range": 4.8,
+            "tags": [
+                "spell",
+                "chain"
+            ],
+            "sort_order": 130,
+            "is_enabled": true,
+            "damage": {
+                "source": "SP",
+                "base_coef": 0.8,
+                "per_level": 0.03
+            },
+            "milestones": {
+                "5": {
+                    "bounces_delta": 1
+                },
+                "10": {
+                    "bounce_range_mul": 1.2
+                },
+                "15": {
+                    "apply_on_last_hit": {
+                        "debuff": {
+                            "id": "vuln_small",
+                            "duration_sec": 6,
+                            "take_damage_up_add_pct": 0.04,
+                            "boss_effect_mul": 0.7
+                        }
+                    }
+                }
+            },
+            "chain": {
+                "bounces": 1,
+                "bounce_range": 4
+            }
+        },
+        {
+            "id": "TAL_02",
+            "name": "火符焚灼",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 10,
+            "cost_qi": 4,
+            "cast_range": 4.8,
+            "tags": [
+                "spell",
+                "aoe",
+                "dot"
+            ],
+            "sort_order": 140,
+            "is_enabled": true,
+            "damage": {
+                "source": "SP",
+                "base_coef": 0.95,
+                "per_level": 0.03,
+                "aoe": {
+                    "shape": "circle",
+                    "radius": 2.1
+                }
+            },
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15
+                },
+                "10": {
+                    "cost_qi_delta": -1
+                },
+                "15": {
+                    "spell_lifesteal_pct": 0.02,
+                    "boss_lifesteal_mul": 0.5
+                }
+            },
+            "dot": {
+                "id": "burn",
+                "duration_sec": 4,
+                "tick_sec": 1,
+                "coef_per_tick": 0.12,
+                "source": "SP"
+            }
+        },
+        {
+            "id": "TAL_03",
+            "name": "定身符",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 12,
+            "cost_qi": 4,
+            "cast_range": 4.8,
+            "tags": [
+                "spell",
+                "control"
+            ],
+            "sort_order": 150,
+            "is_enabled": true,
+            "damage": {
+                "source": "SP",
+                "base_coef": 0.65,
+                "per_level": 0.03
+            },
+            "milestones": {
+                "5": {
+                    "control_duration_add_sec": 0.2,
+                    "boss_duration_add_sec": 0.1
+                },
+                "10": {
+                    "cd_delta_sec": -4
+                },
+                "15": {
+                    "on_control_end": {
+                        "damage": {
+                            "source": "SP",
+                            "coef": 0.55,
+                            "aoe": {
+                                "shape": "circle",
+                                "radius": 2
+                            }
+                        }
+                    }
+                }
+            },
+            "control": {
+                "type": "root",
+                "duration_sec": 1,
+                "boss_as": "heavy_slow",
+                "boss_slow_pct": 0.4,
+                "boss_duration_sec": 2.2
+            }
+        },
+        {
+            "id": "TAL_04",
+            "name": "爆符",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "primary",
+            "cd_sec": 14,
+            "cost_qi": 6,
+            "cast_range": 4.8,
+            "tags": [
+                "spell",
+                "aoe",
+                "delayed"
+            ],
+            "sort_order": 160,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15
+                },
+                "10": {
+                    "refund_qi": {
+                        "if_enemy_hit_gte": 3,
+                        "amount": 1
+                    }
+                },
+                "15": {
+                    "apply_on_hit": {
+                        "debuff": {
+                            "id": "resist_down_small",
+                            "duration_sec": 6,
+                            "resist_down_flat": 8,
+                            "boss_effect_mul": 0.7
+                        }
+                    }
+                }
+            },
+            "delayed_explosion": {
+                "delay_sec": 1.2,
+                "damage": {
+                    "source": "SP",
+                    "base_coef": 1.1,
+                    "per_level": 0.03,
+                    "aoe": {
+                        "shape": "circle",
+                        "radius": 2.2
+                    }
+                }
+            }
+        },
+        {
+            "id": "TAL_05",
+            "name": "纸人替身",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 20,
+            "max_level": 15,
+            "target_rule": "self",
+            "cd_sec": 18,
+            "cost_qi": 7,
+            "cast_range": 0,
+            "tags": [
+                "summon",
+                "defense"
+            ],
+            "sort_order": 170,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "summon_duration_add_sec": 2
+                },
+                "10": {
+                    "summon_on_end_explosion": {
+                        "damage": {
+                            "source": "SP",
+                            "coef": 0.75,
+                            "aoe": {
+                                "shape": "circle",
+                                "radius": 2
+                            }
+                        }
+                    }
+                },
+                "15": {
+                    "self_periodic_shield": {
+                        "interval_sec": 4,
+                        "base_value": 2,
+                        "per_level": 0.15,
+                        "duration_sec": 4
+                    }
+                }
+            },
+            "summon": {
+                "summon_id": "paper_doll",
+                "duration_sec": 8,
+                "spawn": "near_self",
+                "aggro": {
+                    "small_mob_mul": 3,
+                    "boss_mul": 0.3
+                },
+                "damage_over_time": {
+                    "tick_sec": 1,
+                    "source": "SP",
+                    "base_coef_per_tick": 0.25,
+                    "per_level": 0.01,
+                    "radius": 1.6
+                }
+            }
+        },
+        {
+            "id": "TAL_06",
+            "name": "奥义·天雷火雨",
+            "desc": "",
+            "sect": "符箓宗",
+            "class": "talisman",
+            "type": "active",
+            "min_level": 35,
+            "max_level": 15,
+            "target_rule": "cluster",
+            "cd_sec": 30,
+            "cost_qi": 11,
+            "cast_range": 8,
+            "tags": [
+                "ultimate",
+                "spell",
+                "aoe"
+            ],
+            "sort_order": 180,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "aoe_radius_mul": 1.15
+                },
+                "10": {
+                    "cd_delta_sec": -6
+                },
+                "15": {
+                    "elite_boss_damage_add_pct": 0.1
+                }
+            },
+            "area_barrage": {
+                "duration_sec": 3,
+                "hits": 6,
+                "per_hit_damage": {
+                    "source": "SP",
+                    "base_coef": 0.35,
+                    "per_level": 0.01
+                },
+                "aoe": {
+                    "shape": "circle",
+                    "radius": 3
+                }
+            }
+        },
+        {
+            "id": "P_GLOBAL_01",
+            "name": "强身",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "survival"
+            ],
+            "sort_order": 190,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "max_hp_add_pct": 0.03
+                },
+                "10": {
+                    "flat_damage_reduction_add": 1
+                },
+                "15": {
+                    "low_hp_damage_taken_down_add_pct": 0.06,
+                    "low_hp_threshold_pct": 0.35
+                }
+            },
+            "per_level": {
+                "max_hp_add_pct_per_level": 0.002
+            }
+        },
+        {
+            "id": "P_GLOBAL_02",
+            "name": "练气",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "resource"
+            ],
+            "sort_order": 200,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "qi_regen_per_10s": 1
+                },
+                "10": {
+                    "skill_cost_qi_down": 1,
+                    "min_cost_qi": 1,
+                    "internal_cd_sec": 6
+                },
+                "15": {
+                    "cdr_cap_add_pct": 0.05
+                }
+            },
+            "per_level": {
+                "max_qi_add_pct_per_level": 0.0015
+            }
+        },
+        {
+            "id": "P_GLOBAL_03",
+            "name": "精准",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 1,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "damage"
+            ],
+            "sort_order": 210,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "crit_damage_add_pct": 0.06
+                },
+                "10": {
+                    "elite_boss_crit_chance_add_pct": 0.02
+                },
+                "15": {
+                    "on_crit_refund_qi": 0.5,
+                    "internal_cd_sec": 2
+                }
+            },
+            "per_level": {
+                "crit_chance_add_pct_per_level": 0.001
+            }
+        },
+        {
+            "id": "P_GLOBAL_04",
+            "name": "坚韧",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "survival",
+                "control_resist"
+            ],
+            "sort_order": 220,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "element_damage_taken_down_add_pct": 0.04
+                },
+                "10": {
+                    "cc_duration_down_add_pct": 0.1
+                },
+                "15": {
+                    "grant_cc_immunity_once": true,
+                    "internal_cd_sec": 30
+                }
+            },
+            "per_level": {
+                "element_resist_add_per_level": 0.2
+            }
+        },
+        {
+            "id": "P_GLOBAL_05",
+            "name": "续战",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 10,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "sustain"
+            ],
+            "sort_order": 230,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "lifesteal_pct": 0.02,
+                    "boss_lifesteal_mul": 0.5
+                },
+                "10": {
+                    "on_kill_heal_flat": 1
+                },
+                "15": {
+                    "boss_lifesteal_mul": 0.7
+                }
+            },
+            "per_level": {
+                "lifesteal_add_pct_per_level": 0.0005
+            }
+        },
+        {
+            "id": "P_GLOBAL_06",
+            "name": "破甲精通",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 20,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "damage",
+                "armor_break"
+            ],
+            "sort_order": 240,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "damage_add_vs_armor_break_pct": 0.06
+                },
+                "10": {
+                    "armor_break_duration_add_sec": 2
+                },
+                "15": {
+                    "boss_armor_break_effect_mul": 0.7
+                }
+            },
+            "per_level": {
+                "damage_add_vs_armor_break_pct_per_level": 0.004
+            }
+        },
+        {
+            "id": "P_GLOBAL_07",
+            "name": "术法专精",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 20,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "damage",
+                "spell"
+            ],
+            "sort_order": 250,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "spell_damage_add_pct": 0.06
+                },
+                "10": {
+                    "spell_aoe_radius_mul": 1.1
+                },
+                "15": {
+                    "on_spell_hit_refund_qi_chance": 0.2,
+                    "refund_qi": 1,
+                    "internal_cd_sec": 3
+                }
+            },
+            "per_level": {
+                "spell_damage_add_pct_per_level": 0.004
+            }
+        },
+        {
+            "id": "P_GLOBAL_08",
+            "name": "护体",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 35,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "survival",
+                "shield"
+            ],
+            "sort_order": 260,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "shield_gain_add_pct": 0.1
+                },
+                "10": {
+                    "refund_qi_on_shield_end": 1,
+                    "internal_cd_sec": 10
+                },
+                "15": {
+                    "on_shield_break_counter": {
+                        "source": "AUTO",
+                        "coef": 0.4
+                    }
+                }
+            },
+            "per_level": {
+                "shield_gain_add_pct_per_level": 0.007
+            }
+        },
+        {
+            "id": "P_GLOBAL_09",
+            "name": "猎运",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 35,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "loot"
+            ],
+            "sort_order": 270,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "elite_loot_add_pct": 0.06
+                },
+                "10": {
+                    "trigger_effect_add_pct": 0.06
+                },
+                "15": {
+                    "lucky_strike_chance_add_pct": 0.02
+                }
+            },
+            "per_level": {
+                "loot_add_pct_per_level": 0.002
+            }
+        },
+        {
+            "id": "P_GLOBAL_10",
+            "name": "老练",
+            "desc": "",
+            "sect": "global",
+            "class": "global",
+            "type": "passive",
+            "min_level": 50,
+            "max_level": 15,
+            "target_rule": "",
+            "cd_sec": 0,
+            "cost_qi": 0,
+            "cast_range": null,
+            "tags": [
+                "boss",
+                "meta"
+            ],
+            "sort_order": 280,
+            "is_enabled": true,
+            "milestones": {
+                "5": {
+                    "death_penalty_down_add_pct": 0.2
+                },
+                "10": {
+                    "boss_first_30s_damage_taken_down_add_pct": 0.04
+                },
+                "15": {
+                    "boss_first_kill_bonus_drop": 1
+                }
+            },
+            "per_level": {
+                "boss_first30s_dr_add_pct_per_level": 0.0002
+            }
+        }
+    ]
 }

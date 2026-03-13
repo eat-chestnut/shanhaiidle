@@ -73,8 +73,7 @@ func _ready() -> void:
 		_offline_popup.visible = false
 
 	var spawn_count := 1
-	var cfg: Dictionary = ConfigService.get_cfg()
-	var battle_any = cfg.get("battle", {})
+	var battle_any = ConfigService.get_battle_cfg()
 	if battle_any is Dictionary:
 		var battle_cfg: Dictionary = battle_any
 		var spawn_points_any = battle_cfg.get("spawn_points", [])

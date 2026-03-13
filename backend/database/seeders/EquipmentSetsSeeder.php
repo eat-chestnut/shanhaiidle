@@ -46,7 +46,6 @@ class EquipmentSetsSeeder extends Seeder
                         'stage' => $stage,
                         'piece_count' => $pieceCount,
                         'slot_ids' => self::BASE_SLOTS,
-                        'max_pieces' => $pieceCount,
                         'thresholds' => $this->thresholdsFor($line['id'], $stage),
                         'description' => sprintf('%s在%d级阶段的套装效果配置。', $line['name'], $stage),
                         'is_enabled' => true,

@@ -20,11 +20,9 @@ class EditEquipmentSet extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $data['thresholds'] = EquipmentSetResource::normalizeThresholdsInput($data['thresholds'] ?? []);
-        $maxPieces = (int) ($data['piece_count'] ?? $data['max_pieces'] ?? 0);
-        $data['max_pieces'] = $maxPieces;
         EquipmentSetResource::validateThresholdsOrFail(
             $data['thresholds'],
-            $maxPieces,
+            (int) ($data['piece_count'] ?? 0),
             isset($data['stage']) ? (int) $data['stage'] : null,
         );
 
