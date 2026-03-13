@@ -39,7 +39,7 @@ class TalismanModuleSupport
             'fixed_tier_numbers' => Talisman::FIXED_TIER_NUMBERS,
             'star_link_required_equipment_stars' => Talisman::STAR_LINK_THRESHOLDS,
             'star_link_condition_mode' => self::STAR_LINK_CONDITION_MODE,
-            'star_link_condition_summary' => '所有参与统计的装备位都至少达到指定星级，护符位不参与全身装备星级统计。',
+            'star_link_condition_summary' => '护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。',
             'star_link_tracked_slot_ids' => self::STAR_LINK_TRACKED_SLOT_IDS,
             'star_link_excluded_slot_ids' => self::STAR_LINK_EXCLUDED_SLOT_IDS,
             'recommended_sect_mode' => 'soft_recommendation_only',

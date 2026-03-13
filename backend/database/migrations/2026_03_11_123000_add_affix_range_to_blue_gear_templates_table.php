@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * @deprecated 历史迁移，仅服务于已淘汰的 BlueGearTemplate* 旧表结构。
+ * 当前正式模块口径为 BlueEquipmentTemplate / BlueEquipmentTemplateBaseStat。
+ */
 return new class extends Migration
 {
     public function up(): void

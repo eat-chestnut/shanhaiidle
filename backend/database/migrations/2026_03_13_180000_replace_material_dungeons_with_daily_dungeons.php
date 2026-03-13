@@ -117,6 +117,7 @@ return new class extends Migration
             $table->index(['dungeon_level_id', 'sort_order'], 'dd_first_clear_rewards_level_sort_idx');
         });
 
+        // 清理已淘汰的 MaterialDungeon* 旧表，正式副本口径统一改为 DailyDungeon*。
         Schema::dropIfExists('material_dungeon_drop_groups');
         Schema::dropIfExists('material_dungeons');
     }

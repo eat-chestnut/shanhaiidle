@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * @deprecated 历史迁移，仅为兼容旧 BlueAffixPool* 表结构的迁移链路保留。
+ * 当前正式模块口径为 BlueAffix / BlueAffixSlotRule。
+ */
 return new class extends Migration
 {
     public function up(): void

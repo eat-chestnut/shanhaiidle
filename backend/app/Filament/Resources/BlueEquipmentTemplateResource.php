@@ -126,7 +126,7 @@ class BlueEquipmentTemplateResource extends Resource
                 ])
                 ->columns(3),
             Section::make('白字属性')
-                ->description('蓝装模板只定义白字属性，允许同一模板维护多条白字。当前不处理蓝词条池、提取逻辑、掉落逻辑、打造执行和穿戴逻辑。')
+                ->description('蓝装模板只定义白字属性，允许同一模板维护多条白字。当前不处理蓝词条定义、提取逻辑、掉落逻辑、打造执行和穿戴逻辑。')
                 ->schema([
                     Repeater::make('base_stats')
                         ->hiddenLabel()
@@ -179,7 +179,7 @@ class BlueEquipmentTemplateResource extends Resource
                         ->columnSpanFull(),
                 ]),
             Section::make('蓝词条数量规则')
-                ->description('这里只维护蓝词条数量范围，不维护蓝词条库、蓝词条权重池或抽取逻辑。')
+                ->description('这里只维护蓝词条数量范围，不维护 `blue_affixes` / `blue_affix_slot_rules` 定义、权重或抽取逻辑。')
                 ->schema([
                     TextInput::make('blue_affix_count_min')
                         ->label('最少蓝词条数')

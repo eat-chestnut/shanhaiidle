@@ -101,7 +101,7 @@ class BlueAffixResource extends Resource
                 ])
                 ->columns(3),
             Section::make('数值配置')
-                ->description('蓝词条只维护 effect_key、数值范围和权重，不做流派限制、职业硬限制和词条池嵌套。')
+                ->description('蓝词条只维护 effect_key、数值范围和权重，不做流派限制、职业硬限制和词条组合嵌套。')
                 ->schema([
                     Select::make('effect_key')
                         ->label('效果 Key')

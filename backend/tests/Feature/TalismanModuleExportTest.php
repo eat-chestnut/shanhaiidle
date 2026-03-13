@@ -41,6 +41,10 @@ class TalismanModuleExportTest extends TestCase
         $this->assertSame([1, 2, 3], $rules['fixed_tier_numbers']);
         $this->assertSame([6, 8, 9, 10], $rules['star_link_required_equipment_stars']);
         $this->assertSame('all_tracked_slots_min_star', $rules['star_link_condition_mode']);
+        $this->assertSame(
+            '护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。',
+            $rules['star_link_condition_summary'],
+        );
         $this->assertContains('talisman', $rules['star_link_excluded_slot_ids']);
         $this->assertNotContains('talisman', $rules['star_link_tracked_slot_ids']);
 
