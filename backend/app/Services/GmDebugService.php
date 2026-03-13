@@ -137,7 +137,7 @@ class GmDebugService
                     throw new RuntimeException('物品和数量不能为空。');
                 }
 
-                $item = Item::query()->where('id', $safeItemId)->first();
+                $item = Item::query()->where('item_id', $safeItemId)->first();
                 if (! $item instanceof Item) {
                     throw new RuntimeException('目标物品不存在。');
                 }
@@ -149,7 +149,7 @@ class GmDebugService
                 $profile->inventory = $inventory;
                 $profile->save();
 
-                return ['message' => sprintf('已发放物品：%s × %d。', (string) $item->name, $safeCount)];
+                return ['message' => sprintf('已发放物品：%s × %d。', (string) $item->display_name, $safeCount)];
             },
         );
     }

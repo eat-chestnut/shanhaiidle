@@ -30,7 +30,7 @@ class ShopPurchaseService
             return ['ok' => false, 'reason' => 'goods_not_found'];
         }
 
-        if (! Item::query()->where('id', $goods->reward_item_id)->exists()) {
+        if (! Item::query()->where('item_id', $goods->reward_item_id)->exists()) {
             return ['ok' => false, 'reason' => 'reward_item_missing'];
         }
 

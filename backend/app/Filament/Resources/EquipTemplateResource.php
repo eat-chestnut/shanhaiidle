@@ -593,11 +593,11 @@ class EquipTemplateResource extends Resource
         return Item::query()
             ->where('is_enabled', true)
             ->where('type', 'blueprint')
-            ->whereIn('id', $candidateIds)
+            ->whereIn('item_id', $candidateIds)
             ->orderBy('sort_order')
-            ->orderBy('name')
+            ->orderBy('display_name')
             ->get()
-            ->mapWithKeys(fn (Item $item): array => [$item->id => (string) $item->name])
+            ->mapWithKeys(fn (Item $item): array => [$item->item_id => (string) $item->display_name])
             ->all();
     }
 
@@ -747,8 +747,8 @@ class EquipTemplateResource extends Resource
         return Item::query()
             ->where('is_enabled', true)
             ->where('type', 'blueprint')
-            ->where('id', $itemId)
-            ->value('id');
+            ->where('item_id', $itemId)
+            ->value('item_id');
     }
 
     protected static function nullableString(mixed $value): ?string

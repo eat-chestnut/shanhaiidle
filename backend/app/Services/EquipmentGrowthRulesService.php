@@ -333,8 +333,8 @@ class EquipmentGrowthRulesService
             ->where('type', 'material')
             ->where('material_type', 'star')
             ->orderBy('sort_order')
-            ->orderBy('name')
-            ->pluck('name', 'id')
+            ->orderBy('display_name')
+            ->pluck('display_name', 'item_id')
             ->all();
     }
 

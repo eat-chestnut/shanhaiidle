@@ -109,8 +109,13 @@ class AdminOptions
             'blue' => '蓝色',
             'purple' => '紫色',
             'gold' => '金色',
-            'orange' => '橙色',
+            'red' => '红色',
         ];
+    }
+
+    public static function qualityOptions(): array
+    {
+        return Item::QUALITY_OPTIONS;
     }
 
     public static function recipeTypeOptions(): array
@@ -160,6 +165,62 @@ class AdminOptions
             'blueprint' => '图纸',
             'blueprint_fragment' => '图纸碎片',
             'currency' => '货币',
+        ];
+    }
+
+    public static function itemMainTypeOptions(): array
+    {
+        return Item::MAIN_TYPE_OPTIONS;
+    }
+
+    public static function itemSubTypeOptionsByMainType(?string $mainType = null): array
+    {
+        if ($mainType !== null && array_key_exists($mainType, Item::SUB_TYPE_OPTIONS)) {
+            return Item::SUB_TYPE_OPTIONS[$mainType];
+        }
+
+        return self::allItemSubTypeOptions();
+    }
+
+    public static function allItemSubTypeOptions(): array
+    {
+        $options = [];
+
+        foreach (Item::SUB_TYPE_OPTIONS as $group) {
+            $options += $group;
+        }
+
+        return $options;
+    }
+
+    public static function itemSubTypeLabelByMainType(?string $mainType, ?string $subType): string
+    {
+        return self::optionLabel(self::itemSubTypeOptionsByMainType($mainType), $subType);
+    }
+
+    public static function itemBindTypeOptions(): array
+    {
+        return Item::BIND_TYPE_OPTIONS;
+    }
+
+    public static function itemUseTypeOptions(): array
+    {
+        return Item::USE_TYPE_OPTIONS;
+    }
+
+    public static function itemSourceLibraryOptions(): array
+    {
+        return [
+            'core_catalog' => '核心目录',
+            'legacy_catalog_import' => '历史导入',
+            'monster_rewards' => '怪物掉落',
+            'stage_rewards' => '主线首通奖励',
+            'shop_catalog' => '商城目录',
+            'milestone_catalog' => '成长里程碑',
+            'gift_catalog' => '礼包目录',
+            'equipment_catalog' => '装备成品目录',
+            'gem_catalog' => '宝石目录',
+            'talisman_catalog' => '护符目录',
         ];
     }
 
@@ -590,14 +651,14 @@ class AdminOptions
 
     public static function itemOptions(?callable $scope = null): array
     {
-        $query = Item::query()->where('is_enabled', true)->orderBy('sort_order')->orderBy('name');
+        $query = Item::query()->where('is_enabled', true)->orderBy('sort_order')->orderBy('display_name');
 
         if ($scope !== null) {
             $query = $scope($query) ?? $query;
         }
 
         return $query->get()->mapWithKeys(fn (Item $item): array => [
-            $item->id => (string) $item->name,
+            $item->item_id => (string) $item->display_name,
         ])->all();
     }
 
@@ -607,7 +668,7 @@ class AdminOptions
             return '';
         }
 
-        return (string) Item::query()->where('id', $itemId)->value('name');
+        return (string) Item::query()->where('item_id', $itemId)->value('display_name');
     }
 
     public static function monsterOptions(?string $kind = null, ?string $chapterId = null): array

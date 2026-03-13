@@ -20,12 +20,15 @@ class ExportMaterialCatalogJson extends Command
             ->where('is_enabled', true)
             ->whereIn('type', ['material', 'item', 'blueprint', 'blueprint_fragment', 'currency'])
             ->orderBy('sort_order')
-            ->orderBy('id')
+            ->orderBy('display_name')
             ->get()
             ->map(fn (Item $item): array => [
-                'id' => (string) $item->id,
-                'name' => (string) $item->name,
+                'item_id' => (string) $item->item_id,
+                'display_name' => (string) $item->display_name,
+                'id' => (string) $item->item_id,
+                'name' => (string) $item->display_name,
                 'type' => (string) $item->type,
+                'main_type' => (string) $item->main_type,
                 'sub_type' => (string) ($item->sub_type ?? ''),
                 'material_type' => (string) ($item->material_type ?? ''),
                 'rarity' => (string) $item->rarity,

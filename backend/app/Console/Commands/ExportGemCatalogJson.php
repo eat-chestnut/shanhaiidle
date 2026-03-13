@@ -20,12 +20,14 @@ class ExportGemCatalogJson extends Command
             ->where('is_enabled', true)
             ->where('type', 'gem')
             ->orderBy('sort_order')
-            ->orderBy('id')
+            ->orderBy('display_name')
             ->get()
             ->map(function (Item $item): array {
                 return [
-                    'id' => (string) $item->id,
-                    'name' => (string) $item->name,
+                    'item_id' => (string) $item->item_id,
+                    'display_name' => (string) $item->display_name,
+                    'id' => (string) $item->item_id,
+                    'name' => (string) $item->display_name,
                     'gem_type' => (string) ($item->sub_type ?? 'attr'),
                     'rarity' => (string) $item->rarity,
                     'effect_type' => (string) ($item->effect_type ?? 'stat'),

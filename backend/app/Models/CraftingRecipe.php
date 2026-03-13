@@ -48,7 +48,7 @@ class CraftingRecipe extends Model
 
             $itemName = trim((string) ($row['item_name'] ?? ''));
             if ($itemName === '') {
-                $itemName = (string) Item::query()->where('id', $itemId)->value('name');
+                $itemName = (string) Item::query()->where('item_id', $itemId)->value('display_name');
             }
 
             $rows[] = [

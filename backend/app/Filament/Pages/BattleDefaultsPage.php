@@ -682,7 +682,7 @@ class BattleDefaultsPage extends Page implements HasForms
         $core = trim((string) $payload['special_drops']['boss']['core_guarantee']);
         if ($core === '') {
             $errors['special_drops.boss.core_guarantee'] = 'Boss保底核心必填。';
-        } elseif (! Item::query()->where('id', $core)->where('type', 'gem')->exists()) {
+        } elseif (! Item::query()->where('item_id', $core)->where('type', 'gem')->exists()) {
             $errors['special_drops.boss.core_guarantee'] = 'Boss保底核心必须是宝石类型物品。';
         }
 
@@ -717,7 +717,7 @@ class BattleDefaultsPage extends Page implements HasForms
                         $errors["economy.refine_cost_by_rarity.{$rarity}.items_rows"] = '进阶材料数量不能为负数。';
                         break;
                     }
-                    if (! Item::query()->where('id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
+                    if (! Item::query()->where('item_id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
                         $errors["economy.refine_cost_by_rarity.{$rarity}.items_rows"] = "进阶材料 {$id} 必须是有效的普通物品。";
                         break;
                     }
@@ -743,7 +743,7 @@ class BattleDefaultsPage extends Page implements HasForms
                     $errors["economy.salvage_reward_by_rarity.{$rarity}.items_rows"] = '分解材料数量不能为负数。';
                     break;
                 }
-                if (! Item::query()->where('id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
+                if (! Item::query()->where('item_id', $id)->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])->exists()) {
                     $errors["economy.salvage_reward_by_rarity.{$rarity}.items_rows"] = "分解材料 {$id} 必须是有效的普通物品。";
                     break;
                 }
@@ -1171,7 +1171,7 @@ class BattleDefaultsPage extends Page implements HasForms
             ->where('is_enabled', true)
             ->whereIn('type', ['item', 'material', 'blueprint', 'blueprint_fragment', 'currency'])
             ->orderBy('sort_order')
-            ->pluck('name', 'id')
+            ->pluck('display_name', 'item_id')
             ->all();
     }
 
@@ -1202,7 +1202,7 @@ class BattleDefaultsPage extends Page implements HasForms
             ->where('is_enabled', true)
             ->where('type', 'gem')
             ->orderBy('sort_order')
-            ->pluck('name', 'id')
+            ->pluck('display_name', 'item_id')
             ->all();
     }
 }

@@ -145,7 +145,7 @@ class MonsterModuleSupport
     public static function validateDropItemsOrFail(array $rows): void
     {
         $errors = [];
-        $validItemIds = Item::query()->pluck('id')->all();
+        $validItemIds = Item::query()->pluck('item_id')->all();
         $validItemLookup = array_fill_keys($validItemIds, true);
 
         foreach ($rows as $index => $row) {

@@ -252,7 +252,7 @@ class ProgressionMilestonesService
 
             if ($rewardItemId === '') {
                 $errors["milestones.{$index}.reward_item_id"] = '请选择里程碑奖励物品。';
-            } elseif (! Item::query()->where('id', $rewardItemId)->where('is_enabled', true)->exists()) {
+            } elseif (! Item::query()->where('item_id', $rewardItemId)->where('is_enabled', true)->exists()) {
                 $errors["milestones.{$index}.reward_item_id"] = '里程碑奖励物品无效。';
             }
 

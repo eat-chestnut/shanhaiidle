@@ -167,7 +167,7 @@ class MountainGodOfferingService
                 $errors["offerings.{$index}.name"] = '供奉项名称不能为空。';
             }
 
-            if ($offeringItemId === '' || ! Item::query()->where('id', $offeringItemId)->where('is_enabled', true)->exists()) {
+            if ($offeringItemId === '' || ! Item::query()->where('item_id', $offeringItemId)->where('is_enabled', true)->exists()) {
                 $errors["offerings.{$index}.offering_item_id"] = '祭品物品无效。';
             }
 
@@ -213,7 +213,7 @@ class MountainGodOfferingService
                 continue;
             }
 
-            if (! Item::query()->where('id', $itemId)->where('is_enabled', true)->exists()) {
+            if (! Item::query()->where('item_id', $itemId)->where('is_enabled', true)->exists()) {
                 $errors["{$field}.items.{$index}.item_id"] = '奖励物品无效。';
                 continue;
             }

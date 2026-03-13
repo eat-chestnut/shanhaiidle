@@ -420,8 +420,8 @@ class PlayerProfileSyncService
         }
 
         $itemNames = Item::query()
-            ->whereIn('id', array_keys($inventory))
-            ->pluck('name', 'id')
+            ->whereIn('item_id', array_keys($inventory))
+            ->pluck('display_name', 'item_id')
             ->all();
 
         $rows = collect($inventory)

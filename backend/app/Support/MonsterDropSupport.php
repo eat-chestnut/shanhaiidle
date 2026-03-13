@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 class MonsterDropSupport
 {
     /**
-     * @var array<string, array{id:string,name:string}>
+     * @var array<string, array{item_id:string,name:string}>
      */
     private static array $itemMetaCache = [];
 
@@ -129,7 +129,7 @@ class MonsterDropSupport
     }
 
     /**
-     * @return array{id:string,name:string}|array{}
+     * @return array{item_id:string,name:string}|array{}
      */
     private static function itemMeta(string $itemId): array
     {
@@ -142,16 +142,16 @@ class MonsterDropSupport
         }
 
         $item = Item::query()
-            ->where('id', $itemId)
-            ->first(['id', 'name']);
+            ->where('item_id', $itemId)
+            ->first(['item_id', 'display_name']);
 
         if (! $item) {
             return static::$itemMetaCache[$itemId] = [];
         }
 
         return static::$itemMetaCache[$itemId] = [
-            'id' => (string) $item->id,
-            'name' => (string) $item->name,
+            'item_id' => (string) $item->item_id,
+            'name' => (string) $item->display_name,
         ];
     }
 

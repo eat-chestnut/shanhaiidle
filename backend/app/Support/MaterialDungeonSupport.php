@@ -411,9 +411,9 @@ class MaterialDungeonSupport
         }
 
         $item = Item::query()
-            ->where('name', $candidate)
+            ->where('display_name', $candidate)
             ->where('is_enabled', true)
-            ->value('id');
+            ->value('item_id');
 
         return filled($item) ? (string) $item : null;
     }
@@ -423,7 +423,7 @@ class MaterialDungeonSupport
         $itemId = trim((string) $itemId);
         if ($itemId === '') {
             return [
-                'id' => '',
+                'item_id' => '',
                 'name' => '',
                 'icon' => '',
                 'rarity' => '',
@@ -433,13 +433,13 @@ class MaterialDungeonSupport
 
         if (! isset(static::$itemMetaCache[$itemId])) {
             $row = Item::query()
-                ->where('id', $itemId)
+                ->where('item_id', $itemId)
                 ->where('is_enabled', true)
-                ->first(['id', 'name', 'icon', 'rarity']);
+                ->first(['item_id', 'display_name', 'icon', 'rarity']);
 
             static::$itemMetaCache[$itemId] = [
-                'id' => $itemId,
-                'name' => (string) ($row?->name ?? $itemId),
+                'item_id' => $itemId,
+                'name' => (string) ($row?->display_name ?? $itemId),
                 'icon' => (string) ($row?->icon ?? ''),
                 'rarity' => (string) ($row?->rarity ?? ''),
                 'rarity_name' => AdminOptions::optionLabel(AdminOptions::rarityOptions(), $row?->rarity),
@@ -466,7 +466,7 @@ class MaterialDungeonSupport
 
     private static function itemExists(string $itemId): bool
     {
-        return static::itemMeta($itemId)['name'] !== $itemId || Item::query()->where('id', $itemId)->where('is_enabled', true)->exists();
+        return static::itemMeta($itemId)['name'] !== $itemId || Item::query()->where('item_id', $itemId)->where('is_enabled', true)->exists();
     }
 
     /**

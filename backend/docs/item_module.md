@@ -1,0 +1,209 @@
+# Item Module
+
+## 模块定位
+
+`items` 是全局统一物品锚点表。任何“可发放、可掉落、可展示、可计数”的对象，优先通过 `items.item_id` 建立业务引用。
+
+当前明确应 item 化的内容：
+
+- 货币
+- 材料
+- 装备成品
+- 宝石成品
+- 护符成品
+- 礼包本体
+- 消耗品
+
+当前明确不是 item 的内容：
+
+- 怪物
+- 技能本体
+- 主线章节 / 难度 / 副本
+- 蓝色词条本体
+- 套装线 / 套装效果定义
+- 宝石类型定义 / 护符类型定义
+- 掉落条目 / 奖励条目
+- 蓝装模板
+
+## 表职责
+
+`items` 负责：
+
+- 提供稳定 `item_id`
+- 维护展示名称、品质、稀有度、图标、描述
+- 维护堆叠、等级、绑定、出售、使用类型等基础规则
+- 为掉落、首通奖励、礼包、商城、里程碑等模块提供统一引用目标
+
+## 核心字段
+
+### Canonical 字段
+
+- `item_id`
+  - 业务唯一 ID
+  - 全系统最终引用锚点
+- `item_name`
+  - 内部名称
+- `display_name`
+  - 前端展示名称
+- `main_type`
+  - 一级分类
+- `sub_type`
+  - 二级分类
+- `quality`
+  - 玩法品质
+- `rarity`
+  - UI 展示稀有度
+- `is_stackable`
+  - 是否可堆叠
+- `max_stack`
+  - 最大堆叠
+- `required_level`
+  - 使用 / 获取建议等级
+- `bind_type`
+  - 绑定规则
+- `sell_price`
+  - 出售价格
+- `use_type`
+  - 使用类型
+- `source_library`
+  - 来源目录标识
+- `rarity_frame_key`
+  - 稀有度边框覆盖
+
+### 兼容扩展字段
+
+当前仍保留旧扩展字段，以免立即打断 gem / material / 旧页面的细分逻辑：
+
+- `type`
+- `material_type`
+- `effect_type`
+- `target_scope`
+- `effect_payload`
+- `drop_unlock_level`
+- `socket_limit`
+- `source_tags`
+- `use_tags`
+- `stack_limit`
+- `can_compose`
+- `can_reforge`
+
+这些字段不是新的统一锚点口径，但在当前版本中仍可承接旧专用模块的扩展属性。
+
+## quality 与 rarity
+
+### quality
+
+偏玩法品质。用于：
+
+- 装备 / 宝石 / 礼包 / 材料的玩法分层
+- 掉落和成长配置中的品质约束
+
+### rarity
+
+偏全局 UI 展示层级。用于：
+
+- 背包格子背景
+- 奖励预览边框
+- 列表 badge
+- 稀有度边框与色带
+
+当前 V1 中两者可使用同一套值：
+
+- `white`
+- `blue`
+- `purple`
+- `gold`
+- `red`
+
+## main_type / sub_type
+
+### main_type
+
+- `currency`
+- `material`
+- `equipment`
+- `gem`
+- `talisman`
+- `gift_pack`
+- `consumable`
+- `blueprint`
+- `blueprint_fragment`
+
+### sub_type
+
+`currency`
+- `gold`
+- `premium`
+- `contribution`
+- `other_token`
+
+`material`
+- `base_material`
+- `boss_material`
+- `upgrade_material`
+- `gem_material`
+- `talisman_material`
+- `refine_material`
+- `star_material`
+- `story_material`
+- `function_material`
+
+`equipment`
+- `set_equipment`
+- `blue_equipment`
+- `common_equipment`
+
+`gem`
+- `attr_gem`
+- `skill_gem`
+
+`talisman`
+- `common_talisman`
+- `sect_talisman`
+
+`gift_pack`
+- `stage_reward_pack`
+- `growth_pack`
+- `shop_pack`
+- `milestone_pack`
+
+`consumable`
+- `exp_item`
+- `ticket`
+- `special_item`
+
+## bind_type / use_type
+
+### bind_type
+
+- `none`
+- `bind_on_get`
+- `bind_on_use`
+
+### use_type
+
+- `none`
+- `consume_reward`
+- `open_pack`
+- `equip`
+- `embed`
+- `craft_material`
+
+## 与其他模块关系
+
+- 怪物掉落条目引用 `items.item_id`
+- 主线难度首通奖励引用 `items.item_id`
+- 礼包本体本身也应存在于 `items`
+- 礼包内容未来应继续引用 `items.item_id`
+- 商城商品的 `reward_item_id` 优先引用 `items.item_id`
+- 成品实体与配置定义分离：
+  - 蓝装模板不是 item
+  - 蓝装成品是 item
+  - 套装线不是 item
+  - 套装成品装备是 item
+
+## 数据源规则
+
+- 正式物品目录源文件：`data/items.json`
+- `ItemsSeeder` 只负责从源文件导入
+- 不再内置 demo fallback 物品数据

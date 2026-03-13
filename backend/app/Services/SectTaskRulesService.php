@@ -270,7 +270,7 @@ class SectTaskRulesService
                 continue;
             }
 
-            if (! Item::query()->where('id', $itemId)->where('is_enabled', true)->exists()) {
+            if (! Item::query()->where('item_id', $itemId)->where('is_enabled', true)->exists()) {
                 $errors["{$field}.items.{$index}.item_id"] = '奖励物品无效。';
                 continue;
             }
