@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             EquipTemplatesSeeder::class,
             BlueAffixPoolSeeder::class,
             PurpleAffixPoolSeeder::class,
-            BlueGearTemplatesSeeder::class,
+            BlueEquipmentTemplatesSeeder::class,
             CraftingRecipesSeeder::class,
             BattleDefaultsSettingSeeder::class,
             EquipmentGrowthRulesSettingSeeder::class,

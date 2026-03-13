@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\BlueGearTemplate;
+use App\Models\BlueEquipmentTemplate;
 use App\Models\EquipTemplate;
 use App\Models\User;
 use App\Services\GmDebugService;
@@ -390,13 +390,13 @@ class GmDebugConsolePage extends Page implements HasForms
             ])
             ->all();
 
-        $blueOptions = BlueGearTemplate::query()
+        $blueOptions = BlueEquipmentTemplate::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
-            ->orderBy('name')
+            ->orderBy('display_name')
             ->get()
-            ->mapWithKeys(fn (BlueGearTemplate $template): array => [
-                (string) $template->template_id => sprintf('蓝装：%s', (string) $template->name),
+            ->mapWithKeys(fn (BlueEquipmentTemplate $template): array => [
+                (string) $template->template_id => sprintf('蓝装：%s', (string) $template->display_name),
             ])
             ->all();
 

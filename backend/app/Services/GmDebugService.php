@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\BlueGearTemplate;
+use App\Models\BlueEquipmentTemplate;
 use App\Models\EquipTemplate;
 use App\Models\GmOperationLog;
 use App\Models\Item;
@@ -387,14 +387,14 @@ class GmDebugService
             ];
         }
 
-        $blueTemplate = BlueGearTemplate::query()->where('template_id', $templateId)->first();
-        if ($blueTemplate instanceof BlueGearTemplate) {
+        $blueTemplate = BlueEquipmentTemplate::query()->where('template_id', $templateId)->first();
+        if ($blueTemplate instanceof BlueEquipmentTemplate) {
             return [
                 'template_id' => (string) $blueTemplate->template_id,
-                'template_name' => (string) $blueTemplate->name,
-                'template_type' => 'blue_gear_template',
+                'template_name' => (string) $blueTemplate->display_name,
+                'template_type' => 'blue_equipment_template',
                 'rarity' => 'blue',
-                'required_level' => max(1, (int) ($blueTemplate->required_level ?? 1)),
+                'required_level' => max(1, (int) ($blueTemplate->unlock_level ?? 1)),
             ];
         }
 
