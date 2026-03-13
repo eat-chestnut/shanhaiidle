@@ -194,13 +194,21 @@
 - 怪物掉落条目引用 `items.item_id`
 - 主线难度首通奖励引用 `items.item_id`
 - 礼包本体本身也应存在于 `items`
-- 礼包内容未来应继续引用 `items.item_id`
+- 礼包内容通过 `gift_pack_items.item_id` 继续引用 `items.item_id`
+- V1 禁止 `gift_pack_items.item_id` 再指向 `gift_pack` 类型 item
 - 商城商品的 `reward_item_id` 优先引用 `items.item_id`
 - 成品实体与配置定义分离：
   - 蓝装模板不是 item
   - 蓝装成品是 item
   - 套装线不是 item
   - 套装成品装备是 item
+
+## 礼包承载方式
+
+- 礼包本体是 item，正式 carrier 为 `items.item_id`
+- 礼包主表 `gift_packs.item_id` 必须命中对应礼包 item
+- 礼包内容表 `gift_pack_items.item_id` 只引用普通 item，不再拆成货币 / 材料 / 装备多套结构
+- `recommended_sect` 仅是礼包自选内容的展示标签，不是领取限制
 
 ## 数据源规则
 

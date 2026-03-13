@@ -24,6 +24,7 @@ class ExportConfigBundle extends Command
     private const FILES = [
         ['key' => 'stages', 'command' => 'game:export-stages', 'source' => 'stages_v1.json', 'filename' => 'stages_v1.json'],
         ['key' => 'items', 'command' => 'game:export-items', 'source' => 'items.json', 'filename' => 'items.json'],
+        ['key' => 'gift_pack_module', 'command' => 'game:export-gift-pack-module', 'source' => 'gift_pack_module_v1.json', 'filename' => 'gift_pack_module_v1.json'],
         ['key' => 'equip_templates', 'command' => 'game:export-equip-templates', 'source' => 'equip_templates.json', 'filename' => 'equip_templates.json'],
         ['key' => 'equipment_sets', 'command' => 'game:export-equipment-sets', 'source' => 'equipment_sets.json', 'filename' => 'equipment_sets.json'],
         ['key' => 'equip_slots', 'command' => 'game:export-equip-slots', 'source' => 'equip_slots_v1.json', 'filename' => 'equip_slots_v1.json'],

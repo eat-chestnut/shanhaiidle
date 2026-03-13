@@ -671,6 +671,41 @@ class AdminOptions
         return (string) Item::query()->where('item_id', $itemId)->value('display_name');
     }
 
+    public static function giftPackTypeOptions(): array
+    {
+        return \App\Models\GiftPack::PACK_TYPE_OPTIONS;
+    }
+
+    public static function giftPackModeOptions(): array
+    {
+        return \App\Models\GiftPack::PACK_MODE_OPTIONS;
+    }
+
+    public static function giftPackOpenModeOptions(): array
+    {
+        return \App\Models\GiftPack::OPEN_MODE_OPTIONS;
+    }
+
+    public static function giftPackContentModeOptions(): array
+    {
+        return \App\Models\GiftPackItem::CONTENT_MODE_OPTIONS;
+    }
+
+    public static function giftPackRecommendedSectOptions(): array
+    {
+        return \App\Models\GiftPackItem::RECOMMENDED_SECT_OPTIONS;
+    }
+
+    public static function giftPackCarrierItemOptions(): array
+    {
+        return self::itemOptions(fn (Builder $query): Builder => $query->where('main_type', 'gift_pack'));
+    }
+
+    public static function giftPackContentItemOptions(): array
+    {
+        return self::itemOptions(fn (Builder $query): Builder => $query->where('main_type', '!=', 'gift_pack'));
+    }
+
     public static function monsterOptions(?string $kind = null, ?string $chapterId = null): array
     {
         return Monster::query()

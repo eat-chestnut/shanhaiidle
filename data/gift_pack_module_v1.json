@@ -1,0 +1,179 @@
+{
+    "meta": {
+        "key": "gift_pack_module",
+        "schema_version": 1,
+        "exported_at": "2026-03-13 08:14:16",
+        "sha256": "68802516840076b9437b1a88ed4a5b78169e5b830c9a5e2de24042ee78756fcc"
+    },
+    "gift_pack_module": {
+        "gift_packs": [
+            {
+                "pack_id": "gift_stage01_first_clear",
+                "item_id": "gift_stage01_first_clear",
+                "pack_name": "第一章首通礼包",
+                "display_name": "第一章首通礼包",
+                "pack_type": "stage_reward_pack",
+                "pack_mode": "fixed",
+                "open_mode": "manual",
+                "select_count_min": null,
+                "select_count_max": null,
+                "desc": "主线首通礼包样例。",
+                "icon": null,
+                "is_enabled": true,
+                "sort_order": 10,
+                "remark": "固定礼包样例"
+            },
+            {
+                "pack_id": "gift_lv20_growth",
+                "item_id": "gift_lv20_growth",
+                "pack_name": "20级成长礼包",
+                "display_name": "20级成长礼包",
+                "pack_type": "growth_pack",
+                "pack_mode": "fixed",
+                "open_mode": "manual",
+                "select_count_min": null,
+                "select_count_max": null,
+                "desc": "成长礼包样例。",
+                "icon": null,
+                "is_enabled": true,
+                "sort_order": 20,
+                "remark": "固定礼包样例"
+            },
+            {
+                "pack_id": "gift_shop_weapon_select_20",
+                "item_id": "gift_shop_weapon_select_20",
+                "pack_name": "20级武器自选礼包",
+                "display_name": "20级武器自选礼包",
+                "pack_type": "shop_pack",
+                "pack_mode": "select_one",
+                "open_mode": "manual",
+                "select_count_min": 1,
+                "select_count_max": 1,
+                "desc": "商城武器自选礼包样例。",
+                "icon": null,
+                "is_enabled": true,
+                "sort_order": 30,
+                "remark": "单选礼包样例"
+            }
+        ],
+        "gift_pack_items": [
+            {
+                "pack_id": "gift_lv20_growth",
+                "item_id": "cur_gold",
+                "content_mode": "fixed",
+                "count_min": 200,
+                "count_max": 200,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 10,
+                "is_enabled": true,
+                "remark": "成长礼包铜贝"
+            },
+            {
+                "pack_id": "gift_lv20_growth",
+                "item_id": "cur_premium_jade",
+                "content_mode": "fixed",
+                "count_min": 30,
+                "count_max": 30,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 20,
+                "is_enabled": true,
+                "remark": "成长礼包灵石"
+            },
+            {
+                "pack_id": "gift_lv20_growth",
+                "item_id": "con_exp_pill_s",
+                "content_mode": "fixed",
+                "count_min": 10,
+                "count_max": 10,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 30,
+                "is_enabled": true,
+                "remark": "成长礼包经验丹"
+            },
+            {
+                "pack_id": "gift_shop_weapon_select_20",
+                "item_id": "itm_weapon_bing_20",
+                "content_mode": "selectable",
+                "count_min": 1,
+                "count_max": 1,
+                "weight": 0,
+                "recommended_sect": "bing",
+                "display_note": "推荐兵宗使用",
+                "sort_order": 10,
+                "is_enabled": true,
+                "remark": "兵宗武器"
+            },
+            {
+                "pack_id": "gift_shop_weapon_select_20",
+                "item_id": "itm_weapon_jingang_20",
+                "content_mode": "selectable",
+                "count_min": 1,
+                "count_max": 1,
+                "weight": 0,
+                "recommended_sect": "jingang",
+                "display_note": "推荐金刚宗使用",
+                "sort_order": 20,
+                "is_enabled": true,
+                "remark": "金刚宗武器"
+            },
+            {
+                "pack_id": "gift_shop_weapon_select_20",
+                "item_id": "itm_weapon_fulu_20",
+                "content_mode": "selectable",
+                "count_min": 1,
+                "count_max": 1,
+                "weight": 0,
+                "recommended_sect": "fulu",
+                "display_note": "推荐符箓宗使用",
+                "sort_order": 30,
+                "is_enabled": true,
+                "remark": "符箓宗武器"
+            },
+            {
+                "pack_id": "gift_stage01_first_clear",
+                "item_id": "cur_gold",
+                "content_mode": "fixed",
+                "count_min": 100,
+                "count_max": 100,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 10,
+                "is_enabled": true,
+                "remark": "固定铜贝"
+            },
+            {
+                "pack_id": "gift_stage01_first_clear",
+                "item_id": "cur_premium_jade",
+                "content_mode": "fixed",
+                "count_min": 20,
+                "count_max": 20,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 20,
+                "is_enabled": true,
+                "remark": "固定灵石"
+            },
+            {
+                "pack_id": "gift_stage01_first_clear",
+                "item_id": "mat_upgrade_star_low",
+                "content_mode": "fixed",
+                "count_min": 5,
+                "count_max": 5,
+                "weight": 0,
+                "recommended_sect": "none",
+                "display_note": null,
+                "sort_order": 30,
+                "is_enabled": true,
+                "remark": "固定升星材料"
+            }
+        ]
+    }
+}

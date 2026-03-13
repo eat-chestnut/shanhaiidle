@@ -85,6 +85,7 @@ return new class extends Migration
             $table->string('camera_rule', 120)->nullable();
             $table->string('entry_fx_key', 160)->nullable();
             $table->string('death_fx_key', 160)->nullable();
+            // Deprecated legacy residue. Boss 首通奖励已迁到主线难度层，不再作为正式 Boss 字段使用。
             $table->string('first_clear_reward_group_id', 160)->nullable();
             $table->string('story_flag_on_clear', 160)->nullable();
             $table->text('remark')->nullable();

@@ -2,8 +2,8 @@
     "meta": {
         "key": "main_stage_module",
         "schema_version": 1,
-        "exported_at": "2026-03-13 06:35:14",
-        "sha256": "6f47511ae4123937b5095fb95ece16dbe73c3ed174e73b7d546e6cc7a206843e"
+        "exported_at": "2026-03-13 08:14:16",
+        "sha256": "47568bfa006e05a8ce807c3b20c0d97430173f73436e4cd6e512a28f1dd44914"
     },
     "main_stage_module": {
         "chapters": [
@@ -111,25 +111,11 @@
                         ],
                         "first_clear_rewards": [
                             {
-                                "item_id": "金币",
-                                "count": 120,
+                                "item_id": "gift_stage01_first_clear",
+                                "count": 1,
                                 "sort_order": 10,
                                 "is_enabled": true,
-                                "remark": "首通金币"
-                            },
-                            {
-                                "item_id": "玉屑",
-                                "count": 12,
-                                "sort_order": 20,
-                                "is_enabled": true,
-                                "remark": "首通成长资源"
-                            },
-                            {
-                                "item_id": "白玉碎",
-                                "count": 2,
-                                "sort_order": 30,
-                                "is_enabled": true,
-                                "remark": "首通强化资源"
+                                "remark": "首通礼包样例"
                             }
                         ]
                     },

@@ -41,6 +41,7 @@ return new class extends Migration
 
         if (Schema::hasTable('monster_boss_profiles') && Schema::hasColumn('monster_boss_profiles', 'first_clear_reward_group_id')) {
             Schema::table('monster_boss_profiles', function (Blueprint $table): void {
+                // Remove deprecated legacy residue from Boss 扩展正式链路。
                 $table->dropColumn('first_clear_reward_group_id');
             });
         }
@@ -63,6 +64,7 @@ return new class extends Migration
 
         if (Schema::hasTable('monster_boss_profiles') && ! Schema::hasColumn('monster_boss_profiles', 'first_clear_reward_group_id')) {
             Schema::table('monster_boss_profiles', function (Blueprint $table): void {
+                // Legacy rollback only. 正式结构不再使用该字段。
                 $table->string('first_clear_reward_group_id', 160)->nullable();
             });
         }
