@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Item;
 use App\Models\Monster;
 use Illuminate\Validation\ValidationException;
 
@@ -56,6 +57,15 @@ class MonsterModuleSupport
         ];
     }
 
+    public static function dropTypeOptions(): array
+    {
+        return [
+            'fixed' => '固定掉落',
+            'random' => '概率掉落',
+            'guarantee' => '保底掉落',
+        ];
+    }
+
     public static function normalizeSkillBindings(mixed $raw): array
     {
         $rows = [];
@@ -103,7 +113,7 @@ class MonsterModuleSupport
         }
     }
 
-    public static function normalizeDropBindings(mixed $raw): array
+    public static function normalizeDropItems(mixed $raw): array
     {
         $rows = [];
 
@@ -112,15 +122,19 @@ class MonsterModuleSupport
                 continue;
             }
 
-            $dropGroupId = trim((string) ($row['drop_group_id'] ?? ''));
-            if ($dropGroupId === '') {
+            $itemId = trim((string) ($row['item_id'] ?? ''));
+            if ($itemId === '') {
                 continue;
             }
 
             $rows[] = [
-                'drop_group_id' => $dropGroupId,
-                'is_primary' => (bool) ($row['is_primary'] ?? false),
+                'item_id' => $itemId,
+                'drop_type' => trim((string) ($row['drop_type'] ?? 'fixed')),
+                'count_min' => max(1, (int) ($row['count_min'] ?? 1)),
+                'count_max' => max(1, (int) ($row['count_max'] ?? 1)),
+                'drop_rate' => max(0, min(1, (float) ($row['drop_rate'] ?? 1))),
                 'sort_order' => max(0, (int) ($row['sort_order'] ?? ($index + 1) * 10)),
+                'is_enabled' => (bool) ($row['is_enabled'] ?? true),
                 'remark' => filled($row['remark'] ?? null) ? trim((string) $row['remark']) : null,
             ];
         }
@@ -128,13 +142,39 @@ class MonsterModuleSupport
         return array_values($rows);
     }
 
-    public static function validateDropBindingsOrFail(array $rows): void
+    public static function validateDropItemsOrFail(array $rows): void
     {
         $errors = [];
+        $validItemIds = Item::query()->pluck('id')->all();
+        $validItemLookup = array_fill_keys($validItemIds, true);
 
         foreach ($rows as $index => $row) {
-            if (trim((string) ($row['drop_group_id'] ?? '')) === '') {
-                $errors["drop_bindings.{$index}.drop_group_id"] = '请填写掉落组 ID。';
+            $itemId = trim((string) ($row['item_id'] ?? ''));
+            $dropType = trim((string) ($row['drop_type'] ?? ''));
+            $countMin = (int) ($row['count_min'] ?? 0);
+            $countMax = (int) ($row['count_max'] ?? 0);
+            $dropRate = (float) ($row['drop_rate'] ?? -1);
+
+            if ($itemId === '') {
+                $errors["drops.{$index}.item_id"] = '请选择掉落物品。';
+            } elseif (! isset($validItemLookup[$itemId])) {
+                $errors["drops.{$index}.item_id"] = '掉落物品不存在。';
+            }
+
+            if (! isset(self::dropTypeOptions()[$dropType])) {
+                $errors["drops.{$index}.drop_type"] = '掉落类型非法。';
+            }
+
+            if ($countMin < 1) {
+                $errors["drops.{$index}.count_min"] = '最小数量必须大于等于 1。';
+            }
+
+            if ($countMax < $countMin) {
+                $errors["drops.{$index}.count_max"] = '最大数量不能小于最小数量。';
+            }
+
+            if ($dropRate < 0 || $dropRate > 1) {
+                $errors["drops.{$index}.drop_rate"] = '掉落概率必须在 0 到 1 之间。';
             }
         }
 
@@ -158,7 +198,6 @@ class MonsterModuleSupport
             'camera_rule' => filled($row['camera_rule'] ?? null) ? trim((string) $row['camera_rule']) : null,
             'entry_fx_key' => filled($row['entry_fx_key'] ?? null) ? trim((string) $row['entry_fx_key']) : null,
             'death_fx_key' => filled($row['death_fx_key'] ?? null) ? trim((string) $row['death_fx_key']) : null,
-            'first_clear_reward_group_id' => filled($row['first_clear_reward_group_id'] ?? null) ? trim((string) $row['first_clear_reward_group_id']) : null,
             'story_flag_on_clear' => filled($row['story_flag_on_clear'] ?? null) ? trim((string) $row['story_flag_on_clear']) : null,
             'remark' => filled($row['remark'] ?? null) ? trim((string) $row['remark']) : null,
         ];

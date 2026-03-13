@@ -11,23 +11,23 @@ class CreateMonster extends CreateRecord
 
     private array $skillBindingsToSync = [];
 
-    private array $dropBindingsToSync = [];
+    private array $dropItemsToSync = [];
 
     private array $bossProfileToSync = [];
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $this->skillBindingsToSync = MonsterResource::normalizeSkillBindingsOrFail($data['skill_bindings'] ?? []);
-        $this->dropBindingsToSync = MonsterResource::normalizeDropBindingsOrFail($data['drop_bindings'] ?? []);
+        $this->dropItemsToSync = MonsterResource::normalizeDropItemsOrFail($data['drop_items'] ?? []);
         $this->bossProfileToSync = MonsterResource::normalizeBossProfile($data['boss_profile'] ?? []);
 
-        unset($data['skill_bindings'], $data['drop_bindings'], $data['boss_profile']);
+        unset($data['skill_bindings'], $data['drop_items'], $data['boss_profile']);
 
         return $data;
     }
 
     protected function afterCreate(): void
     {
-        MonsterResource::syncRelations($this->record, $this->skillBindingsToSync, $this->dropBindingsToSync, $this->bossProfileToSync);
+        MonsterResource::syncRelations($this->record, $this->skillBindingsToSync, $this->dropItemsToSync, $this->bossProfileToSync);
     }
 }

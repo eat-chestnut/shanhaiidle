@@ -152,9 +152,9 @@ class MonsterModuleImportService
                     $monster->skillBindings()->create($binding);
                 }
 
-                $monster->dropBindings()->delete();
-                foreach (MonsterModuleSupport::normalizeDropBindings($row['drop_bindings'] ?? []) as $binding) {
-                    $monster->dropBindings()->create($binding);
+                $monster->drops()->delete();
+                foreach (MonsterModuleSupport::normalizeDropItems($row['drop_items'] ?? []) as $dropItem) {
+                    $monster->drops()->create($dropItem);
                 }
 
                 if ((string) $monster->monster_type === 'boss') {
@@ -235,8 +235,11 @@ class MonsterModuleImportService
             $skillBindings = MonsterModuleSupport::normalizeSkillBindings($row['skill_bindings'] ?? []);
             MonsterModuleSupport::validateSkillBindingsOrFail($skillBindings);
 
-            $dropBindings = MonsterModuleSupport::normalizeDropBindings($row['drop_bindings'] ?? []);
-            MonsterModuleSupport::validateDropBindingsOrFail($dropBindings);
+            $dropItems = MonsterModuleSupport::normalizeDropItems($row['drop_items'] ?? []);
+            MonsterModuleSupport::validateDropItemsOrFail($dropItems);
+            if ($dropItems === []) {
+                $errors["monsters.{$index}.drop_items"] = '怪物必须至少配置 1 条掉落物。';
+            }
 
             if ($monsterType === 'boss') {
                 $bossProfile = MonsterModuleSupport::normalizeBossProfile($row['boss_profile'] ?? []);

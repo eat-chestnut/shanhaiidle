@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MainStageChapter;
 use App\Models\MainStageDifficulty;
+use App\Models\StageDifficultyFirstClearReward;
 use App\Support\MainStageModuleSupport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -75,6 +76,14 @@ class MainStageModuleImportService
                         ['difficulty_id' => $difficulty['difficulty_id']],
                         collect($difficulty)->except('difficulty_id')->all(),
                     );
+
+                    StageDifficultyFirstClearReward::query()->where('difficulty_id', $difficulty['difficulty_id'])->delete();
+                    foreach (MainStageModuleSupport::normalizeFirstClearRewards($difficultyRow['first_clear_rewards'] ?? []) as $reward) {
+                        StageDifficultyFirstClearReward::query()->create([
+                            'difficulty_id' => $difficulty['difficulty_id'],
+                            ...$reward,
+                        ]);
+                    }
                 }
             }
 

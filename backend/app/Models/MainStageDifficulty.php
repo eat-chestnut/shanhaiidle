@@ -21,8 +21,6 @@ class MainStageDifficulty extends Model
         'chapter_id',
         'difficulty_code',
         'difficulty_name',
-        'drop_preview_group_id',
-        'first_clear_reward_group_id',
         'remark',
         'sort_order',
         'is_enabled',
@@ -56,5 +54,10 @@ class MainStageDifficulty extends Model
     public function bossMonsters(): HasMany
     {
         return $this->monsterEntries()->where('spawn_type', 'boss');
+    }
+
+    public function firstClearRewards(): HasMany
+    {
+        return $this->hasMany(StageDifficultyFirstClearReward::class, 'difficulty_id', 'difficulty_id')->orderBy('sort_order');
     }
 }

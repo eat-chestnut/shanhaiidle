@@ -15,19 +15,22 @@ class CreateMainStageDifficulty extends CreateRecord
 
     private array $bossMonstersToSync = [];
 
+    private array $firstClearRewardsToSync = [];
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $this->normalMonstersToSync = MainStageDifficultyResource::normalizeMonsterEntriesOrFail($data['normal_monsters'] ?? [], 'normal');
         $this->eliteMonstersToSync = MainStageDifficultyResource::normalizeMonsterEntriesOrFail($data['elite_monsters'] ?? [], 'elite');
         $this->bossMonstersToSync = MainStageDifficultyResource::normalizeMonsterEntriesOrFail($data['boss_monsters'] ?? [], 'boss');
+        $this->firstClearRewardsToSync = MainStageDifficultyResource::normalizeFirstClearRewardsOrFail($data['first_clear_rewards'] ?? []);
 
-        unset($data['normal_monsters'], $data['elite_monsters'], $data['boss_monsters']);
+        unset($data['normal_monsters'], $data['elite_monsters'], $data['boss_monsters'], $data['first_clear_rewards']);
 
         return $data;
     }
 
     protected function afterCreate(): void
     {
-        MainStageDifficultyResource::syncMonsterEntries($this->record, $this->normalMonstersToSync, $this->eliteMonstersToSync, $this->bossMonstersToSync);
+        MainStageDifficultyResource::syncRelations($this->record, $this->normalMonstersToSync, $this->eliteMonstersToSync, $this->bossMonstersToSync, $this->firstClearRewardsToSync);
     }
 }

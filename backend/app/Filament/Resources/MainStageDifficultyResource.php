@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MainStageDifficultyResource\Pages;
 use App\Models\MainStageDifficulty;
 use App\Models\StageDifficultyMonster;
+use App\Models\StageDifficultyFirstClearReward;
 use App\Support\AdminOptions;
 use App\Support\MainStageModuleSupport;
 use App\Support\MonsterModuleSupport;
@@ -39,7 +40,7 @@ class MainStageDifficultyResource extends Resource
     {
         return $schema->schema([
             Section::make('难度基础')
-                ->description('主线难度只维护显示名、奖励挂载和怪物列表，不再使用 monster_pool。')
+                ->description('主线难度只维护显示名、首通奖励和怪物列表，不再使用掉落组或奖励组。')
                 ->schema([
                     TextInput::make('difficulty_id')->label('难度 ID')->required()->maxLength(160)->unique(ignoreRecord: true),
                     Select::make('chapter_id')->label('所属章节')
@@ -50,12 +51,31 @@ class MainStageDifficultyResource extends Resource
                         ->live(),
                     Select::make('difficulty_code')->label('难度编码')->options(MainStageModuleSupport::difficultyCodeOptions())->required(),
                     TextInput::make('difficulty_name')->label('难度名称')->required()->maxLength(64),
-                    TextInput::make('drop_preview_group_id')->label('掉落预览组 ID')->required()->maxLength(160),
-                    TextInput::make('first_clear_reward_group_id')->label('首通奖励组 ID')->required()->maxLength(160),
                     TextInput::make('sort_order')->label('排序')->required()->integer()->default(0)->minValue(0),
                     Toggle::make('is_enabled')->label('启用')->default(true),
                     Textarea::make('remark')->label('备注')->rows(3)->columnSpanFull(),
                 ])->columns(4),
+            Section::make('首通奖励')
+                ->description('首通奖励直接挂在主线难度上，不再通过奖励组间接引用。')
+                ->schema([
+                    Repeater::make('first_clear_rewards')
+                        ->label('首通奖励条目')
+                        ->default([])
+                        ->reorderable(false)
+                        ->reorderableWithButtons(false)
+                        ->reorderableWithDragAndDrop(false)
+                        ->itemLabel(fn (array $state): ?string => filled($state['item_id'] ?? null) ? AdminOptions::itemName((string) $state['item_id']) : '奖励')
+                        ->addActionLabel('新增首通奖励')
+                        ->schema([
+                            Select::make('item_id')->label('奖励物品')->options(fn (): array => AdminOptions::itemOptions())->searchable()->preload()->required()->columnSpan(6),
+                            TextInput::make('count')->label('数量')->required()->integer()->minValue(1)->default(1)->columnSpan(2),
+                            Toggle::make('is_enabled')->label('启用')->default(true)->columnSpan(2),
+                            TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->default(0)->columnSpan(2),
+                            Textarea::make('remark')->label('备注')->rows(2)->columnSpanFull(),
+                        ])
+                        ->columns(12)
+                        ->columnSpanFull(),
+                ]),
             Section::make('普通怪列表')
                 ->description('仅可选择普通怪。')
                 ->schema([
@@ -83,8 +103,7 @@ class MainStageDifficultyResource extends Resource
                 TextColumn::make('difficulty_code')->label('难度编码')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(MainStageModuleSupport::difficultyCodeOptions(), $state))->sortable(),
                 TextColumn::make('difficulty_name')->label('难度名称')->searchable(),
                 TextColumn::make('monster_summary')->label('怪物配置')->state(fn (MainStageDifficulty $record): string => static::monsterSummary($record))->wrap(),
-                TextColumn::make('drop_preview_group_id')->label('掉落预览组')->toggleable(),
-                TextColumn::make('first_clear_reward_group_id')->label('首通奖励组')->toggleable(),
+                TextColumn::make('reward_summary')->label('首通奖励')->state(fn (MainStageDifficulty $record): string => static::rewardSummary($record))->wrap(),
                 IconColumn::make('is_enabled')->label('启用')->boolean(),
                 TextColumn::make('sort_order')->label('排序')->sortable(),
             ])
@@ -136,12 +155,39 @@ class MainStageDifficultyResource extends Resource
         return $rows;
     }
 
-    public static function syncMonsterEntries(MainStageDifficulty $difficulty, array $normalMonsters, array $eliteMonsters, array $bossMonsters): void
+    public static function firstClearRewardsForForm(MainStageDifficulty $record): array
+    {
+        return $record->firstClearRewards()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (StageDifficultyFirstClearReward $reward): array => [
+                'item_id' => (string) $reward->item_id,
+                'count' => (int) $reward->count,
+                'sort_order' => (int) $reward->sort_order,
+                'is_enabled' => (bool) $reward->is_enabled,
+                'remark' => $reward->remark !== null ? (string) $reward->remark : null,
+            ])->all();
+    }
+
+    public static function normalizeFirstClearRewardsOrFail(mixed $raw): array
+    {
+        $rows = MainStageModuleSupport::normalizeFirstClearRewards($raw);
+        MainStageModuleSupport::validateFirstClearRewardsOrFail($rows);
+
+        return $rows;
+    }
+
+    public static function syncRelations(MainStageDifficulty $difficulty, array $normalMonsters, array $eliteMonsters, array $bossMonsters, array $firstClearRewards): void
     {
         $difficulty->monsterEntries()->delete();
 
         foreach (array_merge($normalMonsters, $eliteMonsters, $bossMonsters) as $row) {
             $difficulty->monsterEntries()->create($row);
+        }
+
+        $difficulty->firstClearRewards()->delete();
+        foreach ($firstClearRewards as $row) {
+            $difficulty->firstClearRewards()->create($row);
         }
     }
 
@@ -159,6 +205,18 @@ class MainStageDifficultyResource extends Resource
             (int) ($counts['elite'] ?? 0),
             (int) ($counts['boss'] ?? 0),
         );
+    }
+
+    public static function rewardSummary(MainStageDifficulty $difficulty): string
+    {
+        $items = $difficulty->firstClearRewards()
+            ->where('is_enabled', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (StageDifficultyFirstClearReward $reward): string => sprintf('%s x%d', AdminOptions::itemName((string) $reward->item_id), (int) $reward->count))
+            ->all();
+
+        return $items === [] ? '未配置' : implode('、', array_slice($items, 0, 3));
     }
 
     private static function monsterEntriesRepeater(string $name, string $spawnType): Repeater

@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Monster;
 use App\Models\MonsterBossProfile;
-use App\Models\MonsterDropBinding;
+use App\Models\MonsterDropItem;
 use App\Models\MonsterSkillBinding;
 use App\Services\ExportMetaService;
 use Illuminate\Console\Command;
@@ -24,7 +24,7 @@ class ExportMonstersJson extends Command
         $monsters = Monster::query()
             ->with([
                 'skillBindings' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
-                'dropBindings' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
+                'drops' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
                 'bossProfile',
             ])
             ->where('is_enabled', true)
@@ -69,11 +69,15 @@ class ExportMonstersJson extends Command
                         'is_enabled' => (bool) $binding->is_enabled,
                         'remark' => $binding->remark !== null ? (string) $binding->remark : null,
                     ])->values()->all(),
-                    'drop_bindings' => $monster->dropBindings->map(fn (MonsterDropBinding $binding): array => [
-                        'drop_group_id' => (string) $binding->drop_group_id,
-                        'is_primary' => (bool) $binding->is_primary,
-                        'sort_order' => (int) $binding->sort_order,
-                        'remark' => $binding->remark !== null ? (string) $binding->remark : null,
+                    'drop_items' => $monster->drops->map(fn (MonsterDropItem $drop): array => [
+                        'item_id' => (string) $drop->item_id,
+                        'drop_type' => (string) $drop->drop_type,
+                        'count_min' => (int) $drop->count_min,
+                        'count_max' => (int) $drop->count_max,
+                        'drop_rate' => (float) $drop->drop_rate,
+                        'sort_order' => (int) $drop->sort_order,
+                        'is_enabled' => (bool) $drop->is_enabled,
+                        'remark' => $drop->remark !== null ? (string) $drop->remark : null,
                     ])->values()->all(),
                     'boss_profile' => $monster->bossProfile instanceof MonsterBossProfile ? [
                         'phase_count' => (int) $monster->bossProfile->phase_count,
@@ -86,7 +90,6 @@ class ExportMonstersJson extends Command
                         'camera_rule' => $monster->bossProfile->camera_rule,
                         'entry_fx_key' => $monster->bossProfile->entry_fx_key,
                         'death_fx_key' => $monster->bossProfile->death_fx_key,
-                        'first_clear_reward_group_id' => $monster->bossProfile->first_clear_reward_group_id,
                         'story_flag_on_clear' => $monster->bossProfile->story_flag_on_clear,
                         'remark' => $monster->bossProfile->remark,
                     ] : null,

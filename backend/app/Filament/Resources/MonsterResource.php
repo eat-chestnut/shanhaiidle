@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MonsterResource\Pages;
 use App\Models\Monster;
 use App\Models\MonsterBossProfile;
-use App\Models\MonsterDropBinding;
+use App\Models\MonsterDropItem;
 use App\Models\MonsterSkillBinding;
 use App\Support\AdminOptions;
 use App\Support\MonsterModuleSupport;
@@ -110,24 +110,28 @@ class MonsterResource extends Resource
                                             ->columnSpanFull(),
                                     ]),
                             ]),
-                        Tab::make('掉落挂载')
+                        Tab::make('掉落条目')
                             ->schema([
-                                Section::make('掉落组挂载')
-                                    ->description('怪物只挂掉落组，不在怪物主表里直接录掉落条目。')
+                                Section::make('怪物掉落')
+                                    ->description('怪物直接维护掉落物条目，不再通过 drop_group 间接挂载。')
                                     ->schema([
-                                        Repeater::make('drop_bindings')
-                                            ->label('掉落挂载')
+                                        Repeater::make('drop_items')
+                                            ->label('掉落条目')
                                             ->default([])
                                             ->reorderable(false)
                                             ->reorderableWithButtons(false)
                                             ->reorderableWithDragAndDrop(false)
-                                            ->itemLabel(fn (array $state): ?string => filled($state['drop_group_id'] ?? null) ? (string) $state['drop_group_id'] : '掉落组')
-                                            ->addActionLabel('新增掉落挂载')
+                                            ->itemLabel(fn (array $state): ?string => filled($state['item_id'] ?? null) ? AdminOptions::itemName((string) $state['item_id']) : '掉落物')
+                                            ->addActionLabel('新增掉落条目')
                                             ->schema([
-                                                TextInput::make('drop_group_id')->label('掉落组 ID')->required()->maxLength(160)->columnSpan(5),
-                                                Toggle::make('is_primary')->label('主掉落组')->default(false)->columnSpan(2),
+                                                Select::make('item_id')->label('掉落物品')->options(fn (): array => AdminOptions::itemOptions())->searchable()->preload()->required()->columnSpan(4),
+                                                Select::make('drop_type')->label('掉落类型')->options(MonsterModuleSupport::dropTypeOptions())->required()->default('fixed')->columnSpan(2),
+                                                TextInput::make('count_min')->label('最小数量')->integer()->minValue(1)->required()->default(1)->columnSpan(2),
+                                                TextInput::make('count_max')->label('最大数量')->integer()->minValue(1)->required()->default(1)->columnSpan(2),
+                                                TextInput::make('drop_rate')->label('掉落概率')->numeric()->minValue(0)->maxValue(1)->required()->default(1)->columnSpan(1),
+                                                Toggle::make('is_enabled')->label('启用')->default(true)->columnSpan(1),
                                                 TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->default(0)->columnSpan(2),
-                                                Textarea::make('remark')->label('备注')->rows(2)->columnSpan(3),
+                                                Textarea::make('remark')->label('备注')->rows(2)->columnSpanFull(),
                                             ])
                                             ->columns(12)
                                             ->columnSpanFull(),
@@ -144,7 +148,6 @@ class MonsterResource extends Resource
                                         TextInput::make('boss_profile.camera_rule')->label('镜头规则')->maxLength(120),
                                         TextInput::make('boss_profile.entry_fx_key')->label('入场特效 Key')->maxLength(160),
                                         TextInput::make('boss_profile.death_fx_key')->label('死亡特效 Key')->maxLength(160),
-                                        TextInput::make('boss_profile.first_clear_reward_group_id')->label('首通奖励组 ID')->maxLength(160),
                                         TextInput::make('boss_profile.story_flag_on_clear')->label('通关剧情标记')->maxLength(160),
                                         Textarea::make('boss_profile.intro_text')->label('Boss 出场文本')->rows(3)->columnSpanFull(),
                                         Textarea::make('boss_profile.remark')->label('Boss 备注')->rows(3)->columnSpanFull(),
@@ -172,7 +175,7 @@ class MonsterResource extends Resource
                 TextColumn::make('hp')->label('HP')->numeric()->sortable(),
                 TextColumn::make('ai_type')->label('AI')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(MonsterModuleSupport::aiTypeOptions(), $state))->wrap(),
                 IconColumn::make('has_skills')->label('已配技能')->state(fn (Monster $record): bool => $record->skillBindings()->exists())->boolean(),
-                IconColumn::make('has_drops')->label('已配掉落')->state(fn (Monster $record): bool => $record->dropBindings()->exists())->boolean(),
+                IconColumn::make('has_drops')->label('已配掉落')->state(fn (Monster $record): bool => $record->drops()->exists())->boolean(),
                 IconColumn::make('is_boss')->label('Boss')->state(fn (Monster $record): bool => $record->monster_type === 'boss')->boolean(),
                 IconColumn::make('is_enabled')->label('启用')->boolean(),
             ])
@@ -196,8 +199,8 @@ class MonsterResource extends Resource
                 Tables\Filters\TernaryFilter::make('missing_drops')
                     ->label('缺掉落配置')
                     ->queries(
-                        true: fn ($query) => $query->doesntHave('dropBindings'),
-                        false: fn ($query) => $query->has('dropBindings'),
+                        true: fn ($query) => $query->doesntHave('drops'),
+                        false: fn ($query) => $query->has('drops'),
                         blank: fn ($query) => $query,
                     ),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
@@ -236,16 +239,20 @@ class MonsterResource extends Resource
             ])->all();
     }
 
-    public static function dropBindingsForForm(Monster $record): array
+    public static function dropItemsForForm(Monster $record): array
     {
-        return $record->dropBindings()
+        return $record->drops()
             ->orderBy('sort_order')
             ->get()
-            ->map(fn (MonsterDropBinding $binding): array => [
-                'drop_group_id' => (string) $binding->drop_group_id,
-                'is_primary' => (bool) $binding->is_primary,
-                'sort_order' => (int) $binding->sort_order,
-                'remark' => $binding->remark !== null ? (string) $binding->remark : null,
+            ->map(fn (MonsterDropItem $drop): array => [
+                'item_id' => (string) $drop->item_id,
+                'drop_type' => (string) $drop->drop_type,
+                'count_min' => (int) $drop->count_min,
+                'count_max' => (int) $drop->count_max,
+                'drop_rate' => (float) $drop->drop_rate,
+                'sort_order' => (int) $drop->sort_order,
+                'is_enabled' => (bool) $drop->is_enabled,
+                'remark' => $drop->remark !== null ? (string) $drop->remark : null,
             ])->all();
     }
 
@@ -274,7 +281,6 @@ class MonsterResource extends Resource
             'camera_rule' => $profile->camera_rule,
             'entry_fx_key' => $profile->entry_fx_key,
             'death_fx_key' => $profile->death_fx_key,
-            'first_clear_reward_group_id' => $profile->first_clear_reward_group_id,
             'story_flag_on_clear' => $profile->story_flag_on_clear,
             'remark' => $profile->remark,
         ];
@@ -288,10 +294,10 @@ class MonsterResource extends Resource
         return $rows;
     }
 
-    public static function normalizeDropBindingsOrFail(mixed $raw): array
+    public static function normalizeDropItemsOrFail(mixed $raw): array
     {
-        $rows = MonsterModuleSupport::normalizeDropBindings($raw);
-        MonsterModuleSupport::validateDropBindingsOrFail($rows);
+        $rows = MonsterModuleSupport::normalizeDropItems($raw);
+        MonsterModuleSupport::validateDropItemsOrFail($rows);
 
         return $rows;
     }
@@ -301,16 +307,16 @@ class MonsterResource extends Resource
         return MonsterModuleSupport::normalizeBossProfile($raw);
     }
 
-    public static function syncRelations(Monster $monster, array $skillBindings, array $dropBindings, array $bossProfile): void
+    public static function syncRelations(Monster $monster, array $skillBindings, array $dropItems, array $bossProfile): void
     {
         $monster->skillBindings()->delete();
         foreach ($skillBindings as $row) {
             $monster->skillBindings()->create($row);
         }
 
-        $monster->dropBindings()->delete();
-        foreach ($dropBindings as $row) {
-            $monster->dropBindings()->create($row);
+        $monster->drops()->delete();
+        foreach ($dropItems as $row) {
+            $monster->drops()->create($row);
         }
 
         if ($monster->monster_type === 'boss') {

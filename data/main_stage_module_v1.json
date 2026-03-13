@@ -2,8 +2,8 @@
     "meta": {
         "key": "main_stage_module",
         "schema_version": 1,
-        "exported_at": "2026-03-13 06:08:55",
-        "sha256": "27cd6c9b2167ba8d5125b8507d2a814a61f3d9935cbca69bcf809b2cb9f2e5e5"
+        "exported_at": "2026-03-13 06:35:14",
+        "sha256": "6f47511ae4123937b5095fb95ece16dbe73c3ed174e73b7d546e6cc7a206843e"
     },
     "main_stage_module": {
         "chapters": [
@@ -64,8 +64,6 @@
                         "difficulty_id": "stage_01_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_01_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_01_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -110,14 +108,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 120,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 12,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 2,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_01_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_01_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_01_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -162,14 +181,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 154,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 15,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 3,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_01_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_01_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_01_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -213,6 +260,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 187,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 18,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 3,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "招摇印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -248,8 +332,6 @@
                         "difficulty_id": "stage_02_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_02_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_02_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -294,14 +376,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 180,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 18,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 3,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_02_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_02_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_02_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -346,14 +449,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 230,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 22,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 4,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_02_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_02_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_02_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -397,6 +528,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 281,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 27,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 5,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "堂庭印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -432,8 +600,6 @@
                         "difficulty_id": "stage_03_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_03_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_03_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -478,14 +644,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 260,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 26,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 4,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_03_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_03_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_03_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -530,14 +717,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 333,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 32,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 5,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_03_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_03_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_03_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -581,6 +796,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 406,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 39,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 7,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "猨翼印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -616,8 +868,6 @@
                         "difficulty_id": "stage_04_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_04_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_04_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -662,14 +912,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 360,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 36,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 5,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_04_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_04_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_04_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -714,14 +985,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 461,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 45,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 7,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_04_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_04_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_04_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -765,6 +1064,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 562,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 54,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 8,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "杻阳印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -800,8 +1136,6 @@
                         "difficulty_id": "stage_05_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_05_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_05_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -846,14 +1180,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 500,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 48,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 6,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_05_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_05_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_05_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -898,14 +1253,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 640,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 60,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 8,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_05_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_05_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_05_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -949,6 +1332,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 780,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 72,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 10,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "柢山印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -984,8 +1404,6 @@
                         "difficulty_id": "stage_06_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_06_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_06_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -1030,14 +1448,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 680,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 64,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 8,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_06_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_06_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_06_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -1082,14 +1521,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 870,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 80,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 11,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_06_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_06_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_06_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -1133,6 +1600,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1061,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 96,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 14,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "亶爰禁印",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -1168,8 +1672,6 @@
                         "difficulty_id": "stage_07_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_07_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_07_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -1214,14 +1716,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 900,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 82,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 10,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_07_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_07_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_07_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -1266,14 +1789,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1152,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 102,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 14,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_07_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_07_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_07_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -1317,6 +1868,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1404,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 123,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 17,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "基山秘印",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }
@@ -1352,8 +1940,6 @@
                         "difficulty_id": "stage_08_difficulty_1",
                         "difficulty_code": "difficulty_1",
                         "difficulty_name": "普通",
-                        "drop_preview_group_id": "drop_preview_stage_08_difficulty_1",
-                        "first_clear_reward_group_id": "first_clear_stage_08_difficulty_1",
                         "remark": null,
                         "sort_order": 10,
                         "is_enabled": true,
@@ -1398,14 +1984,35 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1180,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 104,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 12,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_08_difficulty_2",
                         "difficulty_code": "difficulty_2",
                         "difficulty_name": "困难I",
-                        "drop_preview_group_id": "drop_preview_stage_08_difficulty_2",
-                        "first_clear_reward_group_id": "first_clear_stage_08_difficulty_2",
                         "remark": null,
                         "sort_order": 20,
                         "is_enabled": true,
@@ -1450,14 +2057,42 @@
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
                             }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1510,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 130,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 16,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 2,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            }
                         ]
                     },
                     {
                         "difficulty_id": "stage_08_difficulty_3",
                         "difficulty_code": "difficulty_3",
                         "difficulty_name": "困难II",
-                        "drop_preview_group_id": "drop_preview_stage_08_difficulty_3",
-                        "first_clear_reward_group_id": "first_clear_stage_08_difficulty_3",
                         "remark": null,
                         "sort_order": 30,
                         "is_enabled": true,
@@ -1501,6 +2136,43 @@
                                 "sort_order": 40,
                                 "is_enabled": true,
                                 "remark": "Boss 固定挂载"
+                            }
+                        ],
+                        "first_clear_rewards": [
+                            {
+                                "item_id": "金币",
+                                "count": 1841,
+                                "sort_order": 10,
+                                "is_enabled": true,
+                                "remark": "首通金币"
+                            },
+                            {
+                                "item_id": "玉屑",
+                                "count": 156,
+                                "sort_order": 20,
+                                "is_enabled": true,
+                                "remark": "首通成长资源"
+                            },
+                            {
+                                "item_id": "白玉碎",
+                                "count": 20,
+                                "sort_order": 30,
+                                "is_enabled": true,
+                                "remark": "首通强化资源"
+                            },
+                            {
+                                "item_id": "桂枝",
+                                "count": 3,
+                                "sort_order": 40,
+                                "is_enabled": true,
+                                "remark": "首通打造材料"
+                            },
+                            {
+                                "item_id": "青丘印记",
+                                "count": 1,
+                                "sort_order": 50,
+                                "is_enabled": true,
+                                "remark": "章节印记奖励"
                             }
                         ]
                     }

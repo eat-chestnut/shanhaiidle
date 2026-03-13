@@ -53,7 +53,10 @@ class MainStageModuleExportService
     {
         return MainStageChapter::query()
             ->with([
-                'difficulties' => fn ($query) => $query->with(['monsterEntries' => fn ($monsterQuery) => $monsterQuery->orderBy('sort_order')->orderBy('id')])
+                'difficulties' => fn ($query) => $query->with([
+                    'monsterEntries' => fn ($monsterQuery) => $monsterQuery->orderBy('sort_order')->orderBy('id'),
+                    'firstClearRewards' => fn ($rewardQuery) => $rewardQuery->orderBy('sort_order')->orderBy('id'),
+                ])
                     ->orderBy('sort_order')
                     ->orderBy('difficulty_id'),
             ])
@@ -90,8 +93,6 @@ class MainStageModuleExportService
                         'difficulty_id' => (string) $difficulty->difficulty_id,
                         'difficulty_code' => (string) $difficulty->difficulty_code,
                         'difficulty_name' => (string) $difficulty->difficulty_name,
-                        'drop_preview_group_id' => (string) $difficulty->drop_preview_group_id,
-                        'first_clear_reward_group_id' => (string) $difficulty->first_clear_reward_group_id,
                         'remark' => $difficulty->remark !== null ? (string) $difficulty->remark : null,
                         'sort_order' => (int) $difficulty->sort_order,
                         'is_enabled' => (bool) $difficulty->is_enabled,
@@ -104,6 +105,13 @@ class MainStageModuleExportService
                             'sort_order' => (int) $entry->sort_order,
                             'is_enabled' => (bool) $entry->is_enabled,
                             'remark' => $entry->remark !== null ? (string) $entry->remark : null,
+                        ])->values()->all(),
+                        'first_clear_rewards' => $difficulty->firstClearRewards->map(fn ($reward): array => [
+                            'item_id' => (string) $reward->item_id,
+                            'count' => (int) $reward->count,
+                            'sort_order' => (int) $reward->sort_order,
+                            'is_enabled' => (bool) $reward->is_enabled,
+                            'remark' => $reward->remark !== null ? (string) $reward->remark : null,
                         ])->values()->all(),
                     ])->values()->all(),
                 ];

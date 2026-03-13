@@ -19,7 +19,6 @@ class MonsterBossProfile extends Model
         'camera_rule',
         'entry_fx_key',
         'death_fx_key',
-        'first_clear_reward_group_id',
         'story_flag_on_clear',
         'remark',
     ];

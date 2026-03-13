@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Item;
 use Illuminate\Validation\ValidationException;
 
 class MainStageModuleSupport
@@ -70,12 +71,60 @@ class MainStageModuleSupport
             'chapter_id' => $chapterId,
             'difficulty_code' => trim((string) ($row['difficulty_code'] ?? 'difficulty_1')),
             'difficulty_name' => trim((string) ($row['difficulty_name'] ?? '')),
-            'drop_preview_group_id' => trim((string) ($row['drop_preview_group_id'] ?? '')),
-            'first_clear_reward_group_id' => trim((string) ($row['first_clear_reward_group_id'] ?? '')),
             'remark' => filled($row['remark'] ?? null) ? trim((string) $row['remark']) : null,
             'sort_order' => (int) ($row['sort_order'] ?? 0),
             'is_enabled' => (bool) ($row['is_enabled'] ?? true),
         ];
+    }
+
+    public static function normalizeFirstClearRewards(mixed $raw): array
+    {
+        $rows = [];
+
+        foreach (is_array($raw) ? $raw : [] as $index => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $itemId = trim((string) ($row['item_id'] ?? ''));
+            if ($itemId === '') {
+                continue;
+            }
+
+            $rows[] = [
+                'item_id' => $itemId,
+                'count' => max(1, (int) ($row['count'] ?? 1)),
+                'sort_order' => max(0, (int) ($row['sort_order'] ?? ($index + 1) * 10)),
+                'is_enabled' => (bool) ($row['is_enabled'] ?? true),
+                'remark' => filled($row['remark'] ?? null) ? trim((string) $row['remark']) : null,
+            ];
+        }
+
+        return array_values($rows);
+    }
+
+    public static function validateFirstClearRewardsOrFail(array $rows): void
+    {
+        $errors = [];
+        $validItemIds = Item::query()->pluck('id')->all();
+        $validItemLookup = array_fill_keys($validItemIds, true);
+
+        foreach ($rows as $index => $row) {
+            $itemId = trim((string) ($row['item_id'] ?? ''));
+            if ($itemId === '') {
+                $errors["first_clear_rewards.{$index}.item_id"] = '请选择奖励物品。';
+            } elseif (! isset($validItemLookup[$itemId])) {
+                $errors["first_clear_rewards.{$index}.item_id"] = '奖励物品不存在。';
+            }
+
+            if ((int) ($row['count'] ?? 0) < 1) {
+                $errors["first_clear_rewards.{$index}.count"] = '奖励数量必须大于等于 1。';
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     /**
@@ -148,18 +197,23 @@ class MainStageModuleSupport
                     $errors["chapters.{$index}.difficulties.{$difficultyIndex}.difficulty_name"] = '请填写难度名称。';
                 }
 
-                if ($difficultyRow['drop_preview_group_id'] === '') {
-                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.drop_preview_group_id"] = '请填写掉落预览组 ID。';
-                }
-
-                if ($difficultyRow['first_clear_reward_group_id'] === '') {
-                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.first_clear_reward_group_id"] = '请填写首通奖励组 ID。';
-                }
-
                 $monsterEntries = array_values(is_array($difficulty['monster_entries'] ?? null) ? $difficulty['monster_entries'] : []);
                 if ($row['has_combat'] && $monsterEntries === []) {
                     $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries"] = '战斗章节的每个难度都必须配置怪物列表。';
                     continue;
+                }
+
+                $firstClearRewards = self::normalizeFirstClearRewards($difficulty['first_clear_rewards'] ?? []);
+                if ($row['has_combat'] && $firstClearRewards === []) {
+                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.first_clear_rewards"] = '战斗章节的每个难度都必须配置首通奖励。';
+                } else {
+                    try {
+                        self::validateFirstClearRewardsOrFail($firstClearRewards);
+                    } catch (ValidationException $exception) {
+                        foreach ($exception->errors() as $field => $messages) {
+                            $errors["chapters.{$index}.difficulties.{$difficultyIndex}.{$field}"] = $messages[0];
+                        }
+                    }
                 }
 
                 foreach ($monsterEntries as $monsterIndex => $entry) {

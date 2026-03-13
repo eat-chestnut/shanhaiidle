@@ -58,9 +58,9 @@ class Monster extends Model
         return $this->hasMany(MonsterSkillBinding::class, 'monster_id', 'monster_id')->orderBy('sort_order');
     }
 
-    public function dropBindings(): HasMany
+    public function drops(): HasMany
     {
-        return $this->hasMany(MonsterDropBinding::class, 'monster_id', 'monster_id')->orderBy('sort_order');
+        return $this->hasMany(MonsterDropItem::class, 'monster_id', 'monster_id')->orderBy('sort_order');
     }
 
     public function bossProfile(): HasOne

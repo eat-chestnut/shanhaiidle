@@ -5,19 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MonsterDropBinding extends Model
+class MonsterDropItem extends Model
 {
     protected $fillable = [
         'monster_id',
-        'drop_group_id',
-        'is_primary',
+        'item_id',
+        'drop_type',
+        'count_min',
+        'count_max',
+        'drop_rate',
         'sort_order',
+        'is_enabled',
         'remark',
     ];
 
     protected $casts = [
-        'is_primary' => 'boolean',
+        'count_min' => 'integer',
+        'count_max' => 'integer',
+        'drop_rate' => 'float',
         'sort_order' => 'integer',
+        'is_enabled' => 'boolean',
     ];
 
     public function monster(): BelongsTo

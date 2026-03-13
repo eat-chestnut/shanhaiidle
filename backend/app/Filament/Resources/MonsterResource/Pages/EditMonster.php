@@ -11,14 +11,14 @@ class EditMonster extends EditRecord
 
     private array $skillBindingsToSync = [];
 
-    private array $dropBindingsToSync = [];
+    private array $dropItemsToSync = [];
 
     private array $bossProfileToSync = [];
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['skill_bindings'] = MonsterResource::skillBindingsForForm($this->record);
-        $data['drop_bindings'] = MonsterResource::dropBindingsForForm($this->record);
+        $data['drop_items'] = MonsterResource::dropItemsForForm($this->record);
         $data['boss_profile'] = MonsterResource::bossProfileForForm($this->record);
 
         return $data;
@@ -27,16 +27,16 @@ class EditMonster extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->skillBindingsToSync = MonsterResource::normalizeSkillBindingsOrFail($data['skill_bindings'] ?? []);
-        $this->dropBindingsToSync = MonsterResource::normalizeDropBindingsOrFail($data['drop_bindings'] ?? []);
+        $this->dropItemsToSync = MonsterResource::normalizeDropItemsOrFail($data['drop_items'] ?? []);
         $this->bossProfileToSync = MonsterResource::normalizeBossProfile($data['boss_profile'] ?? []);
 
-        unset($data['skill_bindings'], $data['drop_bindings'], $data['boss_profile']);
+        unset($data['skill_bindings'], $data['drop_items'], $data['boss_profile']);
 
         return $data;
     }
 
     protected function afterSave(): void
     {
-        MonsterResource::syncRelations($this->record, $this->skillBindingsToSync, $this->dropBindingsToSync, $this->bossProfileToSync);
+        MonsterResource::syncRelations($this->record, $this->skillBindingsToSync, $this->dropItemsToSync, $this->bossProfileToSync);
     }
 }
