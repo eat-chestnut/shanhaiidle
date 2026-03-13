@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             MainStageModuleSeeder::class,
             MilestoneModuleSeeder::class,
             MonstersSeeder::class,
+            BossCoresSeeder::class,
             DailyDungeonsSeeder::class,
             StagesSeeder::class,
             NanshanYijingWorldSeeder::class,

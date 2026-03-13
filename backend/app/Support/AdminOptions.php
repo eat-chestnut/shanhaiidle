@@ -223,8 +223,10 @@ class AdminOptions
             'milestone_catalog' => '成长里程碑',
             'gift_catalog' => '礼包目录',
             'equipment_catalog' => '装备成品目录',
+            'equipment_set_catalog' => '套装目录',
             'gem_catalog' => '宝石目录',
             'talisman_catalog' => '护符目录',
+            'boss_core_catalog' => 'Boss核心目录',
         ];
     }
 
@@ -621,6 +623,7 @@ class AdminOptions
         return [
             20 => '20级',
             40 => '40级',
+            50 => '50级',
             60 => '60级',
         ];
     }
@@ -932,8 +935,16 @@ class AdminOptions
         return EquipmentSet::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
+            ->orderBy('set_level')
             ->get()
-            ->mapWithKeys(fn (EquipmentSet $set): array => [$set->id => (string) $set->name])
+            ->mapWithKeys(fn (EquipmentSet $set): array => [
+                $set->id => sprintf(
+                    '%s｜%s｜%s',
+                    (string) $set->set_id,
+                    (string) $set->display_name,
+                    (string) ($set->set_level . '级')
+                ),
+            ])
             ->all();
     }
 
@@ -942,11 +953,11 @@ class AdminOptions
         return EquipmentSet::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
-            ->orderBy('stage')
+            ->orderBy('set_level')
             ->get()
             ->unique('set_line_id')
             ->mapWithKeys(fn (EquipmentSet $set): array => [
-                $set->set_line_id => static::displaySetLineName((string) $set->name, (string) $set->set_line_id),
+                $set->set_line_id => static::displaySetLineName((string) $set->display_name, (string) $set->set_line_id),
             ])
             ->all();
     }

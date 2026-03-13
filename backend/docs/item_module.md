@@ -11,6 +11,7 @@
 - 装备成品
 - 宝石成品
 - 护符成品
+- Boss 核心成品
 - 礼包本体
 - 消耗品
 
@@ -140,6 +141,7 @@
 - `equipment`
 - `gem`
 - `talisman`
+- `boss_core`
 - `gift_pack`
 - `consumable`
 - `blueprint`
@@ -176,6 +178,9 @@
 `talisman`
 - `common_talisman`
 - `sect_talisman`
+
+`boss_core`
+- `boss_core`
 
 `gift_pack`
 - `stage_reward_pack`
@@ -248,6 +253,17 @@
   - `sect_talisman`
 - 护符成长、升阶消耗、星级连锁定义写在护符模块表中，不写回 `items`
 - 商城、礼包、奖励后续都通过护符 `item_id` 引用
+
+## Boss 核心承载方式
+
+- Boss 核心成品是 item，正式 carrier 为 `items.item_id`
+- `boss_cores.item_id` 必须命中对应 Boss 核心 item
+- `items.main_type` 必须为 `boss_core`
+- `items.sub_type` 首版固定为 `boss_core`
+- Boss 核心独立于宝石模块，不写入 `gems`
+- Boss 核心独立于套装件数效果，不占套装效果栏
+- 首版每个核心仅保留 1 条主效果，效果定义写在 `boss_core_effects`
+- 后续掉落、礼包、商城若引用 Boss 核心，应统一走 Boss 核心 `item_id`
 
 ## 礼包承载方式
 

@@ -10,23 +10,43 @@ class EditEquipmentSet extends EditRecord
 {
     protected static string $resource = EquipmentSetResource::class;
 
+    private array $itemsToSync = [];
+
+    private array $effectsToSync = [];
+
+    private array $recipesToSync = [];
+
+    private array $costItemsToSync = [];
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['thresholds'] = EquipmentSetResource::normalizeThresholdsInput($data['thresholds'] ?? []);
+        $data['set_items'] = EquipmentSetResource::setItemsForForm($this->record);
+        $data['effects'] = EquipmentSetResource::effectsForForm($this->record);
+        $data['recipes'] = EquipmentSetResource::recipesForForm($this->record);
 
         return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $data['thresholds'] = EquipmentSetResource::normalizeThresholdsInput($data['thresholds'] ?? []);
-        EquipmentSetResource::validateThresholdsOrFail(
-            $data['thresholds'],
-            (int) ($data['piece_count'] ?? 0),
-            isset($data['stage']) ? (int) $data['stage'] : null,
-        );
+        $normalized = EquipmentSetResource::normalizeFormDataOrFail($data);
+        $this->itemsToSync = $normalized['items'];
+        $this->effectsToSync = $normalized['effects'];
+        $this->recipesToSync = $normalized['recipes'];
+        $this->costItemsToSync = $normalized['cost_items'];
 
-        return $data;
+        return $normalized['set'];
+    }
+
+    protected function afterSave(): void
+    {
+        EquipmentSetResource::syncRelations(
+            $this->record,
+            $this->itemsToSync,
+            $this->effectsToSync,
+            $this->recipesToSync,
+            $this->costItemsToSync,
+        );
     }
 
     protected function getHeaderActions(): array

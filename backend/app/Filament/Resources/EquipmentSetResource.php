@@ -4,10 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EquipmentSetResource\Pages;
 use App\Models\EquipmentSet;
+use App\Models\EquipmentSetCraftRecipe;
+use App\Models\EquipmentSetEffect;
+use App\Models\EquipmentSetItem;
+use App\Models\EquipmentSetRecipeCostItem;
 use App\Support\AdminOptions;
-use Filament\Forms\Components\MultiSelect;
+use App\Support\EquipmentSetModuleSupport;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -16,14 +19,12 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Validation\ValidationException;
 
 class EquipmentSetResource extends Resource
 {
@@ -43,188 +44,145 @@ class EquipmentSetResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make('EquipmentSetTabs')
+                Tabs::make('equipment_set_tabs')
                     ->persistTabInQueryString()
                     ->tabs([
-                        static::baseInfoTab(),
-                        static::thresholdBonusTab(),
+                        Tab::make('基础信息')
+                            ->schema([
+                                Section::make('套装基础')
+                                    ->description('套装线不是 item，套装成品装备通过 items.item_id 承接。本轮只实现 20 / 40 / 50 / 60 四档打造链，不包含升星。')
+                                    ->schema([
+                                        TextInput::make('set_id')
+                                            ->label('set_id')
+                                            ->required()
+                                            ->maxLength(64)
+                                            ->unique(ignoreRecord: true)
+                                            ->disabled(fn (?EquipmentSet $record): bool => $record !== null),
+                                        TextInput::make('set_name')
+                                            ->label('set_name')
+                                            ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('display_name')
+                                            ->label('display_name')
+                                            ->required()
+                                            ->maxLength(255),
+                                        Select::make('set_level')
+                                            ->label('set_level')
+                                            ->options(EquipmentSet::SET_LEVEL_OPTIONS)
+                                            ->required()
+                                            ->default(20)
+                                            ->live()
+                                            ->afterStateUpdated(function (Set $set, int|string|null $state): void {
+                                                $level = (int) ($state ?? 0);
+                                                $set('piece_total', EquipmentSet::PIECE_TOTAL_BY_LEVEL[$level] ?? null);
+                                            }),
+                                        TextInput::make('piece_total')
+                                            ->label('piece_total')
+                                            ->required()
+                                            ->integer()
+                                            ->disabled()
+                                            ->dehydrated()
+                                            ->default(EquipmentSet::PIECE_TOTAL_BY_LEVEL[20]),
+                                        Select::make('set_type')
+                                            ->label('set_type')
+                                            ->options(EquipmentSet::SET_TYPE_OPTIONS)
+                                            ->required()
+                                            ->default('combat_set'),
+                                        Select::make('quality')
+                                            ->label('quality')
+                                            ->options(AdminOptions::qualityOptions())
+                                            ->required()
+                                            ->default('blue'),
+                                        Select::make('rarity')
+                                            ->label('rarity')
+                                            ->options(AdminOptions::rarityOptions())
+                                            ->required()
+                                            ->default('blue'),
+                                        TextInput::make('unlock_level')
+                                            ->label('unlock_level')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(1)
+                                            ->default(20),
+                                        TextInput::make('icon')
+                                            ->label('icon')
+                                            ->maxLength(255),
+                                        Textarea::make('summary')
+                                            ->label('summary')
+                                            ->rows(2)
+                                            ->columnSpanFull(),
+                                        TextInput::make('source_desc')
+                                            ->label('source_desc')
+                                            ->maxLength(255),
+                                        TextInput::make('sort_order')
+                                            ->label('sort_order')
+                                            ->required()
+                                            ->integer()
+                                            ->minValue(0)
+                                            ->default(0),
+                                        Toggle::make('is_enabled')
+                                            ->label('is_enabled')
+                                            ->default(true),
+                                        Textarea::make('remark')
+                                            ->label('remark')
+                                            ->rows(2)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(4),
+                            ]),
+                        Tab::make('套装成品')
+                            ->schema([
+                                Section::make('equipment_set_items')
+                                    ->description('只维护套装成品映射。20级固定 4 件，40级固定 6 件，50 / 60 级固定 8 件。')
+                                    ->schema([
+                                        static::setItemsRepeater(),
+                                    ]),
+                            ]),
+                        Tab::make('件数效果')
+                            ->schema([
+                                Section::make('equipment_set_effects')
+                                    ->description('套装效果必须使用 effect_key / value_type / value 的结构化字段表达。')
+                                    ->schema([
+                                        static::effectsRepeater(),
+                                    ]),
+                            ]),
+                        Tab::make('打造配方')
+                            ->schema([
+                                Section::make('equipment_set_craft_recipes')
+                                    ->description('20级不需要图纸与前一档装备；40 / 50 / 60 级必须消耗前一档同部位成品和图纸，并支持附加材料。')
+                                    ->schema([
+                                        static::recipesRepeater(),
+                                    ]),
+                            ]),
                     ]),
             ])
             ->columns(1);
-    }
-
-    protected static function baseInfoTab(): Tab
-    {
-        return Tab::make('基础信息')
-            ->schema([
-                Section::make('套装基础')
-                    ->description('按 20 / 40 / 60 三级套装配置，阈值数量会在保存前严格校验。')
-                    ->schema([
-                        TextInput::make('id')
-                            ->label('套装 ID')
-                            ->required()
-                            ->maxLength(64)
-                            ->unique(ignoreRecord: true)
-                            ->disabled(fn (?EquipmentSet $record): bool => $record !== null),
-
-                        TextInput::make('set_line_id')
-                            ->label('套装线 ID')
-                            ->required()
-                            ->maxLength(64),
-
-                        TextInput::make('name')
-                            ->label('名称')
-                            ->required()
-                            ->maxLength(255),
-
-                        TextInput::make('sect')
-                            ->label('所属宗门')
-                            ->maxLength(64),
-
-                        Select::make('flow_tag')
-                            ->label('流派')
-                            ->options(AdminOptions::flowOptions())
-                            ->searchable()
-                            ->nullable(),
-
-                        Select::make('stage')
-                            ->label('阶段')
-                            ->required()
-                            ->options(AdminOptions::setStageOptions())
-                            ->live(),
-
-                        TextInput::make('piece_count')
-                            ->label('套装总件数')
-                            ->integer()
-                            ->required()
-                            ->default(4)
-                            ->minValue(2)
-                            ->maxValue(8),
-
-                        Select::make('slot_ids')
-                            ->label('套装位')
-                            ->multiple()
-                            ->options(AdminOptions::slotOptions())
-                            ->searchable()
-                            ->preload()
-                            ->helperText('固定套装位请直接从预设部位中选择。'),
-
-                        Textarea::make('description')
-                            ->label('说明')
-                            ->rows(3)
-                            ->columnSpanFull(),
-
-                        Toggle::make('is_enabled')
-                            ->label('启用')
-                            ->default(true),
-
-                        TextInput::make('sort_order')
-                            ->label('排序')
-                            ->required()
-                            ->integer()
-                            ->minValue(0)
-                            ->default(0),
-                    ])
-                    ->columns(3),
-            ]);
-    }
-
-    protected static function thresholdBonusTab(): Tab
-    {
-        return Tab::make('阈值与加成')
-            ->schema([
-                Section::make('阈值配置')
-                    ->description('20级建议 2/4，40级建议 2/4/6，60级建议 2/4/6/8。')
-                    ->schema([
-                        static::thresholdsRepeater(),
-                    ]),
-            ]);
-    }
-
-    protected static function thresholdsRepeater(): Repeater
-    {
-        return Repeater::make('thresholds')
-            ->hiddenLabel()
-            ->addActionLabel('添加配置')
-            ->default([])
-            ->minItems(1)
-            ->reorderable(false)
-            ->reorderableWithButtons(false)
-            ->reorderableWithDragAndDrop(false)
-            ->table([
-                TableColumn::make('阈值件数'),
-                TableColumn::make('加成类型'),
-                TableColumn::make('属性'),
-                TableColumn::make('技能'),
-                TableColumn::make('数值'),
-            ])
-            ->schema([
-                TextInput::make('count')
-                    ->label('阈值件数')
-                    ->required()
-                    ->integer()
-                    ->minValue(1),
-
-                Select::make('type')
-                    ->label('加成类型')
-                    ->required()
-                    ->options(static::bonusTypeOptions())
-                    ->live()
-                    ->afterStateUpdated(function (Set $set, ?string $state): void {
-                        if ($state === 'stat') {
-                            $set('skill_id', null);
-                        }
-
-                        if ($state === 'skill_level') {
-                            $set('stat', null);
-                        }
-                    }),
-
-                Select::make('stat')
-                    ->label('属性')
-                    ->options(AdminOptions::statOptions())
-                    ->searchable()
-                    ->disabled(fn (Get $get): bool => $get('type') !== 'stat')
-                    ->required(fn (Get $get): bool => $get('type') === 'stat'),
-
-                Select::make('skill_id')
-                    ->label('技能')
-                    ->options(fn (): array => AdminOptions::skillOptions())
-                    ->searchable()
-                    ->disabled(fn (Get $get): bool => $get('type') !== 'skill_level')
-                    ->required(fn (Get $get): bool => $get('type') === 'skill_level'),
-
-                TextInput::make('val')
-                    ->label('数值')
-                    ->required()
-                    ->integer()
-                    ->minValue(0)
-                    ->default(0),
-            ])
-            ->columns(4)
-            ->columnSpanFull();
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('套装 ID')->searchable()->sortable(),
-                TextColumn::make('set_line_id')->label('套装线')->searchable()->sortable(),
-                TextColumn::make('name')->label('名称')->searchable()->sortable(),
-                TextColumn::make('flow_tag')->label('流派')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::flowOptions(), $state))->toggleable(),
-                TextColumn::make('stage')
-                    ->label('阶段')
-                    ->formatStateUsing(fn (int|string|null $state): string => AdminOptions::optionLabel(AdminOptions::setStageOptions(), $state === null ? null : (string) $state))
+                TextColumn::make('set_id')->label('set_id')->searchable()->sortable(),
+                TextColumn::make('display_name')->label('display_name')->searchable()->sortable(),
+                TextColumn::make('set_level')
+                    ->label('set_level')
+                    ->formatStateUsing(fn (int|string|null $state): string => AdminOptions::optionLabel(EquipmentSet::SET_LEVEL_OPTIONS, $state === null ? null : (string) $state))
                     ->sortable(),
-                TextColumn::make('piece_count')->label('件数')->numeric()->sortable(),
-                ToggleColumn::make('is_enabled')->label('启用')->sortable(),
-                TextColumn::make('sort_order')->label('排序')->numeric()->sortable(),
+                TextColumn::make('piece_total')->label('piece_total')->numeric()->sortable(),
+                TextColumn::make('quality')
+                    ->label('quality')
+                    ->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::qualityOptions(), $state))
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('unlock_level')->label('unlock_level')->numeric()->sortable(),
+                TextColumn::make('source_desc')->label('source_desc')->searchable()->toggleable(),
+                ToggleColumn::make('is_enabled')->label('is_enabled')->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('stage')->label('阶段')->options(AdminOptions::setStageOptions()),
-                Tables\Filters\SelectFilter::make('flow_tag')->label('流派')->options(AdminOptions::flowOptions()),
-                Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
+                Tables\Filters\SelectFilter::make('set_level')->label('set_level')->options(EquipmentSet::SET_LEVEL_OPTIONS),
+                Tables\Filters\SelectFilter::make('quality')->label('quality')->options(AdminOptions::qualityOptions()),
+                Tables\Filters\TernaryFilter::make('is_enabled')->label('is_enabled'),
             ])
             ->recordActions([
                 \Filament\Actions\EditAction::make(),
@@ -237,11 +195,6 @@ class EquipmentSetResource extends Resource
             ->defaultSort('sort_order');
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [
@@ -251,160 +204,332 @@ class EquipmentSetResource extends Resource
         ];
     }
 
-    public static function normalizeThresholdsInput(mixed $raw): array
+    public static function setItemsForForm(EquipmentSet $record): array
     {
-        $rows = [];
-        if (! is_array($raw)) {
-            return $rows;
-        }
-
-        foreach ($raw as $thresholdRaw) {
-            if (! is_array($thresholdRaw)) {
-                continue;
-            }
-            $count = (int) ($thresholdRaw['count'] ?? 0);
-            $bonuses = [];
-            $bonusRows = $thresholdRaw['bonuses'] ?? [];
-            if (is_array($bonusRows)) {
-                foreach ($bonusRows as $bonusRaw) {
-                    if (! is_array($bonusRaw)) {
-                        continue;
-                    }
-                    $type = trim((string) ($bonusRaw['type'] ?? ''));
-                    $val = max(0, (int) ($bonusRaw['val'] ?? 0));
-                    if ($type === 'stat') {
-                        $stat = trim((string) ($bonusRaw['stat'] ?? ''));
-                        if ($stat === '') {
-                            continue;
-                        }
-                        $bonuses[] = [
-                            'type' => 'stat',
-                            'stat' => $stat,
-                            'val' => $val,
-                        ];
-                    } elseif ($type === 'skill_level') {
-                        $skillId = trim((string) ($bonusRaw['skill_id'] ?? ''));
-                        if ($skillId === '') {
-                            continue;
-                        }
-                        $bonuses[] = [
-                            'type' => 'skill_level',
-                            'skill_id' => $skillId,
-                            'val' => $val,
-                        ];
-                    }
-                }
-            }
-
-            $rows[] = [
-                'count' => $count,
-                'bonuses' => array_values($bonuses),
-            ];
-        }
-
-        return array_values($rows);
+        return $record->items()
+            ->orderBy('sort_order')
+            ->orderBy('slot_type')
+            ->get()
+            ->map(fn (EquipmentSetItem $row): array => [
+                'item_id' => (string) $row->item_id,
+                'slot_type' => (string) $row->slot_type,
+                'sort_order' => (int) $row->sort_order,
+                'is_enabled' => (bool) $row->is_enabled,
+                'remark' => $row->remark !== null ? (string) $row->remark : null,
+            ])
+            ->all();
     }
 
-    public static function validateThresholdsOrFail(array $thresholds, int $maxPieces, ?int $stage = null): void
+    public static function effectsForForm(EquipmentSet $record): array
     {
-        if ($thresholds === []) {
-            throw ValidationException::withMessages([
-                'thresholds' => '阈值至少需要 1 行。',
-            ]);
+        return $record->effects()
+            ->orderBy('piece_count')
+            ->orderBy('sort_order')
+            ->orderBy('effect_key')
+            ->get()
+            ->map(fn (EquipmentSetEffect $row): array => [
+                'piece_count' => (int) $row->piece_count,
+                'effect_key' => (string) $row->effect_key,
+                'value_type' => (string) $row->value_type,
+                'value' => EquipmentSetModuleSupport::normalizeNumericValue((float) $row->value),
+                'summary' => $row->summary !== null ? (string) $row->summary : null,
+                'sort_order' => (int) $row->sort_order,
+                'is_enabled' => (bool) $row->is_enabled,
+                'remark' => $row->remark !== null ? (string) $row->remark : null,
+            ])
+            ->all();
+    }
+
+    public static function recipesForForm(EquipmentSet $record): array
+    {
+        return $record->recipes()
+            ->orderBy('sort_order')
+            ->orderBy('slot_type')
+            ->get()
+            ->map(fn (EquipmentSetCraftRecipe $row): array => [
+                'recipe_id' => (string) $row->recipe_id,
+                'slot_type' => (string) $row->slot_type,
+                'result_item_id' => (string) $row->result_item_id,
+                'required_base_item_id' => $row->required_base_item_id !== null ? (string) $row->required_base_item_id : null,
+                'required_blueprint_item_id' => $row->required_blueprint_item_id !== null ? (string) $row->required_blueprint_item_id : null,
+                'unlock_level' => (int) $row->unlock_level,
+                'summary' => $row->summary !== null ? (string) $row->summary : null,
+                'sort_order' => (int) $row->sort_order,
+                'is_enabled' => (bool) $row->is_enabled,
+                'remark' => $row->remark !== null ? (string) $row->remark : null,
+                'cost_items' => $row->costItems()
+                    ->orderBy('sort_order')
+                    ->orderBy('item_id')
+                    ->get()
+                    ->map(fn (EquipmentSetRecipeCostItem $cost): array => [
+                        'item_id' => (string) $cost->item_id,
+                        'count' => (int) $cost->count,
+                        'sort_order' => (int) $cost->sort_order,
+                        'is_enabled' => (bool) $cost->is_enabled,
+                        'remark' => $cost->remark !== null ? (string) $cost->remark : null,
+                    ])
+                    ->all(),
+            ])
+            ->all();
+    }
+
+    /**
+     * @return array{
+     *     set: array<string, mixed>,
+     *     items: array<int, array<string, mixed>>,
+     *     effects: array<int, array<string, mixed>>,
+     *     recipes: array<int, array<string, mixed>>,
+     *     cost_items: array<int, array<string, mixed>>
+     * }
+     */
+    public static function normalizeFormDataOrFail(array $data): array
+    {
+        return EquipmentSetModuleSupport::normalizeSingleSetFormOrFail($data);
+    }
+
+    public static function syncRelations(EquipmentSet $record, array $items, array $effects, array $recipes, array $costItems): void
+    {
+        $record->items()->delete();
+        $record->effects()->delete();
+        $record->recipes()->delete();
+
+        foreach ($items as $row) {
+            $record->items()->create($row);
         }
 
-        if ($stage !== null) {
-            $expectedPieces = match ($stage) {
-                20 => 4,
-                40 => 6,
-                60 => 8,
-                default => 0,
-            };
-            if ($expectedPieces > 0 && $maxPieces !== $expectedPieces) {
-                throw ValidationException::withMessages([
-                    'piece_count' => sprintf('%d级套装总件数必须为 %d。', $stage, $expectedPieces),
-                ]);
-            }
+        foreach ($effects as $row) {
+            $record->effects()->create($row);
         }
 
-        $statOptions = AdminOptions::statOptions();
-        $seenCounts = [];
-        $lastCount = 0;
+        foreach ($recipes as $row) {
+            $record->recipes()->create($row);
+        }
 
-        foreach ($thresholds as $idx => $row) {
-            if (! is_array($row)) {
-                throw ValidationException::withMessages([
-                    "thresholds.{$idx}" => '阈值行格式错误。',
-                ]);
-            }
-
-            $count = (int) ($row['count'] ?? 0);
-            if ($count < 1 || $count > $maxPieces) {
-                throw ValidationException::withMessages([
-                    "thresholds.{$idx}.count" => "阈值件数需在 1~{$maxPieces}。",
-                ]);
-            }
-            if (in_array($count, $seenCounts, true)) {
-                throw ValidationException::withMessages([
-                    "thresholds.{$idx}.count" => '阈值件数不能重复。',
-                ]);
-            }
-            if ($count <= $lastCount) {
-                throw ValidationException::withMessages([
-                    "thresholds.{$idx}.count" => '阈值件数必须按递增顺序填写。',
-                ]);
-            }
-            $seenCounts[] = $count;
-            $lastCount = $count;
-
-            $bonuses = $row['bonuses'] ?? [];
-            if (! is_array($bonuses) || count($bonuses) < 1) {
-                throw ValidationException::withMessages([
-                    "thresholds.{$idx}.bonuses" => '每个阈值至少配置 1 条加成。',
-                ]);
-            }
-
-            foreach ($bonuses as $bonusIdx => $bonus) {
-                if (! is_array($bonus)) {
-                    throw ValidationException::withMessages([
-                        "thresholds.{$idx}.bonuses.{$bonusIdx}" => '加成格式错误。',
-                    ]);
-                }
-                $type = (string) ($bonus['type'] ?? '');
-                $val = (int) ($bonus['val'] ?? -1);
-                if ($val < 0) {
-                    throw ValidationException::withMessages([
-                        "thresholds.{$idx}.bonuses.{$bonusIdx}.val" => '加成数值必须大于等于 0。',
-                    ]);
-                }
-                if ($type === 'stat') {
-                    $stat = (string) ($bonus['stat'] ?? '');
-                    if ($stat === '' || ! array_key_exists($stat, $statOptions)) {
-                        throw ValidationException::withMessages([
-                            "thresholds.{$idx}.bonuses.{$bonusIdx}.stat" => '请选择合法的属性。',
-                        ]);
-                    }
-                } elseif ($type === 'skill_level') {
-                    $skillId = trim((string) ($bonus['skill_id'] ?? ''));
-                    if ($skillId === '') {
-                        throw ValidationException::withMessages([
-                            "thresholds.{$idx}.bonuses.{$bonusIdx}.skill_id" => '技能等级加成必须选择技能。',
-                        ]);
-                    }
-                } else {
-                    throw ValidationException::withMessages([
-                        "thresholds.{$idx}.bonuses.{$bonusIdx}.type" => '请选择合法的加成类型。',
-                    ]);
-                }
-            }
+        foreach ($costItems as $row) {
+            EquipmentSetRecipeCostItem::query()->create($row);
         }
     }
 
-    private static function bonusTypeOptions(): array
+    private static function setItemsRepeater(): Repeater
     {
-        return [
-            'stat' => '属性加成',
-            'skill_level' => '技能等级',
-        ];
+        return Repeater::make('set_items')
+            ->label('套装成品')
+            ->default([])
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->itemLabel(fn (array $state): ?string => filled($state['item_id'] ?? null) ? AdminOptions::itemName((string) $state['item_id']) : null)
+            ->addActionLabel('新增套装成品')
+            ->schema([
+                Select::make('item_id')
+                    ->label('item_id')
+                    ->options(fn (): array => EquipmentSetModuleSupport::equipmentItemOptions())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpan(4),
+                Select::make('slot_type')
+                    ->label('slot_type')
+                    ->options(EquipmentSet::SLOT_TYPE_OPTIONS)
+                    ->required()
+                    ->columnSpan(3),
+                TextInput::make('sort_order')
+                    ->label('sort_order')
+                    ->integer()
+                    ->minValue(0)
+                    ->default(0)
+                    ->required()
+                    ->columnSpan(2),
+                Toggle::make('is_enabled')
+                    ->label('is_enabled')
+                    ->default(true)
+                    ->columnSpan(1),
+                Textarea::make('remark')
+                    ->label('remark')
+                    ->rows(2)
+                    ->columnSpanFull(),
+            ])
+            ->columns(10)
+            ->columnSpanFull();
+    }
+
+    private static function effectsRepeater(): Repeater
+    {
+        return Repeater::make('effects')
+            ->label('件数效果')
+            ->default([])
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->addActionLabel('新增件数效果')
+            ->schema([
+                Select::make('piece_count')
+                    ->label('piece_count')
+                    ->options([
+                        2 => '2',
+                        4 => '4',
+                        6 => '6',
+                        8 => '8',
+                    ])
+                    ->required()
+                    ->columnSpan(2),
+                Select::make('effect_key')
+                    ->label('effect_key')
+                    ->options(EquipmentSet::EFFECT_KEY_OPTIONS)
+                    ->searchable()
+                    ->required()
+                    ->columnSpan(4),
+                Select::make('value_type')
+                    ->label('value_type')
+                    ->options(EquipmentSet::VALUE_TYPE_OPTIONS)
+                    ->required()
+                    ->columnSpan(2),
+                TextInput::make('value')
+                    ->label('value')
+                    ->numeric()
+                    ->required()
+                    ->columnSpan(2),
+                TextInput::make('sort_order')
+                    ->label('sort_order')
+                    ->integer()
+                    ->minValue(0)
+                    ->default(0)
+                    ->required()
+                    ->columnSpan(2),
+                TextInput::make('summary')
+                    ->label('summary')
+                    ->maxLength(255)
+                    ->columnSpan(10),
+                Toggle::make('is_enabled')
+                    ->label('is_enabled')
+                    ->default(true)
+                    ->columnSpan(2),
+                Textarea::make('remark')
+                    ->label('remark')
+                    ->rows(2)
+                    ->columnSpanFull(),
+            ])
+            ->columns(10)
+            ->columnSpanFull();
+    }
+
+    private static function recipesRepeater(): Repeater
+    {
+        return Repeater::make('recipes')
+            ->label('打造配方')
+            ->default([])
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->itemLabel(fn (array $state): ?string => filled($state['recipe_id'] ?? null) ? (string) $state['recipe_id'] : null)
+            ->addActionLabel('新增打造配方')
+            ->schema([
+                TextInput::make('recipe_id')
+                    ->label('recipe_id')
+                    ->required()
+                    ->maxLength(64)
+                    ->columnSpan(3),
+                Select::make('slot_type')
+                    ->label('slot_type')
+                    ->options(EquipmentSet::SLOT_TYPE_OPTIONS)
+                    ->required()
+                    ->columnSpan(2),
+                Select::make('result_item_id')
+                    ->label('result_item_id')
+                    ->options(fn (): array => EquipmentSetModuleSupport::equipmentItemOptions())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpan(4),
+                TextInput::make('unlock_level')
+                    ->label('unlock_level')
+                    ->integer()
+                    ->minValue(1)
+                    ->default(1)
+                    ->required()
+                    ->columnSpan(2),
+                TextInput::make('sort_order')
+                    ->label('sort_order')
+                    ->integer()
+                    ->minValue(0)
+                    ->default(0)
+                    ->required()
+                    ->columnSpan(1),
+                Select::make('required_base_item_id')
+                    ->label('required_base_item_id')
+                    ->options(fn (): array => EquipmentSetModuleSupport::equipmentItemOptions())
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->columnSpan(4),
+                Select::make('required_blueprint_item_id')
+                    ->label('required_blueprint_item_id')
+                    ->options(fn (): array => EquipmentSetModuleSupport::blueprintItemOptions())
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->columnSpan(4),
+                Toggle::make('is_enabled')
+                    ->label('is_enabled')
+                    ->default(true)
+                    ->columnSpan(2),
+                TextInput::make('summary')
+                    ->label('summary')
+                    ->maxLength(255)
+                    ->columnSpan(10),
+                Textarea::make('remark')
+                    ->label('remark')
+                    ->rows(2)
+                    ->columnSpanFull(),
+                static::recipeCostItemsRepeater(),
+            ])
+            ->columns(12)
+            ->columnSpanFull();
+    }
+
+    private static function recipeCostItemsRepeater(): Repeater
+    {
+        return Repeater::make('cost_items')
+            ->label('equipment_set_recipe_cost_items')
+            ->default([])
+            ->reorderable(false)
+            ->reorderableWithButtons(false)
+            ->reorderableWithDragAndDrop(false)
+            ->itemLabel(fn (array $state): ?string => filled($state['item_id'] ?? null) ? AdminOptions::itemName((string) $state['item_id']) : null)
+            ->addActionLabel('新增附加材料')
+            ->extraAttributes(['class' => 'compact-cost-items'])
+            ->schema([
+                Select::make('item_id')
+                    ->label('item_id')
+                    ->options(fn (): array => EquipmentSetModuleSupport::costMaterialOptions())
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpan(5),
+                TextInput::make('count')
+                    ->label('count')
+                    ->integer()
+                    ->minValue(1)
+                    ->required()
+                    ->default(1)
+                    ->columnSpan(2),
+                TextInput::make('sort_order')
+                    ->label('sort_order')
+                    ->integer()
+                    ->minValue(0)
+                    ->default(0)
+                    ->required()
+                    ->columnSpan(2),
+                Toggle::make('is_enabled')
+                    ->label('is_enabled')
+                    ->default(true)
+                    ->columnSpan(1),
+                TextInput::make('remark')
+                    ->label('remark')
+                    ->maxLength(255)
+                    ->columnSpan(2),
+            ])
+            ->columns(12)
+            ->columnSpanFull();
     }
 }

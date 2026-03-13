@@ -1,0 +1,97 @@
+{
+    "meta": {
+        "key": "boss_core_module",
+        "schema_version": 1,
+        "exported_at": "2026-03-13 13:44:08",
+        "sha256": "26480a5106339c7604ed9f9b23c29995cbe1fafbea91a26262e6f49e21575557"
+    },
+    "boss_core_rules": {
+        "item_anchor_rule": "Boss 核心成品统一通过 items.item_id 承接，且 main_type = boss_core、sub_type = boss_core。",
+        "module_boundary": [
+            "Boss 核心独立于宝石模块。",
+            "Boss 核心独立于套装件数效果，不占套装效果栏。",
+            "首版每个核心仅 1 条主效果。"
+        ],
+        "recommended_sect_options": {
+            "none": "无",
+            "bing": "兵宗",
+            "jingang": "金刚宗",
+            "fulu": "符箓宗"
+        },
+        "recommended_build_options": {
+            "burst": "爆发",
+            "survival": "生存",
+            "skill_loop": "技能循环",
+            "boss_hunt": "Boss向",
+            "burn": "燃烧",
+            "frost": "寒霜"
+        },
+        "effect_key_options": {
+            "bonus_burn_damage": "燃烧伤害加成",
+            "bonus_frost_damage": "寒霜伤害加成",
+            "bonus_skill_dmg": "技能伤害加成",
+            "bonus_boss_dmg": "Boss伤害加成",
+            "bonus_low_hp_shield": "低血量护盾",
+            "bonus_melee_atk": "近战攻击加成",
+            "bonus_final_damage": "最终伤害加成"
+        }
+    },
+    "boss_cores": [
+        {
+            "core_id": "core_qingqiu_frost",
+            "item_id": "core_qingqiu_frost",
+            "core_name": "青丘寒核",
+            "display_name": "青丘寒核",
+            "source_boss_id": "stage_08_boss",
+            "quality": "gold",
+            "rarity": "gold",
+            "recommended_sect": "fulu",
+            "recommended_build": "frost",
+            "icon": "",
+            "summary": "青丘九尾狐影掉落的寒系 Boss 核心，独立于宝石模块与套装件数效果。",
+            "drop_rate_note": "小概率掉落",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": "首版仅保留1条主效果。"
+        },
+        {
+            "core_id": "core_zhaoyao_burst",
+            "item_id": "core_zhaoyao_burst",
+            "core_name": "招摇战核",
+            "display_name": "招摇战核",
+            "source_boss_id": "stage_02_boss",
+            "quality": "gold",
+            "rarity": "gold",
+            "recommended_sect": "bing",
+            "recommended_build": "burst",
+            "icon": "",
+            "summary": "招摇阶段 Boss 核心样例，走近战爆发向，不归属 gem 模块。",
+            "drop_rate_note": "小概率掉落",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": "首版仅保留1条主效果。"
+        }
+    ],
+    "boss_core_effects": [
+        {
+            "core_id": "core_qingqiu_frost",
+            "effect_key": "bonus_frost_damage",
+            "value_type": "percent",
+            "value": 12,
+            "summary": "寒霜伤害提升12%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "core_id": "core_zhaoyao_burst",
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 10,
+            "summary": "近战攻击提升10%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ]
+}

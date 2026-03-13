@@ -2,963 +2,1077 @@
     "meta": {
         "key": "equipment_sets",
         "schema_version": 1,
-        "exported_at": "2026-03-12 13:00:12",
-        "sha256": "17dad4f368be2ab8db395ca0adc9dea31a0216c72319fc4330633e1c168d9cbe"
+        "exported_at": "2026-03-13 13:44:08",
+        "sha256": "c3f13ae30706caab0b0f645828633c00ee74ee09d20a6e3cab65b26c869cc3ac"
+    },
+    "equipment_set_rules": {
+        "supported_levels": [
+            20,
+            40,
+            50,
+            60
+        ],
+        "piece_total_by_level": {
+            "20": 4,
+            "40": 6,
+            "50": 8,
+            "60": 8
+        },
+        "thresholds_by_level": {
+            "20": [
+                2,
+                4
+            ],
+            "40": [
+                2,
+                4,
+                6
+            ],
+            "50": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "60": [
+                2,
+                4,
+                6,
+                8
+            ]
+        },
+        "slot_types": {
+            "main_weapon": "主武器",
+            "sub_weapon": "副武器",
+            "armor": "护甲",
+            "shoe": "鞋子",
+            "helmet": "头盔",
+            "leg": "护腿",
+            "cloak": "披风",
+            "necklace": "项链"
+        },
+        "slot_types_by_level": {
+            "20": [
+                "main_weapon",
+                "sub_weapon",
+                "armor",
+                "shoe"
+            ],
+            "40": [
+                "main_weapon",
+                "sub_weapon",
+                "armor",
+                "shoe",
+                "helmet",
+                "leg"
+            ],
+            "50": [
+                "main_weapon",
+                "sub_weapon",
+                "armor",
+                "shoe",
+                "helmet",
+                "leg",
+                "cloak",
+                "necklace"
+            ],
+            "60": [
+                "main_weapon",
+                "sub_weapon",
+                "armor",
+                "shoe",
+                "helmet",
+                "leg",
+                "cloak",
+                "necklace"
+            ]
+        },
+        "craft_rule_summary": [
+            "20级套装仅需要打造附加材料，不需要前一档装备与图纸。",
+            "40级打造必须消耗 20级对应部位成品，并要求图纸。",
+            "50级打造必须消耗 40级对应部位成品，并要求图纸。",
+            "60级打造必须消耗 50级对应部位成品，并要求图纸。",
+            "高阶新增部位可通过前一档独立 carrier item 承接同部位主材，但不计入低阶正式套装件数。",
+            "套装线不是 item，套装成品通过 items.item_id 承接。",
+            "本轮不实现套装升星，后续会在现有结构上继续扩展。"
+        ],
+        "craft_only": true,
+        "star_upgrade_supported": false,
+        "future_extension_note": "套装升星后续扩展，不在本轮模块范围内。"
     },
     "equipment_sets": [
         {
-            "id": "setline_lushu_20",
-            "set_line_id": "setline_lushu",
-            "name": "鹿蜀套·20级",
-            "sect": "兵宗",
-            "flow_tag": "berserk",
-            "stage": 20,
+            "set_id": "set_zhaoyao_20",
+            "set_name": "zhaoyao_20",
+            "display_name": "招摇战祭套·20级",
+            "set_level": 20,
+            "piece_total": 4,
+            "set_type": "combat_set",
+            "quality": "blue",
+            "rarity": "blue",
+            "unlock_level": 20,
+            "icon": "",
+            "summary": "20级招摇套装样例，4件套，全部通过打造获得，不需要图纸与前一档装备。",
+            "source_desc": "南山主线打造",
+            "sort_order": 100,
+            "is_enabled": true,
+            "remark": "本轮仅实现打造链，未实现升星。"
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "set_name": "zhaoyao_40",
+            "display_name": "招摇战祭套·40级",
+            "set_level": 40,
+            "piece_total": 6,
+            "set_type": "combat_set",
+            "quality": "purple",
+            "rarity": "purple",
+            "unlock_level": 40,
+            "icon": "",
+            "summary": "40级招摇套装样例，6件套，打造时必须消耗20级对应部位成品与图纸。",
+            "source_desc": "Boss 图纸打造",
+            "sort_order": 110,
+            "is_enabled": true,
+            "remark": "本轮仅实现打造链，未实现升星。"
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "set_name": "zhaoyao_50",
+            "display_name": "招摇战祭套·50级",
+            "set_level": 50,
+            "piece_total": 8,
+            "set_type": "combat_set",
+            "quality": "gold",
+            "rarity": "gold",
+            "unlock_level": 50,
+            "icon": "",
+            "summary": "50级招摇套装样例，8件套，打造时必须消耗40级对应部位成品与图纸。",
+            "source_desc": "山神祭相关材料",
+            "sort_order": 120,
+            "is_enabled": true,
+            "remark": "本轮仅实现打造链，未实现升星。"
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "set_name": "zhaoyao_60",
+            "display_name": "招摇战祭套·60级",
+            "set_level": 60,
+            "piece_total": 8,
+            "set_type": "combat_set",
+            "quality": "red",
+            "rarity": "red",
+            "unlock_level": 60,
+            "icon": "",
+            "summary": "60级招摇套装样例，8件套，打造时必须消耗50级对应部位成品与图纸。",
+            "source_desc": "Boss 图纸打造",
+            "sort_order": 130,
+            "is_enabled": true,
+            "remark": "本轮仅实现打造链，未实现升星。"
+        }
+    ],
+    "equipment_set_items": [
+        {
+            "set_id": "set_zhaoyao_20",
+            "item_id": "itm_set_zhaoyao_20_main_weapon",
+            "slot_type": "main_weapon",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_20",
+            "item_id": "itm_set_zhaoyao_20_sub_weapon",
+            "slot_type": "sub_weapon",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_20",
+            "item_id": "itm_set_zhaoyao_20_armor",
+            "slot_type": "armor",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_20",
+            "item_id": "itm_set_zhaoyao_20_shoe",
+            "slot_type": "shoe",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_main_weapon",
+            "slot_type": "main_weapon",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_sub_weapon",
+            "slot_type": "sub_weapon",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_armor",
+            "slot_type": "armor",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_shoe",
+            "slot_type": "shoe",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_helmet",
+            "slot_type": "helmet",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_40",
+            "item_id": "itm_set_zhaoyao_40_leg",
+            "slot_type": "leg",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_main_weapon",
+            "slot_type": "main_weapon",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_sub_weapon",
+            "slot_type": "sub_weapon",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_armor",
+            "slot_type": "armor",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_shoe",
+            "slot_type": "shoe",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_helmet",
+            "slot_type": "helmet",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_leg",
+            "slot_type": "leg",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_cloak",
+            "slot_type": "cloak",
+            "sort_order": 70,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_50",
+            "item_id": "itm_set_zhaoyao_50_necklace",
+            "slot_type": "necklace",
+            "sort_order": 80,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_main_weapon",
+            "slot_type": "main_weapon",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_sub_weapon",
+            "slot_type": "sub_weapon",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_armor",
+            "slot_type": "armor",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_shoe",
+            "slot_type": "shoe",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_helmet",
+            "slot_type": "helmet",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_leg",
+            "slot_type": "leg",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_cloak",
+            "slot_type": "cloak",
+            "sort_order": 70,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
+            "item_id": "itm_set_zhaoyao_60_necklace",
+            "slot_type": "necklace",
+            "sort_order": 80,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "equipment_set_effects": [
+        {
+            "set_id": "set_zhaoyao_20",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 8,
+            "summary": "2件：近战攻击提升8%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_20",
             "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK",
-                            "val": 6
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 3
-                        }
-                    ]
-                }
-            ],
-            "description": "鹿蜀套在20级阶段的套装效果配置。",
-            "sort_order": 10
+            "effect_key": "bonus_crit_rate",
+            "value_type": "percent",
+            "value": 5,
+            "summary": "4件：暴击率提升5%",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_lushu_40",
-            "set_line_id": "setline_lushu",
-            "name": "鹿蜀套·40级",
-            "sect": "兵宗",
-            "flow_tag": "berserk",
-            "stage": 40,
-            "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK",
-                            "val": 12
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 5
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_DAMAGE",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "鹿蜀套在40级阶段的套装效果配置。",
-            "sort_order": 20
+            "set_id": "set_zhaoyao_40",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 12,
+            "summary": "2件：近战攻击提升12%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_lushu_60",
-            "set_line_id": "setline_lushu",
-            "name": "鹿蜀套·60级",
-            "sect": "兵宗",
-            "flow_tag": "berserk",
-            "stage": 60,
-            "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK",
-                            "val": 18
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_DAMAGE",
-                            "val": 4
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_DMG",
-                            "val": 8
-                        }
-                    ]
-                }
-            ],
-            "description": "鹿蜀套在60级阶段的套装效果配置。",
-            "sort_order": 30
-        },
-        {
-            "id": "setline_xuangui_20",
-            "set_line_id": "setline_xuangui",
-            "name": "旋龟套·20级",
-            "sect": "兵宗",
-            "flow_tag": "guard",
-            "stage": 20,
+            "set_id": "set_zhaoyao_40",
             "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DEF",
-                            "val": 8
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 40
-                        }
-                    ]
-                }
-            ],
-            "description": "旋龟套在20级阶段的套装效果配置。",
-            "sort_order": 40
+            "effect_key": "bonus_damage_reduction",
+            "value_type": "percent",
+            "value": 10,
+            "summary": "4件：减伤提升10%",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_xuangui_40",
-            "set_line_id": "setline_xuangui",
-            "name": "旋龟套·40级",
-            "sect": "兵宗",
-            "flow_tag": "guard",
-            "stage": 40,
+            "set_id": "set_zhaoyao_40",
             "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DEF",
-                            "val": 16
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 80
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_REDUCTION",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "旋龟套在40级阶段的套装效果配置。",
-            "sort_order": 50
+            "effect_key": "bonus_final_damage",
+            "value_type": "percent",
+            "value": 8,
+            "summary": "6件：最终伤害提升8%",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_xuangui_60",
-            "set_line_id": "setline_xuangui",
-            "name": "旋龟套·60级",
-            "sect": "兵宗",
-            "flow_tag": "guard",
-            "stage": 60,
-            "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DEF",
-                            "val": 24
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 120
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_REDUCTION",
-                            "val": 4
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "PDEF",
-                            "val": 18
-                        }
-                    ]
-                }
-            ],
-            "description": "旋龟套在60级阶段的套装效果配置。",
-            "sort_order": 60
+            "set_id": "set_zhaoyao_50",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 15,
+            "summary": "2件：近战攻击提升15%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_guanguan_20",
-            "set_line_id": "setline_guanguan",
-            "name": "灌灌套·20级",
-            "sect": "巧宗",
-            "flow_tag": "hunt",
-            "stage": 20,
+            "set_id": "set_zhaoyao_50",
             "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 3
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK_SPEED",
-                            "val": 3
-                        }
-                    ]
-                }
-            ],
-            "description": "灌灌套在20级阶段的套装效果配置。",
-            "sort_order": 70
+            "effect_key": "bonus_crit_dmg",
+            "value_type": "percent",
+            "value": 18,
+            "summary": "4件：暴击伤害提升18%",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_guanguan_40",
-            "set_line_id": "setline_guanguan",
-            "name": "灌灌套·40级",
-            "sect": "巧宗",
-            "flow_tag": "hunt",
-            "stage": 40,
+            "set_id": "set_zhaoyao_50",
             "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 5
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK_SPEED",
-                            "val": 5
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "RANGED_ATK",
-                            "val": 14
-                        }
-                    ]
-                }
-            ],
-            "description": "灌灌套在40级阶段的套装效果配置。",
-            "sort_order": 80
+            "effect_key": "bonus_skill_dmg",
+            "value_type": "percent",
+            "value": 12,
+            "summary": "6件：技能伤害提升12%",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_guanguan_60",
-            "set_line_id": "setline_guanguan",
-            "name": "灌灌套·60级",
-            "sect": "巧宗",
-            "flow_tag": "hunt",
-            "stage": 60,
+            "set_id": "set_zhaoyao_50",
             "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_RATE",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "ATK_SPEED",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "RANGED_ATK",
-                            "val": 14
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DODGE",
-                            "val": 8
-                        }
-                    ]
-                }
-            ],
-            "description": "灌灌套在60级阶段的套装效果配置。",
-            "sort_order": 90
+            "effect_key": "bonus_final_damage",
+            "value_type": "percent",
+            "value": 10,
+            "summary": "8件：最终伤害提升10%",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_migu_20",
-            "set_line_id": "setline_migu",
-            "name": "迷榖套·20级",
-            "sect": "游宗",
-            "flow_tag": "evade",
-            "stage": 20,
+            "set_id": "set_zhaoyao_60",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 18,
+            "summary": "2件：近战攻击提升18%",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_id": "set_zhaoyao_60",
             "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DODGE",
-                            "val": 3
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 32
-                        }
-                    ]
-                }
-            ],
-            "description": "迷榖套在20级阶段的套装效果配置。",
-            "sort_order": 100
+            "effect_key": "bonus_crit_rate",
+            "value_type": "percent",
+            "value": 8,
+            "summary": "4件：暴击率提升8%",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_migu_40",
-            "set_line_id": "setline_migu",
-            "name": "迷榖套·40级",
-            "sect": "游宗",
-            "flow_tag": "evade",
-            "stage": 40,
+            "set_id": "set_zhaoyao_60",
             "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DODGE",
-                            "val": 5
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 68
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CDR",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "迷榖套在40级阶段的套装效果配置。",
-            "sort_order": 110
+            "effect_key": "bonus_boss_dmg",
+            "value_type": "percent",
+            "value": 16,
+            "summary": "6件：Boss伤害提升16%",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_migu_60",
-            "set_line_id": "setline_migu",
-            "name": "迷榖套·60级",
-            "sect": "游宗",
-            "flow_tag": "evade",
-            "stage": 60,
+            "set_id": "set_zhaoyao_60",
             "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "DODGE",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "HP",
-                            "val": 108
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CDR",
-                            "val": 4
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "LOOT_BONUS_PERCENT",
-                            "val": 8
-                        }
-                    ]
-                }
-            ],
-            "description": "迷榖套在60级阶段的套装效果配置。",
-            "sort_order": 120
+            "effect_key": "bonus_final_damage",
+            "value_type": "percent",
+            "value": 12,
+            "summary": "8件：最终伤害提升12%",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "equipment_set_craft_recipes": [
+        {
+            "recipe_id": "recipe_set_zhaoyao_20_main_weapon",
+            "set_id": "set_zhaoyao_20",
+            "slot_type": "main_weapon",
+            "result_item_id": "itm_set_zhaoyao_20_main_weapon",
+            "required_base_item_id": "",
+            "required_blueprint_item_id": "",
+            "unlock_level": 20,
+            "summary": "打造20级招摇套主武器",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_chiyu_20",
-            "set_line_id": "setline_chiyu",
-            "name": "赤鱬套·20级",
-            "sect": "术宗",
-            "flow_tag": "flame",
-            "stage": 20,
-            "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SPELL_ATK",
-                            "val": 8
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_DMG",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "赤鱬套在20级阶段的套装效果配置。",
-            "sort_order": 130
+            "recipe_id": "recipe_set_zhaoyao_20_sub_weapon",
+            "set_id": "set_zhaoyao_20",
+            "slot_type": "sub_weapon",
+            "result_item_id": "itm_set_zhaoyao_20_sub_weapon",
+            "required_base_item_id": "",
+            "required_blueprint_item_id": "",
+            "unlock_level": 20,
+            "summary": "打造20级招摇套副武器",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_chiyu_40",
-            "set_line_id": "setline_chiyu",
-            "name": "赤鱬套·40级",
-            "sect": "术宗",
-            "flow_tag": "flame",
-            "stage": 40,
-            "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SPELL_ATK",
-                            "val": 16
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_DMG",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_DAMAGE",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "赤鱬套在40级阶段的套装效果配置。",
-            "sort_order": 140
+            "recipe_id": "recipe_set_zhaoyao_20_armor",
+            "set_id": "set_zhaoyao_20",
+            "slot_type": "armor",
+            "result_item_id": "itm_set_zhaoyao_20_armor",
+            "required_base_item_id": "",
+            "required_blueprint_item_id": "",
+            "unlock_level": 20,
+            "summary": "打造20级招摇套护甲",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_chiyu_60",
-            "set_line_id": "setline_chiyu",
-            "name": "赤鱬套·60级",
-            "sect": "术宗",
-            "flow_tag": "flame",
-            "stage": 60,
-            "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SPELL_ATK",
-                            "val": 24
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CRIT_DMG",
-                            "val": 10
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_DAMAGE",
-                            "val": 4
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SP",
-                            "val": 18
-                        }
-                    ]
-                }
-            ],
-            "description": "赤鱬套在60级阶段的套装效果配置。",
-            "sort_order": 150
+            "recipe_id": "recipe_set_zhaoyao_20_shoe",
+            "set_id": "set_zhaoyao_20",
+            "slot_type": "shoe",
+            "result_item_id": "itm_set_zhaoyao_20_shoe",
+            "required_base_item_id": "",
+            "required_blueprint_item_id": "",
+            "unlock_level": 20,
+            "summary": "打造20级招摇套鞋子",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_qingqiu_20",
-            "set_line_id": "setline_qingqiu",
-            "name": "青丘套·20级",
-            "sect": "术宗",
-            "flow_tag": "frost",
-            "stage": 20,
-            "piece_count": 4,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "MDEF",
-                            "val": 8
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CDR",
-                            "val": 3
-                        }
-                    ]
-                }
-            ],
-            "description": "青丘套在20级阶段的套装效果配置。",
-            "sort_order": 160
+            "recipe_id": "recipe_set_zhaoyao_40_main_weapon",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "main_weapon",
+            "result_item_id": "itm_set_zhaoyao_40_main_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_20_main_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套主武器",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_qingqiu_40",
-            "set_line_id": "setline_qingqiu",
-            "name": "青丘套·40级",
-            "sect": "术宗",
-            "flow_tag": "frost",
-            "stage": 40,
-            "piece_count": 6,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "MDEF",
-                            "val": 16
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CDR",
-                            "val": 5
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SPELL_ATK",
-                            "val": 12
-                        }
-                    ]
-                }
-            ],
-            "description": "青丘套在40级阶段的套装效果配置。",
-            "sort_order": 170
+            "recipe_id": "recipe_set_zhaoyao_40_sub_weapon",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "sub_weapon",
+            "result_item_id": "itm_set_zhaoyao_40_sub_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_20_sub_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套副武器",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
         },
         {
-            "id": "setline_qingqiu_60",
-            "set_line_id": "setline_qingqiu",
-            "name": "青丘套·60级",
-            "sect": "术宗",
-            "flow_tag": "frost",
-            "stage": 60,
-            "piece_count": 8,
-            "slot_ids": [
-                "main_weapon",
-                "off_weapon",
-                "armor",
-                "belt",
-                "shoes",
-                "gloves",
-                "helm",
-                "necklace"
-            ],
-            "thresholds": [
-                {
-                    "count": 2,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "MDEF",
-                            "val": 24
-                        }
-                    ]
-                },
-                {
-                    "count": 4,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "CDR",
-                            "val": 7
-                        }
-                    ]
-                },
-                {
-                    "count": 6,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "SPELL_ATK",
-                            "val": 12
-                        }
-                    ]
-                },
-                {
-                    "count": 8,
-                    "bonuses": [
-                        {
-                            "type": "stat",
-                            "stat": "FINAL_REDUCTION",
-                            "val": 4
-                        }
-                    ]
-                }
-            ],
-            "description": "青丘套在60级阶段的套装效果配置。",
-            "sort_order": 180
+            "recipe_id": "recipe_set_zhaoyao_40_armor",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "armor",
+            "result_item_id": "itm_set_zhaoyao_40_armor",
+            "required_base_item_id": "itm_set_zhaoyao_20_armor",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套护甲",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_shoe",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "shoe",
+            "result_item_id": "itm_set_zhaoyao_40_shoe",
+            "required_base_item_id": "itm_set_zhaoyao_20_shoe",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套鞋子",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_helmet",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "helmet",
+            "result_item_id": "itm_set_zhaoyao_40_helmet",
+            "required_base_item_id": "itm_set_zhaoyao_20_helmet_base",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套头盔",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": "20级对应部位主材 carrier，不计入20级套装件数。"
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_leg",
+            "set_id": "set_zhaoyao_40",
+            "slot_type": "leg",
+            "result_item_id": "itm_set_zhaoyao_40_leg",
+            "required_base_item_id": "itm_set_zhaoyao_20_leg_base",
+            "required_blueprint_item_id": "bp_set_zhaoyao_40",
+            "unlock_level": 40,
+            "summary": "打造40级招摇套护腿",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": "20级对应部位主材 carrier，不计入20级套装件数。"
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_main_weapon",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "main_weapon",
+            "result_item_id": "itm_set_zhaoyao_50_main_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_40_main_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套主武器",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_sub_weapon",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "sub_weapon",
+            "result_item_id": "itm_set_zhaoyao_50_sub_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_40_sub_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套副武器",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_armor",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "armor",
+            "result_item_id": "itm_set_zhaoyao_50_armor",
+            "required_base_item_id": "itm_set_zhaoyao_40_armor",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套护甲",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_shoe",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "shoe",
+            "result_item_id": "itm_set_zhaoyao_50_shoe",
+            "required_base_item_id": "itm_set_zhaoyao_40_shoe",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套鞋子",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_helmet",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "helmet",
+            "result_item_id": "itm_set_zhaoyao_50_helmet",
+            "required_base_item_id": "itm_set_zhaoyao_40_helmet",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套头盔",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_leg",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "leg",
+            "result_item_id": "itm_set_zhaoyao_50_leg",
+            "required_base_item_id": "itm_set_zhaoyao_40_leg",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套护腿",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_cloak",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "cloak",
+            "result_item_id": "itm_set_zhaoyao_50_cloak",
+            "required_base_item_id": "itm_set_zhaoyao_40_cloak_base",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套披风",
+            "sort_order": 70,
+            "is_enabled": true,
+            "remark": "40级对应部位主材 carrier，不计入40级套装件数。"
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_necklace",
+            "set_id": "set_zhaoyao_50",
+            "slot_type": "necklace",
+            "result_item_id": "itm_set_zhaoyao_50_necklace",
+            "required_base_item_id": "itm_set_zhaoyao_40_necklace_base",
+            "required_blueprint_item_id": "bp_set_zhaoyao_50",
+            "unlock_level": 50,
+            "summary": "打造50级招摇套项链",
+            "sort_order": 80,
+            "is_enabled": true,
+            "remark": "40级对应部位主材 carrier，不计入40级套装件数。"
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_main_weapon",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "main_weapon",
+            "result_item_id": "itm_set_zhaoyao_60_main_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_50_main_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套主武器",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_sub_weapon",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "sub_weapon",
+            "result_item_id": "itm_set_zhaoyao_60_sub_weapon",
+            "required_base_item_id": "itm_set_zhaoyao_50_sub_weapon",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套副武器",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_armor",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "armor",
+            "result_item_id": "itm_set_zhaoyao_60_armor",
+            "required_base_item_id": "itm_set_zhaoyao_50_armor",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套护甲",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_shoe",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "shoe",
+            "result_item_id": "itm_set_zhaoyao_60_shoe",
+            "required_base_item_id": "itm_set_zhaoyao_50_shoe",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套鞋子",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_helmet",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "helmet",
+            "result_item_id": "itm_set_zhaoyao_60_helmet",
+            "required_base_item_id": "itm_set_zhaoyao_50_helmet",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套头盔",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_leg",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "leg",
+            "result_item_id": "itm_set_zhaoyao_60_leg",
+            "required_base_item_id": "itm_set_zhaoyao_50_leg",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套护腿",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_cloak",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "cloak",
+            "result_item_id": "itm_set_zhaoyao_60_cloak",
+            "required_base_item_id": "itm_set_zhaoyao_50_cloak",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套披风",
+            "sort_order": 70,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_necklace",
+            "set_id": "set_zhaoyao_60",
+            "slot_type": "necklace",
+            "result_item_id": "itm_set_zhaoyao_60_necklace",
+            "required_base_item_id": "itm_set_zhaoyao_50_necklace",
+            "required_blueprint_item_id": "bp_set_zhaoyao_60",
+            "unlock_level": 60,
+            "summary": "打造60级招摇套项链",
+            "sort_order": 80,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "equipment_set_recipe_cost_items": [
+        {
+            "recipe_id": "recipe_set_zhaoyao_20_armor",
+            "item_id": "桂枝",
+            "count": 8,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_20_main_weapon",
+            "item_id": "桂枝",
+            "count": 6,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_20_shoe",
+            "item_id": "桂枝",
+            "count": 5,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_20_sub_weapon",
+            "item_id": "桂枝",
+            "count": 6,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_armor",
+            "item_id": "招摇祭骨",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_helmet",
+            "item_id": "招摇祭骨",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_leg",
+            "item_id": "招摇祭骨",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_main_weapon",
+            "item_id": "招摇祭骨",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_shoe",
+            "item_id": "招摇祭骨",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_40_sub_weapon",
+            "item_id": "招摇祭骨",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_armor",
+            "item_id": "招摇印记",
+            "count": 2,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_cloak",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_helmet",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_leg",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_main_weapon",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_necklace",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_shoe",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_50_sub_weapon",
+            "item_id": "招摇印记",
+            "count": 1,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_armor",
+            "item_id": "妖核",
+            "count": 4,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_cloak",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_helmet",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_leg",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_main_weapon",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_necklace",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_shoe",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "recipe_id": "recipe_set_zhaoyao_60_sub_weapon",
+            "item_id": "妖核",
+            "count": 3,
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
         }
     ]
 }

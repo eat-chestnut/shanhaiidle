@@ -252,7 +252,7 @@ class ItemCatalogImportService
             'gem' => 'gem',
             'blueprint' => 'blueprint',
             'blueprint_fragment' => 'blueprint_fragment',
-            'gift_pack', 'consumable', 'equipment', 'talisman' => 'item',
+            'gift_pack', 'consumable', 'equipment', 'talisman', 'boss_core' => 'item',
             default => 'item',
         };
     }
@@ -275,6 +275,7 @@ class ItemCatalogImportService
             'blueprint' => 'blueprint',
             'blueprint_fragment' => 'blueprint_fragment',
             'gift_pack' => 'pack',
+            'boss_core' => null,
             'consumable' => match ($subType) {
                 'ticket' => 'dungeon_ticket',
                 default => 'pack',

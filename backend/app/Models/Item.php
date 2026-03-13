@@ -20,6 +20,7 @@ class Item extends Model
         'equipment' => '装备',
         'gem' => '宝石',
         'talisman' => '护符',
+        'boss_core' => 'Boss核心',
         'gift_pack' => '礼包',
         'consumable' => '消耗品',
         'blueprint' => '图纸',
@@ -56,6 +57,9 @@ class Item extends Model
         'talisman' => [
             'common_talisman' => '通用护符',
             'sect_talisman' => '宗门护符',
+        ],
+        'boss_core' => [
+            'boss_core' => 'Boss核心',
         ],
         'gift_pack' => [
             'stage_reward_pack' => '主线首通礼包',
