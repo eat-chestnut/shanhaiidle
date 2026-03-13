@@ -1,0 +1,170 @@
+{
+  "version": "v1",
+  "module": "player_equipment_instance_examples",
+  "rules": {
+    "loadout_slot_types": [
+      "main_weapon",
+      "sub_weapon",
+      "armor",
+      "leg",
+      "shoe",
+      "cloak",
+      "helmet",
+      "necklace",
+      "bracelet_1",
+      "bracelet_2",
+      "ring_1",
+      "ring_2",
+      "talisman"
+    ],
+    "set_count_excludes": ["talisman"],
+    "talisman_star_link_excludes": ["talisman"],
+    "gem_slot_unlocks": [
+      { "required_star": 3, "slot_index": 1, "slot_group": "attr_only" },
+      { "required_star": 6, "slot_index": 2, "slot_group": "attr_only" },
+      { "required_star": 8, "slot_index": 3, "slot_group": "skill_only" },
+      { "required_star": 10, "slot_index": 4, "slot_group": "skill_only" }
+    ]
+  },
+  "example_instances": [
+    {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "equipment_source_type": "set_equipment",
+      "slot_type": "main_weapon",
+      "set_id": "set_zhaoyao_20",
+      "set_level": 20,
+      "star": 3,
+      "max_star": 3,
+      "quality": "purple",
+      "rarity": "purple",
+      "is_locked": false,
+      "is_equipped": true,
+      "obtained_at": "2026-03-14 10:00:00"
+    },
+    {
+      "player_id": 10001,
+      "instance_id": "eq_inst_set_armor_40_a001",
+      "item_id": "itm_set_armor_zhaoyao_40",
+      "equipment_source_type": "set_equipment",
+      "slot_type": "armor",
+      "set_id": "set_zhaoyao_40",
+      "set_level": 40,
+      "star": 4,
+      "max_star": 6,
+      "quality": "purple",
+      "rarity": "purple",
+      "is_locked": false,
+      "is_equipped": true,
+      "obtained_at": "2026-03-14 10:00:00"
+    },
+    {
+      "player_id": 10001,
+      "instance_id": "eq_inst_blue_ring_45_a001",
+      "item_id": "itm_blue_ring_45",
+      "equipment_source_type": "blue_equipment",
+      "slot_type": "ring_1",
+      "set_id": null,
+      "set_level": null,
+      "star": 0,
+      "max_star": 0,
+      "quality": "blue",
+      "rarity": "blue",
+      "is_locked": false,
+      "is_equipped": true,
+      "obtained_at": "2026-03-14 10:00:00"
+    },
+    {
+      "player_id": 10001,
+      "instance_id": "eq_inst_talisman_40_a001",
+      "item_id": "itm_talisman_bing_40",
+      "equipment_source_type": "common_equipment",
+      "slot_type": "talisman",
+      "set_id": null,
+      "set_level": null,
+      "star": 0,
+      "max_star": 0,
+      "quality": "purple",
+      "rarity": "purple",
+      "is_locked": false,
+      "is_equipped": true,
+      "obtained_at": "2026-03-14 10:00:00"
+    }
+  ],
+  "example_loadouts": [
+    {
+      "player_id": 10001,
+      "slot_type": "main_weapon",
+      "instance_id": "eq_inst_set_weapon_20_a001"
+    },
+    {
+      "player_id": 10001,
+      "slot_type": "armor",
+      "instance_id": "eq_inst_set_armor_40_a001"
+    },
+    {
+      "player_id": 10001,
+      "slot_type": "ring_1",
+      "instance_id": "eq_inst_blue_ring_45_a001"
+    },
+    {
+      "player_id": 10001,
+      "slot_type": "talisman",
+      "instance_id": "eq_inst_talisman_40_a001"
+    }
+  ],
+  "example_gem_slots": [
+    {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 1,
+      "slot_group": "attr_only",
+      "required_star": 3,
+      "is_unlocked": true,
+      "gem_item_id": "itm_gem_attr_chijinshi_white"
+    },
+    {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 2,
+      "slot_group": "attr_only",
+      "required_star": 6,
+      "is_unlocked": false,
+      "gem_item_id": null
+    },
+    {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 3,
+      "slot_group": "skill_only",
+      "required_star": 8,
+      "is_unlocked": false,
+      "gem_item_id": null
+    },
+    {
+      "instance_id": "eq_inst_set_weapon_20_a001",
+      "slot_index": 4,
+      "slot_group": "skill_only",
+      "required_star": 10,
+      "is_unlocked": false,
+      "gem_item_id": null
+    }
+  ],
+  "progression_examples": [
+    {
+      "before": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "set_level": 20,
+        "star": 3,
+        "max_star": 3
+      },
+      "after": {
+        "instance_id": "eq_inst_set_weapon_20_a001",
+        "item_id": "itm_set_main_weapon_zhaoyao_40",
+        "set_level": 40,
+        "star": 3,
+        "max_star": 6
+      },
+      "summary": "20级满3星装备进阶到40级后，保留3星并提升上限到6星"
+    }
+  ]
+}
