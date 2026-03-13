@@ -1,0 +1,287 @@
+{
+    "version": "v1",
+    "module": "equipment_star_module",
+    "rules": {
+        "star_mode": "always_success",
+        "failure_supported": false,
+        "downgrade_supported": false,
+        "guarantee_supported": false,
+        "progression_requires_max_star": true,
+        "progression_keeps_current_star": true,
+        "core_material_source": "star_sand_dungeon"
+    },
+    "star_rules": [
+        {
+            "set_level": 20,
+            "max_star": 3,
+            "summary": "20级套装装备最高可升至3星",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_level": 40,
+            "max_star": 6,
+            "summary": "40级套装装备最高可升至6星",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_level": 50,
+            "max_star": 8,
+            "summary": "50级套装装备最高可升至8星",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "set_level": 60,
+            "max_star": 10,
+            "summary": "60级套装装备最高可升至10星",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "slot_unlocks": [
+        {
+            "required_star": 3,
+            "slot_index": 1,
+            "slot_group": "attr_only",
+            "summary": "3星解锁第1孔（属性孔）",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "required_star": 6,
+            "slot_index": 2,
+            "slot_group": "attr_only",
+            "summary": "6星解锁第2孔（属性孔）",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "required_star": 8,
+            "slot_index": 3,
+            "slot_group": "skill_only",
+            "summary": "8星解锁第3孔（技能孔）",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "required_star": 10,
+            "slot_index": 4,
+            "slot_group": "skill_only",
+            "summary": "10星解锁第4孔（技能孔）",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "progression_rules": [
+        {
+            "from_set_level": 20,
+            "to_set_level": 40,
+            "required_max_star": 3,
+            "star_keep_mode": "keep_current_star",
+            "summary": "20级装备需满3星才能进阶40级，进阶后保留当前星级",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "from_set_level": 40,
+            "to_set_level": 50,
+            "required_max_star": 6,
+            "star_keep_mode": "keep_current_star",
+            "summary": "40级装备需满6星才能进阶50级，进阶后保留当前星级",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": ""
+        },
+        {
+            "from_set_level": 50,
+            "to_set_level": 60,
+            "required_max_star": 8,
+            "star_keep_mode": "keep_current_star",
+            "summary": "50级装备需满8星才能进阶60级，进阶后保留当前星级",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": ""
+        }
+    ],
+    "upgrade_costs": [
+        {
+            "set_level": 20,
+            "from_star": 0,
+            "to_star": 1,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_fragment_low",
+                    "count": 10,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 500,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 20,
+            "from_star": 1,
+            "to_star": 2,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_fragment_low",
+                    "count": 20,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 1000,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 20,
+            "from_star": 2,
+            "to_star": 3,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_low",
+                    "count": 8,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 1500,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 40,
+            "from_star": 0,
+            "to_star": 1,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_low",
+                    "count": 6,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "mat_star_sand_fragment_mid",
+                    "count": 12,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 2500,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 40,
+            "from_star": 5,
+            "to_star": 6,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_mid",
+                    "count": 10,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 9000,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 50,
+            "from_star": 7,
+            "to_star": 8,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_high_fragment",
+                    "count": 16,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "mat_star_sand_high",
+                    "count": 6,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 18000,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "set_level": 60,
+            "from_star": 9,
+            "to_star": 10,
+            "cost_items": [
+                {
+                    "item_id": "mat_star_sand_high",
+                    "count": 12,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "mat_star_core_extreme",
+                    "count": 2,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "item_id": "cur_gold",
+                    "count": 30000,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        }
+    ]
+}

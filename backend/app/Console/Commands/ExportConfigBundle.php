@@ -27,6 +27,7 @@ class ExportConfigBundle extends Command
         ['key' => 'gift_pack_module', 'command' => 'game:export-gift-pack-module', 'source' => 'gift_pack_module_v1.json', 'filename' => 'gift_pack_module_v1.json'],
         ['key' => 'equip_templates', 'command' => 'game:export-equip-templates', 'source' => 'equip_templates.json', 'filename' => 'equip_templates.json'],
         ['key' => 'equipment_sets', 'command' => 'game:export-equipment-sets', 'source' => 'equipment_sets.json', 'filename' => 'equipment_sets.json'],
+        ['key' => 'equipment_star_module', 'command' => 'game:export-equipment-star-module', 'source' => 'equipment_star_module_v1.json', 'filename' => 'equipment_star_module_v1.json'],
         ['key' => 'equip_slots', 'command' => 'game:export-equip-slots', 'source' => 'equip_slots_v1.json', 'filename' => 'equip_slots_v1.json'],
         ['key' => 'equipment_growth_rules', 'command' => 'game:export-equipment-growth-rules', 'source' => 'equipment_growth_rules_v1.json', 'filename' => 'equipment_growth_rules_v1.json'],
         ['key' => 'character_growth_rules', 'command' => 'game:export-character-growth-rules', 'source' => 'character_growth_rules_v1.json', 'filename' => 'character_growth_rules_v1.json'],
