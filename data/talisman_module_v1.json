@@ -2,8 +2,8 @@
     "meta": {
         "key": "talisman_module",
         "schema_version": 1,
-        "exported_at": "2026-03-13 12:33:53",
-        "sha256": "cb3911fa6ef9540c86428c51c565660d9e75e92c83b1fedaea4242b15262b925"
+        "exported_at": "2026-03-13 14:48:15",
+        "sha256": "8bed18d7cb603ccd150ea4da3f9446620647dfd50b772c002f902ae28d3acedf"
     },
     "talisman_module": {
         "rules": {
@@ -19,7 +19,7 @@
                 10
             ],
             "star_link_condition_mode": "all_tracked_slots_min_star",
-            "star_link_condition_summary": "所有参与统计的装备位都至少达到指定星级，护符位不参与全身装备星级统计。",
+            "star_link_condition_summary": "护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。",
             "star_link_tracked_slot_ids": [
                 "main_weapon",
                 "off_weapon",
