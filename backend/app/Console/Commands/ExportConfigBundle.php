@@ -36,7 +36,7 @@ class ExportConfigBundle extends Command
         ['key' => 'purple_affix_pool', 'command' => 'game:export-purple-affix-pool', 'source' => 'purple_affix_pool_v1.json', 'filename' => 'purple_affix_pool_v1.json'],
         ['key' => 'gem_catalog', 'command' => 'game:export-gem-catalog', 'source' => 'gem_catalog_v1.json', 'filename' => 'gem_catalog_v1.json'],
         ['key' => 'material_catalog', 'command' => 'game:export-material-catalog', 'source' => 'material_catalog_v1.json', 'filename' => 'material_catalog_v1.json'],
-        ['key' => 'material_dungeons', 'command' => 'game:export-material-dungeons', 'source' => 'material_dungeons_v1.json', 'filename' => 'material_dungeons_v1.json'],
+        ['key' => 'daily_dungeons', 'command' => 'game:export-daily-dungeons', 'source' => 'daily_dungeons_v1.json', 'filename' => 'daily_dungeons_v1.json'],
         ['key' => 'sect_tasks', 'command' => 'game:export-sect-task-rules', 'source' => 'sect_tasks_v1.json', 'filename' => 'sect_tasks_v1.json'],
         ['key' => 'mountain_god', 'command' => 'game:export-mountain-god-offerings', 'source' => 'mountain_god_v1.json', 'filename' => 'mountain_god_v1.json'],
         ['key' => 'shop_goods', 'command' => 'game:export-shop-goods', 'source' => 'shop_goods_v1.json', 'filename' => 'shop_goods_v1.json'],

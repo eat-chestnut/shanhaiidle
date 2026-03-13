@@ -3,7 +3,7 @@
 namespace App\Support;
 
 use App\Models\Item;
-use App\Models\MaterialDungeon;
+use App\Models\DailyDungeon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -119,12 +119,12 @@ class ItemEffectRegistry
 
     public static function dungeonOptions(): array
     {
-        return MaterialDungeon::query()
+        return DailyDungeon::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
-            ->orderBy('name')
+            ->orderBy('display_name')
             ->get()
-            ->mapWithKeys(fn (MaterialDungeon $row): array => [$row->dungeon_id => (string) $row->name])
+            ->mapWithKeys(fn (DailyDungeon $row): array => [$row->dungeon_id => (string) $row->display_name])
             ->all();
     }
 

@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             BlueAffixPoolSeeder::class,
             PurpleAffixPoolSeeder::class,
             BlueGearTemplatesSeeder::class,
-            MaterialDungeonsSeeder::class,
             CraftingRecipesSeeder::class,
             BattleDefaultsSettingSeeder::class,
             EquipmentGrowthRulesSettingSeeder::class,
@@ -33,6 +32,7 @@ class DatabaseSeeder extends Seeder
             MainStageModuleSeeder::class,
             MilestoneModuleSeeder::class,
             MonstersSeeder::class,
+            DailyDungeonsSeeder::class,
             StagesSeeder::class,
             NanshanYijingWorldSeeder::class,
         ]);

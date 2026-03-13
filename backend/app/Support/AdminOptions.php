@@ -3,11 +3,11 @@
 namespace App\Support;
 
 use App\Models\BlueAffix;
+use App\Models\DailyDungeon;
 use App\Models\EquipTemplate;
 use App\Models\EquipmentSet;
 use App\Models\Item;
 use App\Models\MainStageChapter;
-use App\Models\MaterialDungeonDropGroup;
 use App\Models\Milestone;
 use App\Models\Monster;
 use App\Models\SkillCatalog;
@@ -216,6 +216,7 @@ class AdminOptions
         return [
             'core_catalog' => '核心目录',
             'legacy_catalog_import' => '历史导入',
+            'daily_dungeon_module' => '日常副本模块',
             'monster_rewards' => '怪物掉落',
             'stage_rewards' => '主线首通奖励',
             'shop_catalog' => '商城目录',
@@ -490,10 +491,10 @@ class AdminOptions
     public static function dungeonTypeOptions(): array
     {
         return [
-            'gold' => '金币副本',
-            'exp' => '经验副本',
-            'material' => '材料副本',
-            'gem' => '宝石副本',
+            'star_sand' => '星砂副本',
+            'spirit_jade' => '灵玉副本',
+            'spirit_mark' => '灵印副本',
+            'refine_soul' => '淬灵副本',
         ];
     }
 
@@ -510,28 +511,32 @@ class AdminOptions
             ->all();
     }
 
-    public static function materialDungeonDropGroupOptions(): array
+    public static function dailyDungeonOptions(): array
     {
-        return MaterialDungeonDropGroup::query()
+        return DailyDungeon::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
-            ->orderBy('name')
+            ->orderBy('display_name')
             ->get()
-            ->mapWithKeys(fn (MaterialDungeonDropGroup $group): array => [
-                $group->group_id => (string) $group->name,
+            ->mapWithKeys(fn (DailyDungeon $dungeon): array => [
+                $dungeon->dungeon_id => sprintf(
+                    '%s｜%s',
+                    (string) $dungeon->dungeon_id,
+                    (string) $dungeon->display_name
+                ),
             ])
             ->all();
     }
 
-    public static function materialDungeonDropGroupName(?string $groupId): string
+    public static function dailyDungeonName(?string $dungeonId): string
     {
-        if (blank($groupId)) {
+        if (blank($dungeonId)) {
             return '';
         }
 
-        return (string) MaterialDungeonDropGroup::query()
-            ->where('group_id', $groupId)
-            ->value('name');
+        return (string) DailyDungeon::query()
+            ->where('dungeon_id', $dungeonId)
+            ->value('display_name');
     }
 
     public static function worldNameCategoryOptions(): array

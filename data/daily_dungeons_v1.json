@@ -1,0 +1,1681 @@
+{
+    "meta": {
+        "key": "daily_dungeons",
+        "schema_version": 1,
+        "exported_at": "2026-03-13 11:37:50",
+        "sha256": "eea37c264ec74ca996349a733064ab8379770ee8379b409bf80cfcb26613edaa"
+    },
+    "daily_dungeons": [
+        {
+            "dungeon_id": "dun_star_sand",
+            "title": "星砂副本",
+            "display_name": "星砂副本",
+            "dungeon_type": "star_sand",
+            "unlock_level": 23,
+            "entry_cost_item_id": null,
+            "entry_cost_count": 0,
+            "daily_limit": 2,
+            "sweep_enabled": false,
+            "icon": "icon_daily_star_sand",
+            "summary": "常驻星砂日常副本，采用 5 级升级制，升级后提高怪物强度与掉落质量。",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": "正式首版常驻日常副本。",
+            "levels": [
+                {
+                    "dungeon_level_id": "dun_star_sand_lv1",
+                    "dungeon_id": "dun_star_sand",
+                    "level_no": 1,
+                    "level_name": "初阶",
+                    "recommended_level": 23,
+                    "recommended_power": 1200,
+                    "is_max_level": false,
+                    "summary": "Lv1 初阶，建议等级 23，推荐战力 1200。",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_04_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_04_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_04_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_04_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 2,
+                            "item_id": "cur_gold",
+                            "count": 2000,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_gui_mu",
+                            "count": 12,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_yan_mu",
+                            "count": 12,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_star_sand",
+                            "count": 20,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 2000,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_star_sand_lv2",
+                    "dungeon_id": "dun_star_sand",
+                    "level_no": 2,
+                    "level_name": "进阶",
+                    "recommended_level": 28,
+                    "recommended_power": 1800,
+                    "is_max_level": false,
+                    "summary": "Lv2 进阶，建议等级 28，推荐战力 1800。",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_05_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 3,
+                            "item_id": "cur_gold",
+                            "count": 5000,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 3,
+                            "item_id": "mat_base_mi_gu_branch",
+                            "count": 10,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 3,
+                            "item_id": "mat_base_zhu_yu_leaf",
+                            "count": 10,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_star_sand",
+                            "count": 30,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 3200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_star_sand_lv3",
+                    "dungeon_id": "dun_star_sand",
+                    "level_no": 3,
+                    "level_name": "精修",
+                    "recommended_level": 34,
+                    "recommended_power": 2600,
+                    "is_max_level": false,
+                    "summary": "Lv3 精修，建议等级 34，推荐战力 2600。",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_06_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 4,
+                            "item_id": "cur_gold",
+                            "count": 9000,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 4,
+                            "item_id": "mat_stage_queshan_remnant",
+                            "count": 6,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 4,
+                            "item_id": "mat_stage_zhaoyao_bone",
+                            "count": 6,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_star_sand",
+                            "count": 40,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 4600,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_star_sand_lv4",
+                    "dungeon_id": "dun_star_sand",
+                    "level_no": 4,
+                    "level_name": "深炼",
+                    "recommended_level": 40,
+                    "recommended_power": 3600,
+                    "is_max_level": false,
+                    "summary": "Lv4 深炼，建议等级 40，推荐战力 3600。",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_07_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 5,
+                            "item_id": "cur_gold",
+                            "count": 15000,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 5,
+                            "item_id": "mat_stage_qingqiu_seal",
+                            "count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 5,
+                            "item_id": "mat_stage_jiwei_stone",
+                            "count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_star_sand",
+                            "count": 50,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 6200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_star_sand_lv5",
+                    "dungeon_id": "dun_star_sand",
+                    "level_no": 5,
+                    "level_name": "极境",
+                    "recommended_level": 46,
+                    "recommended_power": 4800,
+                    "is_max_level": true,
+                    "summary": "Lv5 极境，建议等级 46，推荐战力 4800。",
+                    "sort_order": 50,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_star_sand",
+                            "count": 60,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 8000,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "dungeon_id": "dun_spirit_jade",
+            "title": "灵玉副本",
+            "display_name": "灵玉副本",
+            "dungeon_type": "spirit_jade",
+            "unlock_level": 28,
+            "entry_cost_item_id": null,
+            "entry_cost_count": 0,
+            "daily_limit": 2,
+            "sweep_enabled": false,
+            "icon": "icon_daily_spirit_jade",
+            "summary": "常驻灵玉日常副本，副本等级通过消耗材料升级，不做自动难度解锁。",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": "正式首版常驻日常副本。",
+            "levels": [
+                {
+                    "dungeon_level_id": "dun_spirit_jade_lv1",
+                    "dungeon_id": "dun_spirit_jade",
+                    "level_no": 1,
+                    "level_name": "初阶",
+                    "recommended_level": 28,
+                    "recommended_power": 1800,
+                    "is_max_level": false,
+                    "summary": "Lv1 初阶，建议等级 28，推荐战力 1800。",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_05_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_05_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 2,
+                            "item_id": "cur_gold",
+                            "count": 2600,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_gui_mu",
+                            "count": 8,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_yan_mu",
+                            "count": 8,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_jade",
+                            "count": 12,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 2500,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_jade_lv2",
+                    "dungeon_id": "dun_spirit_jade",
+                    "level_no": 2,
+                    "level_name": "进阶",
+                    "recommended_level": 33,
+                    "recommended_power": 2500,
+                    "is_max_level": false,
+                    "summary": "Lv2 进阶，建议等级 33，推荐战力 2500。",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_06_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_jade",
+                            "count": 18,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 3600,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_jade_lv3",
+                    "dungeon_id": "dun_spirit_jade",
+                    "level_no": 3,
+                    "level_name": "精修",
+                    "recommended_level": 39,
+                    "recommended_power": 3400,
+                    "is_max_level": false,
+                    "summary": "Lv3 精修，建议等级 39，推荐战力 3400。",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_07_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_jade",
+                            "count": 24,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 5000,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_jade_lv4",
+                    "dungeon_id": "dun_spirit_jade",
+                    "level_no": 4,
+                    "level_name": "深炼",
+                    "recommended_level": 45,
+                    "recommended_power": 4600,
+                    "is_max_level": false,
+                    "summary": "Lv4 深炼，建议等级 45，推荐战力 4600。",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_jade",
+                            "count": 30,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 6800,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_jade_lv5",
+                    "dungeon_id": "dun_spirit_jade",
+                    "level_no": 5,
+                    "level_name": "极境",
+                    "recommended_level": 52,
+                    "recommended_power": 6000,
+                    "is_max_level": true,
+                    "summary": "Lv5 极境，建议等级 52，推荐战力 6000。",
+                    "sort_order": 50,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_jade",
+                            "count": 36,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 9000,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "dungeon_id": "dun_spirit_mark",
+            "title": "灵印副本",
+            "display_name": "灵印副本",
+            "dungeon_type": "spirit_mark",
+            "unlock_level": 35,
+            "entry_cost_item_id": null,
+            "entry_cost_count": 0,
+            "daily_limit": 2,
+            "sweep_enabled": false,
+            "icon": "icon_daily_spirit_mark",
+            "summary": "常驻灵印日常副本，等级越高，怪物编成越完整，掉落表现越好。",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": "正式首版常驻日常副本。",
+            "levels": [
+                {
+                    "dungeon_level_id": "dun_spirit_mark_lv1",
+                    "dungeon_id": "dun_spirit_mark",
+                    "level_no": 1,
+                    "level_name": "初阶",
+                    "recommended_level": 35,
+                    "recommended_power": 2600,
+                    "is_max_level": false,
+                    "summary": "Lv1 初阶，建议等级 35，推荐战力 2600。",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_06_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 2,
+                            "max_count": 3,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_06_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 2,
+                            "item_id": "cur_gold",
+                            "count": 3200,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_mi_gu_branch",
+                            "count": 8,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_mark",
+                            "count": 8,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 3200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_mark_lv2",
+                    "dungeon_id": "dun_spirit_mark",
+                    "level_no": 2,
+                    "level_name": "进阶",
+                    "recommended_level": 40,
+                    "recommended_power": 3500,
+                    "is_max_level": false,
+                    "summary": "Lv2 进阶，建议等级 40，推荐战力 3500。",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_07_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_mark",
+                            "count": 12,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 4500,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_mark_lv3",
+                    "dungeon_id": "dun_spirit_mark",
+                    "level_no": 3,
+                    "level_name": "精修",
+                    "recommended_level": 46,
+                    "recommended_power": 4600,
+                    "is_max_level": false,
+                    "summary": "Lv3 精修，建议等级 46，推荐战力 4600。",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_mark",
+                            "count": 16,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 6200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_mark_lv4",
+                    "dungeon_id": "dun_spirit_mark",
+                    "level_no": 4,
+                    "level_name": "深炼",
+                    "recommended_level": 52,
+                    "recommended_power": 6000,
+                    "is_max_level": false,
+                    "summary": "Lv4 深炼，建议等级 52，推荐战力 6000。",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_mark",
+                            "count": 20,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 8400,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_spirit_mark_lv5",
+                    "dungeon_id": "dun_spirit_mark",
+                    "level_no": 5,
+                    "level_name": "极境",
+                    "recommended_level": 58,
+                    "recommended_power": 7600,
+                    "is_max_level": true,
+                    "summary": "Lv5 极境，建议等级 58，推荐战力 7600。",
+                    "sort_order": 50,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 6,
+                            "max_count": 7,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 6,
+                            "max_count": 7,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_spirit_mark",
+                            "count": 24,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 10800,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "dungeon_id": "dun_refine_soul",
+            "title": "淬灵副本",
+            "display_name": "淬灵副本",
+            "dungeon_type": "refine_soul",
+            "unlock_level": 45,
+            "entry_cost_item_id": null,
+            "entry_cost_count": 0,
+            "daily_limit": 2,
+            "sweep_enabled": false,
+            "icon": "icon_daily_refine_soul",
+            "summary": "常驻淬灵日常副本，采用固定 5 级升级制，扫荡仅保留布尔开关。",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": "正式首版常驻日常副本。",
+            "levels": [
+                {
+                    "dungeon_level_id": "dun_refine_soul_lv1",
+                    "dungeon_id": "dun_refine_soul",
+                    "level_no": 1,
+                    "level_name": "初阶",
+                    "recommended_level": 45,
+                    "recommended_power": 4200,
+                    "is_max_level": false,
+                    "summary": "Lv1 初阶，建议等级 45，推荐战力 4200。",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_07_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 3,
+                            "max_count": 4,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_07_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [
+                        {
+                            "target_level_no": 2,
+                            "item_id": "cur_gold",
+                            "count": 4800,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "target_level_no": 2,
+                            "item_id": "mat_base_zhu_yu_leaf",
+                            "count": 8,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_refine_soul",
+                            "count": 6,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 4200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_refine_soul_lv2",
+                    "dungeon_id": "dun_refine_soul",
+                    "level_no": 2,
+                    "level_name": "进阶",
+                    "recommended_level": 50,
+                    "recommended_power": 5200,
+                    "is_max_level": false,
+                    "summary": "Lv2 进阶，建议等级 50，推荐战力 5200。",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 4,
+                            "max_count": 5,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_refine_soul",
+                            "count": 9,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 5600,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_refine_soul_lv3",
+                    "dungeon_id": "dun_refine_soul",
+                    "level_no": 3,
+                    "level_name": "精修",
+                    "recommended_level": 56,
+                    "recommended_power": 6500,
+                    "is_max_level": false,
+                    "summary": "Lv3 精修，建议等级 56，推荐战力 6500。",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 5,
+                            "max_count": 6,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_refine_soul",
+                            "count": 12,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 7600,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_refine_soul_lv4",
+                    "dungeon_id": "dun_refine_soul",
+                    "level_no": 4,
+                    "level_name": "深炼",
+                    "recommended_level": 62,
+                    "recommended_power": 7900,
+                    "is_max_level": false,
+                    "summary": "Lv4 深炼，建议等级 62，推荐战力 7900。",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 6,
+                            "max_count": 7,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 6,
+                            "max_count": 7,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_refine_soul",
+                            "count": 15,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 9800,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                },
+                {
+                    "dungeon_level_id": "dun_refine_soul_lv5",
+                    "dungeon_id": "dun_refine_soul",
+                    "level_no": 5,
+                    "level_name": "极境",
+                    "recommended_level": 68,
+                    "recommended_power": 9500,
+                    "is_max_level": true,
+                    "summary": "Lv5 极境，建议等级 68，推荐战力 9500。",
+                    "sort_order": 50,
+                    "is_enabled": true,
+                    "remark": null,
+                    "monster_entries": [
+                        {
+                            "monster_id": "stage_08_normal_a",
+                            "spawn_type": "normal",
+                            "weight": 100,
+                            "min_count": 7,
+                            "max_count": 8,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_normal_b",
+                            "spawn_type": "normal",
+                            "weight": 90,
+                            "min_count": 7,
+                            "max_count": 8,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_elite",
+                            "spawn_type": "elite",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 2,
+                            "sort_order": 30,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "monster_id": "stage_08_boss",
+                            "spawn_type": "boss",
+                            "weight": 100,
+                            "min_count": 1,
+                            "max_count": 1,
+                            "sort_order": 40,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ],
+                    "upgrade_costs": [],
+                    "first_clear_rewards": [
+                        {
+                            "item_id": "mat_daily_refine_soul",
+                            "count": 18,
+                            "sort_order": 10,
+                            "is_enabled": true,
+                            "remark": null
+                        },
+                        {
+                            "item_id": "cur_gold",
+                            "count": 12200,
+                            "sort_order": 20,
+                            "is_enabled": true,
+                            "remark": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

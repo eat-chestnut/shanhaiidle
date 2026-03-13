@@ -192,6 +192,9 @@
 ## 与其他模块关系
 
 - 怪物掉落条目引用 `items.item_id`
+- 日常副本的 `entry_cost_item_id` 统一引用 `items.item_id`
+- 日常副本升级消耗 `daily_dungeon_upgrade_costs.item_id` 统一引用 `items.item_id`
+- 日常副本首通奖励 `daily_dungeon_first_clear_rewards.item_id` 统一引用 `items.item_id`
 - 主线难度首通奖励引用 `items.item_id`
 - 礼包本体本身也应存在于 `items`
 - 礼包内容通过 `gift_pack_items.item_id` 继续引用 `items.item_id`

@@ -26,7 +26,7 @@ $serveLatestBundleFile = function (string $file) {
         'purple_affix_pool_v1.json',
         'gem_catalog_v1.json',
         'material_catalog_v1.json',
-        'material_dungeons_v1.json',
+        'daily_dungeons_v1.json',
         'sect_tasks_v1.json',
         'mountain_god_v1.json',
         'shop_goods_v1.json',
@@ -56,7 +56,7 @@ Route::get('/bundles/latest/manifest.json', function () use ($serveLatestBundleF
 
 Route::get('/bundles/latest/{file}', function (string $file) use ($serveLatestBundleFile) {
     return $serveLatestBundleFile($file);
-})->where('file', 'config_bundle_v1\.json|stages_v1\.json|items\.json|gift_pack_module_v1\.json|equip_templates\.json|equipment_sets\.json|equip_slots_v1\.json|equipment_growth_rules_v1\.json|character_growth_rules_v1\.json|progression_milestones_v1\.json|blue_gear_templates_v1\.json|blue_affix_pool_v1\.json|purple_affix_pool_v1\.json|gem_catalog_v1\.json|material_catalog_v1\.json|material_dungeons_v1\.json|sect_tasks_v1\.json|mountain_god_v1\.json|shop_goods_v1\.json|crafting_recipes_v1\.json|main_stage_module_v1\.json|monsters\.json|skills_catalog\.json|battle_defaults\.json');
+})->where('file', 'config_bundle_v1\.json|stages_v1\.json|items\.json|gift_pack_module_v1\.json|equip_templates\.json|equipment_sets\.json|equip_slots_v1\.json|equipment_growth_rules_v1\.json|character_growth_rules_v1\.json|progression_milestones_v1\.json|blue_gear_templates_v1\.json|blue_affix_pool_v1\.json|purple_affix_pool_v1\.json|gem_catalog_v1\.json|material_catalog_v1\.json|daily_dungeons_v1\.json|sect_tasks_v1\.json|mountain_god_v1\.json|shop_goods_v1\.json|crafting_recipes_v1\.json|main_stage_module_v1\.json|monsters\.json|skills_catalog\.json|battle_defaults\.json');
 
 Route::get('/stages_v1.json', function () {
     $path = storage_path('app/exports/stages_v1.json');
@@ -193,8 +193,8 @@ Route::get('/material_catalog_v1.json', function () {
     ]);
 });
 
-Route::get('/material_dungeons_v1.json', function () {
-    $path = storage_path('app/exports/material_dungeons_v1.json');
+Route::get('/daily_dungeons_v1.json', function () {
+    $path = storage_path('app/exports/daily_dungeons_v1.json');
     abort_unless(File::exists($path), 404);
     return response(File::get($path), 200, [
         'Content-Type' => 'application/json; charset=utf-8',
