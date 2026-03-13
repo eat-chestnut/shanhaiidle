@@ -30,9 +30,9 @@ class DatabaseSeeder extends Seeder
             MountainGodOfferingSettingSeeder::class,
             SkillsCatalogSeeder::class,
             ShopGoodsSeeder::class,
+            MainStageModuleSeeder::class,
             MonstersSeeder::class,
             StagesSeeder::class,
-            MainStageModuleSeeder::class,
             NanshanYijingWorldSeeder::class,
         ]);
     }

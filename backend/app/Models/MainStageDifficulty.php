@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MainStageDifficulty extends Model
 {
@@ -20,9 +21,6 @@ class MainStageDifficulty extends Model
         'chapter_id',
         'difficulty_code',
         'difficulty_name',
-        'normal_monster_pool_id',
-        'elite_monster_pool_id',
-        'boss_id',
         'drop_preview_group_id',
         'first_clear_reward_group_id',
         'remark',
@@ -38,5 +36,25 @@ class MainStageDifficulty extends Model
     public function chapter(): BelongsTo
     {
         return $this->belongsTo(MainStageChapter::class, 'chapter_id', 'chapter_id');
+    }
+
+    public function monsterEntries(): HasMany
+    {
+        return $this->hasMany(StageDifficultyMonster::class, 'difficulty_id', 'difficulty_id')->orderBy('sort_order');
+    }
+
+    public function normalMonsters(): HasMany
+    {
+        return $this->monsterEntries()->where('spawn_type', 'normal');
+    }
+
+    public function eliteMonsters(): HasMany
+    {
+        return $this->monsterEntries()->where('spawn_type', 'elite');
+    }
+
+    public function bossMonsters(): HasMany
+    {
+        return $this->monsterEntries()->where('spawn_type', 'boss');
     }
 }

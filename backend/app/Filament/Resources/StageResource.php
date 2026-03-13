@@ -36,6 +36,11 @@ class StageResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = '掉落与副本';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema

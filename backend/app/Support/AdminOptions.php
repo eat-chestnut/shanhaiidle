@@ -610,16 +610,17 @@ class AdminOptions
         return (string) Item::query()->where('id', $itemId)->value('name');
     }
 
-    public static function monsterOptions(?string $kind = null): array
+    public static function monsterOptions(?string $kind = null, ?string $chapterId = null): array
     {
         return Monster::query()
             ->where('is_enabled', true)
-            ->when($kind !== null, fn (Builder $query): Builder => $query->where('kind', $kind))
+            ->when($kind !== null, fn (Builder $query): Builder => $query->where('monster_type', $kind))
+            ->when(filled($chapterId), fn (Builder $query): Builder => $query->where('chapter_id', $chapterId))
             ->orderBy('sort_order')
-            ->orderBy('name')
+            ->orderBy('display_name')
             ->get()
             ->mapWithKeys(fn (Monster $monster): array => [
-                $monster->id => (string) $monster->name,
+                $monster->monster_id => (string) $monster->display_name,
             ])
             ->all();
     }
@@ -630,7 +631,7 @@ class AdminOptions
             return '';
         }
 
-        return (string) Monster::query()->where('id', $monsterId)->value('name');
+        return (string) Monster::query()->where('monster_id', $monsterId)->value('display_name');
     }
 
     public static function starMaterialOptions(): array

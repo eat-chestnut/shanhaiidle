@@ -70,9 +70,6 @@ class MainStageModuleSupport
             'chapter_id' => $chapterId,
             'difficulty_code' => trim((string) ($row['difficulty_code'] ?? 'difficulty_1')),
             'difficulty_name' => trim((string) ($row['difficulty_name'] ?? '')),
-            'normal_monster_pool_id' => trim((string) ($row['normal_monster_pool_id'] ?? '')),
-            'elite_monster_pool_id' => trim((string) ($row['elite_monster_pool_id'] ?? '')),
-            'boss_id' => trim((string) ($row['boss_id'] ?? '')),
             'drop_preview_group_id' => trim((string) ($row['drop_preview_group_id'] ?? '')),
             'first_clear_reward_group_id' => trim((string) ($row['first_clear_reward_group_id'] ?? '')),
             'remark' => filled($row['remark'] ?? null) ? trim((string) $row['remark']) : null,
@@ -149,6 +146,44 @@ class MainStageModuleSupport
 
                 if ($difficultyRow['difficulty_name'] === '') {
                     $errors["chapters.{$index}.difficulties.{$difficultyIndex}.difficulty_name"] = '请填写难度名称。';
+                }
+
+                if ($difficultyRow['drop_preview_group_id'] === '') {
+                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.drop_preview_group_id"] = '请填写掉落预览组 ID。';
+                }
+
+                if ($difficultyRow['first_clear_reward_group_id'] === '') {
+                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.first_clear_reward_group_id"] = '请填写首通奖励组 ID。';
+                }
+
+                $monsterEntries = array_values(is_array($difficulty['monster_entries'] ?? null) ? $difficulty['monster_entries'] : []);
+                if ($row['has_combat'] && $monsterEntries === []) {
+                    $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries"] = '战斗章节的每个难度都必须配置怪物列表。';
+                    continue;
+                }
+
+                foreach ($monsterEntries as $monsterIndex => $entry) {
+                    if (! is_array($entry)) {
+                        $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries.{$monsterIndex}"] = '怪物条目格式错误。';
+                        continue;
+                    }
+
+                    if (trim((string) ($entry['monster_id'] ?? '')) === '') {
+                        $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries.{$monsterIndex}.monster_id"] = '请填写 monster_id。';
+                    }
+
+                    if (! isset($entry['spawn_type']) || ! in_array((string) $entry['spawn_type'], array_keys(\App\Support\MonsterModuleSupport::spawnTypeOptions()), true)) {
+                        $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries.{$monsterIndex}.spawn_type"] = 'spawn_type 非法。';
+                    }
+
+                    $minCount = (int) ($entry['min_count'] ?? 0);
+                    $maxCount = (int) ($entry['max_count'] ?? 0);
+                    if ($minCount < 1) {
+                        $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries.{$monsterIndex}.min_count"] = '最小数量必须大于等于 1。';
+                    }
+                    if ($maxCount < $minCount) {
+                        $errors["chapters.{$index}.difficulties.{$difficultyIndex}.monster_entries.{$monsterIndex}.max_count"] = '最大数量不能小于最小数量。';
+                    }
                 }
             }
         }

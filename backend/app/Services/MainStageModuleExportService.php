@@ -52,7 +52,11 @@ class MainStageModuleExportService
     private function buildChapters(): array
     {
         return MainStageChapter::query()
-            ->with(['difficulties' => fn ($query) => $query->orderBy('sort_order')->orderBy('difficulty_id')])
+            ->with([
+                'difficulties' => fn ($query) => $query->with(['monsterEntries' => fn ($monsterQuery) => $monsterQuery->orderBy('sort_order')->orderBy('id')])
+                    ->orderBy('sort_order')
+                    ->orderBy('difficulty_id'),
+            ])
             ->orderBy('sort_order')
             ->orderBy('chapter_id')
             ->get()
@@ -86,14 +90,21 @@ class MainStageModuleExportService
                         'difficulty_id' => (string) $difficulty->difficulty_id,
                         'difficulty_code' => (string) $difficulty->difficulty_code,
                         'difficulty_name' => (string) $difficulty->difficulty_name,
-                        'normal_monster_pool_id' => (string) $difficulty->normal_monster_pool_id,
-                        'elite_monster_pool_id' => (string) $difficulty->elite_monster_pool_id,
-                        'boss_id' => (string) $difficulty->boss_id,
                         'drop_preview_group_id' => (string) $difficulty->drop_preview_group_id,
                         'first_clear_reward_group_id' => (string) $difficulty->first_clear_reward_group_id,
                         'remark' => $difficulty->remark !== null ? (string) $difficulty->remark : null,
                         'sort_order' => (int) $difficulty->sort_order,
                         'is_enabled' => (bool) $difficulty->is_enabled,
+                        'monster_entries' => $difficulty->monsterEntries->map(fn ($entry): array => [
+                            'monster_id' => (string) $entry->monster_id,
+                            'spawn_type' => (string) $entry->spawn_type,
+                            'weight' => (int) $entry->weight,
+                            'min_count' => (int) $entry->min_count,
+                            'max_count' => (int) $entry->max_count,
+                            'sort_order' => (int) $entry->sort_order,
+                            'is_enabled' => (bool) $entry->is_enabled,
+                            'remark' => $entry->remark !== null ? (string) $entry->remark : null,
+                        ])->values()->all(),
                     ])->values()->all(),
                 ];
             })

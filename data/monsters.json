@@ -2,63 +2,2041 @@
     "meta": {
         "key": "monsters",
         "schema_version": 1,
-        "exported_at": "2026-03-11 14:20:43",
-        "sha256": "68359110ef599a08725f8a7dbcaaa1c32507836200ccfbc646159b877ffb0287"
+        "exported_at": "2026-03-13 06:08:55",
+        "sha256": "ef6a3b8f1d8f127ec8f76d7aa644175da9f93be4ee14f3b394646c731a82e55d"
     },
     "monsters": [
         {
-            "id": "mob_a",
-            "name": "小妖",
-            "kind": "normal",
-            "hp": 6,
-            "atk": 1,
-            "def": 0,
-            "speed": 85,
-            "radius": 14,
-            "aggro_range": 220,
-            "attack_interval": 1.1,
-            "attack_range": 8,
-            "exp": 1,
-            "drop_bonus_percent": 0,
-            "dex_gold": 3,
+            "id": 1,
+            "monster_id": "stage_01_normal_a",
+            "monster_name": "白耳山魈",
+            "display_name": "白耳山魈",
+            "monster_type": "normal",
+            "chapter_id": "stage_01",
+            "display_stage_id": "stage_01",
+            "family": "狌狌",
+            "title": "巡山异兽",
+            "desc": "奉命巡山时最先遭遇的山魈异种。",
             "icon": "",
-            "drops": []
-        },
-        {
-            "id": "elite_a",
-            "name": "精英·小妖",
-            "kind": "elite",
-            "hp": 18,
-            "atk": 2,
-            "def": 1,
-            "speed": 92,
-            "radius": 16,
-            "aggro_range": 260,
-            "attack_interval": 1,
-            "attack_range": 10,
-            "exp": 5,
-            "drop_bonus_percent": 30,
-            "dex_gold": 8,
-            "icon": "",
-            "drops": []
-        },
-        {
-            "id": "boss_a",
-            "name": "Boss·妖王",
-            "kind": "boss",
-            "hp": 45,
-            "atk": 3,
+            "sprite": "",
+            "prefab_key": "stage_01_normal_a",
+            "level": 1,
+            "hp": 30,
+            "atk": 6,
             "def": 2,
-            "speed": 80,
-            "radius": 20,
-            "aggro_range": 320,
-            "attack_interval": 0.9,
-            "attack_range": 12,
-            "exp": 12,
-            "drop_bonus_percent": 80,
-            "dex_gold": 20,
+            "speed": 90,
+            "move_speed": 120,
+            "attack_range": 18,
+            "attack_interval": 1.25,
+            "aggro_range": 220,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 110,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_01_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 2,
+            "monster_id": "stage_01_normal_b",
+            "monster_name": "巡山木魅",
+            "display_name": "巡山木魅",
+            "monster_type": "normal",
+            "chapter_id": "stage_01",
+            "display_stage_id": "stage_01",
+            "family": "木魅",
+            "title": "巡山异兽",
+            "desc": "寄生古木间的山中魅影。",
             "icon": "",
-            "drops": []
+            "sprite": "",
+            "prefab_key": "stage_01_normal_b",
+            "level": 2,
+            "hp": 32,
+            "atk": 6,
+            "def": 2,
+            "speed": 92,
+            "move_speed": 124,
+            "attack_range": 22,
+            "attack_interval": 1.21,
+            "aggro_range": 232,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 120,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_01_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 3,
+            "monster_id": "stage_01_elite",
+            "monster_name": "裂爪山魈",
+            "display_name": "裂爪山魈",
+            "monster_type": "elite",
+            "chapter_id": "stage_01",
+            "display_stage_id": "stage_01",
+            "family": "狌狌",
+            "title": "章精英",
+            "desc": "以裂爪扑杀闻名的精英山魈。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_01_elite",
+            "level": 4,
+            "hp": 84,
+            "atk": 11,
+            "def": 4,
+            "speed": 96,
+            "move_speed": 116,
+            "attack_range": 24,
+            "attack_interval": 1.19,
+            "aggro_range": 240,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 130,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_01_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 4,
+            "monster_id": "stage_01_boss",
+            "monster_name": "狌狌王·白耳行君",
+            "display_name": "狌狌王·白耳行君",
+            "monster_type": "boss",
+            "chapter_id": "stage_01",
+            "display_stage_id": "stage_01",
+            "family": "狌狌王",
+            "title": "章首领",
+            "desc": "盘踞鹊山的白耳狌狌王。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_01_boss",
+            "level": 7,
+            "hp": 225,
+            "atk": 15,
+            "def": 4,
+            "speed": 88,
+            "move_speed": 108,
+            "attack_range": 30,
+            "attack_interval": 1.15,
+            "aggro_range": 280,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 140,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_01_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_01_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "狌狌王·白耳行君 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_01_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_01_boss",
+                "story_flag_on_clear": "clear_stage_01_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 5,
+            "monster_id": "stage_02_normal_a",
+            "monster_name": "堂庭山猿",
+            "display_name": "堂庭山猿",
+            "monster_type": "normal",
+            "chapter_id": "stage_02",
+            "display_stage_id": "stage_02",
+            "family": "白猿",
+            "title": "巡山异兽",
+            "desc": "堂庭山路间出没的凶猿。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_02_normal_a",
+            "level": 8,
+            "hp": 42,
+            "atk": 8,
+            "def": 3,
+            "speed": 93,
+            "move_speed": 126,
+            "attack_range": 18,
+            "attack_interval": 1.22,
+            "aggro_range": 230,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 210,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_02_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 6,
+            "monster_id": "stage_02_normal_b",
+            "monster_name": "迷路游猿",
+            "display_name": "迷路游猿",
+            "monster_type": "normal",
+            "chapter_id": "stage_02",
+            "display_stage_id": "stage_02",
+            "family": "游猿",
+            "title": "巡山异兽",
+            "desc": "徘徊在山路尽头的异变游猿。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_02_normal_b",
+            "level": 9,
+            "hp": 45,
+            "atk": 8,
+            "def": 3,
+            "speed": 95,
+            "move_speed": 130,
+            "attack_range": 22,
+            "attack_interval": 1.18,
+            "aggro_range": 242,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 220,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_02_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 7,
+            "monster_id": "stage_02_elite",
+            "monster_name": "白猿近卫",
+            "display_name": "白猿近卫",
+            "monster_type": "elite",
+            "chapter_id": "stage_02",
+            "display_stage_id": "stage_02",
+            "family": "白猿卫",
+            "title": "章精英",
+            "desc": "护卫白猿王的堂庭强敌。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_02_elite",
+            "level": 11,
+            "hp": 118,
+            "atk": 14,
+            "def": 5,
+            "speed": 99,
+            "move_speed": 122,
+            "attack_range": 24,
+            "attack_interval": 1.16,
+            "aggro_range": 250,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 230,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_02_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 8,
+            "monster_id": "stage_02_boss",
+            "monster_name": "堂庭白猿王",
+            "display_name": "堂庭白猿王",
+            "monster_type": "boss",
+            "chapter_id": "stage_02",
+            "display_stage_id": "stage_02",
+            "family": "白猿王",
+            "title": "章首领",
+            "desc": "镇守招摇山门的白猿王。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_02_boss",
+            "level": 14,
+            "hp": 315,
+            "atk": 20,
+            "def": 7,
+            "speed": 90,
+            "move_speed": 112,
+            "attack_range": 30,
+            "attack_interval": 1.12,
+            "aggro_range": 292,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 240,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_02_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_02_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "堂庭白猿王 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_02_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_02_boss",
+                "story_flag_on_clear": "clear_stage_02_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 9,
+            "monster_id": "stage_03_normal_a",
+            "monster_name": "猨翼毒使",
+            "display_name": "猨翼毒使",
+            "monster_type": "normal",
+            "chapter_id": "stage_03",
+            "display_stage_id": "stage_03",
+            "family": "猨翼蝮",
+            "title": "巡山异兽",
+            "desc": "携毒翼扑袭的山中蝮灵。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_03_normal_a",
+            "level": 15,
+            "hp": 57,
+            "atk": 11,
+            "def": 4,
+            "speed": 96,
+            "move_speed": 132,
+            "attack_range": 18,
+            "attack_interval": 1.19,
+            "aggro_range": 240,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 310,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_03_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 10,
+            "monster_id": "stage_03_normal_b",
+            "monster_name": "蝮影山妖",
+            "display_name": "蝮影山妖",
+            "monster_type": "normal",
+            "chapter_id": "stage_03",
+            "display_stage_id": "stage_03",
+            "family": "蝮灵",
+            "title": "巡山异兽",
+            "desc": "潜伏林间、吐瘴干扰的妖影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_03_normal_b",
+            "level": 16,
+            "hp": 62,
+            "atk": 10,
+            "def": 4,
+            "speed": 98,
+            "move_speed": 136,
+            "attack_range": 22,
+            "attack_interval": 1.15,
+            "aggro_range": 252,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 320,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_03_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 11,
+            "monster_id": "stage_03_elite",
+            "monster_name": "猨翼蝮卫",
+            "display_name": "猨翼蝮卫",
+            "monster_type": "elite",
+            "chapter_id": "stage_03",
+            "display_stage_id": "stage_03",
+            "family": "猨翼蝮",
+            "title": "章精英",
+            "desc": "掌握扑袭节奏的蝮王近卫。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_03_elite",
+            "level": 18,
+            "hp": 160,
+            "atk": 20,
+            "def": 7,
+            "speed": 102,
+            "move_speed": 128,
+            "attack_range": 24,
+            "attack_interval": 1.13,
+            "aggro_range": 260,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 330,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_03_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 12,
+            "monster_id": "stage_03_boss",
+            "monster_name": "猨翼蝮王",
+            "display_name": "猨翼蝮王",
+            "monster_type": "boss",
+            "chapter_id": "stage_03",
+            "display_stage_id": "stage_03",
+            "family": "猨翼蝮王",
+            "title": "章首领",
+            "desc": "盘踞堂庭之山的毒翼之王。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_03_boss",
+            "level": 21,
+            "hp": 428,
+            "atk": 28,
+            "def": 9,
+            "speed": 92,
+            "move_speed": 116,
+            "attack_range": 30,
+            "attack_interval": 1.09,
+            "aggro_range": 304,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 340,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_03_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_03_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "猨翼蝮王 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_03_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_03_boss",
+                "story_flag_on_clear": "clear_stage_03_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 13,
+            "monster_id": "stage_04_normal_a",
+            "monster_name": "鹿蜀幼兽",
+            "display_name": "鹿蜀幼兽",
+            "monster_type": "normal",
+            "chapter_id": "stage_04",
+            "display_stage_id": "stage_04",
+            "family": "鹿蜀",
+            "title": "巡山异兽",
+            "desc": "被荒废旧祭惊扰的鹿蜀异兽。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_04_normal_a",
+            "level": 22,
+            "hp": 75,
+            "atk": 15,
+            "def": 5,
+            "speed": 99,
+            "move_speed": 138,
+            "attack_range": 18,
+            "attack_interval": 1.16,
+            "aggro_range": 250,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 410,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_04_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 14,
+            "monster_id": "stage_04_normal_b",
+            "monster_name": "赤尾谣灵",
+            "display_name": "赤尾谣灵",
+            "monster_type": "normal",
+            "chapter_id": "stage_04",
+            "display_stage_id": "stage_04",
+            "family": "谣灵",
+            "title": "巡山异兽",
+            "desc": "伴随鹿蜀王低吟而生的谣灵。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_04_normal_b",
+            "level": 24,
+            "hp": 81,
+            "atk": 14,
+            "def": 6,
+            "speed": 101,
+            "move_speed": 142,
+            "attack_range": 22,
+            "attack_interval": 1.12,
+            "aggro_range": 262,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 420,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_04_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 15,
+            "monster_id": "stage_04_elite",
+            "monster_name": "裂蹄鹿蜀",
+            "display_name": "裂蹄鹿蜀",
+            "monster_type": "elite",
+            "chapter_id": "stage_04",
+            "display_stage_id": "stage_04",
+            "family": "鹿蜀",
+            "title": "章精英",
+            "desc": "践踏地脉、冲锋凶猛的精英鹿蜀。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_04_elite",
+            "level": 26,
+            "hp": 210,
+            "atk": 27,
+            "def": 9,
+            "speed": 105,
+            "move_speed": 134,
+            "attack_range": 24,
+            "attack_interval": 1.1,
+            "aggro_range": 270,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 430,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_04_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 16,
+            "monster_id": "stage_04_boss",
+            "monster_name": "鹿蜀王·赤尾谣兽",
+            "display_name": "鹿蜀王·赤尾谣兽",
+            "monster_type": "boss",
+            "chapter_id": "stage_04",
+            "display_stage_id": "stage_04",
+            "family": "鹿蜀王",
+            "title": "章首领",
+            "desc": "杻阳荒祭之地的赤尾王兽。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_04_boss",
+            "level": 29,
+            "hp": 563,
+            "atk": 38,
+            "def": 11,
+            "speed": 94,
+            "move_speed": 120,
+            "attack_range": 30,
+            "attack_interval": 1.06,
+            "aggro_range": 316,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 440,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_04_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_04_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "鹿蜀王·赤尾谣兽 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_04_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_04_boss",
+                "story_flag_on_clear": "clear_stage_04_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 17,
+            "monster_id": "stage_05_normal_a",
+            "monster_name": "旋龟裂鳞",
+            "display_name": "旋龟裂鳞",
+            "monster_type": "normal",
+            "chapter_id": "stage_05",
+            "display_stage_id": "stage_05",
+            "family": "旋龟",
+            "title": "巡山异兽",
+            "desc": "灵脉失衡后浮出裂渊的龟鳞妖物。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_05_normal_a",
+            "level": 30,
+            "hp": 96,
+            "atk": 19,
+            "def": 6,
+            "speed": 102,
+            "move_speed": 144,
+            "attack_range": 18,
+            "attack_interval": 1.13,
+            "aggro_range": 260,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 510,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_05_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 18,
+            "monster_id": "stage_05_normal_b",
+            "monster_name": "灵脉龟灵",
+            "display_name": "灵脉龟灵",
+            "monster_type": "normal",
+            "chapter_id": "stage_05",
+            "display_stage_id": "stage_05",
+            "family": "龟灵",
+            "title": "巡山异兽",
+            "desc": "围绕地脉游走的龟灵残影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_05_normal_b",
+            "level": 32,
+            "hp": 104,
+            "atk": 18,
+            "def": 7,
+            "speed": 104,
+            "move_speed": 148,
+            "attack_range": 22,
+            "attack_interval": 1.09,
+            "aggro_range": 272,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 520,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_05_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 19,
+            "monster_id": "stage_05_elite",
+            "monster_name": "守脉旋龟",
+            "display_name": "守脉旋龟",
+            "monster_type": "elite",
+            "chapter_id": "stage_05",
+            "display_stage_id": "stage_05",
+            "family": "旋龟",
+            "title": "章精英",
+            "desc": "守在裂渊深处的精英旋龟。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_05_elite",
+            "level": 34,
+            "hp": 269,
+            "atk": 34,
+            "def": 11,
+            "speed": 108,
+            "move_speed": 140,
+            "attack_range": 24,
+            "attack_interval": 1.07,
+            "aggro_range": 280,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 530,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_05_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 20,
+            "monster_id": "stage_05_boss",
+            "monster_name": "旋龟守脉者",
+            "display_name": "旋龟守脉者",
+            "monster_type": "boss",
+            "chapter_id": "stage_05",
+            "display_stage_id": "stage_05",
+            "family": "旋龟守脉者",
+            "title": "章首领",
+            "desc": "守望失衡灵脉的古老旋龟。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_05_boss",
+            "level": 37,
+            "hp": 720,
+            "atk": 48,
+            "def": 13,
+            "speed": 96,
+            "move_speed": 124,
+            "attack_range": 30,
+            "attack_interval": 1.03,
+            "aggro_range": 328,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 540,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_05_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_05_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "旋龟守脉者 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_05_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_05_boss",
+                "story_flag_on_clear": "clear_stage_05_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 21,
+            "monster_id": "stage_06_normal_a",
+            "monster_name": "裂渊鯥影",
+            "display_name": "裂渊鯥影",
+            "monster_type": "normal",
+            "chapter_id": "stage_06",
+            "display_stage_id": "stage_06",
+            "family": "鯥",
+            "title": "巡山异兽",
+            "desc": "深岭裂渊中游弋的凶鯥残影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_06_normal_a",
+            "level": 38,
+            "hp": 120,
+            "atk": 24,
+            "def": 8,
+            "speed": 105,
+            "move_speed": 150,
+            "attack_range": 18,
+            "attack_interval": 1.1,
+            "aggro_range": 270,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 610,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_06_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 22,
+            "monster_id": "stage_06_normal_b",
+            "monster_name": "深岭凶鲵",
+            "display_name": "深岭凶鲵",
+            "monster_type": "normal",
+            "chapter_id": "stage_06",
+            "display_stage_id": "stage_06",
+            "family": "遗种",
+            "title": "巡山异兽",
+            "desc": "受秘禁腐蚀的深岭遗种。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_06_normal_b",
+            "level": 40,
+            "hp": 130,
+            "atk": 23,
+            "def": 9,
+            "speed": 107,
+            "move_speed": 154,
+            "attack_range": 22,
+            "attack_interval": 1.06,
+            "aggro_range": 282,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 620,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_06_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 23,
+            "monster_id": "stage_06_elite",
+            "monster_name": "遗种鯥将",
+            "display_name": "遗种鯥将",
+            "monster_type": "elite",
+            "chapter_id": "stage_06",
+            "display_stage_id": "stage_06",
+            "family": "鯥将",
+            "title": "章精英",
+            "desc": "裂渊遗种中最凶暴的战将。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_06_elite",
+            "level": 43,
+            "hp": 336,
+            "atk": 43,
+            "def": 14,
+            "speed": 111,
+            "move_speed": 146,
+            "attack_range": 24,
+            "attack_interval": 1.04,
+            "aggro_range": 290,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 630,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_06_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 24,
+            "monster_id": "stage_06_boss",
+            "monster_name": "鯥王·裂渊遗种",
+            "display_name": "鯥王·裂渊遗种",
+            "monster_type": "boss",
+            "chapter_id": "stage_06",
+            "display_stage_id": "stage_06",
+            "family": "鯥王",
+            "title": "章首领",
+            "desc": "被秘禁封痕困住的裂渊王种。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_06_boss",
+            "level": 47,
+            "hp": 900,
+            "atk": 60,
+            "def": 18,
+            "speed": 98,
+            "move_speed": 128,
+            "attack_range": 30,
+            "attack_interval": 1,
+            "aggro_range": 340,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 640,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_06_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_06_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "鯥王·裂渊遗种 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_06_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_06_boss",
+                "story_flag_on_clear": "clear_stage_06_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 25,
+            "monster_id": "stage_07_normal_a",
+            "monster_name": "基山魍灵",
+            "display_name": "基山魍灵",
+            "monster_type": "normal",
+            "chapter_id": "stage_07",
+            "display_stage_id": "stage_07",
+            "family": "魍灵",
+            "title": "巡山异兽",
+            "desc": "秘藏外缘游荡的魍灵残影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_07_normal_a",
+            "level": 48,
+            "hp": 150,
+            "atk": 30,
+            "def": 10,
+            "speed": 108,
+            "move_speed": 156,
+            "attack_range": 18,
+            "attack_interval": 1.07,
+            "aggro_range": 280,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 710,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_07_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 26,
+            "monster_id": "stage_07_normal_b",
+            "monster_name": "秘藏灌灌",
+            "display_name": "秘藏灌灌",
+            "monster_type": "normal",
+            "chapter_id": "stage_07",
+            "display_stage_id": "stage_07",
+            "family": "灌灌",
+            "title": "巡山异兽",
+            "desc": "守在基山秘藏前的异羽灌灌。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_07_normal_b",
+            "level": 50,
+            "hp": 162,
+            "atk": 29,
+            "def": 11,
+            "speed": 110,
+            "move_speed": 160,
+            "attack_range": 22,
+            "attack_interval": 1.03,
+            "aggro_range": 292,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 720,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_07_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 27,
+            "monster_id": "stage_07_elite",
+            "monster_name": "赤鱬战灵",
+            "display_name": "赤鱬战灵",
+            "monster_type": "elite",
+            "chapter_id": "stage_07",
+            "display_stage_id": "stage_07",
+            "family": "赤鱬",
+            "title": "章精英",
+            "desc": "由秘藏怨气催生的战灵。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_07_elite",
+            "level": 54,
+            "hp": 420,
+            "atk": 54,
+            "def": 18,
+            "speed": 114,
+            "move_speed": 152,
+            "attack_range": 24,
+            "attack_interval": 1.01,
+            "aggro_range": 300,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 730,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_07_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 28,
+            "monster_id": "stage_07_boss",
+            "monster_name": "猼訑 / 灌灌 / 赤鱬",
+            "display_name": "猼訑 / 灌灌 / 赤鱬",
+            "monster_type": "boss",
+            "chapter_id": "stage_07",
+            "display_stage_id": "stage_07",
+            "family": "三魂天妖",
+            "title": "章首领",
+            "desc": "基山秘藏中聚合而成的三魂天妖。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_07_boss",
+            "level": 57,
+            "hp": 1125,
+            "atk": 75,
+            "def": 22,
+            "speed": 100,
+            "move_speed": 132,
+            "attack_range": 30,
+            "attack_interval": 0.97,
+            "aggro_range": 352,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 740,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_07_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_07_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "猼訑 / 灌灌 / 赤鱬 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_07_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_07_boss",
+                "story_flag_on_clear": "clear_stage_07_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
+        },
+        {
+            "id": 29,
+            "monster_id": "stage_08_normal_a",
+            "monster_name": "青丘狐灵",
+            "display_name": "青丘狐灵",
+            "monster_type": "normal",
+            "chapter_id": "stage_08",
+            "display_stage_id": "stage_08",
+            "family": "青丘狐",
+            "title": "巡山异兽",
+            "desc": "九尾残光散落后的狐灵投影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_08_normal_a",
+            "level": 58,
+            "hp": 186,
+            "atk": 37,
+            "def": 12,
+            "speed": 111,
+            "move_speed": 162,
+            "attack_range": 18,
+            "attack_interval": 1.04,
+            "aggro_range": 290,
+            "ai_type": "melee_chase",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 810,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_08_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 30,
+            "monster_id": "stage_08_normal_b",
+            "monster_name": "九尾残影",
+            "display_name": "九尾残影",
+            "monster_type": "normal",
+            "chapter_id": "stage_08",
+            "display_stage_id": "stage_08",
+            "family": "狐影",
+            "title": "巡山异兽",
+            "desc": "围绕青丘山神的残留狐影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_08_normal_b",
+            "level": 58,
+            "hp": 201,
+            "atk": 35,
+            "def": 13,
+            "speed": 113,
+            "move_speed": 166,
+            "attack_range": 22,
+            "attack_interval": 1,
+            "aggro_range": 302,
+            "ai_type": "ranged_keep",
+            "rarity_tag": "common",
+            "is_enabled": true,
+            "sort_order": 820,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_shot",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "基础普攻挂载"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_08_normal_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 31,
+            "monster_id": "stage_08_elite",
+            "monster_name": "青丘狐卫",
+            "display_name": "青丘狐卫",
+            "monster_type": "elite",
+            "chapter_id": "stage_08",
+            "display_stage_id": "stage_08",
+            "family": "狐卫",
+            "title": "章精英",
+            "desc": "守卫九尾狐影的青丘近侍。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_08_elite",
+            "level": 59,
+            "hp": 521,
+            "atk": 67,
+            "def": 22,
+            "speed": 117,
+            "move_speed": 158,
+            "attack_range": 24,
+            "attack_interval": 0.98,
+            "aggro_range": 310,
+            "ai_type": "elite_melee_skill",
+            "rarity_tag": "elite",
+            "is_enabled": true,
+            "sort_order": 830,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_basic_claw",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "精英普攻"
+                },
+                {
+                    "skill_id": "monster_elite_charge",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "精英主动技能"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_08_elite_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                }
+            ],
+            "boss_profile": null
+        },
+        {
+            "id": 32,
+            "monster_id": "stage_08_boss",
+            "monster_name": "青丘九尾狐影",
+            "display_name": "青丘九尾狐影",
+            "monster_type": "boss",
+            "chapter_id": "stage_08",
+            "display_stage_id": "stage_08",
+            "family": "九尾狐影",
+            "title": "章首领",
+            "desc": "唤醒山神前必须面对的最终狐影。",
+            "icon": "",
+            "sprite": "",
+            "prefab_key": "stage_08_boss",
+            "level": 60,
+            "hp": 1395,
+            "atk": 93,
+            "def": 26,
+            "speed": 102,
+            "move_speed": 136,
+            "attack_range": 30,
+            "attack_interval": 0.94,
+            "aggro_range": 364,
+            "ai_type": "boss_pattern",
+            "rarity_tag": "boss",
+            "is_enabled": true,
+            "sort_order": 840,
+            "remark": null,
+            "skill_bindings": [
+                {
+                    "skill_id": "monster_boss_basic",
+                    "slot_type": "basic_attack",
+                    "trigger_priority": 10,
+                    "phase_limit": null,
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": "Boss 普攻"
+                },
+                {
+                    "skill_id": "monster_boss_pattern",
+                    "slot_type": "active",
+                    "trigger_priority": 20,
+                    "phase_limit": null,
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": "Boss 常规技能"
+                },
+                {
+                    "skill_id": "monster_boss_ultimate",
+                    "slot_type": "ultimate",
+                    "trigger_priority": 30,
+                    "phase_limit": null,
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": "Boss 大招"
+                }
+            ],
+            "drop_bindings": [
+                {
+                    "drop_group_id": "drop_stage_08_boss_primary",
+                    "is_primary": true,
+                    "sort_order": 10,
+                    "remark": "主掉落组"
+                },
+                {
+                    "drop_group_id": "drop_stage_08_boss_bonus",
+                    "is_primary": false,
+                    "sort_order": 20,
+                    "remark": "Boss 补充掉落组"
+                }
+            ],
+            "boss_profile": {
+                "phase_count": 1,
+                "phase_rules": [
+                    {
+                        "phase": 1,
+                        "trigger": "battle_start",
+                        "label": "常规阶段"
+                    }
+                ],
+                "summon_rules": [],
+                "rage_rules": [
+                    {
+                        "hp_percent": 30,
+                        "effect": "enrage"
+                    }
+                ],
+                "weak_point_rules": [],
+                "intro_text": "青丘九尾狐影 现身，主线章节进入首领战。",
+                "battle_bgm_id": "bgm_stage_08_boss",
+                "camera_rule": "boss_close",
+                "entry_fx_key": "fx_boss_entry_smoke",
+                "death_fx_key": "fx_boss_death_burst",
+                "first_clear_reward_group_id": "first_clear_stage_08_boss",
+                "story_flag_on_clear": "clear_stage_08_boss",
+                "remark": "Boss 扩展结构占位，后续多阶段机制继续在此扩展。"
+            }
         }
     ]
 }
