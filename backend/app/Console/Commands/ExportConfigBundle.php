@@ -32,7 +32,7 @@ class ExportConfigBundle extends Command
         ['key' => 'character_growth_rules', 'command' => 'game:export-character-growth-rules', 'source' => 'character_growth_rules_v1.json', 'filename' => 'character_growth_rules_v1.json'],
         ['key' => 'milestones', 'command' => 'game:export-progression-milestones', 'source' => 'progression_milestones_v1.json', 'filename' => 'progression_milestones_v1.json'],
         ['key' => 'blue_equipment_templates', 'command' => 'game:export-blue-equipment-templates', 'source' => 'blue_equipment_templates_v1.json', 'filename' => 'blue_equipment_templates_v1.json'],
-        ['key' => 'blue_affix_pool', 'command' => 'game:export-blue-affix-pool', 'source' => 'blue_affix_pool_v1.json', 'filename' => 'blue_affix_pool_v1.json'],
+        ['key' => 'blue_affixes', 'command' => 'game:export-blue-affixes', 'source' => 'blue_affixes_v1.json', 'filename' => 'blue_affixes_v1.json'],
         ['key' => 'purple_affix_pool', 'command' => 'game:export-purple-affix-pool', 'source' => 'purple_affix_pool_v1.json', 'filename' => 'purple_affix_pool_v1.json'],
         ['key' => 'gem_catalog', 'command' => 'game:export-gem-catalog', 'source' => 'gem_catalog_v1.json', 'filename' => 'gem_catalog_v1.json'],
         ['key' => 'talisman_module', 'command' => 'game:export-talisman-module', 'source' => 'talisman_module_v1.json', 'filename' => 'talisman_module_v1.json'],

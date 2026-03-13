@@ -4,11 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BlueAffixResource\Pages;
 use App\Models\BlueAffix;
-use App\Support\AdminOptions;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\EditAction;
+use App\Support\BlueAffixModuleSupport;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -27,11 +25,11 @@ class BlueAffixResource extends Resource
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
-    protected static ?string $navigationLabel = '蓝词条池';
+    protected static ?string $navigationLabel = '蓝词条';
 
     protected static ?string $modelLabel = '蓝色词条';
 
-    protected static ?string $pluralModelLabel = '蓝色词条池';
+    protected static ?string $pluralModelLabel = '蓝色词条';
 
     protected static string | \UnitEnum | null $navigationGroup = '装备成长';
 
@@ -39,31 +37,143 @@ class BlueAffixResource extends Resource
     {
         return $schema->schema([
             Section::make('基础信息')
-                ->description('蓝色词条只定义词条本体，不再在这里维护流派限制和抽取权重。抽取倾向统一在蓝装模板侧配置。')
+                ->description('蓝词条本体不是 item。本模块只做定义层，不处理提取、生成、洗练、重铸和掉落逻辑；护符不参与蓝词条体系。')
                 ->schema([
-                    TextInput::make('affix_id')->label('词条 ID')->required()->maxLength(64)->unique(ignoreRecord: true)->helperText('建议使用稳定英文 ID。'),
-                    TextInput::make('affix_name')->label('词条名称')->required()->maxLength(128),
-                    Select::make('stat')->label('属性')->required()->options(AdminOptions::statOptions())->searchable()->helperText('显示中文名，同时保留内部 Key。'),
-                    Select::make('value_mode')->label('数值模式')->required()->options(AdminOptions::valueModeOptions())->default('flat'),
+                    TextInput::make('affix_id')
+                        ->label('词条 ID')
+                        ->helperText('业务唯一 ID。蓝词条按“单条记录 + level_band”拆分。')
+                        ->required()
+                        ->maxLength(64)
+                        ->unique(ignoreRecord: true),
+                    TextInput::make('affix_name')
+                        ->label('内部名称')
+                        ->helperText('用于后台维护的内部名称。')
+                        ->required()
+                        ->maxLength(255),
+                    TextInput::make('display_name')
+                        ->label('显示名称')
+                        ->helperText('前端展示名称。')
+                        ->required()
+                        ->maxLength(255),
+                    Textarea::make('summary')
+                        ->label('摘要')
+                        ->helperText('描述该词条效果，不参与数值逻辑。')
+                        ->rows(2)
+                        ->columnSpanFull(),
+                    Select::make('level_band')
+                        ->label('等级档')
+                        ->helperText('仅允许 20 / 35 / 45。')
+                        ->required()
+                        ->options(BlueAffixModuleSupport::LEVEL_BAND_OPTIONS)
+                        ->searchable()
+                        ->preload(),
+                    Select::make('quality')
+                        ->label('品质')
+                        ->helperText('本轮固定为 blue。')
+                        ->options(['blue' => '蓝色（blue）'])
+                        ->default('blue')
+                        ->disabled()
+                        ->dehydrated()
+                        ->required(),
+                    Select::make('rarity')
+                        ->label('稀有度')
+                        ->helperText('本轮固定为 blue。')
+                        ->options(['blue' => '蓝色（blue）'])
+                        ->default('blue')
+                        ->disabled()
+                        ->dehydrated()
+                        ->required(),
+                    TextInput::make('sort_order')
+                        ->label('排序')
+                        ->integer()
+                        ->minValue(0)
+                        ->required()
+                        ->default(0),
+                    Toggle::make('is_enabled')
+                        ->label('启用')
+                        ->helperText('关闭后不会出现在导出文件中。')
+                        ->default(true),
+                    Textarea::make('remark')
+                        ->label('备注')
+                        ->helperText('补充维护说明。')
+                        ->rows(2)
+                        ->columnSpanFull(),
                 ])
-                ->columns(4),
-            Section::make('适用范围')
-                ->description('允许部位会作为蓝装模板配置词条时的过滤条件。')
+                ->columns(3),
+            Section::make('数值配置')
+                ->description('蓝词条只维护 effect_key、数值范围和权重，不做流派限制、职业硬限制和词条池嵌套。')
                 ->schema([
-                    Select::make('slot_tags')->label('部位')->multiple()->options(AdminOptions::slotOptions())->searchable()->preload()->helperText('选择该词条可生效的装备部位。'),
-                ])
-                ->columns(1),
-            Section::make('数值与启用')
-                ->description('蓝词条是通用词条池，开放等级用于控制系统开放时点。')
-                ->schema([
-                    TextInput::make('min_value')->label('最小值')->integer()->required()->default(0)->minValue(0),
-                    TextInput::make('max_value')->label('最大值')->integer()->required()->default(0)->minValue(0),
-                    TextInput::make('unlock_level')->label('开放等级')->integer()->minValue(1)->required()->default(1)->helperText('按 1 / 5 / 10 / 15 / 20 级档配置'),
-                    TextInput::make('sort_order')->label('排序')->integer()->minValue(0)->required()->default(0),
-                    Textarea::make('notes')->label('备注')->rows(3)->columnSpanFull(),
-                    Toggle::make('is_enabled')->label('启用')->default(true),
+                    Select::make('effect_key')
+                        ->label('效果 Key')
+                        ->helperText('只允许使用 blue_affixes_v1.json 中定义的 effect_key。')
+                        ->required()
+                        ->options(BlueAffixModuleSupport::EFFECT_KEY_OPTIONS)
+                        ->searchable()
+                        ->preload(),
+                    Select::make('value_type')
+                        ->label('数值类型')
+                        ->helperText('固定值或百分比。')
+                        ->required()
+                        ->options(BlueAffixModuleSupport::VALUE_TYPE_OPTIONS),
+                    TextInput::make('value_min')
+                        ->label('最小值')
+                        ->numeric()
+                        ->required()
+                        ->step(0.0001),
+                    TextInput::make('value_max')
+                        ->label('最大值')
+                        ->numeric()
+                        ->required()
+                        ->step(0.0001),
+                    TextInput::make('weight')
+                        ->label('权重')
+                        ->helperText('必须大于 0。')
+                        ->integer()
+                        ->required()
+                        ->minValue(1),
                 ])
                 ->columns(5),
+            Section::make('适用部位')
+                ->description('部位规则通过独立表维护，不使用 JSON。护符明确排除，不允许配置 talisman。')
+                ->schema([
+                    Repeater::make('slot_rules')
+                        ->hiddenLabel()
+                        ->default([])
+                        ->reorderable(false)
+                        ->reorderableWithButtons(false)
+                        ->reorderableWithDragAndDrop(false)
+                        ->table([
+                            TableColumn::make('部位'),
+                            TableColumn::make('排序'),
+                            TableColumn::make('启用'),
+                        ])
+                        ->schema([
+                            Select::make('slot_type')
+                                ->label('部位')
+                                ->options(BlueAffixModuleSupport::SLOT_OPTIONS)
+                                ->searchable()
+                                ->required()
+                                ->columnSpan(6),
+                            TextInput::make('sort_order')
+                                ->label('排序')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->required()
+                                ->columnSpan(3),
+                            Toggle::make('is_enabled')
+                                ->label('启用')
+                                ->default(true)
+                                ->columnSpan(2),
+                            TextInput::make('remark')
+                                ->label('备注')
+                                ->maxLength(255)
+                                ->columnSpan(12),
+                        ])
+                        ->addActionLabel('新增适用部位')
+                        ->columnSpanFull(),
+                ])
+                ->columns(1),
         ])->columns(1);
     }
 
@@ -72,33 +182,84 @@ class BlueAffixResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('affix_id')->label('词条 ID')->searchable()->sortable(),
-                TextColumn::make('affix_name')->label('名称')->searchable()->sortable(),
-                TextColumn::make('stat')->label('属性')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::statOptions(), $state))->sortable(),
-                TextColumn::make('slot_tags')
-                    ->label('允许部位')
-                    ->formatStateUsing(fn (?string $state): string => AdminOptions::slotOptions()[$state] ?? $state)
-                    ->toggleable(),
-                TextColumn::make('value_mode')->label('数值模式')->formatStateUsing(fn (?string $state): string => AdminOptions::optionLabel(AdminOptions::valueModeOptions(), $state)),
-                TextColumn::make('unlock_level')->label('开放等级')->sortable(),
+                TextColumn::make('display_name')->label('显示名称')->searchable()->sortable(),
+                TextColumn::make('effect_key')
+                    ->label('效果 Key')
+                    ->formatStateUsing(fn (?string $state): string => BlueAffixModuleSupport::EFFECT_KEY_OPTIONS[$state] ?? (string) $state)
+                    ->sortable(),
+                TextColumn::make('value_type')
+                    ->label('数值类型')
+                    ->formatStateUsing(fn (?string $state): string => BlueAffixModuleSupport::VALUE_TYPE_OPTIONS[$state] ?? (string) $state)
+                    ->sortable(),
+                TextColumn::make('value_min')
+                    ->label('最小值')
+                    ->formatStateUsing(fn (int|float|string|null $state): int|float => BlueAffixModuleSupport::normalizeNumericValue((float) $state))
+                    ->sortable(),
+                TextColumn::make('value_max')
+                    ->label('最大值')
+                    ->formatStateUsing(fn (int|float|string|null $state): int|float => BlueAffixModuleSupport::normalizeNumericValue((float) $state))
+                    ->sortable(),
+                TextColumn::make('weight')->label('权重')->sortable(),
+                TextColumn::make('level_band')->label('等级档')->sortable(),
                 ToggleColumn::make('is_enabled')->label('启用'),
-                TextColumn::make('sort_order')->label('排序')->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('stat')->label('属性')->options(AdminOptions::statOptions()),
-                Tables\Filters\SelectFilter::make('value_mode')->label('数值模式')->options(AdminOptions::valueModeOptions()),
+                Tables\Filters\SelectFilter::make('effect_key')->label('效果 Key')->options(BlueAffixModuleSupport::EFFECT_KEY_OPTIONS),
+                Tables\Filters\SelectFilter::make('level_band')->label('等级档')->options(BlueAffixModuleSupport::LEVEL_BAND_OPTIONS),
                 Tables\Filters\TernaryFilter::make('is_enabled')->label('启用'),
             ])
             ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                ]),
+                \Filament\Actions\EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    BulkAction::make('delete'),
+                \Filament\Actions\BulkActionGroup::make([
+                    \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('sort_order');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function formDataForEdit(BlueAffix $record): array
+    {
+        $data = $record->attributesToArray();
+        $data['value_min'] = BlueAffixModuleSupport::normalizeNumericValue((float) $record->value_min);
+        $data['value_max'] = BlueAffixModuleSupport::normalizeNumericValue((float) $record->value_max);
+        $data['slot_rules'] = $record->slotRules
+            ->map(fn ($row): array => [
+                'slot_type' => (string) $row->slot_type,
+                'sort_order' => (int) $row->sort_order,
+                'is_enabled' => (bool) $row->is_enabled,
+                'remark' => $row->remark !== null ? (string) $row->remark : '',
+            ])
+            ->values()
+            ->all();
+
+        return $data;
+    }
+
+    /**
+     * @return array{affix: array<string, mixed>, slot_rules: array<int, array<string, mixed>>}
+     */
+    public static function normalizeFormDataOrFail(array $data, ?BlueAffix $record = null): array
+    {
+        return BlueAffixModuleSupport::normalizeSingleAffixFormOrFail($data, $record);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    public static function syncSlotRules(BlueAffix $record, array $rows): void
+    {
+        $record->slotRules()->delete();
+
+        $record->slotRules()->createMany(
+            collect($rows)
+                ->map(fn (array $row): array => collect($row)->except('affix_id')->all())
+                ->all(),
+        );
     }
 
     public static function getPages(): array

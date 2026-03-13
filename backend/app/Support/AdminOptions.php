@@ -812,14 +812,15 @@ class AdminOptions
 
         $query = BlueAffix::query()
             ->where('is_enabled', true)
-            ->where('unlock_level', '=', $level)
+            ->where('level_band', '=', $level)
             ->orderBy('sort_order')
-            ->orderBy('affix_name');
-
-        $query->whereJsonContains('slot_tags', $slotId);
+            ->orderBy('display_name')
+            ->whereHas('slotRules', fn (Builder $builder): Builder => $builder
+                ->where('slot_type', $slotId)
+                ->where('is_enabled', true));
 
         return $query->get()->mapWithKeys(fn (BlueAffix $affix): array => [
-            $affix->affix_id => sprintf('%s（%s）', $affix->affix_name, $affix->notes),
+            $affix->affix_id => sprintf('%s（%s）', $affix->display_name, $affix->affix_name),
         ])->all();
     }
 
@@ -829,7 +830,9 @@ class AdminOptions
             return '';
         }
 
-        return (string) BlueAffix::query()->where('affix_id', $affixId)->value('affix_name');
+        $value = BlueAffix::query()->where('affix_id', $affixId)->value('display_name');
+
+        return $value !== null ? (string) $value : '';
     }
 
     public static function skillOptions(): array

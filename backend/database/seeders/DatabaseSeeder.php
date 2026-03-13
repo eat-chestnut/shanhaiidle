@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             EquipSlotsSeeder::class,
             EquipmentSetsSeeder::class,
             EquipTemplatesSeeder::class,
-            BlueAffixPoolSeeder::class,
+            BlueAffixesSeeder::class,
             PurpleAffixPoolSeeder::class,
             BlueEquipmentTemplatesSeeder::class,
             CraftingRecipesSeeder::class,

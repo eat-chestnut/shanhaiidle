@@ -1,0 +1,433 @@
+{
+    "version": "v1",
+    "module": "blue_affixes",
+    "rules": {
+        "talisman_excluded": true,
+        "quality": "blue",
+        "rarity": "blue",
+        "supported_level_bands": [
+            20,
+            35,
+            45
+        ],
+        "supported_effect_keys": [
+            "bonus_melee_atk",
+            "bonus_hp",
+            "bonus_def",
+            "bonus_crit_rate",
+            "bonus_crit_dmg",
+            "bonus_atk_speed",
+            "bonus_skill_dmg",
+            "bonus_boss_dmg",
+            "bonus_lifesteal"
+        ]
+    },
+    "affixes": [
+        {
+            "affix_id": "affix_melee_atk_20",
+            "affix_name": "20级攻击词条",
+            "display_name": "攻击提升",
+            "effect_key": "bonus_melee_atk",
+            "value_type": "flat",
+            "value_min": 6,
+            "value_max": 12,
+            "weight": 100,
+            "level_band": 20,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升攻击",
+            "sort_order": 10,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "main_weapon",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "sub_weapon",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_hp_20",
+            "affix_name": "20级生命词条",
+            "display_name": "生命提升",
+            "effect_key": "bonus_hp",
+            "value_type": "flat",
+            "value_min": 40,
+            "value_max": 80,
+            "weight": 100,
+            "level_band": 20,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升生命",
+            "sort_order": 20,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "armor",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "leg",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "helmet",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "shoe",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "cloak",
+                    "sort_order": 50,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "necklace",
+                    "sort_order": 60,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_def_20",
+            "affix_name": "20级防御词条",
+            "display_name": "防御提升",
+            "effect_key": "bonus_def",
+            "value_type": "flat",
+            "value_min": 4,
+            "value_max": 8,
+            "weight": 80,
+            "level_band": 20,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升防御",
+            "sort_order": 30,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "armor",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "leg",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "helmet",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_crit_rate_20",
+            "affix_name": "20级暴击词条",
+            "display_name": "暴击提升",
+            "effect_key": "bonus_crit_rate",
+            "value_type": "percent",
+            "value_min": 1,
+            "value_max": 2,
+            "weight": 70,
+            "level_band": 20,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升暴击率",
+            "sort_order": 40,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "main_weapon",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "sub_weapon",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "necklace",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_skill_dmg_35",
+            "affix_name": "35级技伤词条",
+            "display_name": "技能伤害提升",
+            "effect_key": "bonus_skill_dmg",
+            "value_type": "percent",
+            "value_min": 2,
+            "value_max": 4,
+            "weight": 60,
+            "level_band": 35,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升技能伤害",
+            "sort_order": 50,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "main_weapon",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "sub_weapon",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "bracelet",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "necklace",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_atk_speed_35",
+            "affix_name": "35级攻速词条",
+            "display_name": "攻速提升",
+            "effect_key": "bonus_atk_speed",
+            "value_type": "percent",
+            "value_min": 1,
+            "value_max": 2,
+            "weight": 60,
+            "level_band": 35,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升攻击速度",
+            "sort_order": 60,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "shoe",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "cloak",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "bracelet",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_hp_35",
+            "affix_name": "35级生命词条",
+            "display_name": "生命提升",
+            "effect_key": "bonus_hp",
+            "value_type": "flat",
+            "value_min": 90,
+            "value_max": 150,
+            "weight": 90,
+            "level_band": 35,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升生命",
+            "sort_order": 70,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "armor",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "leg",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "helmet",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "bracelet",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_boss_dmg_45",
+            "affix_name": "45级首领增伤词条",
+            "display_name": "首领增伤",
+            "effect_key": "bonus_boss_dmg",
+            "value_type": "percent",
+            "value_min": 3,
+            "value_max": 6,
+            "weight": 50,
+            "level_band": 45,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升对首领伤害",
+            "sort_order": 80,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "main_weapon",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "sub_weapon",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "ring",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "necklace",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_crit_dmg_45",
+            "affix_name": "45级暴伤词条",
+            "display_name": "暴伤提升",
+            "effect_key": "bonus_crit_dmg",
+            "value_type": "percent",
+            "value_min": 4,
+            "value_max": 8,
+            "weight": 50,
+            "level_band": 45,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升暴击伤害",
+            "sort_order": 90,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "main_weapon",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "sub_weapon",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "ring",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        },
+        {
+            "affix_id": "affix_lifesteal_45",
+            "affix_name": "45级吸血词条",
+            "display_name": "吸血提升",
+            "effect_key": "bonus_lifesteal",
+            "value_type": "percent",
+            "value_min": 1,
+            "value_max": 2.5,
+            "weight": 40,
+            "level_band": 45,
+            "quality": "blue",
+            "rarity": "blue",
+            "summary": "提升吸血效果",
+            "sort_order": 100,
+            "is_enabled": true,
+            "remark": "",
+            "slot_rules": [
+                {
+                    "slot_type": "armor",
+                    "sort_order": 10,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "leg",
+                    "sort_order": 20,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "shoe",
+                    "sort_order": 30,
+                    "is_enabled": true,
+                    "remark": ""
+                },
+                {
+                    "slot_type": "ring",
+                    "sort_order": 40,
+                    "is_enabled": true,
+                    "remark": ""
+                }
+            ]
+        }
+    ]
+}

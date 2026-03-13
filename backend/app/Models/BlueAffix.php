@@ -2,36 +2,52 @@
 
 namespace App\Models;
 
+use App\Support\BlueAffixModuleSupport;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BlueAffix extends Model
 {
-    protected $table = 'blue_affix_pool';
+    protected $table = 'blue_affixes';
 
     protected $fillable = [
         'affix_id',
         'affix_name',
-        'stat',
-        'slot_tags',
-        'flow_tags',
-        'min_value',
-        'max_value',
-        'value_mode',
+        'display_name',
+        'effect_key',
+        'value_type',
+        'value_min',
+        'value_max',
         'weight',
-        'unlock_level',
+        'level_band',
+        'quality',
+        'rarity',
+        'summary',
         'sort_order',
-        'notes',
         'is_enabled',
+        'remark',
     ];
 
     protected $casts = [
-        'slot_tags' => 'array',
-        'flow_tags' => 'array',
-        'min_value' => 'integer',
-        'max_value' => 'integer',
+        'value_min' => 'float',
+        'value_max' => 'float',
         'weight' => 'integer',
-        'unlock_level' => 'integer',
+        'level_band' => 'integer',
         'sort_order' => 'integer',
         'is_enabled' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $affix): void {
+            BlueAffixModuleSupport::validateAffixModelOrFail($affix);
+        });
+    }
+
+    public function slotRules(): HasMany
+    {
+        return $this->hasMany(BlueAffixSlotRule::class, 'affix_id', 'affix_id')
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
 }
