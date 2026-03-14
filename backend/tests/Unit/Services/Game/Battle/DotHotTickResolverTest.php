@@ -8,23 +8,23 @@ use Tests\TestCase;
 
 class DotHotTickResolverTest extends TestCase
 {
-    public function test_dot_deals_damage_per_tick_from_json_example(): void
+    public function test_dot_deals_damage_per_tick_from_advanced_json_example(): void
     {
         $example = $this->loadExamples()['dot_example'];
         $runtimeState = $this->buildRuntimeState([$example], 200, 200);
 
-        foreach ($example['expected_tick_results'] as $expectedTickResult) {
-            $result = app(DotHotTickResolver::class)->resolve($runtimeState, (int) $expectedTickResult['tick']);
+        for ($tick = 1; $tick <= (int) $example['duration_ticks']; $tick++) {
+            $result = app(DotHotTickResolver::class)->resolve($runtimeState, $tick);
 
             $this->assertTrue($result['ok']);
             $this->assertSame([
                 [
-                    'tick' => $expectedTickResult['tick'],
+                    'tick' => $tick,
                     'effect_key' => $example['effect_key'],
                     'owner_unit_id' => $example['owner_unit_id'],
                     'target_unit_id' => $example['target_unit_id'],
                     'effect_type' => $example['effect_type'],
-                    'hp_damage' => $expectedTickResult['hp_damage'],
+                    'hp_damage' => $example['damage_per_tick'],
                     'hp_healed' => 0,
                 ],
             ], $result['data']['tick_results']);
@@ -32,27 +32,27 @@ class DotHotTickResolverTest extends TestCase
             $runtimeState = $result['data']['runtime_state'];
         }
 
-        $this->assertSame(50, $runtimeState['player_unit']['current_hp']);
+        $this->assertSame(100, $runtimeState['player_unit']['current_hp']);
     }
 
-    public function test_hot_restores_hp_per_tick_from_json_example(): void
+    public function test_hot_restores_hp_per_tick_from_advanced_json_example(): void
     {
         $example = $this->loadExamples()['hot_example'];
         $runtimeState = $this->buildRuntimeState([$example], 100, 300);
 
-        foreach ($example['expected_tick_results'] as $expectedTickResult) {
-            $result = app(DotHotTickResolver::class)->resolve($runtimeState, (int) $expectedTickResult['tick']);
+        for ($tick = 1; $tick <= (int) $example['duration_ticks']; $tick++) {
+            $result = app(DotHotTickResolver::class)->resolve($runtimeState, $tick);
 
             $this->assertTrue($result['ok']);
             $this->assertSame([
                 [
-                    'tick' => $expectedTickResult['tick'],
+                    'tick' => $tick,
                     'effect_key' => $example['effect_key'],
                     'owner_unit_id' => $example['owner_unit_id'],
                     'target_unit_id' => $example['target_unit_id'],
                     'effect_type' => $example['effect_type'],
                     'hp_damage' => 0,
-                    'hp_healed' => $expectedTickResult['hp_healed'],
+                    'hp_healed' => $example['healing_per_tick'],
                 ],
             ], $result['data']['tick_results']);
 
@@ -92,6 +92,6 @@ class DotHotTickResolverTest extends TestCase
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_minimal_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
     }
 }

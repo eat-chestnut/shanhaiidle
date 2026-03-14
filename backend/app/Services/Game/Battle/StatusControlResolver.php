@@ -42,7 +42,7 @@ class StatusControlResolver
                 continue;
             }
 
-            $states[] = [
+            $state = [
                 'effect_key' => $effectKey,
                 'owner_unit_id' => $ownerUnitId,
                 'target_unit_id' => $targetUnitId,
@@ -54,6 +54,20 @@ class StatusControlResolver
                 'applied' => false,
                 'resolved' => false,
             ];
+
+            if (array_key_exists('stacking', $effect)) {
+                $state['stacking'] = (bool) $effect['stacking'];
+            }
+
+            if (array_key_exists('immune_tags', $effect)) {
+                $state['immune_tags'] = $this->normalizeStringList($effect['immune_tags']);
+            }
+
+            if (array_key_exists('refreshable', $effect)) {
+                $state['refreshable'] = (bool) $effect['refreshable'];
+            }
+
+            $states[] = $state;
         }
 
         return $this->success([
@@ -195,5 +209,24 @@ class StatusControlResolver
             'reason' => null,
             'data' => $data,
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizeStringList(mixed $value): array
+    {
+        $normalized = [];
+
+        foreach (is_array($value) ? $value : [] as $entry) {
+            $safeEntry = trim((string) $entry);
+            if ($safeEntry === '') {
+                continue;
+            }
+
+            $normalized[] = $safeEntry;
+        }
+
+        return array_values(array_unique($normalized));
     }
 }

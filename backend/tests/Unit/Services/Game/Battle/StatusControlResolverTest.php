@@ -7,12 +7,15 @@ use Tests\TestCase;
 
 class StatusControlResolverTest extends TestCase
 {
-    public function test_status_control_applies_and_expires_from_json_example(): void
+    public function test_advanced_status_control_applies_and_expires_from_json_example(): void
     {
         $example = $this->loadExamples()['status_control_example'];
         $buildResult = app(StatusControlResolver::class)->buildStates([$example]);
 
         $this->assertTrue($buildResult['ok']);
+        $this->assertSame('stunned', $buildResult['data']['status_control_states'][0]['status']);
+        $this->assertFalse($buildResult['data']['status_control_states'][0]['stacking']);
+        $this->assertSame([], $buildResult['data']['status_control_states'][0]['immune_tags']);
 
         $runtimeState = [
             'player_unit' => [
@@ -34,7 +37,13 @@ class StatusControlResolverTest extends TestCase
             'status_control_states' => $buildResult['data']['status_control_states'],
         ];
 
-        foreach ($example['expected_tick_results'] as $expectedTickResult) {
+        $expectedTickResults = [
+            ['tick' => 1, 'status_applied' => true],
+            ['tick' => 2, 'status_active' => true],
+            ['tick' => 3, 'status_active' => false],
+        ];
+
+        foreach ($expectedTickResults as $expectedTickResult) {
             $result = app(StatusControlResolver::class)->tick($runtimeState, (int) $expectedTickResult['tick']);
 
             $this->assertTrue($result['ok']);
@@ -66,6 +75,23 @@ class StatusControlResolverTest extends TestCase
         $this->assertSame(2, $result['data']['status_control_states'][0]['remaining_ticks']);
     }
 
+    public function test_slowed_status_is_supported(): void
+    {
+        $result = app(StatusControlResolver::class)->buildStates([[
+            'effect_key' => 'slow_status',
+            'owner_unit_id' => 'enemy_mon_ice_witch_2_1',
+            'target_unit_id' => 'player_10001',
+            'effect_type' => 'status_control',
+            'trigger_timing' => 'on_apply',
+            'duration_ticks' => 2,
+            'status' => 'slowed',
+        ]]);
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame('slowed', $result['data']['status_control_states'][0]['status']);
+        $this->assertSame(2, $result['data']['status_control_states'][0]['remaining_ticks']);
+    }
+
     /**
      * @param  array<string, mixed>  $example
      * @param  array<string, mixed>  $expectedTickResult
@@ -94,6 +120,6 @@ class StatusControlResolverTest extends TestCase
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_minimal_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
     }
 }

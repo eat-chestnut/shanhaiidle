@@ -11,11 +11,10 @@ class StatusEffectLoggerTest extends TestCase
     {
         $examples = $this->loadExamples();
         $example = $examples['status_control_example'];
-        $expectedTickResult = $example['expected_tick_results'][0];
 
         $result = app(StatusEffectLogger::class)->logStatus(
             ['logs' => []],
-            (int) $expectedTickResult['tick'],
+            1,
             $example['owner_unit_id'],
             $example['target_unit_id'],
             $example['effect_key'],
@@ -38,6 +37,6 @@ class StatusEffectLoggerTest extends TestCase
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_minimal_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
     }
 }

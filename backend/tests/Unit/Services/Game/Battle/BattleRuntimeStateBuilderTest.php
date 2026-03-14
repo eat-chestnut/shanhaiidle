@@ -191,8 +191,23 @@ class BattleRuntimeStateBuilderTest extends TestCase
         $this->assertCount(2, $result['data']['dot_hot_states']);
         $this->assertCount(1, $result['data']['status_control_states']);
         $this->assertNull($result['data']['player_unit']['status']);
-        $this->assertSame('stunned', $result['data']['status_control_states'][0]['status']);
-        $this->assertSame(2, $result['data']['status_control_states'][0]['remaining_ticks']);
+
+        $dotHotStates = [];
+        foreach ($result['data']['dot_hot_states'] as $state) {
+            $dotHotStates[$state['effect_key']] = $state;
+        }
+
+        $this->assertTrue($dotHotStates['poison_dot']['stacking']);
+        $this->assertTrue($dotHotStates['poison_dot']['refreshable']);
+        $this->assertSame(20, $dotHotStates['poison_dot']['damage_per_tick']);
+        $this->assertTrue($dotHotStates['regeneration_hot']['stacking']);
+        $this->assertSame(50, $dotHotStates['regeneration_hot']['healing_per_tick']);
+
+        $statusState = $result['data']['status_control_states'][0];
+        $this->assertSame('stunned', $statusState['status']);
+        $this->assertSame(2, $statusState['remaining_ticks']);
+        $this->assertFalse($statusState['stacking']);
+        $this->assertSame([], $statusState['immune_tags']);
     }
 
     private function loadExamples(): array
@@ -207,6 +222,6 @@ class BattleRuntimeStateBuilderTest extends TestCase
 
     private function loadDotHotExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_minimal_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
     }
 }

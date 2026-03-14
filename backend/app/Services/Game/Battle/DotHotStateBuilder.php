@@ -48,6 +48,8 @@ class DotHotStateBuilder
                 'duration_ticks' => $durationTicks,
             ];
 
+            $this->appendOptionalMetadata($state, $effect);
+
             if ($effectType === 'dot') {
                 $damagePerTick = max(0, $this->normalizeNumber($effect['damage_per_tick'] ?? 0));
                 if ((float) $damagePerTick <= 0) {
@@ -97,5 +99,43 @@ class DotHotStateBuilder
             'reason' => null,
             'data' => $data,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $state
+     * @param  array<string, mixed>  $effect
+     */
+    private function appendOptionalMetadata(array &$state, array $effect): void
+    {
+        if (array_key_exists('stacking', $effect)) {
+            $state['stacking'] = (bool) $effect['stacking'];
+        }
+
+        if (array_key_exists('refreshable', $effect)) {
+            $state['refreshable'] = (bool) $effect['refreshable'];
+        }
+
+        if (array_key_exists('immune_tags', $effect)) {
+            $state['immune_tags'] = $this->normalizeStringList($effect['immune_tags']);
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizeStringList(mixed $value): array
+    {
+        $normalized = [];
+
+        foreach (is_array($value) ? $value : [] as $entry) {
+            $safeEntry = trim((string) $entry);
+            if ($safeEntry === '') {
+                continue;
+            }
+
+            $normalized[] = $safeEntry;
+        }
+
+        return array_values(array_unique($normalized));
     }
 }
