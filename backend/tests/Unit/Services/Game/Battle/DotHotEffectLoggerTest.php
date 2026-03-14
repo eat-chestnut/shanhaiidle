@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class DotHotEffectLoggerTest extends TestCase
 {
-    public function test_it_writes_dot_hot_tick_logs(): void
+    public function test_it_writes_dot_hot_tick_logs_with_advanced_fields(): void
     {
         $examples = $this->loadExamples();
         $example = $examples['dot_example'];
@@ -20,7 +20,13 @@ class DotHotEffectLoggerTest extends TestCase
             $example['effect_key'],
             $example['effect_type'],
             $example['damage_per_tick'],
-            0
+            0,
+            [
+                'stack_count' => 2,
+                'remaining_ticks' => 4,
+                'resisted' => true,
+                'resistance_pct' => 0.25,
+            ],
         );
 
         $this->assertTrue($result['ok']);
@@ -33,11 +39,15 @@ class DotHotEffectLoggerTest extends TestCase
             'effect_type' => 'dot',
             'hp_damage' => 20,
             'hp_healed' => 0,
+            'stack_count' => 2,
+            'remaining_ticks' => 4,
+            'resisted' => true,
+            'resistance_pct' => 0.25,
         ], $result['data']['log']);
     }
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v2.json')), true);
     }
 }

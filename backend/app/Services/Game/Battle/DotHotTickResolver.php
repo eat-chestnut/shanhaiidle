@@ -16,55 +16,139 @@ class DotHotTickResolver
         $tickResults = [];
 
         foreach ($runtimeState['dot_hot_states'] as $stateIndex => $state) {
-            $remainingTicks = max(0, (int) ($state['remaining_ticks'] ?? 0));
-            if ($remainingTicks <= 0) {
-                continue;
-            }
+            $effectType = trim((string) ($state['effect_type'] ?? ''));
+            $valueField = $effectType === 'hot' ? 'healing_per_tick' : 'damage_per_tick';
+            $activeStackIndexes = [];
+            $valueTotal = 0.0;
+            $remainingTicks = 0;
+            $stackCount = 0;
+            $immune = false;
+            $dispelled = false;
+            $resisted = false;
+            $resistancePct = 0.0;
 
-            $tickResult = [
-                'tick' => max(0, $tick),
-                'effect_key' => trim((string) ($state['effect_key'] ?? '')),
-                'owner_unit_id' => trim((string) ($state['owner_unit_id'] ?? '')),
-                'target_unit_id' => trim((string) ($state['target_unit_id'] ?? '')),
-                'effect_type' => trim((string) ($state['effect_type'] ?? '')),
-                'hp_damage' => 0,
-                'hp_healed' => 0,
-            ];
+            foreach (is_array($state['stacks'] ?? null) ? $state['stacks'] : [] as $stackIndex => $stack) {
+                if (! is_array($stack)) {
+                    continue;
+                }
 
-            $targetResolveResult = $this->resolveTargetUnit(
-                $runtimeState['player_unit'],
-                $runtimeState['enemy_units'],
-                $tickResult['target_unit_id']
-            );
+                if ($this->isActiveStack($stack)) {
+                    $activeStackIndexes[] = $stackIndex;
+                    $valueTotal += max(0.0, (float) ($stack[$valueField] ?? 0));
+                    $remainingTicks = max($remainingTicks, (int) ($stack['remaining_ticks'] ?? 0));
+                    $stackCount++;
+                    $resisted = $resisted || (bool) ($stack['resisted'] ?? false);
+                    $resistancePct = max($resistancePct, (float) ($stack['resistance_pct'] ?? 0));
+                    continue;
+                }
 
-            if ($tickResult['effect_type'] === 'dot') {
-                $damagePerTick = (float) ($state['damage_per_tick'] ?? 0);
-                if ($targetResolveResult['target_type'] !== null) {
-                    $appliedDamage = $this->applyDotDamage(
-                        $runtimeState,
-                        $targetResolveResult['target_type'],
-                        (int) $targetResolveResult['target_index'],
-                        $damagePerTick
-                    );
-                    $tickResult['hp_damage'] = $appliedDamage;
+                if (($stack['resolved'] ?? false) !== true && (($stack['immune'] ?? false) === true || ($stack['dispelled'] ?? false) === true)) {
+                    $immune = $immune || (bool) ($stack['immune'] ?? false);
+                    $dispelled = $dispelled || (bool) ($stack['dispelled'] ?? false);
+                    $resisted = $resisted || (bool) ($stack['resisted'] ?? false);
+                    $resistancePct = max($resistancePct, (float) ($stack['resistance_pct'] ?? 0));
                 }
             }
 
-            if ($tickResult['effect_type'] === 'hot') {
-                $healingPerTick = (float) ($state['healing_per_tick'] ?? 0);
-                if ($targetResolveResult['target_type'] !== null) {
-                    $appliedHealing = $this->applyHotHealing(
+            $tickResult = null;
+            if ($stackCount > 0) {
+                $tickResult = [
+                    'tick' => max(0, $tick),
+                    'effect_key' => trim((string) ($state['effect_key'] ?? '')),
+                    'owner_unit_id' => trim((string) ($state['owner_unit_id'] ?? '')),
+                    'target_unit_id' => trim((string) ($state['target_unit_id'] ?? '')),
+                    'effect_type' => $effectType,
+                    'hp_damage' => 0,
+                    'hp_healed' => 0,
+                    'stack_count' => $stackCount,
+                    'remaining_ticks' => $remainingTicks,
+                ];
+
+                if ($resisted) {
+                    $tickResult['resisted'] = true;
+                    $tickResult['resistance_pct'] = $this->normalizeNumber($resistancePct);
+                }
+
+                $targetResolveResult = $this->resolveTargetUnit(
+                    $runtimeState['player_unit'],
+                    $runtimeState['enemy_units'],
+                    $tickResult['target_unit_id']
+                );
+
+                if ($effectType === 'dot' && $targetResolveResult['target_type'] !== null) {
+                    $tickResult['hp_damage'] = $this->applyDotDamage(
                         $runtimeState,
                         $targetResolveResult['target_type'],
-                        (int) $targetResolveResult['target_index'],
-                        $healingPerTick
+                        $targetResolveResult['target_index'],
+                        $valueTotal
                     );
-                    $tickResult['hp_healed'] = $appliedHealing;
+                }
+
+                if ($effectType === 'hot' && $targetResolveResult['target_type'] !== null) {
+                    $tickResult['hp_healed'] = $this->applyHotHealing(
+                        $runtimeState,
+                        $targetResolveResult['target_type'],
+                        $targetResolveResult['target_index'],
+                        $valueTotal
+                    );
+                }
+            } elseif ($immune || $dispelled) {
+                $tickResult = [
+                    'tick' => max(0, $tick),
+                    'effect_key' => trim((string) ($state['effect_key'] ?? '')),
+                    'owner_unit_id' => trim((string) ($state['owner_unit_id'] ?? '')),
+                    'target_unit_id' => trim((string) ($state['target_unit_id'] ?? '')),
+                    'effect_type' => $effectType,
+                    'hp_damage' => 0,
+                    'hp_healed' => 0,
+                    'stack_count' => 0,
+                    'remaining_ticks' => 0,
+                ];
+
+                if ($immune) {
+                    $tickResult['immune'] = true;
+                }
+
+                if ($dispelled) {
+                    $tickResult['dispelled'] = true;
+                }
+
+                if ($resisted) {
+                    $tickResult['resisted'] = true;
+                    $tickResult['resistance_pct'] = $this->normalizeNumber($resistancePct);
                 }
             }
 
-            $runtimeState['dot_hot_states'][$stateIndex]['remaining_ticks'] = $remainingTicks - 1;
-            $tickResults[] = $tickResult;
+            foreach ($activeStackIndexes as $stackIndex) {
+                $stack = $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex];
+                if (! is_array($stack)) {
+                    continue;
+                }
+
+                $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex]['remaining_ticks'] = max(0, (int) ($stack['remaining_ticks'] ?? 0) - 1);
+            }
+
+            if ($stackCount === 0) {
+                foreach (is_array($runtimeState['dot_hot_states'][$stateIndex]['stacks'] ?? null) ? $runtimeState['dot_hot_states'][$stateIndex]['stacks'] : [] as $stackIndex => $stack) {
+                    if (! is_array($stack)) {
+                        continue;
+                    }
+
+                    if (($stack['resolved'] ?? false) === true) {
+                        continue;
+                    }
+
+                    if (($stack['immune'] ?? false) === true || ($stack['dispelled'] ?? false) === true) {
+                        $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex]['resolved'] = true;
+                    }
+                }
+            }
+
+            $runtimeState['dot_hot_states'][$stateIndex] = $this->recalculateState($runtimeState['dot_hot_states'][$stateIndex]);
+
+            if (is_array($tickResult)) {
+                $tickResults[] = $tickResult;
+            }
         }
 
         return $this->success([
@@ -74,17 +158,80 @@ class DotHotTickResolver
     }
 
     /**
+     * @param  array<string, mixed>  $runtimeState
+     */
+    public function dispel(
+        array $runtimeState,
+        string $targetUnitId,
+        ?string $effectType = null,
+        ?string $effectKey = null,
+        ?int $maxRemoved = null,
+    ): array {
+        $runtimeState['dot_hot_states'] = $this->normalizeStates($runtimeState['dot_hot_states'] ?? []);
+        $safeTargetUnitId = trim($targetUnitId);
+        $safeEffectType = trim((string) $effectType);
+        $safeEffectKey = trim((string) $effectKey);
+        $removedCount = 0;
+
+        if ($safeTargetUnitId === '') {
+            return $this->failure('invalid_dispel_target');
+        }
+
+        foreach ($runtimeState['dot_hot_states'] as $stateIndex => $state) {
+            if (trim((string) ($state['target_unit_id'] ?? '')) !== $safeTargetUnitId) {
+                continue;
+            }
+
+            if ($safeEffectType !== '' && trim((string) ($state['effect_type'] ?? '')) !== $safeEffectType) {
+                continue;
+            }
+
+            if ($safeEffectKey !== '' && trim((string) ($state['effect_key'] ?? '')) !== $safeEffectKey) {
+                continue;
+            }
+
+            foreach (is_array($state['stacks'] ?? null) ? $state['stacks'] : [] as $stackIndex => $stack) {
+                if (! is_array($stack) || ! $this->isActiveStack($stack)) {
+                    continue;
+                }
+
+                $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex]['remaining_ticks'] = 0;
+                $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex]['dispelled'] = true;
+                $runtimeState['dot_hot_states'][$stateIndex]['stacks'][$stackIndex]['resolved'] = false;
+                $removedCount++;
+
+                if ($maxRemoved !== null && $removedCount >= max(0, $maxRemoved)) {
+                    break 2;
+                }
+            }
+        }
+
+        foreach ($runtimeState['dot_hot_states'] as $stateIndex => $state) {
+            $runtimeState['dot_hot_states'][$stateIndex] = $this->recalculateState($state);
+        }
+
+        return $this->success([
+            'runtime_state' => $runtimeState,
+            'removed_count' => $removedCount,
+        ]);
+    }
+
+    /**
+     * @param  mixed  $states
      * @return array<int, array<string, mixed>>
      */
     private function normalizeStates(mixed $states): array
     {
-        return array_values(array_filter(
-            is_array($states) ? $states : [],
-            static fn (mixed $state): bool => is_array($state)
-        ));
+        $builder = new DotHotStateBuilder();
+        $buildResult = $builder->build([], ['existing_states' => is_array($states) ? $states : []]);
+
+        return is_array($buildResult['data']['dot_hot_states'] ?? null)
+            ? array_values($buildResult['data']['dot_hot_states'])
+            : [];
     }
 
     /**
+     * @param  mixed  $units
      * @return array<int, array<string, mixed>>
      */
     private function normalizeUnits(mixed $units): array
@@ -176,6 +323,30 @@ class DotHotTickResolver
         return 0;
     }
 
+    /**
+     * @param  array<string, mixed>  $state
+     * @return array<string, mixed>
+     */
+    private function recalculateState(array $state): array
+    {
+        $builder = new DotHotStateBuilder();
+        $buildResult = $builder->build([], ['existing_states' => [$state]]);
+
+        return is_array($buildResult['data']['dot_hot_states'][0] ?? null)
+            ? $buildResult['data']['dot_hot_states'][0]
+            : $state;
+    }
+
+    /**
+     * @param  array<string, mixed>  $stack
+     */
+    private function isActiveStack(array $stack): bool
+    {
+        return max(0, (int) ($stack['remaining_ticks'] ?? 0)) > 0
+            && ($stack['immune'] ?? false) !== true
+            && ($stack['dispelled'] ?? false) !== true;
+    }
+
     private function normalizeNumber(float $value): int|float
     {
         $rounded = round($value, 3);
@@ -193,6 +364,15 @@ class DotHotTickResolver
             'ok' => true,
             'reason' => null,
             'data' => $data,
+        ];
+    }
+
+    private function failure(string $reason): array
+    {
+        return [
+            'ok' => false,
+            'reason' => $reason,
+            'data' => null,
         ];
     }
 }

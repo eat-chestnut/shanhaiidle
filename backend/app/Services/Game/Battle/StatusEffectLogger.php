@@ -16,6 +16,7 @@ class StatusEffectLogger
         string $status,
         ?bool $statusApplied,
         ?bool $statusActive,
+        array $extraFields = [],
     ): array {
         $safeActorUnitId = trim($actorUnitId);
         $safeTargetUnitId = trim($targetUnitId);
@@ -43,6 +44,15 @@ class StatusEffectLogger
 
         if ($statusActive !== null) {
             $log['status_active'] = $statusActive;
+        }
+
+        foreach ($extraFields as $fieldKey => $fieldValue) {
+            $safeFieldKey = trim((string) $fieldKey);
+            if ($safeFieldKey === '' || array_key_exists($safeFieldKey, $log)) {
+                continue;
+            }
+
+            $log[$safeFieldKey] = $fieldValue;
         }
 
         $runtimeState['logs'][] = $log;

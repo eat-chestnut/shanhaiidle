@@ -666,7 +666,22 @@ class CombatTickRunner
      */
     private function hasUnitStatus(array $unit, string $status): bool
     {
-        return trim((string) ($unit['status'] ?? '')) === trim($status);
+        $safeStatus = trim($status);
+        if ($safeStatus === '') {
+            return false;
+        }
+
+        if (trim((string) ($unit['status'] ?? '')) === $safeStatus) {
+            return true;
+        }
+
+        foreach (is_array($unit['statuses'] ?? null) ? $unit['statuses'] : [] as $activeStatus) {
+            if (trim((string) $activeStatus) === $safeStatus) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -867,6 +882,14 @@ class CombatTickRunner
                 trim((string) ($tickResult['status'] ?? '')),
                 array_key_exists('status_applied', $tickResult) ? (bool) $tickResult['status_applied'] : null,
                 array_key_exists('status_active', $tickResult) ? (bool) $tickResult['status_active'] : null,
+                $this->extractRuntimeEffectLogFields($tickResult, [
+                    'stack_count',
+                    'remaining_ticks',
+                    'immune',
+                    'resisted',
+                    'resistance_pct',
+                    'dispelled',
+                ]),
             );
 
             if (! ($logResult['ok'] ?? false)) {
@@ -899,6 +922,14 @@ class CombatTickRunner
                 trim((string) ($tickResult['effect_type'] ?? '')),
                 (float) ($tickResult['hp_damage'] ?? 0),
                 (float) ($tickResult['hp_healed'] ?? 0),
+                $this->extractRuntimeEffectLogFields($tickResult, [
+                    'stack_count',
+                    'remaining_ticks',
+                    'immune',
+                    'resisted',
+                    'resistance_pct',
+                    'dispelled',
+                ]),
             );
 
             if (! ($logResult['ok'] ?? false)) {
@@ -912,6 +943,27 @@ class CombatTickRunner
         $enemyUnits = is_array($runtimeState['enemy_units'] ?? null) ? $runtimeState['enemy_units'] : $enemyUnits;
 
         return true;
+    }
+
+    /**
+     * @param  array<string, mixed>  $tickResult
+     * @param  array<int, string>  $allowedFields
+     * @return array<string, mixed>
+     */
+    private function extractRuntimeEffectLogFields(array $tickResult, array $allowedFields): array
+    {
+        $extraFields = [];
+
+        foreach ($allowedFields as $field) {
+            $safeField = trim($field);
+            if ($safeField === '' || ! array_key_exists($safeField, $tickResult)) {
+                continue;
+            }
+
+            $extraFields[$safeField] = $tickResult[$safeField];
+        }
+
+        return $extraFields;
     }
 
     private function success(array $data): array

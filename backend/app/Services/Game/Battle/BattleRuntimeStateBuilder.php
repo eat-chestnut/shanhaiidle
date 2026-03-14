@@ -265,12 +265,20 @@ class BattleRuntimeStateBuilder
     {
         $timedEffects = $this->collectTimedEffects($runtimeState['player_unit'], $runtimeState['enemy_units']);
 
-        $dotHotBuildResult = $this->dotHotStateBuilder->build($timedEffects);
+        $dotHotBuildResult = $this->dotHotStateBuilder->build($timedEffects, [
+            'runtime_state' => $runtimeState,
+            'existing_states' => $runtimeState['dot_hot_states'] ?? [],
+            'tick' => 0,
+        ]);
         if (! ($dotHotBuildResult['ok'] ?? false)) {
             return $this->failure((string) ($dotHotBuildResult['reason'] ?? 'dot_hot_state_build_failed'));
         }
 
-        $statusBuildResult = $this->statusControlResolver->buildStates($timedEffects);
+        $statusBuildResult = $this->statusControlResolver->buildStates($timedEffects, [
+            'runtime_state' => $runtimeState,
+            'existing_states' => $runtimeState['status_control_states'] ?? [],
+            'tick' => 0,
+        ]);
         if (! ($statusBuildResult['ok'] ?? false)) {
             return $this->failure((string) ($statusBuildResult['reason'] ?? 'status_control_state_build_failed'));
         }

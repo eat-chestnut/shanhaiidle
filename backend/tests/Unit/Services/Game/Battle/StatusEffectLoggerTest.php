@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class StatusEffectLoggerTest extends TestCase
 {
-    public function test_it_writes_status_effect_logs(): void
+    public function test_it_writes_status_effect_logs_with_advanced_fields(): void
     {
         $examples = $this->loadExamples();
         $example = $examples['status_control_example'];
@@ -21,6 +21,12 @@ class StatusEffectLoggerTest extends TestCase
             $example['status'],
             true,
             null,
+            [
+                'stack_count' => 1,
+                'remaining_ticks' => 2,
+                'resisted' => true,
+                'resistance_pct' => 0.5,
+            ],
         );
 
         $this->assertTrue($result['ok']);
@@ -32,11 +38,15 @@ class StatusEffectLoggerTest extends TestCase
             'effect_key' => 'stun_status',
             'status' => 'stunned',
             'status_applied' => true,
+            'stack_count' => 1,
+            'remaining_ticks' => 2,
+            'resisted' => true,
+            'resistance_pct' => 0.5,
         ], $result['data']['log']);
     }
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v2.json')), true);
     }
 }

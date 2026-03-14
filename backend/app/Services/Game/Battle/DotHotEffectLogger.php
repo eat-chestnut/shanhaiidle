@@ -16,6 +16,7 @@ class DotHotEffectLogger
         string $effectType,
         int|float $hpDamage,
         int|float $hpHealed,
+        array $extraFields = [],
     ): array {
         $safeActorUnitId = trim($actorUnitId);
         $safeTargetUnitId = trim($targetUnitId);
@@ -38,6 +39,15 @@ class DotHotEffectLogger
             'hp_damage' => $this->normalizeNumber(max(0.0, (float) $hpDamage)),
             'hp_healed' => $this->normalizeNumber(max(0.0, (float) $hpHealed)),
         ];
+
+        foreach ($extraFields as $fieldKey => $fieldValue) {
+            $safeFieldKey = trim((string) $fieldKey);
+            if ($safeFieldKey === '' || array_key_exists($safeFieldKey, $log)) {
+                continue;
+            }
+
+            $log[$safeFieldKey] = $fieldValue;
+        }
 
         $runtimeState['logs'][] = $log;
 

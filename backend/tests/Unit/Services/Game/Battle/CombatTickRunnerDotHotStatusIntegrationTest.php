@@ -13,18 +13,11 @@ class CombatTickRunnerDotHotStatusIntegrationTest extends TestCase
     public function test_advanced_dot_hot_and_status_effects_are_processed_each_tick(): void
     {
         $examples = $this->loadExamples();
-        $runtimeState = $this->buildAdvancedRuntimeState($examples);
-
-        $expectedResults = [
-            ['tick' => 1, 'hp_damage' => 20, 'hp_healed' => 50, 'status' => 'stunned'],
-            ['tick' => 2, 'hp_damage' => 20, 'hp_healed' => 50, 'status' => 'stunned'],
-            ['tick' => 3, 'hp_damage' => 20, 'hp_healed' => 50, 'status' => null],
-            ['tick' => 4, 'hp_damage' => 20, 'hp_healed' => 0, 'status' => null],
-            ['tick' => 5, 'hp_damage' => 20, 'hp_healed' => 0, 'status' => null],
-        ];
+        $runtimeState = $this->buildCombinedRuntimeState($examples['combined_example']);
 
         $results = [];
-        for ($tick = 1; $tick <= 5; $tick++) {
+        foreach ($examples['combined_example']['expected_runtime_results'] as $expectedTickResult) {
+            $tick = (int) $expectedTickResult['tick'];
             $runtimeState['current_wave_index'] = 1;
             $runResult = app(CombatTickRunner::class)->runTick($runtimeState);
 
@@ -50,7 +43,7 @@ class CombatTickRunnerDotHotStatusIntegrationTest extends TestCase
             ];
         }
 
-        $this->assertSame($expectedResults, $results);
+        $this->assertSame($examples['combined_example']['expected_runtime_results'], $results);
         $this->assertSame('running', $runtimeState['status']);
 
         $dotHotLogs = array_values(array_filter(
@@ -62,34 +55,40 @@ class CombatTickRunnerDotHotStatusIntegrationTest extends TestCase
             static fn (array $log): bool => ($log['action'] ?? '') === 'status_effect'
         ));
 
-        $this->assertCount(8, $dotHotLogs);
+        $this->assertCount(7, $dotHotLogs);
         $this->assertSame([
             [
                 'tick' => 1,
                 'actor' => 'enemy_mon_ice_witch_2_1',
                 'target' => 'player_10001',
                 'action' => 'status_effect',
-                'effect_key' => 'stun_status',
-                'status' => 'stunned',
+                'effect_key' => 'slow_status',
+                'status' => 'slowed',
                 'status_applied' => true,
+                'stack_count' => 1,
+                'remaining_ticks' => 2,
             ],
             [
                 'tick' => 2,
                 'actor' => 'enemy_mon_ice_witch_2_1',
                 'target' => 'player_10001',
                 'action' => 'status_effect',
-                'effect_key' => 'stun_status',
-                'status' => 'stunned',
+                'effect_key' => 'slow_status',
+                'status' => 'slowed',
                 'status_active' => true,
+                'stack_count' => 1,
+                'remaining_ticks' => 1,
             ],
             [
                 'tick' => 3,
                 'actor' => 'enemy_mon_ice_witch_2_1',
                 'target' => 'player_10001',
                 'action' => 'status_effect',
-                'effect_key' => 'stun_status',
-                'status' => 'stunned',
+                'effect_key' => 'slow_status',
+                'status' => 'slowed',
                 'status_active' => false,
+                'stack_count' => 0,
+                'remaining_ticks' => 0,
             ],
         ], $statusLogs);
     }
@@ -155,18 +154,22 @@ class CombatTickRunnerDotHotStatusIntegrationTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $examples
+     * @param  array<string, mixed>  $combinedExample
      * @return array<string, mixed>
      */
-    private function buildAdvancedRuntimeState(array $examples): array
+    private function buildCombinedRuntimeState(array $combinedExample): array
     {
-        $dotHotBuildResult = app(DotHotStateBuilder::class)->build([
-            $examples['dot_example'],
-            $examples['hot_example'],
-        ]);
-        $statusBuildResult = app(StatusControlResolver::class)->buildStates([
-            $examples['status_control_example'],
-        ]);
+        $dotHotEffects = array_values(array_filter(
+            $combinedExample['effects'],
+            static fn (array $effect): bool => in_array($effect['effect_type'], ['dot', 'hot'], true)
+        ));
+        $statusEffects = array_values(array_filter(
+            $combinedExample['effects'],
+            static fn (array $effect): bool => $effect['effect_type'] === 'status_control'
+        ));
+
+        $dotHotBuildResult = app(DotHotStateBuilder::class)->build($dotHotEffects);
+        $statusBuildResult = app(StatusControlResolver::class)->buildStates($statusEffects);
 
         $this->assertTrue($dotHotBuildResult['ok']);
         $this->assertTrue($statusBuildResult['ok']);
@@ -228,6 +231,6 @@ class CombatTickRunnerDotHotStatusIntegrationTest extends TestCase
 
     private function loadExamples(): array
     {
-        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v1.json')), true);
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_advanced_examples_v2.json')), true);
     }
 }
