@@ -1,0 +1,103 @@
+{
+  "version": "v1",
+  "module": "buff_special_effect_execution_minimal_examples",
+  "runtime_effect_state_example": {
+    "unit_id": "player_10001",
+    "special_effects": [
+      {
+        "effect_key": "boss_hunt_tag",
+        "source": "core_qingqiu_frost",
+        "effect_type": "passive_tag",
+        "trigger_timing": "passive_always",
+        "value": null
+      },
+      {
+        "effect_key": "battle_start_shield",
+        "source": "talisman_jingang_tier_3",
+        "effect_type": "battle_start_shield",
+        "trigger_timing": "on_battle_start",
+        "value": 120
+      },
+      {
+        "effect_key": "always_bonus_def_flat",
+        "source": "set_zhaoyao_40_4pc",
+        "effect_type": "passive_modifier",
+        "trigger_timing": "passive_always",
+        "value": 15,
+        "modifier_key": "bonus_def_flat"
+      }
+    ],
+    "expected_runtime_effects": [
+      {
+        "effect_key": "boss_hunt_tag",
+        "owner_unit_id": "player_10001",
+        "source": "core_qingqiu_frost",
+        "effect_type": "passive_tag",
+        "trigger_timing": "passive_always",
+        "value": null,
+        "enabled": true
+      },
+      {
+        "effect_key": "battle_start_shield",
+        "owner_unit_id": "player_10001",
+        "source": "talisman_jingang_tier_3",
+        "effect_type": "battle_start_shield",
+        "trigger_timing": "on_battle_start",
+        "value": 120,
+        "enabled": true
+      },
+      {
+        "effect_key": "always_bonus_def_flat",
+        "owner_unit_id": "player_10001",
+        "source": "set_zhaoyao_40_4pc",
+        "effect_type": "passive_modifier",
+        "trigger_timing": "passive_always",
+        "value": 15,
+        "modifier_key": "bonus_def_flat",
+        "enabled": true
+      }
+    ]
+  },
+  "passive_apply_example": {
+    "before": {
+      "unit_id": "player_10001",
+      "runtime_tags": [],
+      "runtime_modifiers": {
+        "bonus_def_flat": 0
+      },
+      "shield": 0
+    },
+    "after": {
+      "unit_id": "player_10001",
+      "runtime_tags": [
+        "boss_hunt_tag"
+      ],
+      "runtime_modifiers": {
+        "bonus_def_flat": 15
+      },
+      "shield": 0
+    }
+  },
+  "battle_start_apply_example": {
+    "before": {
+      "unit_id": "player_10001",
+      "runtime_tags": [],
+      "runtime_modifiers": {},
+      "shield": 0
+    },
+    "after": {
+      "unit_id": "player_10001",
+      "runtime_tags": [],
+      "runtime_modifiers": {},
+      "shield": 120
+    }
+  },
+  "effect_log_example": {
+    "tick": 0,
+    "actor": "player_10001",
+    "action": "effect_apply",
+    "effect_key": "battle_start_shield",
+    "value": 120,
+    "source": "talisman_jingang_tier_3"
+  }
+}

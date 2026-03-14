@@ -29,6 +29,10 @@ class BattleRuntimeStateBuilderTest extends TestCase
         $this->assertSame($examples['battle_start_payload_example']['player_snapshot']['base_stats'], $result['data']['player_unit']['stats']);
         $this->assertSame($examples['battle_start_payload_example']['player_snapshot']['bonus_stats'], $result['data']['player_unit']['bonus_stats']);
         $this->assertSame($examples['battle_start_payload_example']['player_snapshot']['special_effects'], $result['data']['player_unit']['special_effects']);
+        $this->assertSame([], $result['data']['player_unit']['runtime_effects']);
+        $this->assertSame([], $result['data']['player_unit']['runtime_modifiers']);
+        $this->assertSame([], $result['data']['player_unit']['runtime_tags']);
+        $this->assertSame(0, $result['data']['player_unit']['shield']);
         $this->assertTrue($result['data']['player_unit']['alive']);
         $this->assertCount(3, $result['data']['enemy_units']);
         $this->assertSame([
@@ -47,6 +51,10 @@ class BattleRuntimeStateBuilderTest extends TestCase
             ],
             'skills' => ['skill_claw'],
             'tags' => ['melee', 'beast'],
+            'runtime_effects' => [],
+            'runtime_modifiers' => [],
+            'runtime_tags' => [],
+            'shield' => 0,
             'alive' => true,
         ], $result['data']['enemy_units'][0]);
         $this->assertSame($examples['battle_start_payload_example']['battle_context'], $result['data']['battle_context']);
@@ -54,8 +62,76 @@ class BattleRuntimeStateBuilderTest extends TestCase
         $this->assertStringStartsWith('battle_runtime_10001_', $result['data']['battle_id']);
     }
 
+    public function test_it_initializes_minimal_special_effect_runtime_during_build(): void
+    {
+        $buffExamples = $this->loadBuffExamples();
+        $runtimeExample = $buffExamples['runtime_effect_state_example'];
+
+        $result = app(BattleRuntimeStateBuilder::class)->build([
+            'battle_id' => 'battle_runtime_001',
+            'player_snapshot' => [
+                'player_id' => 10001,
+                'base_stats' => [
+                    'MELEE_ATK' => 120,
+                    'HP' => 850,
+                    'DEF' => 66,
+                ],
+                'bonus_stats' => [],
+                'skills' => [],
+                'special_effects' => $runtimeExample['special_effects'],
+            ],
+            'enemy_snapshots' => [],
+            'battle_context' => [
+                'battle_type' => 'main_stage',
+            ],
+        ]);
+
+        $this->assertTrue($result['ok']);
+        $this->assertNull($result['reason']);
+        $expectedRuntimeEffects = $runtimeExample['expected_runtime_effects'];
+        $expectedRuntimeEffects[1]['enabled'] = false;
+
+        $this->assertSame($expectedRuntimeEffects, $result['data']['player_unit']['runtime_effects']);
+        $this->assertSame(
+            $buffExamples['passive_apply_example']['after']['runtime_tags'],
+            $result['data']['player_unit']['runtime_tags']
+        );
+        $this->assertSame(
+            $buffExamples['passive_apply_example']['after']['runtime_modifiers'],
+            $result['data']['player_unit']['runtime_modifiers']
+        );
+        $this->assertSame(
+            $buffExamples['battle_start_apply_example']['after']['shield'],
+            $result['data']['player_unit']['shield']
+        );
+        $this->assertSame([
+            [
+                'tick' => 0,
+                'actor' => 'player_10001',
+                'action' => 'effect_apply',
+                'effect_key' => 'boss_hunt_tag',
+                'value' => null,
+                'source' => 'core_qingqiu_frost',
+            ],
+            [
+                'tick' => 0,
+                'actor' => 'player_10001',
+                'action' => 'effect_apply',
+                'effect_key' => 'always_bonus_def_flat',
+                'value' => 15,
+                'source' => 'set_zhaoyao_40_4pc',
+            ],
+            $buffExamples['effect_log_example'],
+        ], $result['data']['logs']);
+    }
+
     private function loadExamples(): array
     {
         return json_decode((string) file_get_contents(base_path('../data/combat_runtime_minimal_loop_examples_v1.json')), true);
+    }
+
+    private function loadBuffExamples(): array
+    {
+        return json_decode((string) file_get_contents(base_path('../data/buff_special_effect_execution_minimal_examples_v1.json')), true);
     }
 }
