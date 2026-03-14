@@ -4,60 +4,32 @@ namespace App\Services\Game\Battle;
 
 class BasicDamageResolver
 {
+    public function __construct(
+        private readonly ExpandedDamageResolver $expandedDamageResolver = new ExpandedDamageResolver(),
+    ) {
+    }
+
     public function resolvePlayerToEnemy(array $playerUnit, array $enemyUnit): array
     {
-        $baseAttack = (int) ($playerUnit['stats']['MELEE_ATK'] ?? 0);
-        $enemyDef = (int) ($enemyUnit['stats']['DEF'] ?? 0);
-        $effectiveAttack = $this->applyPercentBonuses(
-            $baseAttack,
-            $playerUnit['bonus_stats']['bonus_melee_atk'] ?? []
-        );
-
-        $damage = max(1, $effectiveAttack - $enemyDef);
-
-        if (($enemyUnit['is_boss'] ?? false) === true) {
-            $damage = $this->applyPercentBonuses($damage, $playerUnit['bonus_stats']['bonus_boss_dmg'] ?? []);
-        }
-
-        return $this->success([
-            'damage' => max(1, $damage),
-        ]);
+        return $this->resolve($playerUnit, $enemyUnit);
     }
 
     public function resolveEnemyToPlayer(array $enemyUnit, array $playerUnit): array
     {
-        $enemyAttack = (int) ($enemyUnit['stats']['ATK'] ?? 0);
-        $playerDef = (int) ($playerUnit['stats']['DEF'] ?? 0);
-
-        return $this->success([
-            'damage' => max(1, $enemyAttack - $playerDef),
-        ]);
+        return $this->resolve($enemyUnit, $playerUnit);
     }
 
-    private function applyPercentBonuses(int $baseValue, mixed $bonusRows): int
+    private function resolve(array $attackerUnit, array $targetUnit): array
     {
-        $value = $baseValue;
-
-        foreach (is_array($bonusRows) ? $bonusRows : [] as $bonusRow) {
-            if (! is_array($bonusRow)) {
-                continue;
-            }
-
-            $bonusValue = (float) ($bonusRow['value'] ?? 0);
-            $valueType = trim((string) ($bonusRow['value_type'] ?? 'percent'));
-
-            if ($valueType === 'percent') {
-                $value += $baseValue * ($bonusValue / 100);
-
-                continue;
-            }
-
-            if ($valueType === 'flat') {
-                $value += $bonusValue;
-            }
+        $result = $this->expandedDamageResolver->resolveBasicAttack($attackerUnit, $targetUnit);
+        if (! ($result['ok'] ?? false)) {
+            return $this->failure((string) ($result['reason'] ?? 'expanded_basic_attack_resolve_failed'));
         }
 
-        return max(0, (int) floor($value));
+        $data = is_array($result['data'] ?? null) ? $result['data'] : [];
+        $data['damage'] = $data['raw_damage'] ?? 0;
+
+        return $this->success($data);
     }
 
     private function success(array $data): array
@@ -66,6 +38,15 @@ class BasicDamageResolver
             'ok' => true,
             'reason' => null,
             'data' => $data,
+        ];
+    }
+
+    private function failure(string $reason): array
+    {
+        return [
+            'ok' => false,
+            'reason' => $reason,
+            'data' => null,
         ];
     }
 }

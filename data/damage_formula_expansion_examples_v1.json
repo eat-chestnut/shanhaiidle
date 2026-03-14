@@ -1,0 +1,185 @@
+{
+  "version": "v1",
+  "module": "damage_formula_expansion_examples",
+  "critical_strike_example": {
+    "attacker_unit": {
+      "unit_id": "player_10001",
+      "bonus_stats": {
+        "bonus_crit_rate": [
+          {
+            "value_type": "percent",
+            "value": 25,
+            "source": "affix_crit_rate_45"
+          }
+        ],
+        "bonus_crit_dmg": [
+          {
+            "value_type": "percent",
+            "value": 50,
+            "source": "affix_crit_dmg_45"
+          }
+        ]
+      }
+    },
+    "forced_roll": 0.20,
+    "expected_result": {
+      "is_critical": true,
+      "critical_multiplier": 1.5
+    }
+  },
+  "basic_attack_modifier_example": {
+    "attacker_unit": {
+      "bonus_stats": {
+        "bonus_melee_atk": [
+          {
+            "value_type": "percent",
+            "value": 10,
+            "source": "set_zhaoyao_40_2pc"
+          }
+        ],
+        "final_damage_bonus": [
+          {
+            "value_type": "percent",
+            "value": 5,
+            "source": "core_qingqiu_frost"
+          }
+        ]
+      }
+    },
+    "target_unit": {
+      "is_boss": false
+    },
+    "expected_result": {
+      "attack_multiplier": 1.1,
+      "skill_multiplier": 1.0,
+      "boss_multiplier": 1.0,
+      "final_multiplier": 1.05
+    }
+  },
+  "skill_modifier_vs_boss_example": {
+    "attacker_unit": {
+      "bonus_stats": {
+        "bonus_skill_dmg": [
+          {
+            "value_type": "percent",
+            "value": 20,
+            "source": "talisman_star_link_6"
+          }
+        ],
+        "bonus_boss_dmg": [
+          {
+            "value_type": "percent",
+            "value": 12,
+            "source": "core_qingqiu_frost"
+          }
+        ],
+        "final_damage_bonus": [
+          {
+            "value_type": "percent",
+            "value": 5,
+            "source": "set_special_final_bonus"
+          }
+        ]
+      }
+    },
+    "target_unit": {
+      "is_boss": true
+    },
+    "expected_result": {
+      "attack_multiplier": 1.0,
+      "skill_multiplier": 1.2,
+      "boss_multiplier": 1.12,
+      "final_multiplier": 1.05
+    }
+  },
+  "shield_absorption_example": {
+    "target_unit": {
+      "unit_id": "enemy_mon_qingqiu_boss_2_1",
+      "shield": 50,
+      "current_hp": 3000
+    },
+    "incoming_damage": 220,
+    "expected_result": {
+      "absorbed_by_shield": 50,
+      "hp_damage": 170,
+      "remaining_shield": 0
+    }
+  },
+  "expanded_skill_damage_example": {
+    "attacker_unit": {
+      "unit_id": "player_10001",
+      "stats": {
+        "MELEE_ATK": 120
+      },
+      "bonus_stats": {
+        "bonus_skill_dmg": [
+          {
+            "value_type": "percent",
+            "value": 20,
+            "source": "talisman_star_link_6"
+          }
+        ],
+        "bonus_boss_dmg": [
+          {
+            "value_type": "percent",
+            "value": 12,
+            "source": "core_qingqiu_frost"
+          }
+        ],
+        "bonus_crit_rate": [
+          {
+            "value_type": "percent",
+            "value": 25,
+            "source": "affix_crit_rate_45"
+          }
+        ],
+        "bonus_crit_dmg": [
+          {
+            "value_type": "percent",
+            "value": 50,
+            "source": "affix_crit_dmg_45"
+          }
+        ],
+        "final_damage_bonus": [
+          {
+            "value_type": "percent",
+            "value": 5,
+            "source": "set_special_final_bonus"
+          }
+        ]
+      }
+    },
+    "target_unit": {
+      "unit_id": "enemy_mon_qingqiu_boss_2_1",
+      "is_boss": true,
+      "stats": {
+        "DEF": 50
+      },
+      "shield": 50,
+      "current_hp": 3000
+    },
+    "skill_state": {
+      "skill_id": "skill_slash",
+      "skill_type": "single_damage",
+      "damage_ratio": 1.5
+    },
+    "forced_roll": 0.20,
+    "expected_result": {
+      "raw_damage": 279.636,
+      "is_critical": true,
+      "shield_absorbed": 50,
+      "hp_damage": 229.636
+    }
+  },
+  "damage_log_example": {
+    "tick": 5,
+    "actor": "player_10001",
+    "target": "enemy_mon_qingqiu_boss_2_1",
+    "action": "skill_cast",
+    "skill_id": "skill_slash",
+    "raw_damage": 279.636,
+    "is_critical": true,
+    "shield_absorbed": 50,
+    "hp_damage": 229.636
+  }
+}

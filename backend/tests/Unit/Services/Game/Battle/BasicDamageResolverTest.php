@@ -100,6 +100,6 @@ class BasicDamageResolverTest extends TestCase
         );
 
         $this->assertSame(80, $normalEnemyResult['data']['damage']);
-        $this->assertSame(120, $bossEnemyResult['data']['damage']);
+        $this->assertSame(130, $bossEnemyResult['data']['damage']);
     }
 }

@@ -5,13 +5,12 @@ namespace App\Services\Game\Battle;
 class CombatTickRunner
 {
     public function __construct(
-        private readonly BasicDamageResolver $basicDamageResolver = new BasicDamageResolver(),
         private readonly BattleVictoryResolver $battleVictoryResolver = new BattleVictoryResolver(),
         private readonly SkillRuntimeStateBuilder $skillRuntimeStateBuilder = new SkillRuntimeStateBuilder(),
         private readonly SkillCooldownResolver $skillCooldownResolver = new SkillCooldownResolver(),
         private readonly SkillCastResolver $skillCastResolver = new SkillCastResolver(),
-        private readonly SkillDamageResolver $skillDamageResolver = new SkillDamageResolver(),
-        private readonly SkillActionLogger $skillActionLogger = new SkillActionLogger(),
+        private readonly ExpandedDamageResolver $expandedDamageResolver = new ExpandedDamageResolver(),
+        private readonly DamageActionLogger $damageActionLogger = new DamageActionLogger(),
     ) {
     }
 
@@ -36,7 +35,7 @@ class CombatTickRunner
         $playerSkillStates = $playerSkillStateResult['data']['skills'];
         $playerUnit['skill_states'] = $playerSkillStates;
 
-        if (($playerUnit['alive'] ?? false) === true && max(0, (int) ($playerUnit['current_hp'] ?? 0)) > 0) {
+        if ($this->canUnitAct($playerUnit)) {
             $playerCastResult = $this->skillCastResolver->resolvePlayerCast($playerUnit, $enemyUnits, $playerSkillStates);
             if (! ($playerCastResult['ok'] ?? false)) {
                 return $this->failure((string) ($playerCastResult['reason'] ?? 'player_skill_cast_resolve_failed'));
@@ -61,20 +60,39 @@ class CombatTickRunner
             if (! $playerDidCastSkill) {
                 $playerTargetIndex = $this->findFirstAliveEnemyIndex($enemyUnits, $currentWaveIndex);
                 if ($playerTargetIndex !== null) {
-                    $damageResult = $this->basicDamageResolver->resolvePlayerToEnemy($playerUnit, $enemyUnits[$playerTargetIndex]);
+                    $damageResult = $this->expandedDamageResolver->resolveBasicAttack(
+                        $playerUnit,
+                        $enemyUnits[$playerTargetIndex],
+                        $this->buildAttackContext($tick, 'basic_attack')
+                    );
                     if (! ($damageResult['ok'] ?? false)) {
                         return $this->failure((string) ($damageResult['reason'] ?? 'player_attack_resolve_failed'));
                     }
 
-                    $damage = max(1, (int) ($damageResult['data']['damage'] ?? 1));
-                    $enemyUnits[$playerTargetIndex]['current_hp'] = max(0, (int) $enemyUnits[$playerTargetIndex]['current_hp'] - $damage);
+                    $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
+                    $enemyUnits[$playerTargetIndex] = $this->applyDamageToTargetUnit(
+                        $enemyUnits[$playerTargetIndex],
+                        $damageData
+                    );
 
-                    $runtimeState['logs'][] = $this->buildAttackLog(
+                    $logResult = $this->damageActionLogger->logDamage(
+                        $runtimeState,
                         $tick,
                         (string) ($playerUnit['unit_id'] ?? 'player'),
                         (string) ($enemyUnits[$playerTargetIndex]['unit_id'] ?? 'enemy'),
-                        $damage
+                        'basic_attack',
+                        null,
+                        (float) ($damageData['raw_damage'] ?? 0),
+                        (bool) ($damageData['is_critical'] ?? false),
+                        (float) ($damageData['shield_absorbed'] ?? 0),
+                        (float) ($damageData['hp_damage'] ?? 0),
                     );
+
+                    if (! ($logResult['ok'] ?? false)) {
+                        return $this->failure((string) ($logResult['reason'] ?? 'player_attack_log_failed'));
+                    }
+
+                    $runtimeState = $logResult['data']['runtime_state'];
                 }
             }
         }
@@ -83,12 +101,12 @@ class CombatTickRunner
             if (
                 (int) ($enemyUnit['wave_index'] ?? 0) !== $currentWaveIndex
                 || ($enemyUnit['alive'] ?? false) !== true
-                || max(0, (int) ($enemyUnit['current_hp'] ?? 0)) <= 0
+                || $this->resolveCurrentHp($enemyUnit) <= 0
             ) {
                 continue;
             }
 
-            if (($playerUnit['alive'] ?? false) !== true || max(0, (int) ($playerUnit['current_hp'] ?? 0)) <= 0) {
+            if (! $this->canUnitAct($playerUnit)) {
                 break;
             }
 
@@ -121,26 +139,42 @@ class CombatTickRunner
             }
 
             if (! $enemyDidCastSkill) {
-                $damageResult = $this->basicDamageResolver->resolveEnemyToPlayer($enemyUnit, $playerUnit);
+                $damageResult = $this->expandedDamageResolver->resolveBasicAttack(
+                    $enemyUnit,
+                    $playerUnit,
+                    $this->buildAttackContext($tick, 'basic_attack')
+                );
                 if (! ($damageResult['ok'] ?? false)) {
                     return $this->failure((string) ($damageResult['reason'] ?? 'enemy_attack_resolve_failed'));
                 }
 
-                $damage = max(1, (int) ($damageResult['data']['damage'] ?? 1));
-                $playerUnit['current_hp'] = max(0, (int) $playerUnit['current_hp'] - $damage);
+                $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
+                $playerUnit = $this->applyDamageToTargetUnit($playerUnit, $damageData);
 
-                $runtimeState['logs'][] = $this->buildAttackLog(
+                $logResult = $this->damageActionLogger->logDamage(
+                    $runtimeState,
                     $tick,
                     (string) ($enemyUnit['unit_id'] ?? 'enemy'),
                     (string) ($playerUnit['unit_id'] ?? 'player'),
-                    $damage
+                    'basic_attack',
+                    null,
+                    (float) ($damageData['raw_damage'] ?? 0),
+                    (bool) ($damageData['is_critical'] ?? false),
+                    (float) ($damageData['shield_absorbed'] ?? 0),
+                    (float) ($damageData['hp_damage'] ?? 0),
                 );
+
+                if (! ($logResult['ok'] ?? false)) {
+                    return $this->failure((string) ($logResult['reason'] ?? 'enemy_attack_log_failed'));
+                }
+
+                $runtimeState = $logResult['data']['runtime_state'];
             }
 
             $enemyUnit['skill_states'] = $enemySkillStates;
             $enemyUnits[$enemyIndex] = $enemyUnit;
 
-            if (max(0, (int) ($playerUnit['current_hp'] ?? 0)) <= 0) {
+            if ($this->resolveCurrentHp($playerUnit) <= 0) {
                 break;
             }
         }
@@ -219,21 +253,33 @@ class CombatTickRunner
             return false;
         }
 
-        $damageResult = $this->skillDamageResolver->resolvePlayerSkillDamage($playerUnit, $enemyUnits[$targetEnemyIndex], $skillState);
+        $damageResult = $this->expandedDamageResolver->resolveSkillDamage(
+            $playerUnit,
+            $enemyUnits[$targetEnemyIndex],
+            $skillState,
+            $this->buildAttackContext($tick, 'skill_cast', (string) ($skillState['skill_id'] ?? ''))
+        );
         if (! ($damageResult['ok'] ?? false)) {
             return false;
         }
 
-        $damage = max(1, (int) ($damageResult['data']['damage'] ?? 1));
-        $enemyUnits[$targetEnemyIndex]['current_hp'] = max(0, (int) $enemyUnits[$targetEnemyIndex]['current_hp'] - $damage);
+        $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
+        $enemyUnits[$targetEnemyIndex] = $this->applyDamageToTargetUnit(
+            $enemyUnits[$targetEnemyIndex],
+            $damageData
+        );
 
-        $logResult = $this->skillActionLogger->logSkillCast(
+        $logResult = $this->damageActionLogger->logDamage(
             $runtimeState,
             $tick,
             (string) ($playerUnit['unit_id'] ?? 'player'),
             (string) ($enemyUnits[$targetEnemyIndex]['unit_id'] ?? 'enemy'),
+            'skill_cast',
             (string) ($skillState['skill_id'] ?? ''),
-            $damage,
+            (float) ($damageData['raw_damage'] ?? 0),
+            (bool) ($damageData['is_critical'] ?? false),
+            (float) ($damageData['shield_absorbed'] ?? 0),
+            (float) ($damageData['hp_damage'] ?? 0),
         );
 
         if (! ($logResult['ok'] ?? false)) {
@@ -267,21 +313,30 @@ class CombatTickRunner
             return false;
         }
 
-        $damageResult = $this->skillDamageResolver->resolveEnemySkillDamage($enemyUnit, $playerUnit, $skillState);
+        $damageResult = $this->expandedDamageResolver->resolveSkillDamage(
+            $enemyUnit,
+            $playerUnit,
+            $skillState,
+            $this->buildAttackContext($tick, 'skill_cast', (string) ($skillState['skill_id'] ?? ''))
+        );
         if (! ($damageResult['ok'] ?? false)) {
             return false;
         }
 
-        $damage = max(1, (int) ($damageResult['data']['damage'] ?? 1));
-        $playerUnit['current_hp'] = max(0, (int) $playerUnit['current_hp'] - $damage);
+        $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
+        $playerUnit = $this->applyDamageToTargetUnit($playerUnit, $damageData);
 
-        $logResult = $this->skillActionLogger->logSkillCast(
+        $logResult = $this->damageActionLogger->logDamage(
             $runtimeState,
             $tick,
             (string) ($enemyUnit['unit_id'] ?? 'enemy'),
             (string) ($playerUnit['unit_id'] ?? 'player'),
+            'skill_cast',
             (string) ($skillState['skill_id'] ?? ''),
-            $damage,
+            (float) ($damageData['raw_damage'] ?? 0),
+            (bool) ($damageData['is_critical'] ?? false),
+            (float) ($damageData['shield_absorbed'] ?? 0),
+            (float) ($damageData['hp_damage'] ?? 0),
         );
 
         if (! ($logResult['ok'] ?? false)) {
@@ -478,7 +533,7 @@ class CombatTickRunner
     private function settleDeaths(array $runtimeState, int $tick, array $playerUnit, array $enemyUnits): array
     {
         $playerWasAlive = ($playerUnit['alive'] ?? false) === true;
-        $playerUnit['alive'] = max(0, (int) ($playerUnit['current_hp'] ?? 0)) > 0;
+        $playerUnit['alive'] = $this->resolveCurrentHp($playerUnit) > 0;
 
         if ($playerWasAlive && ($playerUnit['alive'] ?? false) !== true) {
             $runtimeState['logs'][] = $this->buildStateLog(
@@ -490,7 +545,7 @@ class CombatTickRunner
 
         foreach ($enemyUnits as $enemyIndex => $enemyUnit) {
             $enemyWasAlive = ($enemyUnit['alive'] ?? false) === true;
-            $enemyUnit['alive'] = max(0, (int) ($enemyUnit['current_hp'] ?? 0)) > 0;
+            $enemyUnit['alive'] = $this->resolveCurrentHp($enemyUnit) > 0;
 
             if ($enemyWasAlive && ($enemyUnit['alive'] ?? false) !== true) {
                 $runtimeState['logs'][] = $this->buildStateLog(
@@ -569,15 +624,70 @@ class CombatTickRunner
         return (int) reset($aliveWaveIndexes);
     }
 
-    private function buildAttackLog(int $tick, string $actor, string $target, int $damage): array
+    /**
+     * @param  array<string, mixed>  $unit
+     */
+    private function canUnitAct(array $unit): bool
     {
-        return [
+        return ($unit['alive'] ?? false) === true && $this->resolveCurrentHp($unit) > 0;
+    }
+
+    /**
+     * @param  array<string, mixed>  $targetUnit
+     * @param  array<string, mixed>  $damageData
+     */
+    private function applyDamageToTargetUnit(array $targetUnit, array $damageData): array
+    {
+        if (array_key_exists('remaining_shield', $damageData)) {
+            $targetUnit['shield'] = $damageData['remaining_shield'];
+        }
+
+        if (array_key_exists('remaining_hp', $damageData)) {
+            $targetUnit['current_hp'] = $damageData['remaining_hp'];
+        } else {
+            $targetUnit['current_hp'] = $this->normalizeNumber(
+                max(0.0, $this->resolveCurrentHp($targetUnit) - (float) ($damageData['hp_damage'] ?? 0))
+            );
+        }
+
+        return $targetUnit;
+    }
+
+    /**
+     * @param  array<string, mixed>  $unit
+     */
+    private function resolveCurrentHp(array $unit): float
+    {
+        return max(0.0, (float) ($unit['current_hp'] ?? 0));
+    }
+
+    /**
+     * @param  array<string, mixed>  $attackContext
+     * @return array<string, mixed>
+     */
+    private function buildAttackContext(int $tick, string $actionType, ?string $skillId = null): array
+    {
+        $attackContext = [
             'tick' => $tick,
-            'actor' => $actor,
-            'target' => $target,
-            'action' => 'basic_attack',
-            'damage' => $damage,
+            'action_type' => $actionType,
         ];
+
+        if ($skillId !== null && trim($skillId) !== '') {
+            $attackContext['skill_id'] = trim($skillId);
+        }
+
+        return $attackContext;
+    }
+
+    private function normalizeNumber(float $value): int|float
+    {
+        $rounded = round($value, 3);
+
+        if (abs($rounded - round($rounded)) < 0.000001) {
+            return (int) round($rounded);
+        }
+
+        return $rounded;
     }
 
     private function buildStateLog(int $tick, string $action, string $target): array

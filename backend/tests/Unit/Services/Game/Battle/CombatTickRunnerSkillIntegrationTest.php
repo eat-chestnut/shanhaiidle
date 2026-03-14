@@ -54,7 +54,10 @@ class CombatTickRunnerSkillIntegrationTest extends TestCase
         $this->assertTrue($result['ok']);
         $this->assertSame('skill_cast', $result['data']['logs'][0]['action']);
         $this->assertSame('skill_slash', $result['data']['logs'][0]['skill_id']);
-        $this->assertSame(186, $result['data']['logs'][0]['damage']);
+        $this->assertSame(186, $result['data']['logs'][0]['raw_damage']);
+        $this->assertFalse($result['data']['logs'][0]['is_critical']);
+        $this->assertSame(0, $result['data']['logs'][0]['shield_absorbed']);
+        $this->assertSame(186, $result['data']['logs'][0]['hp_damage']);
         $this->assertSame(314, $result['data']['enemy_units'][0]['current_hp']);
         $this->assertSame(2, $result['data']['player_unit']['skill_states'][0]['cooldown_remaining']);
     }
@@ -97,7 +100,7 @@ class CombatTickRunnerSkillIntegrationTest extends TestCase
 
         $this->assertTrue($result['ok']);
         $this->assertSame('basic_attack', $result['data']['logs'][0]['action']);
-        $this->assertArrayNotHasKey('skill_id', $result['data']['logs'][0]);
+        $this->assertNull($result['data']['logs'][0]['skill_id']);
         $this->assertSame(1, $result['data']['player_unit']['skill_states'][0]['cooldown_remaining']);
     }
 
@@ -157,7 +160,10 @@ class CombatTickRunnerSkillIntegrationTest extends TestCase
             'target' => 'enemy_mon_qingqiu_guard_1_1',
             'action' => 'skill_cast',
             'skill_id' => 'skill_slash',
-            'damage' => 186,
+            'raw_damage' => 186,
+            'is_critical' => false,
+            'shield_absorbed' => 0,
+            'hp_damage' => 186,
         ], $skillLogs[0]);
     }
 
