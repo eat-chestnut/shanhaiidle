@@ -10,9 +10,13 @@ class CombatTickRunner
         private readonly SkillCooldownResolver $skillCooldownResolver = new SkillCooldownResolver(),
         private readonly SkillCastResolver $skillCastResolver = new SkillCastResolver(),
         private readonly MultiSkillTypeResolver $multiSkillTypeResolver = new MultiSkillTypeResolver(),
+        private readonly DotHotTickResolver $dotHotTickResolver = new DotHotTickResolver(),
+        private readonly StatusControlResolver $statusControlResolver = new StatusControlResolver(),
         private readonly ExpandedDamageResolver $expandedDamageResolver = new ExpandedDamageResolver(),
         private readonly DamageActionLogger $damageActionLogger = new DamageActionLogger(),
         private readonly EffectActionLogger $effectActionLogger = new EffectActionLogger(),
+        private readonly DotHotEffectLogger $dotHotEffectLogger = new DotHotEffectLogger(),
+        private readonly StatusEffectLogger $statusEffectLogger = new StatusEffectLogger(),
     ) {
     }
 
@@ -30,21 +34,36 @@ class CombatTickRunner
         $playerUnit = is_array($runtimeState['player_unit'] ?? null) ? $runtimeState['player_unit'] : [];
         $enemyUnits = is_array($runtimeState['enemy_units'] ?? null) ? $runtimeState['enemy_units'] : [];
 
-        $playerSkillStateResult = $this->ensureUnitSkillStates($runtimeState, $playerUnit);
-        if (! ($playerSkillStateResult['ok'] ?? false)) {
-            return $this->failure((string) ($playerSkillStateResult['reason'] ?? 'player_skill_state_build_failed'));
+        if (! $this->processRuntimeEffects($runtimeState, $playerUnit, $enemyUnits, $tick)) {
+            return $this->failure('runtime_effect_tick_failed');
         }
-        $playerSkillStates = $playerSkillStateResult['data']['skills'];
-        $playerUnit['skill_states'] = $playerSkillStates;
+
+        $preActionDeathSettlementResult = $this->settleDeaths($runtimeState, $tick, $playerUnit, $enemyUnits);
+        if (! ($preActionDeathSettlementResult['ok'] ?? false)) {
+            return $this->failure((string) ($preActionDeathSettlementResult['reason'] ?? 'pre_action_death_settlement_failed'));
+        }
+        $runtimeState = $preActionDeathSettlementResult['data']['runtime_state'];
+        $playerUnit = $preActionDeathSettlementResult['data']['player_unit'];
+        $enemyUnits = $preActionDeathSettlementResult['data']['enemy_units'];
+
+        $playerSkillStates = [];
+        if ($this->isUnitAvailable($playerUnit)) {
+            $playerSkillStateResult = $this->ensureUnitSkillStates($runtimeState, $playerUnit);
+            if (! ($playerSkillStateResult['ok'] ?? false)) {
+                return $this->failure((string) ($playerSkillStateResult['reason'] ?? 'player_skill_state_build_failed'));
+            }
+            $playerSkillStates = $playerSkillStateResult['data']['skills'];
+            $playerUnit['skill_states'] = $playerSkillStates;
+        }
 
         if ($this->canUnitAct($playerUnit)) {
             $playerCastResult = $this->skillCastResolver->resolvePlayerCast($playerUnit, $enemyUnits, $playerSkillStates);
-            if (! ($playerCastResult['ok'] ?? false)) {
+            if ($this->canUnitCastSkill($playerUnit) && ! ($playerCastResult['ok'] ?? false)) {
                 return $this->failure((string) ($playerCastResult['reason'] ?? 'player_skill_cast_resolve_failed'));
             }
 
             $playerDidCastSkill = false;
-            if (($playerCastResult['data']['can_cast'] ?? false) === true) {
+            if ($this->canUnitCastSkill($playerUnit) && ($playerCastResult['data']['can_cast'] ?? false) === true) {
                 $playerDidCastSkill = $this->applyPlayerSkillCast(
                     $runtimeState,
                     $playerUnit,
@@ -102,30 +121,39 @@ class CombatTickRunner
         foreach ($enemyUnits as $enemyIndex => $enemyUnit) {
             if (
                 (int) ($enemyUnit['wave_index'] ?? 0) !== $currentWaveIndex
-                || ($enemyUnit['alive'] ?? false) !== true
-                || $this->resolveCurrentHp($enemyUnit) <= 0
+                || ! $this->isUnitAvailable($enemyUnit)
             ) {
                 continue;
             }
 
-            if (! $this->canUnitAct($playerUnit)) {
+            if (! $this->isUnitAvailable($playerUnit)) {
                 break;
             }
 
-            $enemySkillStateResult = $this->ensureUnitSkillStates($runtimeState, $enemyUnit);
-            if (! ($enemySkillStateResult['ok'] ?? false)) {
-                return $this->failure((string) ($enemySkillStateResult['reason'] ?? 'enemy_skill_state_build_failed'));
+            $enemySkillStates = [];
+            if ($this->isUnitAvailable($enemyUnit)) {
+                $enemySkillStateResult = $this->ensureUnitSkillStates($runtimeState, $enemyUnit);
+                if (! ($enemySkillStateResult['ok'] ?? false)) {
+                    return $this->failure((string) ($enemySkillStateResult['reason'] ?? 'enemy_skill_state_build_failed'));
+                }
+                $enemySkillStates = $enemySkillStateResult['data']['skills'];
+                $enemyUnit['skill_states'] = $enemySkillStates;
             }
-            $enemySkillStates = $enemySkillStateResult['data']['skills'];
-            $enemyUnit['skill_states'] = $enemySkillStates;
+
+            if (! $this->canUnitAct($enemyUnit)) {
+                $enemyUnit['skill_states'] = $enemySkillStates;
+                $enemyUnits[$enemyIndex] = $enemyUnit;
+
+                continue;
+            }
 
             $enemyCastResult = $this->skillCastResolver->resolveEnemyCast($enemyUnit, $playerUnit, $enemySkillStates);
-            if (! ($enemyCastResult['ok'] ?? false)) {
+            if ($this->canUnitCastSkill($enemyUnit) && ! ($enemyCastResult['ok'] ?? false)) {
                 return $this->failure((string) ($enemyCastResult['reason'] ?? 'enemy_skill_cast_resolve_failed'));
             }
 
             $enemyDidCastSkill = false;
-            if (($enemyCastResult['data']['can_cast'] ?? false) === true) {
+            if ($this->canUnitCastSkill($enemyUnit) && ($enemyCastResult['data']['can_cast'] ?? false) === true) {
                 $enemyDidCastSkill = $this->applyEnemySkillCast(
                     $runtimeState,
                     $enemyUnit,
@@ -614,7 +642,31 @@ class CombatTickRunner
      */
     private function canUnitAct(array $unit): bool
     {
+        return $this->isUnitAvailable($unit) && ! $this->hasUnitStatus($unit, 'stunned');
+    }
+
+    /**
+     * @param  array<string, mixed>  $unit
+     */
+    private function canUnitCastSkill(array $unit): bool
+    {
+        return $this->canUnitAct($unit) && ! $this->hasUnitStatus($unit, 'silenced');
+    }
+
+    /**
+     * @param  array<string, mixed>  $unit
+     */
+    private function isUnitAvailable(array $unit): bool
+    {
         return ($unit['alive'] ?? false) === true && $this->resolveCurrentHp($unit) > 0;
+    }
+
+    /**
+     * @param  array<string, mixed>  $unit
+     */
+    private function hasUnitStatus(array $unit, string $status): bool
+    {
+        return trim((string) ($unit['status'] ?? '')) === trim($status);
     }
 
     /**
@@ -776,6 +828,90 @@ class CombatTickRunner
             'action' => $action,
             'damage' => null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $runtimeState
+     * @param  array<string, mixed>  $playerUnit
+     * @param  array<int, array<string, mixed>>  $enemyUnits
+     */
+    private function processRuntimeEffects(
+        array &$runtimeState,
+        array &$playerUnit,
+        array &$enemyUnits,
+        int $tick,
+    ): bool {
+        $runtimeState['player_unit'] = $playerUnit;
+        $runtimeState['enemy_units'] = $enemyUnits;
+
+        $statusTickResult = $this->statusControlResolver->tick($runtimeState, $tick);
+        if (! ($statusTickResult['ok'] ?? false)) {
+            return false;
+        }
+
+        $runtimeState = is_array($statusTickResult['data']['runtime_state'] ?? null)
+            ? $statusTickResult['data']['runtime_state']
+            : $runtimeState;
+
+        foreach (is_array($statusTickResult['data']['tick_results'] ?? null) ? $statusTickResult['data']['tick_results'] : [] as $tickResult) {
+            if (! is_array($tickResult)) {
+                continue;
+            }
+
+            $logResult = $this->statusEffectLogger->logStatus(
+                $runtimeState,
+                $tick,
+                trim((string) ($tickResult['owner_unit_id'] ?? '')),
+                trim((string) ($tickResult['target_unit_id'] ?? '')),
+                trim((string) ($tickResult['effect_key'] ?? '')),
+                trim((string) ($tickResult['status'] ?? '')),
+                array_key_exists('status_applied', $tickResult) ? (bool) $tickResult['status_applied'] : null,
+                array_key_exists('status_active', $tickResult) ? (bool) $tickResult['status_active'] : null,
+            );
+
+            if (! ($logResult['ok'] ?? false)) {
+                return false;
+            }
+
+            $runtimeState = $logResult['data']['runtime_state'];
+        }
+
+        $dotHotTickResult = $this->dotHotTickResolver->resolve($runtimeState, $tick);
+        if (! ($dotHotTickResult['ok'] ?? false)) {
+            return false;
+        }
+
+        $runtimeState = is_array($dotHotTickResult['data']['runtime_state'] ?? null)
+            ? $dotHotTickResult['data']['runtime_state']
+            : $runtimeState;
+
+        foreach (is_array($dotHotTickResult['data']['tick_results'] ?? null) ? $dotHotTickResult['data']['tick_results'] : [] as $tickResult) {
+            if (! is_array($tickResult)) {
+                continue;
+            }
+
+            $logResult = $this->dotHotEffectLogger->logTick(
+                $runtimeState,
+                $tick,
+                trim((string) ($tickResult['owner_unit_id'] ?? '')),
+                trim((string) ($tickResult['target_unit_id'] ?? '')),
+                trim((string) ($tickResult['effect_key'] ?? '')),
+                trim((string) ($tickResult['effect_type'] ?? '')),
+                (float) ($tickResult['hp_damage'] ?? 0),
+                (float) ($tickResult['hp_healed'] ?? 0),
+            );
+
+            if (! ($logResult['ok'] ?? false)) {
+                return false;
+            }
+
+            $runtimeState = $logResult['data']['runtime_state'];
+        }
+
+        $playerUnit = is_array($runtimeState['player_unit'] ?? null) ? $runtimeState['player_unit'] : $playerUnit;
+        $enemyUnits = is_array($runtimeState['enemy_units'] ?? null) ? $runtimeState['enemy_units'] : $enemyUnits;
+
+        return true;
     }
 
     private function success(array $data): array

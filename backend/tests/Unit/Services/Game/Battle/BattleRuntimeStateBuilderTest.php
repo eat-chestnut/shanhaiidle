@@ -16,7 +16,7 @@ class BattleRuntimeStateBuilderTest extends TestCase
         $this->assertTrue($result['ok']);
         $this->assertNull($result['reason']);
         $this->assertSame(
-            ['battle_id', 'status', 'tick', 'current_wave_index', 'player_unit', 'enemy_units', 'battle_context', 'logs'],
+            ['battle_id', 'status', 'tick', 'current_wave_index', 'player_unit', 'enemy_units', 'battle_context', 'dot_hot_states', 'status_control_states', 'logs'],
             array_keys($result['data'])
         );
         $this->assertSame('running', $result['data']['status']);
@@ -33,6 +33,7 @@ class BattleRuntimeStateBuilderTest extends TestCase
         $this->assertSame([], $result['data']['player_unit']['runtime_modifiers']);
         $this->assertSame([], $result['data']['player_unit']['runtime_tags']);
         $this->assertSame(0, $result['data']['player_unit']['shield']);
+        $this->assertNull($result['data']['player_unit']['status']);
         $this->assertTrue($result['data']['player_unit']['alive']);
         $this->assertCount(3, $result['data']['enemy_units']);
         $this->assertSame([
@@ -55,9 +56,12 @@ class BattleRuntimeStateBuilderTest extends TestCase
             'runtime_modifiers' => [],
             'runtime_tags' => [],
             'shield' => 0,
+            'status' => null,
             'alive' => true,
         ], $result['data']['enemy_units'][0]);
         $this->assertSame($examples['battle_start_payload_example']['battle_context'], $result['data']['battle_context']);
+        $this->assertSame([], $result['data']['dot_hot_states']);
+        $this->assertSame([], $result['data']['status_control_states']);
         $this->assertSame([], $result['data']['logs']);
         $this->assertStringStartsWith('battle_runtime_10001_', $result['data']['battle_id']);
     }
@@ -125,6 +129,72 @@ class BattleRuntimeStateBuilderTest extends TestCase
         ], $result['data']['logs']);
     }
 
+    public function test_it_initializes_dot_hot_and_status_control_runtime_during_build(): void
+    {
+        $examples = $this->loadDotHotExamples();
+
+        $result = app(BattleRuntimeStateBuilder::class)->build([
+            'battle_id' => 'battle_runtime_dot_hot_001',
+            'player_snapshot' => [
+                'player_id' => 10001,
+                'base_stats' => [
+                    'MELEE_ATK' => 120,
+                    'HP' => 300,
+                    'DEF' => 66,
+                ],
+                'bonus_stats' => [],
+                'skills' => [],
+                'special_effects' => [
+                    $examples['hot_example'],
+                ],
+            ],
+            'enemy_snapshots' => [
+                [
+                    'monster_id' => 'mon_fire_drake',
+                    'wave_index' => 1,
+                    'unit_index' => 1,
+                    'is_boss' => false,
+                    'base_stats' => [
+                        'HP' => 300,
+                        'ATK' => 0,
+                        'DEF' => 10,
+                    ],
+                    'skills' => [],
+                    'tags' => [],
+                    'special_effects' => [
+                        $examples['dot_example'],
+                    ],
+                ],
+                [
+                    'monster_id' => 'mon_ice_witch',
+                    'wave_index' => 2,
+                    'unit_index' => 1,
+                    'is_boss' => false,
+                    'base_stats' => [
+                        'HP' => 300,
+                        'ATK' => 0,
+                        'DEF' => 10,
+                    ],
+                    'skills' => [],
+                    'tags' => [],
+                    'special_effects' => [
+                        $examples['status_control_example'],
+                    ],
+                ],
+            ],
+            'battle_context' => [
+                'battle_type' => 'main_stage',
+            ],
+        ]);
+
+        $this->assertTrue($result['ok']);
+        $this->assertCount(2, $result['data']['dot_hot_states']);
+        $this->assertCount(1, $result['data']['status_control_states']);
+        $this->assertNull($result['data']['player_unit']['status']);
+        $this->assertSame('stunned', $result['data']['status_control_states'][0]['status']);
+        $this->assertSame(2, $result['data']['status_control_states'][0]['remaining_ticks']);
+    }
+
     private function loadExamples(): array
     {
         return json_decode((string) file_get_contents(base_path('../data/combat_runtime_minimal_loop_examples_v1.json')), true);
@@ -133,5 +203,10 @@ class BattleRuntimeStateBuilderTest extends TestCase
     private function loadBuffExamples(): array
     {
         return json_decode((string) file_get_contents(base_path('../data/buff_special_effect_execution_minimal_examples_v1.json')), true);
+    }
+
+    private function loadDotHotExamples(): array
+    {
+        return json_decode((string) file_get_contents(base_path('../data/dot_hot_status_control_minimal_examples_v1.json')), true);
     }
 }

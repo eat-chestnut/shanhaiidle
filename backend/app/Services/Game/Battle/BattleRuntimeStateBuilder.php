@@ -12,6 +12,8 @@ class BattleRuntimeStateBuilder
         private readonly BattleStartEffectApplier $battleStartEffectApplier = new BattleStartEffectApplier(),
         private readonly SpecialEffectTriggerResolver $specialEffectTriggerResolver = new SpecialEffectTriggerResolver(),
         private readonly EffectActionLogger $effectActionLogger = new EffectActionLogger(),
+        private readonly DotHotStateBuilder $dotHotStateBuilder = new DotHotStateBuilder(),
+        private readonly StatusControlResolver $statusControlResolver = new StatusControlResolver(),
     ) {
     }
 
@@ -55,6 +57,8 @@ class BattleRuntimeStateBuilder
             'player_unit' => $playerUnit,
             'enemy_units' => $enemyUnits,
             'battle_context' => $battleContext,
+            'dot_hot_states' => [],
+            'status_control_states' => [],
             'logs' => [],
         ];
 
@@ -75,6 +79,13 @@ class BattleRuntimeStateBuilder
             $runtimeState = $enemyInitialization['data']['runtime_state'];
             $runtimeState['enemy_units'][$enemyIndex] = $enemyInitialization['data']['unit_runtime_state'];
         }
+
+        $timedEffectInitialization = $this->initializeTimedEffectStates($runtimeState);
+        if (! ($timedEffectInitialization['ok'] ?? false)) {
+            return $this->failure((string) ($timedEffectInitialization['reason'] ?? 'timed_effect_state_initialization_failed'));
+        }
+
+        $runtimeState = $timedEffectInitialization['data']['runtime_state'];
 
         return $this->success($runtimeState);
     }
@@ -103,6 +114,7 @@ class BattleRuntimeStateBuilder
             'runtime_modifiers' => [],
             'runtime_tags' => [],
             'shield' => 0,
+            'status' => null,
             'alive' => $maxHp > 0,
         ];
     }
@@ -136,6 +148,7 @@ class BattleRuntimeStateBuilder
             'runtime_modifiers' => [],
             'runtime_tags' => [],
             'shield' => 0,
+            'status' => null,
             'alive' => $maxHp > 0,
         ];
 
@@ -247,6 +260,35 @@ class BattleRuntimeStateBuilder
 
     /**
      * @param  array<string, mixed>  $runtimeState
+     */
+    private function initializeTimedEffectStates(array $runtimeState): array
+    {
+        $timedEffects = $this->collectTimedEffects($runtimeState['player_unit'], $runtimeState['enemy_units']);
+
+        $dotHotBuildResult = $this->dotHotStateBuilder->build($timedEffects);
+        if (! ($dotHotBuildResult['ok'] ?? false)) {
+            return $this->failure((string) ($dotHotBuildResult['reason'] ?? 'dot_hot_state_build_failed'));
+        }
+
+        $statusBuildResult = $this->statusControlResolver->buildStates($timedEffects);
+        if (! ($statusBuildResult['ok'] ?? false)) {
+            return $this->failure((string) ($statusBuildResult['reason'] ?? 'status_control_state_build_failed'));
+        }
+
+        $runtimeState['dot_hot_states'] = is_array($dotHotBuildResult['data']['dot_hot_states'] ?? null)
+            ? array_values($dotHotBuildResult['data']['dot_hot_states'])
+            : [];
+        $runtimeState['status_control_states'] = is_array($statusBuildResult['data']['status_control_states'] ?? null)
+            ? array_values($statusBuildResult['data']['status_control_states'])
+            : [];
+
+        return $this->success([
+            'runtime_state' => $runtimeState,
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $runtimeState
      * @param  mixed  $appliedEffects
      */
     private function writeEffectApplyLogs(array $runtimeState, int $tick, string $actorUnitId, mixed $appliedEffects): array
@@ -275,6 +317,38 @@ class BattleRuntimeStateBuilder
         return $this->success([
             'runtime_state' => $runtimeState,
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $playerUnit
+     * @param  array<int, array<string, mixed>>  $enemyUnits
+     * @return array<int, array<string, mixed>>
+     */
+    private function collectTimedEffects(array $playerUnit, array $enemyUnits): array
+    {
+        $timedEffects = [];
+
+        foreach ([$playerUnit, ...$enemyUnits] as $unit) {
+            if (! is_array($unit)) {
+                continue;
+            }
+
+            $ownerUnitId = trim((string) ($unit['unit_id'] ?? ''));
+
+            foreach (is_array($unit['special_effects'] ?? null) ? $unit['special_effects'] : [] as $effect) {
+                if (! is_array($effect)) {
+                    continue;
+                }
+
+                if (trim((string) ($effect['owner_unit_id'] ?? '')) === '' && $ownerUnitId !== '') {
+                    $effect['owner_unit_id'] = $ownerUnitId;
+                }
+
+                $timedEffects[] = $effect;
+            }
+        }
+
+        return array_values($timedEffects);
     }
 
     private function resolveBattleId(array $payload, array $playerSnapshot): string

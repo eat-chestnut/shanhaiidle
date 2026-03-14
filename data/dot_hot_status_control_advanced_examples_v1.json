@@ -1,0 +1,36 @@
+{
+  "version": "v1",
+  "module": "dot_hot_status_control_advanced_examples",
+  "dot_example": {
+    "effect_key": "poison_dot",
+    "owner_unit_id": "enemy_mon_poison_1",
+    "target_unit_id": "player_10001",
+    "effect_type": "dot",
+    "trigger_timing": "per_tick",
+    "duration_ticks": 5,
+    "damage_per_tick": 20,
+    "stacking": true,
+    "refreshable": true
+  },
+  "hot_example": {
+    "effect_key": "regeneration_hot",
+    "owner_unit_id": "player_10001",
+    "target_unit_id": "player_10001",
+    "effect_type": "hot",
+    "trigger_timing": "per_tick",
+    "duration_ticks": 3,
+    "healing_per_tick": 50,
+    "stacking": true
+  },
+  "status_control_example": {
+    "effect_key": "stun_status",
+    "owner_unit_id": "enemy_mon_ice_witch_2_1",
+    "target_unit_id": "player_10001",
+    "effect_type": "status_control",
+    "trigger_timing": "on_apply",
+    "duration_ticks": 2,
+    "status": "stunned",
+    "immune_tags": [],
+    "stacking": false
+  }
+}
