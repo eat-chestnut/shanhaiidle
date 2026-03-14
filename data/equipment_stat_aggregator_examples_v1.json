@@ -1,0 +1,255 @@
+{
+  "version": "v1",
+  "module": "equipment_stat_aggregator_examples",
+  "return_format": {
+    "ok": "boolean",
+    "reason": "string|null",
+    "data": "object|null"
+  },
+  "base_equipment_stat_aggregator_example": {
+    "input": {
+      "player_id": 10001,
+      "loadouts": [
+        { "slot_type": "main_weapon", "instance_id": "eq_inst_set_weapon_40_a001" },
+        { "slot_type": "armor", "instance_id": "eq_inst_set_armor_40_a001" },
+        { "slot_type": "ring_1", "instance_id": "eq_inst_blue_ring_45_a001" }
+      ],
+      "equipment_instances": [
+        {
+          "instance_id": "eq_inst_set_weapon_40_a001",
+          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "slot_type": "main_weapon"
+        },
+        {
+          "instance_id": "eq_inst_set_armor_40_a001",
+          "item_id": "itm_set_armor_zhaoyao_40",
+          "slot_type": "armor"
+        },
+        {
+          "instance_id": "eq_inst_blue_ring_45_a001",
+          "item_id": "itm_blue_ring_45",
+          "slot_type": "ring_1"
+        }
+      ],
+      "base_stat_sources": [
+        {
+          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "base_stats": [
+            { "stat_key": "MELEE_ATK", "value_type": "flat", "value": 60 }
+          ]
+        },
+        {
+          "item_id": "itm_set_armor_zhaoyao_40",
+          "base_stats": [
+            { "stat_key": "HP", "value_type": "flat", "value": 220 },
+            { "stat_key": "DEF", "value_type": "flat", "value": 18 }
+          ]
+        },
+        {
+          "item_id": "itm_blue_ring_45",
+          "base_stats": [
+            { "stat_key": "CRIT_RATE", "value_type": "percent", "value": 2.0 }
+          ]
+        }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "MELEE_ATK": 60,
+        "HP": 220,
+        "DEF": 18,
+        "CRIT_RATE": 2.0
+      }
+    }
+  },
+  "equipment_bonus_aggregator_example": {
+    "input": {
+      "set_effect_result": {
+        "activated_effects": [
+          {
+            "set_id": "set_zhaoyao_40",
+            "piece_count": 2,
+            "effect_key": "bonus_melee_atk",
+            "value_type": "percent",
+            "value": 8
+          }
+        ]
+      },
+      "talisman_link_result": {
+        "qualified_star_links": [
+          {
+            "required_equipment_star": 6,
+            "effect_key": "bonus_skill_dmg",
+            "value_type": "percent",
+            "value": 5
+          }
+        ]
+      },
+      "talisman_base_effects": [
+        {
+          "effect_key": "bonus_hp",
+          "value_type": "flat",
+          "value": 120,
+          "source": "tal_common_guard_40_tier_1"
+        }
+      ],
+      "gem_effects": [
+        {
+          "effect_key": "bonus_skill_dmg",
+          "value_type": "percent",
+          "value": 8,
+          "source": "itm_gem_skill_qingqiuyin_blue"
+        }
+      ],
+      "boss_core_effects": [
+        {
+          "effect_key": "bonus_boss_dmg",
+          "value_type": "percent",
+          "value": 12,
+          "source": "core_qingqiu_frost"
+        }
+      ],
+      "blue_affix_effects": [
+        {
+          "effect_key": "bonus_crit_dmg",
+          "value_type": "percent",
+          "value": 6,
+          "source": "affix_crit_dmg_45"
+        }
+      ]
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "bonus_melee_atk": [
+          {
+            "value_type": "percent",
+            "value": 8,
+            "source": "set_zhaoyao_40_2pc"
+          }
+        ],
+        "bonus_skill_dmg": [
+          {
+            "value_type": "percent",
+            "value": 5,
+            "source": "talisman_star_link_6"
+          },
+          {
+            "value_type": "percent",
+            "value": 8,
+            "source": "itm_gem_skill_qingqiuyin_blue"
+          }
+        ],
+        "bonus_hp": [
+          {
+            "value_type": "flat",
+            "value": 120,
+            "source": "tal_common_guard_40_tier_1"
+          }
+        ],
+        "bonus_boss_dmg": [
+          {
+            "value_type": "percent",
+            "value": 12,
+            "source": "core_qingqiu_frost"
+          }
+        ],
+        "bonus_crit_dmg": [
+          {
+            "value_type": "percent",
+            "value": 6,
+            "source": "affix_crit_dmg_45"
+          }
+        ]
+      }
+    }
+  },
+  "equipment_special_effect_aggregator_example": {
+    "input": {
+      "talisman_effects": [
+        {
+          "effect_key": "low_hp_shield",
+          "source": "talisman_jingang_tier_3"
+        }
+      ],
+      "boss_core_effects": [
+        {
+          "effect_key": "boss_hunt_tag",
+          "source": "core_zhaoyao_burst"
+        }
+      ],
+      "set_effects": [],
+      "blue_affix_effects": []
+    },
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": [
+        {
+          "effect_key": "low_hp_shield",
+          "source": "talisman_jingang_tier_3"
+        },
+        {
+          "effect_key": "boss_hunt_tag",
+          "source": "core_zhaoyao_burst"
+        }
+      ]
+    }
+  },
+  "player_equipment_stat_aggregator_example": {
+    "output": {
+      "ok": true,
+      "reason": null,
+      "data": {
+        "base_stats": {
+          "MELEE_ATK": 120,
+          "HP": 850,
+          "DEF": 66
+        },
+        "bonus_stats": {
+          "bonus_melee_atk": [
+            {
+              "value_type": "percent",
+              "value": 8,
+              "source": "set_zhaoyao_40_2pc"
+            }
+          ],
+          "bonus_skill_dmg": [
+            {
+              "value_type": "percent",
+              "value": 5,
+              "source": "talisman_star_link_6"
+            }
+          ]
+        },
+        "special_effects": [
+          {
+            "effect_key": "low_hp_shield",
+            "source": "talisman_jingang_tier_3"
+          }
+        ],
+        "sources": [
+          {
+            "type": "equipment",
+            "source": "eq_inst_set_weapon_40_a001"
+          },
+          {
+            "type": "set_effect",
+            "source": "set_zhaoyao_40_2pc"
+          },
+          {
+            "type": "gem",
+            "source": "itm_gem_attr_chijinshi_white"
+          },
+          {
+            "type": "talisman_star_link",
+            "source": "talisman_star_link_6"
+          }
+        ]
+      }
+    }
+  }
+}
