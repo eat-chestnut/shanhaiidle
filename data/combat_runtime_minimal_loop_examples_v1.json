@@ -1,0 +1,305 @@
+{
+  "version": "v1",
+  "module": "combat_runtime_minimal_loop_examples",
+  "battle_start_payload_example": {
+    "player_snapshot": {
+      "player_id": 10001,
+      "base_stats": {
+        "MELEE_ATK": 120,
+        "HP": 850,
+        "DEF": 66
+      },
+      "bonus_stats": {
+        "bonus_melee_atk": [
+          {
+            "value_type": "percent",
+            "value": 8,
+            "source": "set_zhaoyao_40_2pc"
+          }
+        ],
+        "bonus_boss_dmg": [
+          {
+            "value_type": "percent",
+            "value": 12,
+            "source": "core_qingqiu_frost"
+          }
+        ]
+      },
+      "special_effects": [
+        {
+          "effect_key": "low_hp_shield",
+          "source": "talisman_jingang_tier_3"
+        }
+      ],
+      "equipment_summary": {
+        "set_counts": [
+          {
+            "set_id": "set_zhaoyao_40",
+            "equipped_count": 4
+          }
+        ],
+        "talisman_star_links": [6],
+        "equipped_boss_core_ids": ["core_qingqiu_frost"]
+      },
+      "combat_tags": [
+        "boss_hunt_tag",
+        "frost_build_tag"
+      ]
+    },
+    "enemy_snapshots": [
+      {
+        "monster_id": "mon_qingqiu_guard",
+        "wave_index": 1,
+        "unit_index": 1,
+        "is_boss": false,
+        "base_stats": {
+          "HP": 500,
+          "ATK": 40,
+          "DEF": 12
+        },
+        "skills": [
+          "skill_claw"
+        ],
+        "tags": [
+          "melee",
+          "beast"
+        ]
+      },
+      {
+        "monster_id": "mon_qingqiu_guard",
+        "wave_index": 1,
+        "unit_index": 2,
+        "is_boss": false,
+        "base_stats": {
+          "HP": 500,
+          "ATK": 40,
+          "DEF": 12
+        },
+        "skills": [
+          "skill_claw"
+        ],
+        "tags": [
+          "melee",
+          "beast"
+        ]
+      },
+      {
+        "monster_id": "mon_qingqiu_boss",
+        "wave_index": 2,
+        "unit_index": 1,
+        "is_boss": true,
+        "base_stats": {
+          "HP": 3000,
+          "ATK": 120,
+          "DEF": 50
+        },
+        "skills": [
+          "skill_frost_breath"
+        ],
+        "tags": [
+          "boss",
+          "frost"
+        ]
+      }
+    ],
+    "battle_context": {
+      "battle_type": "main_stage",
+      "stage_id": "stage_nanshan_03",
+      "difficulty_id": "hard",
+      "recommended_power": 3200,
+      "is_boss_battle": false,
+      "scene_id": "scene_nanshan_forest",
+      "settlement_mode": "normal",
+      "version": "v1"
+    },
+    "debug_sources": [
+      {
+        "type": "player_equipment",
+        "source": "player_equipment_instances"
+      },
+      {
+        "type": "set_effect",
+        "source": "equipment_set_effects"
+      },
+      {
+        "type": "monster_config",
+        "source": "stage_monster_list"
+      }
+    ]
+  },
+  "runtime_state_example": {
+    "battle_id": "battle_runtime_001",
+    "status": "running",
+    "tick": 0,
+    "current_wave_index": 1,
+    "player_unit": {
+      "unit_id": "player_10001",
+      "side": "player",
+      "current_hp": 850,
+      "max_hp": 850,
+      "stats": {
+        "MELEE_ATK": 120,
+        "HP": 850,
+        "DEF": 66
+      },
+      "bonus_stats": {
+        "bonus_melee_atk": [
+          {
+            "value_type": "percent",
+            "value": 8,
+            "source": "set_zhaoyao_40_2pc"
+          }
+        ],
+        "bonus_boss_dmg": [
+          {
+            "value_type": "percent",
+            "value": 12,
+            "source": "core_qingqiu_frost"
+          }
+        ]
+      },
+      "special_effects": [
+        {
+          "effect_key": "low_hp_shield",
+          "source": "talisman_jingang_tier_3"
+        }
+      ],
+      "alive": true
+    },
+    "enemy_units": [
+      {
+        "unit_id": "enemy_mon_qingqiu_guard_1_1",
+        "monster_id": "mon_qingqiu_guard",
+        "side": "enemy",
+        "wave_index": 1,
+        "unit_index": 1,
+        "is_boss": false,
+        "current_hp": 500,
+        "max_hp": 500,
+        "stats": {
+          "ATK": 40,
+          "HP": 500,
+          "DEF": 12
+        },
+        "skills": [
+          "skill_claw"
+        ],
+        "tags": [
+          "melee",
+          "beast"
+        ],
+        "alive": true
+      },
+      {
+        "unit_id": "enemy_mon_qingqiu_guard_1_2",
+        "monster_id": "mon_qingqiu_guard",
+        "side": "enemy",
+        "wave_index": 1,
+        "unit_index": 2,
+        "is_boss": false,
+        "current_hp": 500,
+        "max_hp": 500,
+        "stats": {
+          "ATK": 40,
+          "HP": 500,
+          "DEF": 12
+        },
+        "skills": [
+          "skill_claw"
+        ],
+        "tags": [
+          "melee",
+          "beast"
+        ],
+        "alive": true
+      },
+      {
+        "unit_id": "enemy_mon_qingqiu_boss_2_1",
+        "monster_id": "mon_qingqiu_boss",
+        "side": "enemy",
+        "wave_index": 2,
+        "unit_index": 1,
+        "is_boss": true,
+        "current_hp": 3000,
+        "max_hp": 3000,
+        "stats": {
+          "ATK": 120,
+          "HP": 3000,
+          "DEF": 50
+        },
+        "skills": [
+          "skill_frost_breath"
+        ],
+        "tags": [
+          "boss",
+          "frost"
+        ],
+        "alive": true
+      }
+    ],
+    "battle_context": {
+      "battle_type": "main_stage",
+      "stage_id": "stage_nanshan_03",
+      "difficulty_id": "hard",
+      "recommended_power": 3200,
+      "is_boss_battle": false,
+      "scene_id": "scene_nanshan_forest",
+      "settlement_mode": "normal",
+      "version": "v1"
+    },
+    "logs": []
+  },
+  "tick_example": {
+    "before_tick": {
+      "tick": 0,
+      "current_wave_index": 1,
+      "player_current_hp": 850,
+      "enemy_wave_1_alive_count": 2
+    },
+    "after_tick": {
+      "tick": 1,
+      "current_wave_index": 1,
+      "player_current_hp": 838,
+      "enemy_wave_1_alive_count": 2,
+      "logs": [
+        {
+          "tick": 1,
+          "actor": "player_10001",
+          "target": "enemy_mon_qingqiu_guard_1_1",
+          "action": "basic_attack",
+          "damage": 122
+        },
+        {
+          "tick": 1,
+          "actor": "enemy_mon_qingqiu_guard_1_1",
+          "target": "player_10001",
+          "action": "basic_attack",
+          "damage": 1
+        },
+        {
+          "tick": 1,
+          "actor": "enemy_mon_qingqiu_guard_1_2",
+          "target": "player_10001",
+          "action": "basic_attack",
+          "damage": 11
+        }
+      ]
+    }
+  },
+  "battle_result_victory_example": {
+    "battle_result": "victory",
+    "elapsed_ticks": 12,
+    "remaining_player_hp": 320,
+    "remaining_enemy_count": 0,
+    "cleared_wave_count": 2,
+    "logs": []
+  },
+  "battle_result_defeat_example": {
+    "battle_result": "defeat",
+    "elapsed_ticks": 7,
+    "remaining_player_hp": 0,
+    "remaining_enemy_count": 1,
+    "cleared_wave_count": 1,
+    "logs": []
+  }
+}
