@@ -68,6 +68,7 @@ class BattleRuntimeStateBuilder
             'max_hp' => $maxHp,
             'stats' => $stats,
             'bonus_stats' => is_array($playerSnapshot['bonus_stats'] ?? null) ? $playerSnapshot['bonus_stats'] : [],
+            'skills' => is_array($playerSnapshot['skills'] ?? null) ? array_values($playerSnapshot['skills']) : [],
             'special_effects' => is_array($playerSnapshot['special_effects'] ?? null) ? array_values($playerSnapshot['special_effects']) : [],
             'alive' => $maxHp > 0,
         ];
