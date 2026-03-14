@@ -196,7 +196,7 @@
     "input": {
       "instance": {
         "instance_id": "eq_inst_set_weapon_20_a001",
-        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "item_id": "itm_set_zhaoyao_20_main_weapon",
         "set_level": 20,
         "star": 3,
         "max_star": 3
@@ -214,7 +214,7 @@
           "from_set_level": 20,
           "to_set_level": 40,
           "slot_type": "main_weapon",
-          "result_item_id": "itm_set_main_weapon_zhaoyao_40"
+          "result_item_id": "itm_set_zhaoyao_40_main_weapon"
         }
       ]
     },
@@ -224,7 +224,7 @@
       "data": {
         "can_progress": true,
         "next_state": {
-          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "item_id": "itm_set_zhaoyao_40_main_weapon",
           "set_level": 40,
           "star": 3,
           "max_star": 6

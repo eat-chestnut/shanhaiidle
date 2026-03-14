@@ -17,12 +17,12 @@
       "equipment_instances": [
         {
           "instance_id": "eq_inst_set_weapon_40_a001",
-          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "item_id": "itm_set_zhaoyao_40_main_weapon",
           "slot_type": "main_weapon"
         },
         {
           "instance_id": "eq_inst_set_armor_40_a001",
-          "item_id": "itm_set_armor_zhaoyao_40",
+          "item_id": "itm_set_zhaoyao_40_armor",
           "slot_type": "armor"
         },
         {
@@ -33,13 +33,13 @@
       ],
       "base_stat_sources": [
         {
-          "item_id": "itm_set_main_weapon_zhaoyao_40",
+          "item_id": "itm_set_zhaoyao_40_main_weapon",
           "base_stats": [
             { "stat_key": "MELEE_ATK", "value_type": "flat", "value": 60 }
           ]
         },
         {
-          "item_id": "itm_set_armor_zhaoyao_40",
+          "item_id": "itm_set_zhaoyao_40_armor",
           "base_stats": [
             { "stat_key": "HP", "value_type": "flat", "value": 220 },
             { "stat_key": "DEF", "value_type": "flat", "value": 18 }

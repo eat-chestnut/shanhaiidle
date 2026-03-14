@@ -53,7 +53,7 @@ class MountainGodOfferingPage extends Page implements HasForms
                     ->schema([
                         TextInput::make('god_id')->label('山神 ID')->required()->maxLength(64),
                         TextInput::make('name')->label('名称')->required()->maxLength(255),
-                        Select::make('unlock_stage_id')->label('解锁主线').required()->options(AdminOptions::stageOptions())->searchable()->preload(),
+                        Select::make('unlock_stage_id')->label('解锁主线')->required()->options(AdminOptions::stageOptions())->searchable()->preload(),
                         Textarea::make('description')->label('说明')->rows(3)->columnSpanFull(),
                     ])
                     ->columns(3),

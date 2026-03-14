@@ -29,7 +29,7 @@
     },
     "before_instance": {
       "instance_id": "eq_inst_set_weapon_20_a001",
-      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "item_id": "itm_set_zhaoyao_20_main_weapon",
       "set_level": 20,
       "star": 2,
       "max_star": 3
@@ -52,7 +52,7 @@
     },
     "before_instance": {
       "instance_id": "eq_inst_set_weapon_20_a001",
-      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "item_id": "itm_set_zhaoyao_20_main_weapon",
       "set_level": 20,
       "star": 3,
       "max_star": 3
@@ -62,8 +62,8 @@
       "reason": null,
       "data": {
         "instance_id": "eq_inst_set_weapon_20_a001",
-        "old_item_id": "itm_set_main_weapon_zhaoyao_20",
-        "new_item_id": "itm_set_main_weapon_zhaoyao_40",
+        "old_item_id": "itm_set_zhaoyao_20_main_weapon",
+        "new_item_id": "itm_set_zhaoyao_40_main_weapon",
         "old_set_level": 20,
         "new_set_level": 40,
         "star": 3,
@@ -127,7 +127,7 @@
       },
       "before_instance": {
         "instance_id": "eq_inst_set_weapon_20_b001",
-        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "item_id": "itm_set_zhaoyao_20_main_weapon",
         "set_level": 20,
         "star": 2,
         "max_star": 3

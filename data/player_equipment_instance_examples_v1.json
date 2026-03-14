@@ -30,15 +30,15 @@
     {
       "player_id": 10001,
       "instance_id": "eq_inst_set_weapon_20_a001",
-      "item_id": "itm_set_main_weapon_zhaoyao_20",
+      "item_id": "itm_set_zhaoyao_20_main_weapon",
       "equipment_source_type": "set_equipment",
       "slot_type": "main_weapon",
       "set_id": "set_zhaoyao_20",
       "set_level": 20,
       "star": 3,
       "max_star": 3,
-      "quality": "purple",
-      "rarity": "purple",
+      "quality": "blue",
+      "rarity": "blue",
       "is_locked": false,
       "is_equipped": true,
       "obtained_at": "2026-03-14 10:00:00"
@@ -46,7 +46,7 @@
     {
       "player_id": 10001,
       "instance_id": "eq_inst_set_armor_40_a001",
-      "item_id": "itm_set_armor_zhaoyao_40",
+      "item_id": "itm_set_zhaoyao_40_armor",
       "equipment_source_type": "set_equipment",
       "slot_type": "armor",
       "set_id": "set_zhaoyao_40",
@@ -152,14 +152,14 @@
     {
       "before": {
         "instance_id": "eq_inst_set_weapon_20_a001",
-        "item_id": "itm_set_main_weapon_zhaoyao_20",
+        "item_id": "itm_set_zhaoyao_20_main_weapon",
         "set_level": 20,
         "star": 3,
         "max_star": 3
       },
       "after": {
         "instance_id": "eq_inst_set_weapon_20_a001",
-        "item_id": "itm_set_main_weapon_zhaoyao_40",
+        "item_id": "itm_set_zhaoyao_40_main_weapon",
         "set_level": 40,
         "star": 3,
         "max_star": 6

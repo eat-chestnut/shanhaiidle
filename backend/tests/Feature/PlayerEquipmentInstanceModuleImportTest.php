@@ -20,7 +20,6 @@ class PlayerEquipmentInstanceModuleImportTest extends TestCase
     public function test_import_service_uses_json_examples_and_builds_three_instance_tables(): void
     {
         $this->seed([ItemsSeeder::class]);
-        $this->seedMissingSetItemsForExamples();
 
         $result = PlayerEquipmentInstanceImportService::importFromProjectFile();
 
@@ -214,13 +213,6 @@ class PlayerEquipmentInstanceModuleImportTest extends TestCase
             'is_unlocked' => true,
             'gem_item_id' => 'itm_gem_attr_chijinshi_white',
         ]);
-    }
-
-    private function seedMissingSetItemsForExamples(): void
-    {
-        $this->upsertItem('itm_set_main_weapon_zhaoyao_20', '照妖主武器20', 'equipment', 'set_equipment', 'purple');
-        $this->upsertItem('itm_set_armor_zhaoyao_40', '照妖衣甲40', 'equipment', 'set_equipment', 'purple');
-        $this->upsertItem('itm_set_main_weapon_zhaoyao_40', '照妖主武器40', 'equipment', 'set_equipment', 'purple');
     }
 
     private function upsertItem(string $itemId, string $name, string $mainType, string $subType, string $quality): void

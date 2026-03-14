@@ -144,6 +144,15 @@ class AdminOptions
         return \App\Models\ShopGood::BUY_LIMIT_TYPE_OPTIONS;
     }
 
+    public static function shopCurrencyOptions(): array
+    {
+        return [
+            'gold' => '金币',
+            'crystal' => '晶石',
+            'contribution' => '宗门贡献',
+        ];
+    }
+
     public static function milestoneConditionTypeOptions(): array
     {
         return Milestone::CONDITION_TYPE_OPTIONS;
