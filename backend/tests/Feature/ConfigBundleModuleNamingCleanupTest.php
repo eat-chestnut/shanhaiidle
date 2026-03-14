@@ -34,5 +34,9 @@ class ConfigBundleModuleNamingCleanupTest extends TestCase
         $this->assertNotContains('material_dungeons_v1.json', $filenames);
         $this->assertNotContains('blue_gear_templates_v1.json', $filenames);
         $this->assertNotContains('blue_affix_pool_v1.json', $filenames);
+
+        $this->assertFileDoesNotExist(base_path('../data/material_dungeons_v1.json'));
+        $this->assertFileDoesNotExist(base_path('../data/blue_gear_templates_v1.json'));
+        $this->assertFileDoesNotExist(base_path('../data/blue_affix_pool_v1.json'));
     }
 }

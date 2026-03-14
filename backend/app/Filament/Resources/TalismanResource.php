@@ -137,7 +137,7 @@ class TalismanResource extends Resource
                         static::upgradeCostsRepeater(),
                     ]),
                 Section::make('星级连锁')
-                    ->description('护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。每个阶级都应配置 6 / 8 / 9 / 10 星连锁。')
+                    ->description('关键规则：护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。每个阶级都应配置 6 / 8 / 9 / 10 星连锁。')
                     ->schema([
                         static::starLinksRepeater(),
                     ]),
@@ -429,7 +429,7 @@ class TalismanResource extends Resource
                     ->label('要求装备星级')
                     ->options(self::starThresholdOptions())
                     ->required()
-                    ->helperText('护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。'),
+                    ->helperText('关键规则：护符星级连锁所要求的“全身装备达到 X 星”，指所有参与统计的装备位都至少达到该星级。护符位本身不参与该统计。'),
                 Select::make('effect_key')
                     ->label('效果 Key')
                     ->options(Talisman::EFFECT_KEY_OPTIONS)

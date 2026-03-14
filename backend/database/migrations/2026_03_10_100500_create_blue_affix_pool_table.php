@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * @deprecated 历史迁移，仅为兼容旧 BlueAffixPool* 表结构的迁移链路保留。
+ * @deprecated 历史迁移，仅为兼容已淘汰的旧蓝词条表结构保留。
  * 当前正式模块口径为 BlueAffix / BlueAffixSlotRule。
  */
 return new class extends Migration

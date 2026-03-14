@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * @deprecated 历史迁移，仅服务于已淘汰的 BlueGearTemplate* / BlueAffixPool* 旧表结构。
+ * @deprecated 历史迁移，仅服务于已淘汰的旧蓝装模板 / 蓝词条表结构。
  * 当前正式蓝装与蓝词条模块不再使用这些旧表。
  */
 return new class extends Migration
