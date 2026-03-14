@@ -18,6 +18,7 @@ class DamageActionLogger
         bool $isCritical,
         int|float $shieldAbsorbed,
         int|float $hpDamage,
+        array $extraFields = [],
     ): array {
         $safeActorUnitId = trim($actorUnitId);
         $safeTargetUnitId = trim($targetUnitId);
@@ -45,6 +46,15 @@ class DamageActionLogger
             'shield_absorbed' => $this->normalizeNumber(max(0.0, (float) $shieldAbsorbed)),
             'hp_damage' => $this->normalizeNumber(max(0.0, (float) $hpDamage)),
         ];
+
+        foreach ($extraFields as $fieldKey => $fieldValue) {
+            $safeFieldKey = trim((string) $fieldKey);
+            if ($safeFieldKey === '' || array_key_exists($safeFieldKey, $log)) {
+                continue;
+            }
+
+            $log[$safeFieldKey] = $fieldValue;
+        }
 
         $runtimeState['logs'][] = $log;
 

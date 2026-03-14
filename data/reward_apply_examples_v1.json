@@ -1,0 +1,83 @@
+{
+  "version": "v1",
+  "module": "reward_apply_examples",
+  "reward_items_example": [
+    {
+      "item_id": "cur_gold",
+      "count": 500
+    },
+    {
+      "item_id": "mat_star_sand_fragment_low",
+      "count": 8
+    },
+    {
+      "item_id": "core_qingqiu_frost",
+      "count": 1
+    }
+  ],
+  "grant_result_example": {
+    "ok": true,
+    "reason": null,
+    "data": {
+      "battle_id": "battle_runtime_001",
+      "granted": true,
+      "granted_items": [
+        {
+          "item_id": "cur_gold",
+          "count": 500
+        },
+        {
+          "item_id": "mat_star_sand_fragment_low",
+          "count": 8
+        },
+        {
+          "item_id": "core_qingqiu_frost",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "grant_guard_allowed_example": {
+    "ok": true,
+    "reason": null,
+    "data": {
+      "allowed": true
+    }
+  },
+  "grant_guard_rejected_example": {
+    "ok": false,
+    "reason": "reward already granted for battle_id battle_runtime_001",
+    "data": {
+      "allowed": false
+    }
+  },
+  "grant_log_example": [
+    {
+      "player_id": 10001,
+      "battle_id": "battle_runtime_001",
+      "item_id": "cur_gold",
+      "count": 500,
+      "reward_source_type": "battle_settlement",
+      "reward_source_id": "battle_runtime_001",
+      "grant_batch_id": "grant_batch_001"
+    },
+    {
+      "player_id": 10001,
+      "battle_id": "battle_runtime_001",
+      "item_id": "mat_star_sand_fragment_low",
+      "count": 8,
+      "reward_source_type": "main_stage_first_clear",
+      "reward_source_id": "stage_nanshan_03_hard_first_clear",
+      "grant_batch_id": "grant_batch_001"
+    },
+    {
+      "player_id": 10001,
+      "battle_id": "battle_runtime_001",
+      "item_id": "core_qingqiu_frost",
+      "count": 1,
+      "reward_source_type": "monster_drop_config",
+      "reward_source_id": "mon_qingqiu_boss",
+      "grant_batch_id": "grant_batch_001"
+    }
+  ]
+}

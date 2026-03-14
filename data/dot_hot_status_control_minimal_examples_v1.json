@@ -1,0 +1,85 @@
+{
+  "version": "v1",
+  "module": "dot_hot_status_control_minimal_examples",
+  "dot_example": {
+    "effect_key": "burning_dot",
+    "owner_unit_id": "enemy_mon_fire_drake_1_1",
+    "target_unit_id": "player_10001",
+    "effect_type": "dot",
+    "trigger_timing": "per_tick",
+    "duration_ticks": 5,
+    "damage_per_tick": 30,
+    "expected_tick_results": [
+      {"tick": 1, "hp_damage": 30},
+      {"tick": 2, "hp_damage": 30},
+      {"tick": 3, "hp_damage": 30},
+      {"tick": 4, "hp_damage": 30},
+      {"tick": 5, "hp_damage": 30}
+    ]
+  },
+  "hot_example": {
+    "effect_key": "regeneration_hot",
+    "owner_unit_id": "player_10001",
+    "target_unit_id": "player_10001",
+    "effect_type": "hot",
+    "trigger_timing": "per_tick",
+    "duration_ticks": 3,
+    "healing_per_tick": 50,
+    "expected_tick_results": [
+      {"tick": 1, "hp_healed": 50},
+      {"tick": 2, "hp_healed": 50},
+      {"tick": 3, "hp_healed": 50}
+    ]
+  },
+  "status_control_example": {
+    "effect_key": "stun_status",
+    "owner_unit_id": "enemy_mon_ice_witch_2_1",
+    "target_unit_id": "player_10001",
+    "effect_type": "status_control",
+    "trigger_timing": "on_apply",
+    "duration_ticks": 2,
+    "status": "stunned",
+    "expected_tick_results": [
+      {"tick": 1, "status_applied": true},
+      {"tick": 2, "status_active": true},
+      {"tick": 3, "status_active": false}
+    ]
+  },
+  "combined_example": {
+    "effects": [
+      {
+        "effect_key": "poison_dot",
+        "owner_unit_id": "enemy_mon_poison_snake_1_1",
+        "target_unit_id": "player_10001",
+        "effect_type": "dot",
+        "trigger_timing": "per_tick",
+        "duration_ticks": 4,
+        "damage_per_tick": 15
+      },
+      {
+        "effect_key": "regeneration_hot",
+        "owner_unit_id": "player_10001",
+        "target_unit_id": "player_10001",
+        "effect_type": "hot",
+        "trigger_timing": "per_tick",
+        "duration_ticks": 3,
+        "healing_per_tick": 20
+      },
+      {
+        "effect_key": "slow_status",
+        "owner_unit_id": "enemy_mon_ice_witch_2_1",
+        "target_unit_id": "player_10001",
+        "effect_type": "status_control",
+        "trigger_timing": "on_apply",
+        "duration_ticks": 2,
+        "status": "slowed"
+      }
+    ],
+    "expected_runtime_results": [
+      {"tick": 1, "hp_damage": 15, "hp_healed": 20, "status": "slowed"},
+      {"tick": 2, "hp_damage": 15, "hp_healed": 20, "status": "slowed"},
+      {"tick": 3, "hp_damage": 15, "hp_healed": 20, "status": null},
+      {"tick": 4, "hp_damage": 15, "hp_healed": 0, "status": null}
+    ]
+  }
+}

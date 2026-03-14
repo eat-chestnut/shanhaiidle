@@ -9,8 +9,10 @@ class CombatTickRunner
         private readonly SkillRuntimeStateBuilder $skillRuntimeStateBuilder = new SkillRuntimeStateBuilder(),
         private readonly SkillCooldownResolver $skillCooldownResolver = new SkillCooldownResolver(),
         private readonly SkillCastResolver $skillCastResolver = new SkillCastResolver(),
+        private readonly MultiSkillTypeResolver $multiSkillTypeResolver = new MultiSkillTypeResolver(),
         private readonly ExpandedDamageResolver $expandedDamageResolver = new ExpandedDamageResolver(),
         private readonly DamageActionLogger $damageActionLogger = new DamageActionLogger(),
+        private readonly EffectActionLogger $effectActionLogger = new EffectActionLogger(),
     ) {
     }
 
@@ -246,47 +248,35 @@ class CombatTickRunner
         array $castData,
         int $tick,
     ): bool {
-        $targetEnemyIndex = $castData['target_enemy_index'] ?? null;
         $skillState = is_array($castData['skill'] ?? null) ? $castData['skill'] : null;
 
-        if (! is_int($targetEnemyIndex) || ! isset($enemyUnits[$targetEnemyIndex]) || ! is_array($skillState)) {
+        if (! is_array($skillState)) {
             return false;
         }
 
-        $damageResult = $this->expandedDamageResolver->resolveSkillDamage(
+        $resolveResult = $this->multiSkillTypeResolver->resolve(
             $playerUnit,
-            $enemyUnits[$targetEnemyIndex],
+            $enemyUnits,
             $skillState,
-            $this->buildAttackContext($tick, 'skill_cast', (string) ($skillState['skill_id'] ?? ''))
+            $this->buildSkillExecutionContext($tick, $skillState, $castData)
         );
-        if (! ($damageResult['ok'] ?? false)) {
+        if (! ($resolveResult['ok'] ?? false)) {
             return false;
         }
 
-        $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
-        $enemyUnits[$targetEnemyIndex] = $this->applyDamageToTargetUnit(
-            $enemyUnits[$targetEnemyIndex],
-            $damageData
-        );
+        $resolveData = is_array($resolveResult['data'] ?? null) ? $resolveResult['data'] : [];
+        $playerUnit = is_array($resolveData['actor_unit'] ?? null) ? $resolveData['actor_unit'] : $playerUnit;
+        $enemyUnits = is_array($resolveData['target_units'] ?? null) ? $resolveData['target_units'] : $enemyUnits;
 
-        $logResult = $this->damageActionLogger->logDamage(
+        if (! $this->writeSkillExecutionLogs(
             $runtimeState,
             $tick,
             (string) ($playerUnit['unit_id'] ?? 'player'),
-            (string) ($enemyUnits[$targetEnemyIndex]['unit_id'] ?? 'enemy'),
-            'skill_cast',
             (string) ($skillState['skill_id'] ?? ''),
-            (float) ($damageData['raw_damage'] ?? 0),
-            (bool) ($damageData['is_critical'] ?? false),
-            (float) ($damageData['shield_absorbed'] ?? 0),
-            (float) ($damageData['hp_damage'] ?? 0),
-        );
-
-        if (! ($logResult['ok'] ?? false)) {
+            is_array($resolveData['entries'] ?? null) ? $resolveData['entries'] : [],
+        )) {
             return false;
         }
-
-        $runtimeState = $logResult['data']['runtime_state'];
         $playerSkillStates = $this->markSkillAsCast($playerSkillStates, $skillState);
         $playerUnit['skill_states'] = $playerSkillStates;
 
@@ -313,37 +303,32 @@ class CombatTickRunner
             return false;
         }
 
-        $damageResult = $this->expandedDamageResolver->resolveSkillDamage(
+        $resolveResult = $this->multiSkillTypeResolver->resolve(
             $enemyUnit,
-            $playerUnit,
+            [$playerUnit],
             $skillState,
-            $this->buildAttackContext($tick, 'skill_cast', (string) ($skillState['skill_id'] ?? ''))
+            $this->buildSkillExecutionContext($tick, $skillState, ['target_enemy_index' => 0, 'target_enemy_indexes' => [0]])
         );
-        if (! ($damageResult['ok'] ?? false)) {
+        if (! ($resolveResult['ok'] ?? false)) {
             return false;
         }
 
-        $damageData = is_array($damageResult['data'] ?? null) ? $damageResult['data'] : [];
-        $playerUnit = $this->applyDamageToTargetUnit($playerUnit, $damageData);
+        $resolveData = is_array($resolveResult['data'] ?? null) ? $resolveResult['data'] : [];
+        $enemyUnit = is_array($resolveData['actor_unit'] ?? null) ? $resolveData['actor_unit'] : $enemyUnit;
+        $playerTargets = is_array($resolveData['target_units'] ?? null) ? $resolveData['target_units'] : [];
+        if (is_array($playerTargets[0] ?? null)) {
+            $playerUnit = $playerTargets[0];
+        }
 
-        $logResult = $this->damageActionLogger->logDamage(
+        if (! $this->writeSkillExecutionLogs(
             $runtimeState,
             $tick,
             (string) ($enemyUnit['unit_id'] ?? 'enemy'),
-            (string) ($playerUnit['unit_id'] ?? 'player'),
-            'skill_cast',
             (string) ($skillState['skill_id'] ?? ''),
-            (float) ($damageData['raw_damage'] ?? 0),
-            (bool) ($damageData['is_critical'] ?? false),
-            (float) ($damageData['shield_absorbed'] ?? 0),
-            (float) ($damageData['hp_damage'] ?? 0),
-        );
-
-        if (! ($logResult['ok'] ?? false)) {
+            is_array($resolveData['entries'] ?? null) ? $resolveData['entries'] : [],
+        )) {
             return false;
         }
-
-        $runtimeState = $logResult['data']['runtime_state'];
         $enemySkillStates = $this->markSkillAsCast($enemySkillStates, $skillState);
         $enemyUnit['skill_states'] = $enemySkillStates;
 
@@ -677,6 +662,98 @@ class CombatTickRunner
         }
 
         return $attackContext;
+    }
+
+    /**
+     * @param  array<string, mixed>  $skillState
+     * @param  array<string, mixed>  $castData
+     * @return array<string, mixed>
+     */
+    private function buildSkillExecutionContext(int $tick, array $skillState, array $castData): array
+    {
+        $context = $this->buildAttackContext($tick, 'skill_cast', (string) ($skillState['skill_id'] ?? ''));
+        $context['primary_target_index'] = is_numeric($castData['target_enemy_index'] ?? null)
+            ? (int) $castData['target_enemy_index']
+            : null;
+        $context['target_indexes'] = $this->normalizeTargetIndexes($castData['target_enemy_indexes'] ?? []);
+
+        return $context;
+    }
+
+    /**
+     * @param  mixed  $targetIndexes
+     * @return array<int, int>
+     */
+    private function normalizeTargetIndexes(mixed $targetIndexes): array
+    {
+        $normalized = [];
+
+        foreach (is_array($targetIndexes) ? $targetIndexes : [] as $targetIndex) {
+            if (! is_numeric($targetIndex)) {
+                continue;
+            }
+
+            $normalized[] = (int) $targetIndex;
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    /**
+     * @param  array<string, mixed>  $runtimeState
+     * @param  array<int, array<string, mixed>>  $entries
+     */
+    private function writeSkillExecutionLogs(
+        array &$runtimeState,
+        int $tick,
+        string $actorUnitId,
+        string $skillId,
+        array $entries,
+    ): bool {
+        foreach ($entries as $entry) {
+            if (! is_array($entry)) {
+                continue;
+            }
+
+            $logAction = trim((string) ($entry['log_action'] ?? 'skill_cast'));
+            if ($logAction === 'effect_apply') {
+                $logResult = $this->effectActionLogger->logEffectApply(
+                    $runtimeState,
+                    $tick,
+                    $actorUnitId,
+                    trim((string) ($entry['effect_key'] ?? '')),
+                    $entry['effect_value'] ?? null,
+                    trim((string) ($entry['source'] ?? $skillId))
+                );
+            } else {
+                $extraFields = [];
+                if (array_key_exists('hit_index', $entry)) {
+                    $extraFields['hit_index'] = max(1, (int) $entry['hit_index']);
+                }
+
+                $logResult = $this->damageActionLogger->logDamage(
+                    $runtimeState,
+                    $tick,
+                    $actorUnitId,
+                    trim((string) ($entry['target_unit_id'] ?? '')),
+                    'skill_cast',
+                    $skillId,
+                    (float) ($entry['raw_damage'] ?? 0),
+                    (bool) ($entry['is_critical'] ?? false),
+                    (float) ($entry['shield_absorbed'] ?? 0),
+                    (float) ($entry['hp_damage'] ?? 0),
+                    $extraFields,
+                );
+            }
+
+            if (! ($logResult['ok'] ?? false)) {
+                return false;
+            }
+
+            $runtimeState = $logResult['data']['runtime_state'];
+        }
+
+        return true;
     }
 
     private function normalizeNumber(float $value): int|float

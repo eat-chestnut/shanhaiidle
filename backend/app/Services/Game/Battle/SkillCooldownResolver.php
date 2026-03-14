@@ -4,6 +4,14 @@ namespace App\Services\Game\Battle;
 
 class SkillCooldownResolver
 {
+    private const CASTABLE_SKILL_TYPES = [
+        'single_damage',
+        'multi_hit',
+        'aoe',
+        'self_buff',
+        'shield',
+    ];
+
     /**
      * @param  array<string, mixed>  $skillState
      */
@@ -30,7 +38,7 @@ class SkillCooldownResolver
         return $this->success([
             'can_cast' => $enabled
                 && $autoCast
-                && $skillType === 'single_damage'
+                && in_array($skillType, self::CASTABLE_SKILL_TYPES, true)
                 && $cooldownRemaining === 0,
         ]);
     }

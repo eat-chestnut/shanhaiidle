@@ -1,0 +1,123 @@
+{
+  "version": "v1",
+  "module": "multi_skill_types_examples",
+  "multi_hit_example": {
+    "skill_id": "skill_double_slash",
+    "multi_hit_count": 2,
+    "attacker_unit": {
+      "unit_id": "player_10001",
+      "MELEE_ATK": 120,
+      "current_hp": 850
+    },
+    "target_unit": {
+      "unit_id": "enemy_mon_qingqiu_guard_1_1",
+      "DEF": 12,
+      "shield": 0,
+      "current_hp": 175
+    },
+    "skill_state": {
+      "skill_id": "skill_double_slash",
+      "skill_type": "multi_hit",
+      "multi_hit_count": 2,
+      "hit_damage_ratios": [0.85, 0.808333333],
+      "cooldown_total": 3,
+      "cooldown_remaining": 0,
+      "auto_cast": true,
+      "enabled": true
+    },
+    "expected_logs": [
+      {
+        "hit_index": 1,
+        "raw_damage": 90,
+        "hp_damage": 90,
+        "shield_absorbed": 0,
+        "is_critical": false
+      },
+      {
+        "hit_index": 2,
+        "raw_damage": 85,
+        "hp_damage": 85,
+        "shield_absorbed": 0,
+        "is_critical": false
+      }
+    ]
+  },
+  "aoe_example": {
+    "skill_id": "skill_fire_blast",
+    "attacker_unit": {
+      "unit_id": "player_10001",
+      "MELEE_ATK": 120,
+      "current_hp": 850
+    },
+    "skill_state": {
+      "skill_id": "skill_fire_blast",
+      "skill_type": "aoe",
+      "damage_ratio": 0.725,
+      "cooldown_total": 3,
+      "cooldown_remaining": 0,
+      "auto_cast": true,
+      "enabled": true
+    },
+    "enemy_wave_units": [
+      {"unit_id": "enemy_1", "DEF": 12, "shield": 0, "current_hp": 75},
+      {"unit_id": "enemy_2", "DEF": 15, "shield": 0, "current_hp": 72}
+    ],
+    "expected_logs": [
+      {
+        "target": "enemy_1",
+        "raw_damage": 75,
+        "hp_damage": 75,
+        "shield_absorbed": 0,
+        "is_critical": false
+      },
+      {
+        "target": "enemy_2",
+        "raw_damage": 72,
+        "hp_damage": 72,
+        "shield_absorbed": 0,
+        "is_critical": false
+      }
+    ]
+  },
+  "self_buff_example": {
+    "skill_id": "skill_atk_boost",
+    "attacker_unit": {"unit_id": "player_10001"},
+    "runtime_modifiers_before": {"bonus_atk_percent": 0},
+    "skill_state": {
+      "skill_id": "skill_atk_boost",
+      "skill_type": "self_buff",
+      "modifier_key": "bonus_atk_percent",
+      "modifier_value": 20,
+      "cooldown_total": 4,
+      "cooldown_remaining": 0,
+      "auto_cast": true,
+      "enabled": true
+    },
+    "expected_runtime_modifiers_after": {"bonus_atk_percent": 20},
+    "expected_result": {
+      "raw_damage": 0,
+      "hp_damage": 0,
+      "shield_absorbed": 0
+    }
+  },
+  "shield_example": {
+    "skill_id": "skill_guard_up",
+    "attacker_unit": {"unit_id": "player_10001"},
+    "shield_before": 0,
+    "skill_state": {
+      "skill_id": "skill_guard_up",
+      "skill_type": "shield",
+      "shield_value": 150,
+      "cooldown_total": 4,
+      "cooldown_remaining": 0,
+      "auto_cast": true,
+      "enabled": true
+    },
+    "expected_shield_after": 150,
+    "expected_result": {
+      "raw_damage": 0,
+      "hp_damage": 0,
+      "shield_absorbed": 0
+    }
+  }
+}

@@ -57,4 +57,23 @@ class SkillCooldownResolverTest extends TestCase
         $this->assertTrue($result['ok']);
         $this->assertTrue($result['data']['can_cast']);
     }
+
+    public function test_multi_skill_types_are_castable_when_cooldown_is_zero(): void
+    {
+        $resolver = app(SkillCooldownResolver::class);
+
+        foreach (['multi_hit', 'aoe', 'self_buff', 'shield'] as $skillType) {
+            $result = $resolver->canCast([
+                'skill_id' => 'skill_'.$skillType,
+                'skill_type' => $skillType,
+                'cooldown_total' => 3,
+                'cooldown_remaining' => 0,
+                'auto_cast' => true,
+                'enabled' => true,
+            ]);
+
+            $this->assertTrue($result['ok']);
+            $this->assertTrue($result['data']['can_cast']);
+        }
+    }
 }

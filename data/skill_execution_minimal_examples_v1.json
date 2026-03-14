@@ -1,0 +1,85 @@
+{
+  "version": "v1",
+  "module": "skill_execution_minimal_examples",
+  "skill_runtime_state_example": {
+    "unit_id": "player_10001",
+    "skills": [
+      {
+        "skill_id": "skill_slash",
+        "owner_unit_id": "player_10001",
+        "skill_type": "single_damage",
+        "damage_ratio": 1.5,
+        "cooldown_total": 3,
+        "cooldown_remaining": 0,
+        "auto_cast": true,
+        "enabled": true
+      }
+    ]
+  },
+  "player_skill_damage_example": {
+    "player_unit": {
+      "unit_id": "player_10001",
+      "stats": {
+        "MELEE_ATK": 120
+      },
+      "bonus_stats": {
+        "bonus_skill_dmg": [
+          {
+            "value_type": "percent",
+            "value": 10,
+            "source": "talisman_star_link_6"
+          }
+        ]
+      }
+    },
+    "enemy_unit": {
+      "unit_id": "enemy_mon_qingqiu_guard_1_1",
+      "stats": {
+        "DEF": 12
+      },
+      "is_boss": false
+    },
+    "skill_state": {
+      "skill_id": "skill_slash",
+      "skill_type": "single_damage",
+      "damage_ratio": 1.5
+    },
+    "expected_damage": 186
+  },
+  "enemy_skill_damage_example": {
+    "enemy_unit": {
+      "unit_id": "enemy_mon_qingqiu_boss_2_1",
+      "stats": {
+        "ATK": 120
+      }
+    },
+    "player_unit": {
+      "unit_id": "player_10001",
+      "stats": {
+        "DEF": 66
+      }
+    },
+    "skill_state": {
+      "skill_id": "skill_frost_breath",
+      "skill_type": "single_damage",
+      "damage_ratio": 1.2
+    },
+    "expected_damage": 78
+  },
+  "skill_cast_log_example": {
+    "tick": 3,
+    "actor": "player_10001",
+    "target": "enemy_mon_qingqiu_guard_1_1",
+    "action": "skill_cast",
+    "skill_id": "skill_slash",
+    "damage": 186
+  },
+  "tick_priority_example": {
+    "player_can_cast_skill": true,
+    "expected_action": "skill_cast"
+  },
+  "tick_fallback_example": {
+    "player_can_cast_skill": false,
+    "expected_action": "basic_attack"
+  }
+}

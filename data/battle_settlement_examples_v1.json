@@ -1,0 +1,114 @@
+{
+  "version": "v1",
+  "module": "battle_settlement_examples",
+  "battle_result_record_example": {
+    "battle_id": "battle_runtime_001",
+    "player_id": 10001,
+    "battle_type": "main_stage",
+    "stage_id": "stage_nanshan_03",
+    "difficulty_id": "hard",
+    "battle_result": "victory",
+    "elapsed_ticks": 12,
+    "remaining_player_hp": 320,
+    "remaining_enemy_count": 0,
+    "cleared_wave_count": 2,
+    "is_settled": false
+  },
+  "main_stage_first_clear_reward_example": {
+    "reward_items": [
+      {
+        "item_id": "cur_gold",
+        "count": 500
+      },
+      {
+        "item_id": "mat_star_sand_fragment_low",
+        "count": 8
+      }
+    ],
+    "first_clear_granted": true,
+    "next_unlocks": [
+      {
+        "type": "main_stage",
+        "id": "stage_nanshan_04"
+      }
+    ],
+    "debug_reward_sources": [
+      {
+        "type": "main_stage_first_clear",
+        "source": "stage_nanshan_03_hard_first_clear"
+      }
+    ]
+  },
+  "main_stage_non_first_clear_reward_example": {
+    "reward_items": [],
+    "first_clear_granted": false,
+    "next_unlocks": [],
+    "debug_reward_sources": []
+  },
+  "boss_drop_from_monster_config_example": {
+    "reward_items": [
+      {
+        "item_id": "mat_boss_mark_qingqiu",
+        "count": 1
+      },
+      {
+        "item_id": "core_qingqiu_frost",
+        "count": 1
+      }
+    ],
+    "first_clear_granted": false,
+    "next_unlocks": [],
+    "debug_reward_sources": [
+      {
+        "type": "monster_drop_config",
+        "source": "mon_qingqiu_boss"
+      }
+    ]
+  },
+  "daily_dungeon_no_base_reward_example": {
+    "reward_items": [],
+    "first_clear_granted": false,
+    "next_unlocks": [],
+    "debug_reward_sources": []
+  },
+  "settlement_payload_example": {
+    "battle_result": "victory",
+    "reward_items": [
+      {
+        "item_id": "cur_gold",
+        "count": 500
+      },
+      {
+        "item_id": "mat_star_sand_fragment_low",
+        "count": 8
+      }
+    ],
+    "first_clear_granted": true,
+    "next_unlocks": [
+      {
+        "type": "main_stage",
+        "id": "stage_nanshan_04"
+      }
+    ],
+    "debug_reward_sources": [
+      {
+        "type": "main_stage_first_clear",
+        "source": "stage_nanshan_03_hard_first_clear"
+      }
+    ]
+  },
+  "guard_allowed_example": {
+    "ok": true,
+    "reason": null,
+    "data": {
+      "allowed": true
+    }
+  },
+  "guard_rejected_example": {
+    "ok": false,
+    "reason": "battle already settled",
+    "data": {
+      "allowed": false
+    }
+  }
+}

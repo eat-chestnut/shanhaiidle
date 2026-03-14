@@ -11,11 +11,11 @@ config_version=5
 [application]
 
 config/name="山海巡厄录"
-config/client_api_header_name="X-Client-Token"
-config/client_api_token="dev-client-token"
 run/main_scene="res://ui/pages/PageMap.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
+config/client_api_header_name="X-Client-Token"
+config/client_api_token="dev-client-token"
 
 [autoload]
 

@@ -116,7 +116,7 @@ class ExpandedDamageResolver
      */
     private function resolveAttackStat(array $attackerUnit): float
     {
-        $stats = is_array($attackerUnit['stats'] ?? null) ? $attackerUnit['stats'] : [];
+        $stats = is_array($attackerUnit['stats'] ?? null) ? $attackerUnit['stats'] : $attackerUnit;
 
         if (array_key_exists('MELEE_ATK', $stats)) {
             return max(0.0, (float) $stats['MELEE_ATK']);
@@ -124,6 +124,10 @@ class ExpandedDamageResolver
 
         if (array_key_exists('ATK', $stats)) {
             return max(0.0, (float) $stats['ATK']);
+        }
+
+        if (array_key_exists('RANGED_ATK', $stats)) {
+            return max(0.0, (float) $stats['RANGED_ATK']);
         }
 
         return 0.0;
@@ -134,7 +138,7 @@ class ExpandedDamageResolver
      */
     private function resolveTargetDef(array $targetUnit): float
     {
-        $stats = is_array($targetUnit['stats'] ?? null) ? $targetUnit['stats'] : [];
+        $stats = is_array($targetUnit['stats'] ?? null) ? $targetUnit['stats'] : $targetUnit;
 
         return max(0.0, (float) ($stats['DEF'] ?? 0));
     }
